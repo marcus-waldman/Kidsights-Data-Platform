@@ -47,3 +47,44 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# === Kidsights Security & Data Protection ===
+
+# API Keys and Credentials - NEVER COMMIT THESE!
+*.csv
+my-APIs/
+*api*.csv
+*token*.txt
+*credential*.json
+.env
+.env.local
+
+# Database files - protect participant data
+*.db
+*.duckdb
+*.sqlite
+*.sqlite3
+
+# OneDrive and cloud storage paths
+OneDrive*/
+*OneDrive*/
+
+# Logs that may contain sensitive data
+logs/
+*.log
+
+# Cache and temporary files
+cache/
+tmp/
+temp/
+.cache/
+
+# Data files - protect participant data
+data/
+*.rds
+*.parquet
+
+# Personal configuration files
+config/personal/
+*personal*.yaml
+*local*.yaml

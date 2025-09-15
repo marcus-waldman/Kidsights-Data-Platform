@@ -1,0 +1,432 @@
+{
+  "mapping_metadata": {
+    "source": "NE25 REDCap Study",
+    "target": "Kidsights Core Harmonized Schema",
+    "version": "1.0.0",
+    "created_date": "2024-01-01",
+    "description": "Field mapping from NE25 survey variables to harmonized core data model",
+    "mapping_type": "field_level",
+    "notes": "Based on original dashboard recoding logic from utils-etl.R"
+  },
+
+  "identifier_mappings": {
+    "record_id": {
+      "target_field": "record_id",
+      "data_type": "integer",
+      "description": "REDCap record identifier",
+      "transformation": "direct"
+    },
+    "pid": {
+      "target_field": "participant_id",
+      "data_type": "string",
+      "description": "Project participant identifier",
+      "transformation": "direct"
+    },
+    "redcap_event_name": {
+      "target_field": "survey_event",
+      "data_type": "string",
+      "description": "REDCap event name for longitudinal tracking",
+      "transformation": "direct"
+    }
+  },
+
+  "demographic_mappings": {
+    "child_dob": {
+      "target_field": "child_date_of_birth",
+      "data_type": "date",
+      "description": "Child's date of birth",
+      "transformation": "direct",
+      "validation": "must_be_valid_date"
+    },
+    "age_in_days": {
+      "target_field": "child_age_days",
+      "data_type": "integer",
+      "description": "Child's age in days",
+      "transformation": "direct",
+      "validation": "must_be_positive_integer"
+    },
+    "sq001": {
+      "target_field": "zip_code",
+      "data_type": "string",
+      "description": "Residential ZIP code",
+      "transformation": "clean_zip_code",
+      "validation": "nebraska_zip_code"
+    },
+    "fq001": {
+      "target_field": "county_code",
+      "data_type": "integer",
+      "description": "County code from REDCap",
+      "transformation": "direct",
+      "lookup_table": "redcap_county_labels"
+    },
+    "eqstate": {
+      "target_field": "state_residence",
+      "data_type": "integer",
+      "description": "State of residence (1=Nebraska)",
+      "transformation": "direct"
+    }
+  },
+
+  "race_ethnicity_mappings": {
+    "cqr010_1___1": {
+      "target_field": "child_race_white",
+      "data_type": "boolean",
+      "description": "Child race: White",
+      "transformation": "checkbox_to_boolean"
+    },
+    "cqr010_2___1": {
+      "target_field": "child_race_black",
+      "data_type": "boolean",
+      "description": "Child race: Black or African American",
+      "transformation": "checkbox_to_boolean"
+    },
+    "cqr010_3___1": {
+      "target_field": "child_race_asian_indian",
+      "data_type": "boolean",
+      "description": "Child race: Asian Indian",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_4___1": {
+      "target_field": "child_race_chinese",
+      "data_type": "boolean",
+      "description": "Child race: Chinese",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_5___1": {
+      "target_field": "child_race_filipino",
+      "data_type": "boolean",
+      "description": "Child race: Filipino",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_6___1": {
+      "target_field": "child_race_japanese",
+      "data_type": "boolean",
+      "description": "Child race: Japanese",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_7___1": {
+      "target_field": "child_race_korean",
+      "data_type": "boolean",
+      "description": "Child race: Korean",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_8___1": {
+      "target_field": "child_race_vietnamese",
+      "data_type": "boolean",
+      "description": "Child race: Vietnamese",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_9___1": {
+      "target_field": "child_race_native_hawaiian",
+      "data_type": "boolean",
+      "description": "Child race: Native Hawaiian",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_10___1": {
+      "target_field": "child_race_guamanian",
+      "data_type": "boolean",
+      "description": "Child race: Guamanian or Chamorro",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_11___1": {
+      "target_field": "child_race_samoan",
+      "data_type": "boolean",
+      "description": "Child race: Samoan",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_12___1": {
+      "target_field": "child_race_other_pacific_islander",
+      "data_type": "boolean",
+      "description": "Child race: Other Pacific Islander",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_asian_pacific_islander"
+    },
+    "cqr010_13___1": {
+      "target_field": "child_race_american_indian",
+      "data_type": "boolean",
+      "description": "Child race: American Indian or Alaska Native",
+      "transformation": "checkbox_to_boolean"
+    },
+    "cqr010_14___1": {
+      "target_field": "child_race_middle_eastern",
+      "data_type": "boolean",
+      "description": "Child race: Middle Eastern",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_some_other"
+    },
+    "cqr010_15___1": {
+      "target_field": "child_race_some_other",
+      "data_type": "boolean",
+      "description": "Child race: Some other race",
+      "transformation": "checkbox_to_boolean",
+      "harmonize_to": "child_race_some_other"
+    },
+    "cqr011": {
+      "target_field": "child_hispanic_latino",
+      "data_type": "integer",
+      "description": "Child Hispanic/Latino ethnicity (1=Yes, 0=No)",
+      "transformation": "direct",
+      "value_mapping": {
+        "1": "Hispanic",
+        "0": "non-Hispanic"
+      }
+    }
+  },
+
+  "caregiver_race_ethnicity_mappings": {
+    "sq002_1___1": {
+      "target_field": "caregiver_race_white",
+      "data_type": "boolean",
+      "description": "Caregiver race: White",
+      "transformation": "checkbox_to_boolean"
+    },
+    "sq002_2___1": {
+      "target_field": "caregiver_race_black",
+      "data_type": "boolean",
+      "description": "Caregiver race: Black or African American",
+      "transformation": "checkbox_to_boolean"
+    },
+    "sq003": {
+      "target_field": "caregiver_hispanic_latino",
+      "data_type": "integer",
+      "description": "Caregiver Hispanic/Latino ethnicity (1=Yes, 0=No)",
+      "transformation": "direct",
+      "value_mapping": {
+        "1": "Hispanic",
+        "0": "non-Hispanic"
+      }
+    }
+  },
+
+  "eligibility_mappings": {
+    "eq001": {
+      "target_field": "informed_consent",
+      "data_type": "integer",
+      "description": "Informed consent provided (1=Yes, 0=No)",
+      "transformation": "direct"
+    },
+    "eq002": {
+      "target_field": "primary_caregiver",
+      "data_type": "integer",
+      "description": "Is primary caregiver (1=Yes, 0=No)",
+      "transformation": "direct"
+    },
+    "eq003": {
+      "target_field": "caregiver_age_19_plus",
+      "data_type": "integer",
+      "description": "Caregiver age 19+ years (1=Yes, 0=No)",
+      "transformation": "direct"
+    },
+    "date_complete_check": {
+      "target_field": "birthday_confirmed",
+      "data_type": "integer",
+      "description": "Child birthday confirmed (1=Yes, 0=No)",
+      "transformation": "direct"
+    }
+  },
+
+  "compensation_mappings": {
+    "state_law_requires_that_kidsights_data_collect_my_name___1": {
+      "target_field": "comp_name_acknowledgment",
+      "data_type": "integer",
+      "description": "Acknowledged name collection requirement",
+      "transformation": "direct"
+    },
+    "financial_compensation_be_sent_to_a_nebraska_residential_address___1": {
+      "target_field": "comp_address_acknowledgment",
+      "data_type": "integer",
+      "description": "Acknowledged Nebraska address requirement",
+      "transformation": "direct"
+    },
+    "state_law_prohibits_sending_compensation_electronically___1": {
+      "target_field": "comp_electronic_acknowledgment",
+      "data_type": "integer",
+      "description": "Acknowledged electronic prohibition",
+      "transformation": "direct"
+    },
+    "kidsights_data_reviews_all_responses_for_quality___1": {
+      "target_field": "comp_quality_acknowledgment",
+      "data_type": "integer",
+      "description": "Acknowledged quality review",
+      "transformation": "direct"
+    }
+  },
+
+  "reverse_coded_mappings": {
+    "nom054x": {
+      "target_field": "maternal_factor_1_rev",
+      "data_type": "integer",
+      "description": "Maternal factor (reverse coded)",
+      "transformation": "reverse_code_4_point",
+      "formula": "abs(value - 4)"
+    },
+    "nom052y": {
+      "target_field": "maternal_factor_2_rev",
+      "data_type": "integer",
+      "description": "Maternal factor (reverse coded)",
+      "transformation": "reverse_code_4_point",
+      "formula": "abs(value - 4)"
+    },
+    "nom056x": {
+      "target_field": "maternal_factor_3_rev",
+      "data_type": "integer",
+      "description": "Maternal factor (reverse coded)",
+      "transformation": "reverse_code_4_point",
+      "formula": "abs(value - 4)"
+    }
+  },
+
+  "mailing_address_mappings": {
+    "q1394": {
+      "target_field": "mailing_address_line1",
+      "data_type": "string",
+      "description": "Mailing address line 1",
+      "transformation": "direct"
+    },
+    "q1395": {
+      "target_field": "mailing_address_line2",
+      "data_type": "string",
+      "description": "Mailing address line 2",
+      "transformation": "direct"
+    },
+    "q1396": {
+      "target_field": "mailing_city",
+      "data_type": "string",
+      "description": "Mailing address city",
+      "transformation": "direct"
+    },
+    "q1397": {
+      "target_field": "mailing_state",
+      "data_type": "string",
+      "description": "Mailing address state",
+      "transformation": "direct"
+    },
+    "q1398": {
+      "target_field": "mailing_zip_code",
+      "data_type": "string",
+      "description": "Mailing address ZIP code",
+      "transformation": "clean_zip_code"
+    }
+  },
+
+  "missing_value_mappings": {
+    "dont_know_codes": [9, "9", "Don't know"],
+    "missing_codes": ["", "NA", null],
+    "transformation": "convert_to_null"
+  },
+
+  "harmonization_rules": {
+    "race_ethnicity_consolidation": {
+      "asian_pacific_islander_sources": [
+        "child_race_asian_indian", "child_race_chinese", "child_race_filipino",
+        "child_race_japanese", "child_race_korean", "child_race_vietnamese",
+        "child_race_native_hawaiian", "child_race_guamanian", "child_race_samoan",
+        "child_race_other_pacific_islander"
+      ],
+      "some_other_race_sources": [
+        "child_race_middle_eastern", "child_race_some_other"
+      ]
+    },
+    "combined_race_ethnicity": {
+      "formula": "IF hispanic_latino = 'Hispanic' THEN 'Hispanic' ELSE CONCAT(race, ', non-Hispanic')",
+      "reference_category": "White, non-Hispanic"
+    },
+    "two_or_more_races": {
+      "condition": "COUNT(selected_races) > 1",
+      "result_value": "Two or More"
+    }
+  },
+
+  "derived_variables": {
+    "child_age_years": {
+      "formula": "child_age_days / 365.25",
+      "data_type": "numeric",
+      "description": "Child age in years"
+    },
+    "child_age_group": {
+      "formula": "CASE WHEN child_age_days <= 365 THEN '0-1 years' WHEN child_age_days <= 730 THEN '1-2 years' WHEN child_age_days <= 1095 THEN '2-3 years' WHEN child_age_days <= 1460 THEN '3-4 years' WHEN child_age_days <= 1825 THEN '4-5 years' WHEN child_age_days <= 2191 THEN '5-6 years' ELSE '>6 years' END",
+      "data_type": "factor",
+      "description": "Child age groups"
+    },
+    "eligible": {
+      "formula": "eligibility_category = 'Pass'",
+      "data_type": "boolean",
+      "description": "Meets eligibility criteria"
+    },
+    "authentic": {
+      "formula": "authenticity_category = 'Pass'",
+      "data_type": "boolean",
+      "description": "Passes authenticity checks"
+    },
+    "include": {
+      "formula": "eligible AND authentic",
+      "data_type": "boolean",
+      "description": "Eligible and authentic for inclusion"
+    }
+  },
+
+  "validation_rules": {
+    "child_age_days": {
+      "min_value": 0,
+      "max_value": 2191,
+      "description": "Child must be 6 years or younger"
+    },
+    "zip_code": {
+      "pattern": "^(680|681|683|684|685|686|687|688|689|690|691|692|693)\\d{2}$",
+      "description": "Must be valid Nebraska ZIP code"
+    },
+    "record_id": {
+      "required": true,
+      "unique": true,
+      "description": "Record ID must be present and unique"
+    },
+    "participant_id": {
+      "required": true,
+      "description": "Participant ID must be present"
+    }
+  },
+
+  "census_harmonization": {
+    "acs_variable_mappings": {
+      "race_ethnicity": {
+        "source": "raceG",
+        "acs_categories": {
+          "White, non-Hispanic": "white_alone_not_hispanic",
+          "Hispanic": "hispanic_or_latino_any_race",
+          "Black or African American, non-Hispanic": "black_alone_not_hispanic",
+          "Asian or Pacific Islander, non-Hispanic": "asian_alone_not_hispanic",
+          "American Indian or Alaska Native, non-Hispanic": "american_indian_alaska_native_alone_not_hispanic",
+          "Two or More, non-Hispanic": "two_or_more_races_not_hispanic"
+        }
+      },
+      "mom_education_4cat": {
+        "source": "educ4_mom",
+        "acs_categories": {
+          "Less than HS": "less_than_high_school",
+          "HS/GED": "high_school_graduate",
+          "Some college": "some_college_or_associates",
+          "Bachelor+": "bachelors_degree_or_higher"
+        }
+      },
+      "federal_poverty_level": {
+        "source": "fplcat",
+        "acs_categories": {
+          "<100%": "below_100_percent_fpl",
+          "100-199%": "100_to_199_percent_fpl",
+          "200-299%": "200_to_299_percent_fpl",
+          "300-399%": "300_to_399_percent_fpl",
+          "400%+": "400_percent_fpl_and_above"
+        }
+      }
+    }
+  }
+}

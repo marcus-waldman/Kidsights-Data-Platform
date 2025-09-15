@@ -1,0 +1,266 @@
+# NE25 (Nebraska 2025) Study Configuration
+# REDCap data source configuration for Kidsights longitudinal study
+
+# REDCap connection settings
+redcap:
+  url: "https://unmcredcap.unmc.edu/redcap/api/"
+  # API credentials file location (NOT committed to git)
+  api_credentials_file: "C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv"
+  # Project configurations - tokens loaded from environment variables
+  projects:
+    - name: "kidsights_data_survey"
+      pid: 7679
+      token_env: "KIDSIGHTS_API_TOKEN_7679"
+      description: "Kidsights Data Survey"
+    - name: "kidsights_email_registration"
+      pid: 7943
+      token_env: "KIDSIGHTS_API_TOKEN_7943"
+      description: "Kidsights Data Survey- Email Registration"
+    - name: "kidsights_public"
+      pid: 7999
+      token_env: "KIDSIGHTS_API_TOKEN_7999"
+      description: "Kidsights Data Survey_Public"
+    - name: "kidsights_public_birth"
+      pid: 8014
+      token_env: "KIDSIGHTS_API_TOKEN_8014"
+      description: "Kidsights Data Survey Public Birth"
+
+  timeout: 300  # seconds
+  rate_limit:
+    max_requests_per_hour: 1000
+    retry_attempts: 3
+    retry_delay: 5  # seconds
+
+# Survey forms/instruments to extract
+survey_modules:
+  core_modules:
+    - "demographics"           # eq* variables
+    - "child_demographics"     # cq* variables
+    - "screening_questions"    # sq* variables
+    - "household_information"  # fq* variables
+    - "mailing_address"       # q1394-q1398 variables
+
+  assessment_modules:
+    - "child_development"     # KMT assessments
+    - "caregiver_wellbeing"   # Mental health, ACEs
+    - "childcare_experiences" # Childcare access, costs, barriers
+    - "maternal_factors"      # nom* variables (reverse coded items)
+
+# NE25-specific field configuration
+fields:
+  # Core identifiers
+  identifiers:
+    - "record_id"
+    - "pid"
+    - "redcap_event_name"
+    - "redcap_survey_identifier"
+
+  # Age calculation fields
+  age_fields:
+    - "child_dob"
+    - "age_in_days"
+    - "caregiver_dob"
+
+  # Geographic validation
+  geographic:
+    - "sq001"      # ZIP code
+    - "fq001"      # County
+    - "eqstate"    # State residence
+
+  # Eligibility screening
+  eligibility:
+    - "eq001"      # Informed consent
+    - "eq002"      # Primary caregiver status
+    - "eq003"      # Age 19+ verification
+    - "date_complete_check"  # Birthday confirmation
+
+  # Compensation acknowledgment (CID1)
+  compensation:
+    - "state_law_requires_that_kidsights_data_collect_my_name___1"
+    - "financial_compensation_be_sent_to_a_nebraska_residential_address___1"
+    - "state_law_prohibits_sending_compensation_electronically___1"
+    - "kidsights_data_reviews_all_responses_for_quality___1"
+
+# Data validation rules
+validation:
+  # Age restrictions
+  child_age_max_days: 2191  # 6 years
+  caregiver_min_age: 19
+
+  # Geographic validation
+  nebraska_zip_prefixes: ["680", "681", "683", "684", "685", "686", "687", "688", "689", "690", "691", "692", "693"]
+  validate_zip_county_match: true
+
+  # Survey completion requirements
+  required_modules:
+    - "demographics"
+    - "child_demographics"
+    - "screening_questions"
+  completion_status_required: 2  # REDCap complete status
+
+  # Data quality thresholds
+  kmt_min_responses: 10      # Minimum non-"Don't Know" responses
+  kmt_zscore_threshold: 5    # Z-score within 5 standard deviations
+
+  # Response pattern validation
+  dont_know_codes: [9, "9", "Don't know"]
+  missing_codes: ["", "NA", NA]
+
+# Variable recoding specifications
+recoding:
+  # Items that need reverse coding
+  reverse_coded_items:
+    - "nom054x"  # Reverse: abs(value - 4)
+    - "nom052y"  # Reverse: abs(value - 4)
+    - "nom056x"  # Reverse: abs(value - 4)
+
+  # Race/ethnicity field mapping
+  race_ethnicity:
+    child_race_prefix: "cqr010_"
+    child_hispanic: "cqr011"
+    caregiver_race_prefix: "sq002_"
+    caregiver_hispanic: "sq003"
+
+  # Education categories
+  education:
+    create_4_category: true
+    create_6_category: true
+    create_8_category: true
+    maternal_education_only: true
+
+  # Income and poverty
+  income:
+    adjust_for_cpi: true
+    calculate_fpl: true
+    fpl_categories: [100, 200, 300, 400]  # Percentage thresholds
+
+# Eligibility criteria (CID1-CID9)
+eligibility_criteria:
+  cid1:
+    name: "compensation_acknowledgment"
+    description: "Failed to acknowledge compensation terms and conditions"
+    category: "Compensation"
+    action: "Exclusion"
+
+  cid2:
+    name: "informed_consent"
+    description: "Failed to provide informed consent"
+    category: "Eligibility"
+    action: "Exclusion"
+
+  cid3:
+    name: "caregiver_status"
+    description: "Respondent is 19 years or older and a primary caregiver"
+    category: "Eligibility"
+    action: "Inclusion"
+
+  cid4:
+    name: "child_age"
+    description: "Child is 2191 days or younger"
+    category: "Eligibility"
+    action: "Inclusion"
+
+  cid5:
+    name: "nebraska_residence"
+    description: "Currently lives in the state of Nebraska"
+    category: "Eligibility"
+    action: "Inclusion"
+
+  cid6:
+    name: "zip_county_match"
+    description: "ZIP code matches reported county"
+    category: "Authenticity"
+    action: "Exclusion"
+
+  cid7:
+    name: "birthday_confirmation"
+    description: "Child's birthday confirmed"
+    category: "Authenticity"
+    action: "Exclusion"
+
+  cid8:
+    name: "kmt_quality"
+    description: "At least 10 responses other than 'Don't Know' to KMT and z-score within 5SD"
+    category: "Authenticity"
+    action: "Exclusion"
+
+  cid9:
+    name: "survey_completion"
+    description: "Completed all required modules of survey"
+    category: "Compensation"
+    action: "Exclusion"
+
+# Processing options
+processing:
+  # Extraction settings
+  batch_size: 500
+  extract_all_records: false  # Set to true for full refresh
+  incremental_field: "retrieved_date"
+
+  # Transformation settings
+  standardize_missing_values: true
+  create_derived_variables: true
+  apply_reverse_coding: true
+
+  # Quality control
+  flag_duplicates: true
+  duplicate_match_fields: ["pid", "child_dob", "caregiver_name"]
+  validate_geographic_consistency: true
+
+# Output configuration
+output:
+  # DuckDB database location
+  database_path: "C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb"
+
+  # Landing table (raw data)
+  landing_table: "ne25_raw"
+
+  # Staging tables (cleaned data)
+  staging_tables:
+    - "ne25_eligibility"
+    - "ne25_harmonized"
+    - "ne25_data_dictionary"
+
+  # Variable naming conventions
+  prefix_convention: "ne25_"
+  preserve_original_names: true
+
+  # Metadata preservation
+  store_data_dictionary: true
+  store_value_labels: true
+  include_extraction_metadata: true
+
+# Monitoring and logging
+monitoring:
+  # Extraction monitoring
+  track_record_counts: true
+  monitor_api_response_times: true
+  alert_on_missing_projects: true
+
+  # Data quality monitoring
+  track_eligibility_rates: true
+  monitor_completion_rates: true
+  flag_unusual_patterns: true
+
+  # Geographic coverage
+  track_county_representation: true
+  monitor_zip_code_coverage: true
+
+# Integration settings
+integration:
+  # Census comparison
+  enable_acs_comparison: true
+  acs_variables:
+    - "race_ethnicity"
+    - "mom_education_4cat"
+    - "mom_married"
+    - "federal_poverty_level"
+
+  # Harmonization targets
+  harmonize_to_core_schema: true
+  preserve_ne25_specifics: true
+
+  # Longitudinal tracking
+  enable_wave_tracking: true
+  participant_id_field: "pid"
+  wave_field: "study_wave"
