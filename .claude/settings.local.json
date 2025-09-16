@@ -1,9 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir:*)",
-      "Read(//c/Users/waldmanm/git-repositories/Kidsights-Data-Dashboard/**)",
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" run_ne25_pipeline.R)"
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_data_dictionary.R''); result <- generate_data_dictionary(format = ''summary'', export_json = TRUE, export_html = TRUE); print(paste(''Generated:'', result))\")",
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_data_dictionary.R''); result <- generate_pipeline_data_dictionary(format = ''full''); print(paste(''Pipeline result:'', result))\")"
     ],
     "deny": [],
     "ask": []

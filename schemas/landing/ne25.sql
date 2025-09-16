@@ -324,3 +324,128 @@ GROUP BY child_raceG, fplcat, educ4_mom, child_age_group
 ORDER BY n DESC;
 
 -- End of schema file
+-- Fully transformed data table (output of dashboard transformations)
+CREATE TABLE IF NOT EXISTS ne25_transformed (
+    -- Core identifiers
+    record_id INTEGER,
+    pid TEXT,
+    retrieved_date TIMESTAMP,
+
+    -- Dashboard-style eligibility flags
+    eligible BOOLEAN,
+    authentic BOOLEAN,
+    include BOOLEAN,
+
+    -- Child demographics (transformed)
+    years_old REAL,
+    months_old REAL,
+    days_old REAL,
+    sex TEXT,
+    female BOOLEAN,
+
+    -- Race/ethnicity (child) - harmonized
+    hisp TEXT,                    -- Hispanic/non-Hispanic
+    race TEXT,                    -- Race (collapsed categories)
+    raceG TEXT,                   -- Combined race/ethnicity
+
+    -- Race/ethnicity (caregiver) - harmonized
+    a1_hisp TEXT,                 -- Primary caregiver Hispanic/Latino
+    a1_race TEXT,                 -- Primary caregiver race (collapsed)
+    a1_raceG TEXT,                -- Primary caregiver race/ethnicity combined
+
+    -- Caregiver relationships
+    relation1 TEXT,               -- Primary caregiver relationship
+    relation2 TEXT,               -- Secondary caregiver relationship
+    female_a1 BOOLEAN,            -- Primary caregiver is female
+    mom_a1 BOOLEAN,               -- Primary caregiver is mother
+
+    -- Education (8 categories)
+    educ_max TEXT,                -- Maximum education among caregivers
+    educ_a1 TEXT,                 -- Primary caregiver education
+    educ_a2 TEXT,                 -- Secondary caregiver education
+    educ_mom TEXT,                -- Maternal education
+
+    -- Education (4 categories)
+    educ4_max TEXT,               -- Maximum education (4-cat)
+    educ4_a1 TEXT,                -- Primary caregiver education (4-cat)
+    educ4_a2 TEXT,                -- Secondary caregiver education (4-cat)
+    educ4_mom TEXT,               -- Maternal education (4-cat)
+
+    -- Education (6 categories)
+    educ6_max TEXT,               -- Maximum education (6-cat)
+    educ6_a1 TEXT,                -- Primary caregiver education (6-cat)
+    educ6_a2 TEXT,                -- Secondary caregiver education (6-cat)
+    educ6_mom TEXT,               -- Maternal education (6-cat)
+
+    -- Age variables
+    a1_years_old REAL,            -- Primary caregiver age
+
+    -- Income and federal poverty level
+    income REAL,                  -- Household income (nominal)
+    inc99 REAL,                   -- Household income (1999 dollars)
+    family_size INTEGER,          -- Family size
+    federal_poverty_threshold REAL, -- FPL threshold for family size
+    fpl REAL,                     -- Income as % of FPL
+    fplcat TEXT,                  -- FPL categories
+
+    -- Processing metadata
+    transformation_version TEXT,   -- Version of transformation applied
+    transformed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (record_id, pid, retrieved_date)
+);
+
+-- Variable metadata table (comprehensive metadata for all variables)
+CREATE TABLE IF NOT EXISTS ne25_metadata (
+    variable_name TEXT PRIMARY KEY,
+    category TEXT,                -- Transformation category (race, education, etc.)
+    variable_label TEXT,          -- Human-readable description
+    data_type TEXT,              -- R data type (factor, numeric, character, logical)
+    storage_mode TEXT,           -- Storage mode
+    n_total INTEGER,             -- Total observations
+    n_missing INTEGER,           -- Missing values
+    missing_percentage REAL,     -- Missing percentage
+    value_labels TEXT,           -- JSON of value labels for factors
+    summary_statistics TEXT,     -- JSON of summary statistics
+    min_value REAL,             -- Minimum value (numeric variables)
+    max_value REAL,             -- Maximum value (numeric variables)
+    mean_value REAL,            -- Mean value (numeric variables)
+    unique_values INTEGER,       -- Number of unique values
+    transformation_notes TEXT,   -- Notes about transformations applied
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for transformed data
+CREATE INDEX IF NOT EXISTS idx_ne25_transformed_include ON ne25_transformed(include);
+CREATE INDEX IF NOT EXISTS idx_ne25_transformed_pid ON ne25_transformed(pid);
+CREATE INDEX IF NOT EXISTS idx_ne25_transformed_raceG ON ne25_transformed(raceG);
+CREATE INDEX IF NOT EXISTS idx_ne25_transformed_educ4_mom ON ne25_transformed(educ4_mom);
+CREATE INDEX IF NOT EXISTS idx_ne25_transformed_fplcat ON ne25_transformed(fplcat);
+
+-- Create indexes for metadata
+CREATE INDEX IF NOT EXISTS idx_ne25_metadata_category ON ne25_metadata(category);
+CREATE INDEX IF NOT EXISTS idx_ne25_metadata_data_type ON ne25_metadata(data_type);
+
+-- Views for transformed data analysis
+CREATE VIEW IF NOT EXISTS v_ne25_transformed_summary AS
+SELECT
+    COUNT(*) as total_participants,
+    COUNT(CASE WHEN include = TRUE THEN 1 END) as included_participants,
+    ROUND(100.0 * COUNT(CASE WHEN include = TRUE THEN 1 END) / COUNT(*), 1) as inclusion_rate,
+    COUNT(DISTINCT raceG) as unique_race_categories,
+    COUNT(DISTINCT educ4_mom) as unique_education_categories,
+    COUNT(DISTINCT fplcat) as unique_poverty_categories
+FROM ne25_transformed;
+
+CREATE VIEW IF NOT EXISTS v_ne25_metadata_summary AS
+SELECT
+    category,
+    COUNT(*) as n_variables,
+    COUNT(CASE WHEN data_type = 'factor' THEN 1 END) as n_factors,
+    COUNT(CASE WHEN data_type = 'numeric' THEN 1 END) as n_numeric,
+    COUNT(CASE WHEN data_type = 'logical' THEN 1 END) as n_logical,
+    COUNT(CASE WHEN data_type = 'character' THEN 1 END) as n_character,
+    ROUND(AVG(missing_percentage), 2) as avg_missing_pct
+FROM ne25_metadata
+GROUP BY category
+ORDER BY n_variables DESC;

@@ -1,55 +1,25 @@
-#' NE25 Main Pipeline Orchestration Script
+#' NE25 Pipeline Orchestration
 #'
-#' Complete end-to-end pipeline for extracting, processing, and storing
-#' NE25 data from REDCap to DuckDB on OneDrive
+#' Main pipeline function that coordinates the complete NE25 data extraction,
+#' processing, and loading workflow.
 
 # Load required libraries
 library(dplyr)
 library(yaml)
+library(REDCapR)
 
-# Source all required functions
+# Source required functions
 source("R/extract/ne25.R")
 source("R/harmonize/ne25_eligibility.R")
-source("R/harmonize/ne25_transformer.R")
 source("R/duckdb/connection.R")
+source("R/transform/ne25_transforms.R")
+source("R/transform/ne25_metadata.R")
+source("R/documentation/generate_data_dictionary.R")
 
-#' Load API credentials from CSV file and set as environment variables
+#' Execute the complete NE25 pipeline
 #'
-#' @param csv_path Path to CSV file with API credentials
-load_api_credentials <- function(csv_path) {
-
-  if (!file.exists(csv_path)) {
-    stop(paste("API credentials file not found:", csv_path))
-  }
-
-  # Read the CSV file
-  api_data <- readr::read_csv(csv_path, show_col_types = FALSE)
-
-  # Validate required columns
-  required_cols <- c("project", "pid", "api_code")
-  missing_cols <- setdiff(required_cols, names(api_data))
-  if (length(missing_cols) > 0) {
-    stop(paste("Missing required columns in API file:", paste(missing_cols, collapse = ", ")))
-  }
-
-  # Set environment variables for each project
-  for (i in 1:nrow(api_data)) {
-    pid <- api_data$pid[i]
-    api_token <- api_data$api_code[i]
-    env_var_name <- paste0("KIDSIGHTS_API_TOKEN_", pid)
-
-    # Set the environment variable properly
-    do.call(Sys.setenv, setNames(list(api_token), env_var_name))
-    message(paste("Set environment variable:", env_var_name))
-  }
-
-  message(paste("Loaded", nrow(api_data), "API credentials"))
-}
-
-#' Execute complete NE25 pipeline
-#'
-#' @param config_path Path to configuration file
-#' @param pipeline_type Type of pipeline run ('full', 'incremental', 'test')
+#' @param config_path Path to NE25 configuration file
+#' @param pipeline_type Type of pipeline run ("full", "incremental", "test")
 #' @param overwrite_existing Logical, whether to overwrite existing data
 #' @return List with execution results and metrics
 run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
@@ -58,28 +28,41 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
   # Generate execution ID
   execution_id <- paste0("ne25_", format(Sys.time(), "%Y%m%d_%H%M%S"))
-  start_time <- Sys.time()
 
   message("=== Starting NE25 Pipeline ===")
   message(paste("Execution ID:", execution_id))
   message(paste("Pipeline Type:", pipeline_type))
-  message(paste("Start Time:", start_time))
+  message(paste("Start Time:", Sys.time()))
 
-  # Initialize results
-  results <- list(
+  # Initialize metrics
+  metrics <- list(
     execution_id = execution_id,
-    success = FALSE,
-    metrics = list(),
-    errors = list()
+    pipeline_type = pipeline_type,
+    start_time = Sys.time(),
+    projects_attempted = character(),
+    projects_successful = character(),
+    total_records_extracted = 0,
+    extraction_errors = list(),
+    records_processed = 0,
+    records_eligible = 0,
+    records_authentic = 0,
+    records_included = 0,
+    records_transformed = 0,
+    extraction_duration = 0,
+    processing_duration = 0,
+    transformation_duration = 0,
+    metadata_generation_duration = 0,
+    total_duration = 0
   )
 
   # Load configuration
-  tryCatch({
-    config <- yaml::read_yaml(config_path)
-    message("Configuration loaded successfully")
+  config <- tryCatch({
+    yaml::read_yaml(config_path)
   }, error = function(e) {
     stop(paste("Failed to load configuration:", e$message))
   })
+
+  message("Configuration loaded successfully")
 
   # Connect to database
   con <- NULL
@@ -108,6 +91,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     for (project_info in config$redcap$projects) {
       project_name <- project_info$name
       message(paste("Extracting from project:", project_name))
+      metrics$projects_attempted <- c(metrics$projects_attempted, project_name)
 
       tryCatch({
         # Get API token from environment variable
@@ -130,154 +114,218 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           token = api_token
         )
 
-        # Add metadata
+        # Add metadata and pid (following dashboard pattern)
         project_data <- project_data %>%
           mutate(
             retrieved_date = Sys.time(),
             source_project = project_name,
-            extraction_id = execution_id
+            extraction_id = execution_id,
+            pid = project_info$pid  # Add project ID from config (like dashboard does)
           )
 
         projects_data[[project_name]] <- project_data
         all_dictionaries[[project_name]] <- project_dict
 
         message(paste("  - Extracted", nrow(project_data), "records"))
+        metrics$projects_successful <- c(metrics$projects_successful, project_name)
+        metrics$total_records_extracted <- metrics$total_records_extracted + nrow(project_data)
 
       }, error = function(e) {
         error_msg <- paste("Failed to extract from", project_name, ":", e$message)
         message(paste("  - ERROR:", error_msg))
         extraction_errors[[project_name]] <- error_msg
+        metrics$extraction_errors[[project_name]] <- error_msg
       })
 
       # Rate limiting
       Sys.sleep(1)
     }
 
-    # Combine all project data
+    # Combine all project data using flexible_bind_rows (like dashboard)
     if (length(projects_data) > 0) {
-      combined_data <- bind_rows(projects_data)
-      combined_dictionary <- combine_data_dictionaries(all_dictionaries)
+      # Use dashboard's flexible_bind_rows function
+      combined_data <- flexible_bind_rows(projects_data)
+      # Use dictionary from first project (like dashboard)
+      combined_dictionary <- all_dictionaries[[1]]
     } else {
       stop("No data was successfully extracted from any project")
     }
 
     extraction_time <- as.numeric(Sys.time() - extraction_start)
+    metrics$extraction_duration <- extraction_time
     message(paste("Extraction completed in", round(extraction_time, 2), "seconds"))
     message(paste("Total records extracted:", nrow(combined_data)))
 
-    # STEP 2: CLEAN AND VALIDATE DATA
-    message("\n--- Step 2: Data Cleaning and Validation ---")
+    # STEP 3: MINIMAL DATA PROCESSING (like dashboard)
+    message("\n--- Step 3: Data Processing ---")
     processing_start <- Sys.time()
 
-    # Apply initial cleaning
-    cleaned_data <- clean_ne25_initial(combined_data, config)
-    validated_data <- validate_ne25_essential_fields(cleaned_data, config)
+    # Use the cleaned data from extraction (already has sq001 as character)
+    validated_data <- combined_data
 
-    message(paste("Data cleaning completed:", nrow(validated_data), "records"))
+    metrics$records_processed <- nrow(validated_data)
+    message(paste("Data processing completed:", nrow(validated_data), "records"))
 
-    # STEP 3: ELIGIBILITY VALIDATION
-    message("\n--- Step 3: Eligibility Validation ---")
+    # STEP 4: ELIGIBILITY VALIDATION
+    message("\n--- Step 4: Eligibility Validation ---")
 
-    eligibility_results <- check_ne25_eligibility(validated_data, combined_dictionary, config)
-    data_with_eligibility <- apply_ne25_eligibility(validated_data, eligibility_results)
+    # Check eligibility for all records
+    eligibility_checks <- check_ne25_eligibility(validated_data, combined_dictionary, config)
 
-    # Count eligibility results
-    eligibility_counts <- data_with_eligibility %>%
-      summarise(
-        total = n(),
-        eligible = sum(eligible, na.rm = TRUE),
-        authentic = sum(authentic, na.rm = TRUE),
-        included = sum(include, na.rm = TRUE)
-      )
+    # Apply eligibility flags to the dataset
+    eligibility_results <- apply_ne25_eligibility(validated_data, eligibility_checks)
+
+    # Count eligibility metrics
+    metrics$records_eligible <- sum(eligibility_results$eligible, na.rm = TRUE)
+    metrics$records_authentic <- sum(eligibility_results$authentic, na.rm = TRUE)
+    metrics$records_included <- sum(eligibility_results$include, na.rm = TRUE)
 
     message(paste("Eligibility validation completed:"))
-    message(paste("  - Total participants:", eligibility_counts$total))
-    message(paste("  - Eligible:", eligibility_counts$eligible))
-    message(paste("  - Authentic:", eligibility_counts$authentic))
-    message(paste("  - Included:", eligibility_counts$included))
-
-    # STEP 4: DATA TRANSFORMATION
-    message("\n--- Step 4: Data Transformation ---")
-
-    transformed_data <- transform_ne25_data(
-      data = data_with_eligibility,
-      data_dictionary = combined_dictionary,
-      config = config
-    )
+    message(paste("  - Eligible participants:", metrics$records_eligible))
+    message(paste("  - Authentic participants:", metrics$records_authentic))
+    message(paste("  - Included participants:", metrics$records_included))
 
     processing_time <- as.numeric(Sys.time() - processing_start)
-    message(paste("Processing completed in", round(processing_time, 2), "seconds"))
+    metrics$processing_duration <- processing_time
 
-    # STEP 5: LOAD TO DUCKDB
-    message("\n--- Step 5: Loading to DuckDB ---")
-    loading_start <- Sys.time()
+    # STEP 5: STORE RAW DATA IN DUCKDB
+    message("\n--- Step 5: Storing Raw Data in DuckDB ---")
 
-    # Insert raw data
-    raw_rows <- upsert_ne25_data(con, validated_data, "ne25_raw",
-                                 c("record_id", "pid", "retrieved_date"))
+    # Insert raw data (use insert_ne25_data to create tables)
+    message("Storing raw data...")
+    insert_ne25_data(con, validated_data, "ne25_raw", overwrite = overwrite_existing)
 
     # Insert eligibility results
-    eligibility_rows <- upsert_ne25_data(con, eligibility_results$summary, "ne25_eligibility",
-                                         c("record_id", "pid", "retrieved_date"))
+    message("Storing eligibility results...")
+    insert_ne25_data(con, eligibility_results, "ne25_eligibility", overwrite = overwrite_existing)
 
-    # Insert transformed data
-    harmonized_rows <- upsert_ne25_data(con, transformed_data, "ne25_harmonized",
-                                        c("record_id", "pid", "retrieved_date"))
+    # STEP 6: DATA TRANSFORMATION (Dashboard-style)
+    message("\n--- Step 6: Data Transformation ---")
+    transformation_start <- Sys.time()
 
-    # Insert data dictionary
-    dict_df <- convert_dictionary_to_dataframe(combined_dictionary)
-    dict_rows <- insert_ne25_data(con, dict_df, "ne25_data_dictionary", overwrite = TRUE)
-
-    loading_time <- as.numeric(Sys.time() - loading_start)
-    message(paste("Database loading completed in", round(loading_time, 2), "seconds"))
-
-    # STEP 6: GENERATE SUMMARY
-    total_time <- as.numeric(Sys.time() - start_time)
-    message("\n--- Pipeline Summary ---")
-
-    summary_stats <- get_ne25_summary(con)
-    message(paste("Database records:"))
-    message(paste("  - Raw data:", summary_stats$ne25_raw))
-    message(paste("  - Eligibility results:", summary_stats$ne25_eligibility))
-    message(paste("  - Harmonized data:", summary_stats$ne25_harmonized))
-
-    # Log execution to database
-    metrics <- list(
-      projects_attempted = names(projects_data),
-      projects_successful = names(projects_data),
-      total_records_extracted = nrow(combined_data),
-      extraction_errors = paste(unlist(extraction_errors), collapse = "; "),
-      records_processed = nrow(transformed_data),
-      records_eligible = eligibility_counts$eligible,
-      records_authentic = eligibility_counts$authentic,
-      records_included = eligibility_counts$included,
-      extraction_duration = extraction_time,
-      processing_duration = processing_time,
-      total_duration = total_time
+    # Apply dashboard-style transformations using recode_it()
+    message("Applying dashboard transformations...")
+    transformed_data <- recode_it(
+      dat = eligibility_results,
+      dict = combined_dictionary,
+      my_API = NULL,
+      what = "all"  # Apply all transformation categories
     )
 
-    log_pipeline_execution(con, execution_id, pipeline_type, metrics, "success")
+    message(paste("Transformation completed:", nrow(transformed_data), "records"))
+    message(paste("Variables after transformation:", ncol(transformed_data)))
 
-    message(paste("Total pipeline duration:", round(total_time, 2), "seconds"))
-    message("=== Pipeline Completed Successfully ===")
+    # Store transformed data
+    message("Storing transformed data...")
+    insert_transformed_data(
+      con = con,
+      data = transformed_data,
+      transformation_version = "1.0.0",
+      overwrite = overwrite_existing
+    )
 
-    results$success <- TRUE
-    results$metrics <- metrics
-    results$summary_stats <- summary_stats
+    transformation_time <- as.numeric(Sys.time() - transformation_start)
+    metrics$transformation_duration <- transformation_time
+    metrics$records_transformed <- nrow(transformed_data)
 
-  }, error = function(e) {
-    error_message <- paste("Pipeline failed:", e$message)
-    message(paste("ERROR:", error_message))
+    message(paste("Data transformation completed in", round(transformation_time, 2), "seconds"))
 
-    # Log failure to database if connection exists
-    if (!is.null(con) && DBI::dbIsValid(con)) {
-      log_pipeline_execution(con, execution_id, pipeline_type,
-                            list(extraction_errors = error_message),
-                            "failed", error_message)
+    # STEP 7: METADATA GENERATION
+    message("\n--- Step 7: Generating Variable Metadata ---")
+    metadata_start <- Sys.time()
+
+    # Generate comprehensive variable metadata
+    message("Creating variable metadata...")
+    variable_metadata <- create_variable_metadata(
+      dat = transformed_data,
+      dict = combined_dictionary,
+      my_API = NULL,
+      what = "all"
+    )
+
+    # Convert metadata to dataframe for database storage
+    message("Converting metadata to database format...")
+    metadata_df <- metadata_to_dataframe(variable_metadata)
+
+    # Store metadata in database
+    message("Storing variable metadata...")
+    insert_metadata(con, metadata_df, overwrite = TRUE)
+
+    # Create summary table for reporting
+    message("Creating metadata summary...")
+    metadata_summary <- create_variable_summary_table(variable_metadata)
+
+    metadata_time <- as.numeric(Sys.time() - metadata_start)
+    metrics$metadata_generation_duration <- metadata_time
+
+    message(paste("Metadata generation completed in", round(metadata_time, 2), "seconds"))
+    message(paste("Generated metadata for", nrow(metadata_df), "variables"))
+
+    # STEP 8: DATA DICTIONARY GENERATION
+    message("\n--- Step 8: Generating Data Dictionary ---")
+
+    # Generate data dictionary from metadata
+    dict_path <- generate_pipeline_data_dictionary(con = con, format = "full")
+
+    if (!is.null(dict_path)) {
+      message(paste("Data dictionary generated:", dict_path))
+    } else {
+      message("Data dictionary generation skipped or failed")
     }
 
-    results$success <- FALSE
-    results$errors <- list(main_error = error_message)
+    # Calculate final metrics
+    metrics$end_time <- Sys.time()
+    metrics$total_duration <- as.numeric(metrics$end_time - metrics$start_time)
+
+    # Log pipeline execution
+    log_pipeline_execution(
+      con = con,
+      execution_id = execution_id,
+      pipeline_type = pipeline_type,
+      metrics = metrics,
+      status = "success"
+    )
+
+    message(paste("Pipeline completed successfully in", round(metrics$total_duration, 2), "seconds"))
+
+    # Return success result with transformed data summaries
+    return(list(
+      success = TRUE,
+      execution_id = execution_id,
+      metrics = metrics,
+      raw_data_summary = get_ne25_summary(con),
+      transformed_data_summary = get_transformed_summary(con),
+      metadata_summary = get_metadata_summary(con),
+      data_preview = head(transformed_data, 10),
+      variable_summary = head(metadata_summary, 20)
+    ))
+
+  }, error = function(e) {
+    # Log error
+    error_message <- e$message
+    message(paste("ERROR: Pipeline failed:", error_message))
+
+    # Try to log the failure
+    tryCatch({
+      log_pipeline_execution(
+        con = con,
+        execution_id = execution_id,
+        pipeline_type = pipeline_type,
+        metrics = metrics,
+        status = "failed",
+        error_message = error_message
+      )
+    }, error = function(log_error) {
+      message(paste("Error inserting data:", log_error$message))
+    })
+
+    # Return failure result
+    return(list(
+      success = FALSE,
+      execution_id = execution_id,
+      errors = list(main_error = error_message),
+      metrics = metrics
+    ))
 
   }, finally = {
     # Always disconnect from database
@@ -285,66 +333,37 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       disconnect_kidsights_db(con)
     }
   })
-
-  return(results)
 }
 
-#' Helper function to convert data dictionary to data frame
+#' Load API credentials from CSV and set environment variables
 #'
-#' @param dictionary List-based data dictionary
-#' @return Data frame suitable for database insertion
-convert_dictionary_to_dataframe <- function(dictionary) {
+#' @param csv_path Path to CSV file with API credentials
+load_api_credentials <- function(csv_path) {
 
-  if (length(dictionary) == 0) {
-    return(data.frame())
+  if (!file.exists(csv_path)) {
+    stop(paste("API credentials file not found:", csv_path))
   }
 
-  dict_df <- data.frame()
+  # Read the CSV file
+  credentials <- read.csv(csv_path, stringsAsFactors = FALSE)
 
-  for (field_name in names(dictionary)) {
-    field_info <- dictionary[[field_name]]
-
-    row <- data.frame(
-      field_name = field_name,
-      form_name = field_info$form_name %||% "",
-      section_header = field_info$section_header %||% "",
-      field_type = field_info$field_type %||% "",
-      field_label = field_info$field_label %||% "",
-      select_choices_or_calculations = field_info$select_choices_or_calculations %||% "",
-      field_note = field_info$field_note %||% "",
-      text_validation_type_or_show_slider_number = field_info$text_validation_type_or_show_slider_number %||% "",
-      text_validation_min = field_info$text_validation_min %||% "",
-      text_validation_max = field_info$text_validation_max %||% "",
-      identifier = field_info$identifier %||% "",
-      branching_logic = field_info$branching_logic %||% "",
-      required_field = field_info$required_field %||% "",
-      custom_alignment = field_info$custom_alignment %||% "",
-      question_number = field_info$question_number %||% "",
-      matrix_group_name = field_info$matrix_group_name %||% "",
-      matrix_ranking = field_info$matrix_ranking %||% "",
-      field_annotation = field_info$field_annotation %||% "",
-      source_project = field_info$source_project %||% "",
-      stringsAsFactors = FALSE
-    )
-
-    dict_df <- rbind(dict_df, row)
+  # Check required columns
+  required_cols <- c("project", "pid", "api_code")
+  missing_cols <- setdiff(required_cols, names(credentials))
+  if (length(missing_cols) > 0) {
+    stop(paste("Missing required columns in credentials file:", paste(missing_cols, collapse = ", ")))
   }
 
-  return(dict_df)
-}
+  # Set environment variables for each project
+  for (i in 1:nrow(credentials)) {
+    pid <- credentials$pid[i]
+    api_token <- credentials$api_code[i]
+    env_var_name <- paste0("KIDSIGHTS_API_TOKEN_", pid)
 
-# Quick execution function for interactive use
-run_ne25_quick <- function() {
-  message("Running NE25 pipeline with default settings...")
-  result <- run_ne25_pipeline()
-
-  if (result$success) {
-    message("\n✅ Pipeline completed successfully!")
-    message("Database location: C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb")
-  } else {
-    message("\n❌ Pipeline failed!")
-    message("Errors:", paste(unlist(result$errors), collapse = "; "))
+    # Set the environment variable
+    do.call(Sys.setenv, setNames(list(api_token), env_var_name))
+    message(paste("Set environment variable:", env_var_name))
   }
 
-  return(result)
+  message(paste("Loaded", nrow(credentials), "API credentials"))
 }

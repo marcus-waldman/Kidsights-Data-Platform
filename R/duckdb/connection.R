@@ -307,3 +307,154 @@ log_pipeline_execution <- function(con, execution_id, pipeline_type, metrics, st
 
   insert_ne25_data(con, log_data, "ne25_pipeline_log")
 }
+#' Insert transformed data into ne25_transformed table
+#'
+#' @param con DuckDB connection
+#' @param data Transformed data frame
+#' @param transformation_version Version string for transformations applied
+#' @param overwrite Logical, whether to overwrite existing data
+#' @return Number of rows inserted
+insert_transformed_data <- function(con, data, transformation_version = "1.0.0", overwrite = FALSE) {
+
+  if (nrow(data) == 0) {
+    message("No transformed data to insert")
+    return(0)
+  }
+
+  # Add transformation metadata
+  data$transformation_version <- transformation_version
+
+  tryCatch({
+
+    # Use upsert for transformed data to handle updates
+    if (overwrite) {
+      # Clear existing data first
+      DBI::dbExecute(con, "DELETE FROM ne25_transformed")
+    }
+
+    rows_inserted <- insert_ne25_data(con, data, "ne25_transformed", overwrite = FALSE)
+    message(paste("Inserted", rows_inserted, "rows of transformed data"))
+
+    return(rows_inserted)
+
+  }, error = function(e) {
+    message(paste("Error inserting transformed data:", e$message))
+    return(0)
+  })
+}
+
+#' Insert variable metadata into ne25_metadata table
+#'
+#' @param con DuckDB connection
+#' @param metadata_df Data frame with metadata
+#' @param overwrite Logical, whether to overwrite existing metadata
+#' @return Number of rows inserted
+insert_metadata <- function(con, metadata_df, overwrite = TRUE) {
+
+  if (nrow(metadata_df) == 0) {
+    message("No metadata to insert")
+    return(0)
+  }
+
+  tryCatch({
+
+    if (overwrite) {
+      # Clear existing metadata first
+      DBI::dbExecute(con, "DELETE FROM ne25_metadata")
+    }
+
+    rows_inserted <- insert_ne25_data(con, metadata_df, "ne25_metadata", overwrite = FALSE)
+    message(paste("Inserted", rows_inserted, "metadata records"))
+
+    return(rows_inserted)
+
+  }, error = function(e) {
+    message(paste("Error inserting metadata:", e$message))
+    return(0)
+  })
+}
+
+#' Get summary of transformed data
+#'
+#' @param con DuckDB connection
+#' @return List with transformed data summary
+get_transformed_summary <- function(con) {
+
+  summary_stats <- list()
+
+  # Basic counts
+  tryCatch({
+    count_query <- "SELECT COUNT(*) as n FROM ne25_transformed"
+    count_result <- DBI::dbGetQuery(con, count_query)
+    summary_stats[["total_records"]] <- count_result$n[1]
+  }, error = function(e) {
+    summary_stats[["total_records"]] <- 0
+  })
+
+  # Inclusion statistics
+  tryCatch({
+    inclusion_query <- "
+      SELECT
+        COUNT(*) as total,
+        COUNT(CASE WHEN eligible = TRUE THEN 1 END) as eligible,
+        COUNT(CASE WHEN authentic = TRUE THEN 1 END) as authentic,
+        COUNT(CASE WHEN include = TRUE THEN 1 END) as included,
+        ROUND(100.0 * COUNT(CASE WHEN include = TRUE THEN 1 END) / COUNT(*), 1) as inclusion_rate
+      FROM ne25_transformed"
+
+    inclusion_stats <- DBI::dbGetQuery(con, inclusion_query)
+    summary_stats[["inclusion"]] <- inclusion_stats
+
+  }, error = function(e) {
+    summary_stats[["inclusion"]] <- data.frame(total = 0, eligible = 0, authentic = 0, included = 0, inclusion_rate = 0)
+  })
+
+  # Demographics breakdown
+  tryCatch({
+    demo_query <- "
+      SELECT
+        raceG,
+        COUNT(*) as n
+      FROM ne25_transformed
+      WHERE include = TRUE
+      GROUP BY raceG
+      ORDER BY n DESC"
+
+    demo_stats <- DBI::dbGetQuery(con, demo_query)
+    summary_stats[["demographics"]] <- demo_stats
+
+  }, error = function(e) {
+    summary_stats[["demographics"]] <- data.frame(raceG = character(), n = integer())
+  })
+
+  return(summary_stats)
+}
+
+#' Get metadata summary
+#'
+#' @param con DuckDB connection
+#' @return Data frame with metadata summary
+get_metadata_summary <- function(con) {
+
+  tryCatch({
+    metadata_query <- "
+      SELECT
+        category,
+        COUNT(*) as n_variables,
+        COUNT(CASE WHEN data_type = 'factor' THEN 1 END) as n_factors,
+        COUNT(CASE WHEN data_type = 'numeric' THEN 1 END) as n_numeric,
+        COUNT(CASE WHEN data_type = 'logical' THEN 1 END) as n_logical,
+        COUNT(CASE WHEN data_type = 'character' THEN 1 END) as n_character,
+        ROUND(AVG(missing_percentage), 2) as avg_missing_pct
+      FROM ne25_metadata
+      GROUP BY category
+      ORDER BY n_variables DESC"
+
+    metadata_summary <- DBI::dbGetQuery(con, metadata_query)
+    return(metadata_summary)
+
+  }, error = function(e) {
+    message(paste("Error getting metadata summary:", e$message))
+    return(data.frame())
+  })
+}

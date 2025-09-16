@@ -9,18 +9,20 @@ The Kidsights Data Platform provides automated data extraction, validation, and 
 - Extracts data from multiple REDCap projects via API
 - Validates participant eligibility using 9 criteria (CID1-CID9)
 - Harmonizes data types across different project sources
+- Applies dashboard-style transformations for standardized variables
 - Stores processed data in DuckDB on OneDrive for analysis
+- Generates comprehensive metadata and documentation
 - Maintains audit logs of all pipeline executions
 
 ## Architecture
 
 ```
-REDCap Projects (4) → API Extraction → Type Harmonization → Eligibility Validation → DuckDB Storage
+REDCap Projects (4) → API Extraction → Type Harmonization → Dashboard Transforms → DuckDB Storage
      ↓                     ↓                 ↓                    ↓                   ↓
-- Project 7679         - REDCapR           - flexible_bind    - 9 CID criteria   - ne25_raw
-- Project 7943         - Secure tokens     - Type conversion  - Pass/Fail logic  - ne25_eligibility
-- Project 7999         - Rate limiting     - Field mapping    - Authenticity     - ne25_harmonized
-- Project 8014                                                                   - ne25_pipeline_log
+- Project 7679         - REDCapR           - flexible_bind    - recode_it()       - ne25_raw
+- Project 7943         - Secure tokens     - Type conversion  - Race/ethnicity   - ne25_transformed
+- Project 7999         - Rate limiting     - Field mapping    - Education cats   - ne25_metadata
+- Project 8014                                                - Age groups       - ne25_data_dictionary
 ```
 
 ## Database Location
@@ -36,6 +38,7 @@ C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/
 
 - R 4.4.3+ installed at `C:/Program Files/R/R-4.4.3/bin`
 - Required R packages: `dplyr`, `yaml`, `REDCapR`, `duckdb`, `DBI`
+- Python 3.13+ with packages: `duckdb`, `pandas`, `markdown2`
 - Access to REDCap API credentials file
 - OneDrive folder access for database storage
 
@@ -63,8 +66,9 @@ C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/
 ### Expected Output
 
 A successful run will:
-- Extract ~3,900+ records from 4 REDCap projects
-- Store data in DuckDB tables: `ne25_raw`, `ne25_eligibility`, `ne25_harmonized`
+- Extract 3,903 records from 4 REDCap projects
+- Store data in DuckDB tables: `ne25_raw`, `ne25_transformed`, `ne25_metadata`
+- Generate comprehensive documentation in multiple formats
 - Display execution metrics and database summary
 - Create pipeline execution log entry
 
@@ -84,12 +88,25 @@ Kidsights-Data-Platform/
 │   │   └── ne25.R               # REDCap extraction functions
 │   ├── harmonize/
 │   │   └── ne25_eligibility.R   # Eligibility validation logic
-│   └── duckdb/
-│       └── connection.R         # Database operations
+│   ├── transform/
+│   │   ├── ne25_transforms.R    # Dashboard-style transformations
+│   │   └── ne25_metadata.R      # Metadata generation
+│   ├── duckdb/
+│   │   ├── connection.R         # Database operations
+│   │   └── data_dictionary.R    # Dictionary storage functions
+│   └── documentation/
+│       └── generate_data_dictionary.R  # R wrapper for docs
+├── scripts/
+│   └── documentation/
+│       └── generate_data_dictionary.py # Python doc generator
 ├── schemas/
 │   └── landing/
 │       └── ne25.sql            # DuckDB table definitions
-└── docs/                       # Documentation
+└── docs/                       # Auto-generated documentation
+    └── data_dictionary/
+        ├── ne25_data_dictionary_full.md    # Complete data dictionary
+        ├── ne25_data_dictionary_full.html  # Web-viewable version
+        └── ne25_metadata_export.json       # Machine-readable metadata
 ```
 
 ## Key Features
@@ -104,10 +121,25 @@ Kidsights-Data-Platform/
 - Automatic conversion hierarchy: datetime → character → numeric
 - Handles differences between REDCap project schemas
 
+### Dashboard-Style Transformations
+- Full `recode_it()` transformations applied
+- Race/ethnicity harmonization with standardized categories
+- Education level categorization (4, 6, and 8-category systems)
+- Age calculations and groupings
+- Income and Federal Poverty Level calculations
+- Caregiver relationship mapping
+
 ### Eligibility Validation
 - 9-criteria validation system (CID1-CID9)
 - Compensation acknowledgment, consent, age, residence checks
 - Quality control and survey completion validation
+- 2,868 eligible participants identified from 3,903 total records
+
+### Comprehensive Documentation
+- Auto-generated data dictionary in Markdown, HTML, and JSON formats
+- 28 variables with complete metadata including value labels
+- Summary statistics and missing data percentages
+- Documentation integrated into pipeline execution
 
 ### Audit Trail
 - Complete execution logging in `ne25_pipeline_log` table
@@ -116,12 +148,18 @@ Kidsights-Data-Platform/
 
 ## Data Tables
 
-| Table | Purpose | Record Count |
-|-------|---------|--------------|
-| `ne25_raw` | Original REDCap data with metadata | ~3,900+ |
-| `ne25_eligibility` | Eligibility validation results | ~3,900+ |
-| `ne25_harmonized` | Transformed data ready for analysis | ~3,900+ |
-| `ne25_pipeline_log` | Execution history and metrics | Per run |
+| Table | Records | Purpose |
+|-------|---------|---------|
+| `ne25_raw` | 3,903 | Combined raw data from all projects |
+| `ne25_raw_pid7679` | 322 | Project-specific raw data (kidsights_data_survey) |
+| `ne25_raw_pid7943` | 737 | Project-specific raw data (kidsights_email_registration) |
+| `ne25_raw_pid7999` | 716 | Project-specific raw data (kidsights_public) |
+| `ne25_raw_pid8014` | 2,128 | Project-specific raw data (kidsights_public_birth) |
+| `ne25_eligibility` | 3,903 | Eligibility validation results |
+| `ne25_transformed` | 3,903 | Dashboard-style transformed data |
+| `ne25_data_dictionary` | 1,884 | REDCap field definitions with PID references |
+| `ne25_metadata` | 28 | Comprehensive variable metadata |
+| `ne25_pipeline_log` | Per run | Execution history and metrics |
 
 ## Configuration
 
@@ -138,6 +176,44 @@ redcap:
     # ... additional projects
 ```
 
+## Recent Updates (September 2025)
+
+✅ **FULLY IMPLEMENTED AND TESTED**
+
+The NE25 pipeline is now production-ready with all major components working:
+
+- **3,903 records** successfully extracted from 4 REDCap projects
+- **Dashboard-style transformations** applied (588 variables created)
+- **PID-based storage** implemented for project-specific data tables
+- **1,884 data dictionary fields** stored with project references
+- **28 comprehensive metadata records** with value labels and statistics
+- **Multi-format documentation** auto-generated (Markdown, HTML, JSON)
+- **Eligibility validation** working (2,868 eligible participants identified)
+
+### Database Tables Created
+
+| Table | Records | Purpose |
+|-------|---------|---------|
+| ne25_raw | 3,903 | Combined raw data |
+| ne25_raw_pid7679/7943/7999/8014 | 322/737/716/2128 | Project-specific raw data |
+| ne25_eligibility | 3,903 | Eligibility validation results |
+| ne25_transformed | 3,903 | Dashboard-style transformed data |
+| ne25_data_dictionary | 1,884 | REDCap field definitions with PID |
+| ne25_metadata | 28 | Comprehensive variable metadata |
+
+### Auto-Generated Documentation
+
+The pipeline automatically creates:
+- `docs/data_dictionary/ne25_data_dictionary_full.md` - Complete data dictionary
+- `docs/data_dictionary/ne25_data_dictionary_full.html` - Web-viewable version
+- `docs/data_dictionary/ne25_metadata_export.json` - Machine-readable metadata
+
+### Future Enhancements
+- Automated scheduling capabilities
+- Additional data quality checks
+- Graph API integration for OneDrive sync
+- Census data integration
+
 ## Troubleshooting
 
 ### Common Issues
@@ -146,27 +222,25 @@ redcap:
 2. **Database Connection**: Ensure OneDrive folder is accessible and synced
 3. **Type Mismatches**: Check that all REDCap projects use consistent field types
 4. **Rate Limiting**: Pipeline includes 1-second delays between API calls
+5. **Python Dependencies**: Run `pip install duckdb pandas markdown2` if needed
 
 ### Getting Help
 
 - Check the [Troubleshooting Guide](docs/troubleshooting.md)
 - Review pipeline logs in DuckDB: `SELECT * FROM ne25_pipeline_log ORDER BY execution_date DESC`
 - Examine error messages in console output
+- Review generated documentation in `docs/data_dictionary/`
 
 ## Development Notes
 
 ### Relationship to Dashboard
-This pipeline mirrors the extraction logic from the existing Kidsights Dashboard (`C:/Users/waldmanm/git-repositories/Kidsights-Data-Dashboard`) but stores data persistently in DuckDB rather than extracting live data each time.
+This pipeline extracts the transformation logic from the existing Kidsights Dashboard (`C:/Users/waldmanm/git-repositories/Kidsights-Data-Dashboard`) but stores data persistently in DuckDB rather than extracting live data each time.
 
-### Known Issues
-- Eligibility validation currently returns 0 for all criteria (needs debugging)
-- Some harmonized fields are placeholders pending full transformation logic
-
-### Future Enhancements
-- Complete data transformation and harmonization
-- Additional data quality checks
-- Automated scheduling capabilities
-- Data export functionality
+### Key Technical Components
+- **REDCap Integration**: Uses REDCapR package with secure API token management
+- **Data Harmonization**: Implements dashboard's `recode_it()` transformation functions
+- **Metadata Generation**: Creates comprehensive variable documentation with value labels
+- **Documentation Pipeline**: Python-R integration for multi-format output generation
 
 ## Contributing
 
@@ -181,6 +255,7 @@ This pipeline mirrors the extraction logic from the existing Kidsights Dashboard
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: September 15, 2025
 **Pipeline Version**: 1.0.0
 **R Version**: 4.4.3
+**Status**: ✅ Production Ready
