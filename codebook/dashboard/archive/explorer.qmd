@@ -1,0 +1,786 @@
+---
+title: "JSON Explorer"
+subtitle: "Interactive navigation of the raw codebook data"
+format:
+  html:
+    page-layout: full
+    resources:
+      - "assets/json-viewer.js"
+      - "assets/prism.min.js"
+      - "assets/prism.min.css"
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(htmltools)
+
+# Source codebook functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+# Load codebook
+codebook <- load_codebook("../data/codebook.json", validate = FALSE)
+```
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css">
+
+<style>
+.json-explorer-container {
+  display: flex;
+  height: 70vh;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.tree-panel {
+  width: 40%;
+  background: #f8f9fa;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.json-panel {
+  width: 60%;
+  background: white;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.breadcrumb-nav {
+  background: #e9ecef;
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.json-viewer {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.json-key {
+  color: #d63384;
+  font-weight: bold;
+}
+
+.json-string {
+  color: #198754;
+}
+
+.json-number {
+  color: #0d6efd;
+}
+
+.json-boolean {
+  color: #fd7e14;
+}
+
+.json-null {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.copy-btn:hover {
+  background: #0056b3;
+}
+
+.item-summary {
+  background: #f1f3f4;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border-left: 4px solid #007bff;
+}
+
+.expand-toggle {
+  cursor: pointer;
+  user-select: none;
+  color: #007bff;
+  margin-right: 5px;
+}
+
+.expand-toggle:hover {
+  color: #0056b3;
+}
+
+.collapsed-content {
+  display: none;
+}
+
+.filters-panel {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: inline-block;
+  margin-right: 15px;
+  margin-bottom: 10px;
+}
+
+.filter-group select {
+  padding: 5px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.item-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background: white;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.item-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.item-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  padding: 12px 15px;
+  cursor: pointer;
+}
+
+.item-body {
+  padding: 15px;
+}
+
+.study-tags {
+  margin-top: 8px;
+}
+
+.study-tag {
+  display: inline-block;
+  background: #e9ecef;
+  color: #495057;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  margin-right: 5px;
+  margin-top: 3px;
+}
+
+.json-content {
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+#json-tree {
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.jstree-default .jstree-clicked {
+  background: #007bff !important;
+  color: white !important;
+}
+</style>
+
+## Interactive JSON Explorer
+
+Navigate through the raw codebook JSON data using multiple interfaces:
+
+### Quick Search
+
+```{r search-input}
+#| results: asis
+#| echo: false
+
+cat('<div class="search-container">')
+cat('<input type="text" id="global-search" class="search-input" placeholder="Search items by ID, text content, or domain..." autocomplete="off">')
+cat('</div>')
+```
+
+### Filters
+
+```{r filters}
+#| results: asis
+#| echo: false
+
+# Create domains list using dataframe approach
+df <- items_to_dataframe(codebook)
+kidsights_domains <- unique(df$domain_kidsights)
+cahmi_domains <- unique(df$domain_cahmi)
+domains <- unique(c(kidsights_domains, cahmi_domains))
+domains <- domains[!is.na(domains)]
+
+# Create studies list
+studies <- unique(unlist(sapply(codebook$items, function(x) x$studies)))
+
+cat('<div class="filters-panel">')
+
+# Domain filter
+cat('<div class="filter-group">')
+cat('<label for="domain-filter">Domain:</label>')
+cat('<select id="domain-filter">')
+cat('<option value="">All Domains</option>')
+for(domain in sort(domains)) {
+  cat('<option value="', domain, '">', domain, '</option>')
+}
+cat('</select>')
+cat('</div>')
+
+# Study filter
+cat('<div class="filter-group">')
+cat('<label for="study-filter">Study:</label>')
+cat('<select id="study-filter">')
+cat('<option value="">All Studies</option>')
+for(study in sort(studies)) {
+  cat('<option value="', study, '">', study, '</option>')
+}
+cat('</select>')
+cat('</div>')
+
+# View mode filter
+cat('<div class="filter-group">')
+cat('<label for="view-mode">View Mode:</label>')
+cat('<select id="view-mode">')
+cat('<option value="tree">Tree Navigator</option>')
+cat('<option value="cards">Item Cards</option>')
+cat('<option value="table">Data Table</option>')
+cat('</select>')
+cat('</div>')
+
+cat('<button id="clear-filters" class="btn btn-sm btn-outline-secondary">Clear Filters</button>')
+cat('</div>')
+```
+
+### Tree Navigator
+
+```{r tree-navigator}
+#| results: asis
+#| echo: false
+
+cat('<div id="tree-view" class="json-explorer-container">')
+cat('<div class="tree-panel">')
+cat('<h6>Codebook Structure</h6>')
+cat('<div id="json-tree"></div>')
+cat('</div>')
+
+cat('<div class="json-panel">')
+cat('<div class="breadcrumb-nav" id="breadcrumb">')
+cat('Click an item in the tree to view its JSON structure')
+cat('</div>')
+cat('<div id="json-display" class="json-viewer">')
+cat('<div class="item-summary">')
+cat('<h5>Welcome to JSON Explorer</h5>')
+cat('<p>Use the tree on the left to navigate through the codebook structure. Click on any item to see its complete JSON representation with syntax highlighting.</p>')
+cat('<p><strong>Features:</strong></p>')
+cat('<ul>')
+cat('<li>🔍 Search through all items</li>')
+cat('<li>🌳 Tree navigation of JSON structure</li>')
+cat('<li>📋 Copy JSON to clipboard</li>')
+cat('<li>🎨 Syntax highlighting</li>')
+cat('<li>📱 Responsive design</li>')
+cat('</ul>')
+cat('</div>')
+cat('</div>')
+cat('</div>')
+cat('</div>')
+```
+
+### Item Cards View
+
+```{r cards-view}
+#| results: asis
+#| echo: false
+
+cat('<div id="cards-view" style="display: none;">')
+cat('<div id="item-cards" class="item-grid">')
+cat('<!-- Cards will be populated by JavaScript -->')
+cat('</div>')
+cat('</div>')
+```
+
+### Data Table View
+
+```{r table-view-container}
+#| results: asis
+#| echo: false
+
+cat('<div id="table-view" style="display: none;">')
+```
+
+```{r interactive-table}
+# Create comprehensive data frame for table view
+df <- items_to_dataframe(codebook, flatten_identifiers = TRUE)
+
+# Add JSON preview column
+df$json_preview <- sapply(names(codebook$items), function(item_id) {
+  paste0('<button class="btn btn-sm btn-outline-primary view-json" data-item="',
+         item_id, '">View JSON</button>')
+})
+
+datatable(
+  df %>%
+    select(
+      `Item ID` = item_id,
+      `Domain (Kidsights)` = domain_kidsights,
+      `Domain (CAHMI)` = domain_cahmi,
+      `Studies` = studies,
+      `Text` = stem_combined,
+      `JSON` = json_preview
+    ),
+  filter = 'top',
+  escape = FALSE,
+  options = list(
+    pageLength = 15,
+    scrollX = TRUE,
+    searchHighlight = TRUE,
+    dom = 'Bfrtip',
+    buttons = list(
+      'copy',
+      list(extend = 'csv', filename = paste0('codebook_table_', Sys.Date())),
+      'colvis'
+    ),
+    columnDefs = list(
+      list(width = '100px', targets = 0),  # Item ID
+      list(width = '80px', targets = 1),   # Domain (Kidsights)
+      list(width = '80px', targets = 2),   # Domain (CAHMI)
+      list(width = '120px', targets = 3),  # Studies
+      list(width = '300px', targets = 4),  # Text
+      list(width = '80px', targets = 5)    # JSON button
+    )
+  ),
+  extensions = 'Buttons'
+) %>%
+  formatStyle(
+    'Domain (Kidsights)',
+    backgroundColor = styleEqual(
+      c('motor', 'socemo', 'coglan'),
+      c('#4ECDC4', '#FF6B6B', '#45B7D1')
+    ),
+    color = 'white',
+    fontWeight = 'bold'
+  ) %>%
+  formatStyle(
+    'Domain (CAHMI)',
+    backgroundColor = styleEqual(
+      c('motor', 'early_learning', 'self_regulation', 'social_emotional'),
+      c('#4ECDC4', '#96CEB4', '#FECA57', '#FF9999')
+    ),
+    color = 'white',
+    fontWeight = 'bold'
+  )
+```
+
+```{r close-table-view}
+#| results: asis
+#| echo: false
+
+cat('</div>')
+```
+
+```{r modal-html}
+#| results: asis
+#| echo: false
+
+# Modal for JSON display
+cat('<!-- Modal for JSON display -->')
+cat('<div class="modal fade" id="jsonModal" tabindex="-1">')
+cat('<div class="modal-dialog modal-xl">')
+cat('<div class="modal-content">')
+cat('<div class="modal-header">')
+cat('<h5 class="modal-title" id="modalTitle">Item JSON</h5>')
+cat('<button type="button" class="btn-close" data-bs-dismiss="modal"></button>')
+cat('</div>')
+cat('<div class="modal-body">')
+cat('<div style="position: relative;">')
+cat('<button id="copy-modal-json" class="copy-btn">Copy JSON</button>')
+cat('<pre id="modal-json-content" class="json-viewer"></pre>')
+cat('</div>')
+cat('</div>')
+cat('</div>')
+cat('</div>')
+cat('</div>')
+```
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+```{r embed-codebook}
+#| results: asis
+# Embed the codebook JSON as a JavaScript variable
+cat("<script type='application/json' id='codebook-data'>")
+cat(toJSON(codebook, auto_unbox = TRUE, pretty = TRUE))
+cat("</script>")
+```
+
+<script>
+// Load codebook data
+const codebookData = JSON.parse(document.getElementById('codebook-data').textContent);
+
+// Initialize the application
+$(document).ready(function() {
+  initializeExplorer();
+  populateFilters();
+  setupEventHandlers();
+});
+
+function initializeExplorer() {
+  // Initialize tree view
+  initializeTree();
+
+  // Show tree view by default
+  $('#view-mode').val('tree');
+  showView('tree');
+}
+
+function initializeTree() {
+  const treeData = buildTreeData(codebookData);
+
+  $('#json-tree').jstree({
+    'core': {
+      'data': treeData,
+      'themes': {
+        'responsive': true,
+        'dots': true
+      }
+    },
+    'plugins': ['search', 'wholerow']
+  });
+
+  // Handle tree selection
+  $('#json-tree').on('select_node.jstree', function(e, data) {
+    const node = data.node;
+    const path = getNodePath(node);
+    const value = getValueFromPath(codebookData, path);
+
+    displayJSON(value, path);
+  });
+}
+
+function buildTreeData(data) {
+  const result = [];
+
+  // Add metadata
+  result.push({
+    id: 'metadata',
+    text: `Metadata (v${data.metadata.version})`,
+    children: buildObjectChildren(data.metadata, 'metadata'),
+    state: { opened: false }
+  });
+
+  // Add items (flat structure matching JSON)
+  const itemsNode = {
+    id: 'items',
+    text: `Items (${Object.keys(data.items).length})`,
+    children: [],
+    state: { opened: true }
+  };
+
+  // Add items in their natural JSON order (no domain grouping)
+  Object.keys(data.items).forEach(itemId => {
+    const item = data.items[itemId];
+    itemsNode.children.push({
+      id: `items.${itemId}`,
+      text: `${itemId} - ${item.content?.stems?.combined?.substring(0, 50) || 'No text'}...`,
+      children: buildObjectChildren(item, `items.${itemId}`)
+    });
+  });
+
+  result.push(itemsNode);
+
+  // Add response sets
+  if (data.response_sets) {
+    result.push({
+      id: 'response_sets',
+      text: `Response Sets (${Object.keys(data.response_sets).length})`,
+      children: buildObjectChildren(data.response_sets, 'response_sets'),
+      state: { opened: false }
+    });
+  }
+
+  // Add domains
+  if (data.domains) {
+    result.push({
+      id: 'domains',
+      text: `Domains (${Object.keys(data.domains).length})`,
+      children: buildObjectChildren(data.domains, 'domains'),
+      state: { opened: false }
+    });
+  }
+
+  return result;
+}
+
+function buildObjectChildren(obj, path) {
+  const children = [];
+
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index) => {
+      const value = typeof item === 'object' ? `{...}` : item;
+      children.push({
+        id: `${path}.${index}`,
+        text: `[${index}]: ${value}`,
+        children: typeof item === 'object' ? buildObjectChildren(item, `${path}.${index}`) : false
+      });
+    });
+  } else if (typeof obj === 'object' && obj !== null) {
+    Object.keys(obj).forEach(key => {
+      const value = obj[key];
+      const displayValue = typeof value === 'object' && value !== null
+        ? (Array.isArray(value) ? `[...] (${value.length})` : `{...}`)
+        : value;
+
+      children.push({
+        id: `${path}.${key}`,
+        text: `${key}: ${displayValue}`,
+        children: typeof value === 'object' && value !== null ? buildObjectChildren(value, `${path}.${key}`) : false
+      });
+    });
+  }
+
+  return children;
+}
+
+function getNodePath(node) {
+  return node.id.split('.');
+}
+
+function getValueFromPath(data, path) {
+  let current = data;
+
+  for (let i = 0; i < path.length; i++) {
+    const key = path[i];
+    if (current && typeof current === 'object' && key in current) {
+      current = current[key];
+    } else {
+      return null;
+    }
+  }
+
+  return current;
+}
+
+function displayJSON(value, path) {
+  const breadcrumb = path.join(' → ');
+  $('#breadcrumb').text(breadcrumb);
+
+  const jsonString = JSON.stringify(value, null, 2);
+  const highlighted = Prism.highlight(jsonString, Prism.languages.json, 'json');
+
+  $('#json-display').html(`
+    <div style="position: relative;">
+      <button class="copy-btn" onclick="copyToClipboard('${jsonString.replace(/'/g, "\\'")}')">Copy JSON</button>
+      <pre class="language-json"><code>${highlighted}</code></pre>
+    </div>
+  `);
+}
+
+function populateFilters() {
+  // Populate domain filter
+  const domains = new Set();
+  Object.values(codebookData.items).forEach(item => {
+    if (item.classification?.domain) {
+      domains.add(item.classification.domain);
+    }
+  });
+
+  const domainSelect = $('#domain-filter');
+  Array.from(domains).sort().forEach(domain => {
+    domainSelect.append(`<option value="${domain}">${domain}</option>`);
+  });
+
+  // Populate study filter
+  const studies = new Set();
+  Object.values(codebookData.items).forEach(item => {
+    if (item.studies && Array.isArray(item.studies)) {
+      item.studies.forEach(study => studies.add(study));
+    }
+  });
+
+  const studySelect = $('#study-filter');
+  Array.from(studies).sort().forEach(study => {
+    studySelect.append(`<option value="${study}">${study}</option>`);
+  });
+}
+
+function setupEventHandlers() {
+  // Search functionality
+  $('#global-search').on('keyup', function() {
+    const searchTerm = $(this).val();
+
+    if (searchTerm.length > 2) {
+      $('#json-tree').jstree('search', searchTerm);
+      filterItems(searchTerm);
+    } else {
+      $('#json-tree').jstree('clear_search');
+      showAllItems();
+    }
+  });
+
+  // View mode switching
+  $('#view-mode').on('change', function() {
+    const mode = $(this).val();
+    showView(mode);
+  });
+
+  // Filter changes
+  $('#domain-filter, #study-filter').on('change', function() {
+    applyFilters();
+  });
+
+  // Clear filters
+  $('#clear-filters').on('click', function() {
+    $('#domain-filter, #study-filter').val('');
+    $('#global-search').val('');
+    $('#json-tree').jstree('clear_search');
+    showAllItems();
+  });
+
+  // Modal JSON view buttons
+  $(document).on('click', '.view-json', function() {
+    const itemId = $(this).data('item');
+    const item = codebookData.items[itemId];
+
+    $('#modalTitle').text(`Item: ${itemId}`);
+    const jsonString = JSON.stringify(item, null, 2);
+    const highlighted = Prism.highlight(jsonString, Prism.languages.json, 'json');
+    $('#modal-json-content').html(highlighted);
+
+    $('#jsonModal').modal('show');
+  });
+
+  // Copy modal JSON
+  $('#copy-modal-json').on('click', function() {
+    const jsonText = $('#modal-json-content').text();
+    copyToClipboard(jsonText);
+  });
+}
+
+function showView(mode) {
+  $('#tree-view, #cards-view, #table-view').hide();
+
+  switch(mode) {
+    case 'tree':
+      $('#tree-view').show();
+      break;
+    case 'cards':
+      $('#cards-view').show();
+      generateItemCards();
+      break;
+    case 'table':
+      $('#table-view').show();
+      break;
+  }
+}
+
+function generateItemCards() {
+  const container = $('#item-cards');
+  container.empty();
+
+  Object.keys(codebookData.items).forEach(itemId => {
+    const item = codebookData.items[itemId];
+    const card = createItemCard(itemId, item);
+    container.append(card);
+  });
+}
+
+function createItemCard(itemId, item) {
+  const studies = item.studies ? item.studies.map(s => `<span class="study-tag">${s}</span>`).join('') : '';
+  const domain = item.classification?.domain || 'unknown';
+  const text = item.content?.stems?.combined || 'No text available';
+
+  return $(`
+    <div class="item-card" data-item="${itemId}">
+      <div class="item-header" onclick="toggleCard('${itemId}')">
+        <h6 class="mb-1">${itemId}</h6>
+        <small>${domain}</small>
+        <div class="study-tags">${studies}</div>
+      </div>
+      <div class="item-body">
+        <p class="text-muted small">${text.substring(0, 200)}...</p>
+        <div class="json-content collapsed-content" id="json-${itemId}">
+          <button class="copy-btn" onclick="copyItemJSON('${itemId}')">Copy</button>
+          <pre class="language-json"><code>${Prism.highlight(JSON.stringify(item, null, 2), Prism.languages.json, 'json')}</code></pre>
+        </div>
+      </div>
+    </div>
+  `);
+}
+
+function toggleCard(itemId) {
+  $(`#json-${itemId}`).toggleClass('collapsed-content');
+}
+
+function copyItemJSON(itemId) {
+  const item = codebookData.items[itemId];
+  const jsonString = JSON.stringify(item, null, 2);
+  copyToClipboard(jsonString);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(function() {
+    // Could add a toast notification here
+    console.log('JSON copied to clipboard');
+  });
+}
+
+function filterItems(searchTerm) {
+  // Implementation for filtering items based on search
+  // This would filter the tree, cards, and table views
+}
+
+function applyFilters() {
+  const domain = $('#domain-filter').val();
+  const study = $('#study-filter').val();
+
+  // Implementation for applying domain and study filters
+}
+
+function showAllItems() {
+  // Implementation for showing all items (removing filters)
+}
+</script>

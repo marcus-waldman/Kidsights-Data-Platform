@@ -1,0 +1,229 @@
+---
+title: "Item Catalog"
+subtitle: "Searchable database of all assessment items"
+format:
+  html:
+    page-layout: full
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(plotly)
+
+# Source codebook functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+source("../../R/codebook/visualize_codebook.R")
+
+# Load codebook
+codebook <- load_codebook("../data/codebook.json", validate = FALSE)
+```
+
+## Interactive Item Browser
+
+Use the search and filter controls below to find specific items. You can search across item IDs, text content, domains, and studies.
+
+```{r items-table}
+#| column: page
+# Convert to comprehensive data frame
+df <- items_to_dataframe(codebook, flatten_identifiers = TRUE)
+
+# Prepare data for display
+display_df <- df %>%
+  select(
+    `Item ID` = item_id,
+    `Numeric ID` = id,
+    `Domain (Kidsights)` = domain_kidsights,
+    `Domain (CAHMI)` = domain_cahmi,
+    Studies = studies,
+    `Item Text` = stem_combined,
+    `NE25 Text` = stem_ne25,
+    `Reverse Coded` = reverse,
+    `Calibration Item` = calibration_item,
+    `Has Response Options` = has_response_opts,
+    `Has IRT Parameters` = has_irt_params,
+    # Identifiers
+    NE25 = ne25,
+    NE22 = ne22,
+    NE20 = ne20,
+    CREDI = credi,
+    ECDI = ecdi
+  ) %>%
+  mutate(
+    `Reverse Coded` = ifelse(`Reverse Coded`, "Yes", "No"),
+    `Calibration Item` = ifelse(`Calibration Item`, "Yes", "No"),
+    `Has Response Options` = ifelse(`Has Response Options`, "Yes", "No"),
+    `Has IRT Parameters` = ifelse(`Has IRT Parameters`, "Yes", "No")
+  )
+
+# Create searchable datatable
+datatable(
+  display_df,
+  filter = 'top',
+  options = list(
+    pageLength = 25,
+    scrollX = TRUE,
+    searchHighlight = TRUE,
+    dom = 'Bfrtip',
+    buttons = list(
+      'copy',
+      list(extend = 'csv', filename = paste0('kidsights_items_', Sys.Date())),
+      list(extend = 'excel', filename = paste0('kidsights_items_', Sys.Date()))
+    ),
+    columnDefs = list(
+      list(width = '60px', targets = c(0, 1)),    # Item ID, Numeric ID
+      list(width = '80px', targets = c(2, 3)),    # Domains
+      list(width = '100px', targets = 4),         # Studies
+      list(width = '300px', targets = c(5, 6)),   # Item text
+      list(width = '60px', targets = 7:10),       # Boolean columns
+      list(width = '80px', targets = 11:15)       # Identifiers
+    )
+  ),
+  extensions = 'Buttons',
+  escape = FALSE,
+  rownames = FALSE
+) %>%
+  # Color code Kidsights domains
+  formatStyle(
+    'Domain (Kidsights)',
+    backgroundColor = styleEqual(
+      c('motor', 'socemo', 'coglan'),
+      c('#4ECDC4', '#FF6B6B', '#45B7D1')
+    ),
+    color = 'white',
+    fontWeight = 'bold'
+  ) %>%
+  # Color code CAHMI domains
+  formatStyle(
+    'Domain (CAHMI)',
+    backgroundColor = styleEqual(
+      c('motor', 'early_learning', 'self_regulation', 'social_emotional'),
+      c('#4ECDC4', '#96CEB4', '#FECA57', '#FF9999')
+    ),
+    color = 'white',
+    fontWeight = 'bold'
+  ) %>%
+  # Highlight calibration items
+  formatStyle(
+    'Calibration Item',
+    backgroundColor = styleEqual('Yes', '#f39c12'),
+    color = styleEqual('Yes', 'white'),
+    fontWeight = styleEqual('Yes', 'bold')
+  ) %>%
+  # Highlight items with IRT parameters
+  formatStyle(
+    'Has IRT Parameters',
+    backgroundColor = styleEqual('Yes', '#2ecc71'),
+    color = styleEqual('Yes', 'white')
+  )
+```
+
+## Domain Filters
+
+Click on the domain buttons below to quickly filter items:
+
+```{r domain-filters}
+#| results: asis
+# Get all unique domains from both columns
+kidsights_domains <- unique(df$domain_kidsights[!is.na(df$domain_kidsights)])
+cahmi_domains <- unique(df$domain_cahmi[!is.na(df$domain_cahmi)])
+all_domains <- unique(c(kidsights_domains, cahmi_domains))
+
+# Count occurrences in both columns
+domain_counts <- df %>%
+  rowwise() %>%
+  mutate(combined_domain = ifelse(!is.na(domain_kidsights), domain_kidsights, domain_cahmi)) %>%
+  filter(!is.na(combined_domain)) %>%
+  count(combined_domain, name = "n")
+
+for (domain in all_domains) {
+  count <- domain_counts$n[domain_counts$combined_domain == domain]
+  if (length(count) == 0) count <- 0
+  cat('<button type="button" class="btn btn-primary btn-sm" onclick="filterTable(\'', domain, '\')">')
+  cat(stringr::str_to_title(domain), ' (', count, ')')
+  cat('</button> ')
+}
+```
+
+```{js}
+function filterTable(domain) {
+  var table = $('#DataTables_Table_0').DataTable();
+  table.column(2).search(domain).draw();
+}
+```
+
+## Item Details by Domain
+
+### Motor Development {#motor}
+
+```{r motor-items}
+motor_items <- filter_items_by_domain(codebook, "motor")
+cat("**", length(motor_items), "motor development items**\n\n")
+
+# Show sample items
+motor_df <- items_to_dataframe(motor_items) %>%
+  select(item_id, stem_combined, studies) %>%
+  slice_head(n = 5)
+
+knitr::kable(motor_df,
+  col.names = c("Item ID", "Item Text", "Studies"),
+  caption = "Sample Motor Development Items"
+)
+```
+
+### Social-Emotional Development {#socemo}
+
+```{r socemo-items}
+socemo_items <- filter_items_by_domain(codebook, "socemo")
+cat("**", length(socemo_items), "social-emotional development items**\n\n")
+
+# Show sample items
+socemo_df <- items_to_dataframe(socemo_items) %>%
+  select(item_id, stem_combined, studies) %>%
+  slice_head(n = 5)
+
+knitr::kable(socemo_df,
+  col.names = c("Item ID", "Item Text", "Studies"),
+  caption = "Sample Social-Emotional Development Items"
+)
+```
+
+### Cognitive-Language Development {#coglan}
+
+```{r coglan-items}
+coglan_items <- filter_items_by_domain(codebook, "coglan")
+cat("**", length(coglan_items), "cognitive-language development items**\n\n")
+
+# Show sample items
+coglan_df <- items_to_dataframe(coglan_items) %>%
+  select(item_id, stem_combined, studies) %>%
+  slice_head(n = 5)
+
+knitr::kable(coglan_df,
+  col.names = c("Item ID", "Item Text", "Studies"),
+  caption = "Sample Cognitive-Language Development Items"
+)
+```
+
+## Response Options Summary
+
+```{r response-options}
+# Count different response option patterns
+response_patterns <- df %>%
+  filter(has_response_opts) %>%
+  count(has_response_opts, name = "n_items") %>%
+  mutate(percentage = round(100 * n_items / nrow(df), 1))
+
+cat("**Response Options Coverage:**\n")
+cat("- Items with response options: ", sum(df$has_response_opts), " (",
+    round(100 * sum(df$has_response_opts) / nrow(df), 1), "%)\n")
+cat("- Items without response options: ", sum(!df$has_response_opts), " (",
+    round(100 * sum(!df$has_response_opts) / nrow(df), 1), "%)\n")
+```
+
+---
+
+*Use the search functionality above to find specific items. Export options are available via the buttons above the table. For detailed psychometric information, visit the [Psychometrics](psychometrics.html) section.*

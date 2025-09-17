@@ -139,7 +139,7 @@ test_redcap_connectivity <- function(config_path = "config/sources/ne25.yaml") {
 #'
 #' @param db_path Path to DuckDB database file
 #' @param schema_file Path to SQL schema file
-initialize_database <- function(db_path = "C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb",
+initialize_database <- function(db_path = "data/duckdb/kidsights_local.duckdb",
                                schema_file = "schemas/landing/ne25.sql") {
 
   message("Initializing DuckDB database...")

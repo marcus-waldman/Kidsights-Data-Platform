@@ -87,7 +87,7 @@ if (pipeline_result$success) {
   }
 
   cat("\n📁 DATABASE LOCATION:\n")
-  cat("  C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb\n")
+  cat("  data/duckdb/kidsights_local.duckdb (local repository database)\n")
 
   cat("\n🎉 Pipeline completed successfully!\n")
   cat("You can now access your data in DuckDB for analysis.\n")

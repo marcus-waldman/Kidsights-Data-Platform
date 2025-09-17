@@ -1,0 +1,130 @@
+/*-- scss:defaults --*/
+
+// Custom variables
+$kidsights-blue: #1f4e79;
+$kidsights-light-blue: #4a90c2;
+$kidsights-green: #2ecc71;
+$kidsights-orange: #f39c12;
+$kidsights-red: #e74c3c;
+
+// Bootstrap variable overrides
+$primary: $kidsights-blue;
+$success: $kidsights-green;
+$warning: $kidsights-orange;
+$danger: $kidsights-red;
+
+/*-- scss:rules --*/
+
+// Custom styles
+.codebook-stat {
+  background: linear-gradient(135deg, $kidsights-light-blue, $kidsights-blue);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.codebook-stat h3 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: bold;
+}
+
+.codebook-stat p {
+  margin: 5px 0 0 0;
+  font-size: 1.1em;
+  opacity: 0.9;
+}
+
+.domain-motor {
+  border-left: 4px solid #4ECDC4;
+}
+
+.domain-socemo {
+  border-left: 4px solid #FF6B6B;
+}
+
+.domain-coglan {
+  border-left: 4px solid #45B7D1;
+}
+
+.domain-early-learning {
+  border-left: 4px solid #96CEB4;
+}
+
+.domain-self-regulation {
+  border-left: 4px solid #FECA57;
+}
+
+.item-card {
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 15px;
+  margin: 10px 0;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.item-card:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+.item-id {
+  font-family: 'Courier New', monospace;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.study-badge {
+  display: inline-block;
+  background: $kidsights-light-blue;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  margin: 2px;
+}
+
+.validation-pass {
+  color: $kidsights-green;
+  font-weight: bold;
+}
+
+.validation-warning {
+  color: $kidsights-orange;
+  font-weight: bold;
+}
+
+.validation-error {
+  color: $kidsights-red;
+  font-weight: bold;
+}
+
+// Custom navbar styling
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.3em;
+}
+
+// Table styling
+.dataTables_wrapper {
+  margin: 20px 0;
+}
+
+.dataTables_filter input {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 5px 10px;
+}
+
+// Plotly container
+.plotly {
+  width: 100% !important;
+  height: 400px !important;
+}

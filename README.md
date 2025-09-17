@@ -72,14 +72,59 @@ A successful run will:
 - Display execution metrics and database summary
 - Create pipeline execution log entry
 
+## Codebook System
+
+The platform includes a comprehensive JSON-based codebook system for managing item metadata across multiple studies:
+
+### Features
+- **306 Items**: Comprehensive metadata for items from 8 studies with complete IRT parameters
+- **NE22 IRT Parameters**: 203 items with empirical unidimensional IRT estimates
+- **Bifactor Model**: 44 PS items with factor loadings from Mplus output
+- **Interactive Dashboard**: Quarto-based web explorer with dark mode at `docs/codebook_dashboard/`
+- **R API**: Complete function library for querying and analysis
+- **Multiple Studies**: NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI
+- **Multi-domain Support**: Array-based domain assignments for psychosocial items
+
+### Quick Start
+```r
+# Load codebook
+source("R/codebook/load_codebook.R")
+source("R/codebook/query_codebook.R")
+codebook <- load_codebook("codebook/data/codebook.json")
+
+# Query items
+motor_items <- filter_items_by_domain(codebook, "motor")
+ps_items <- filter_items_by_study(codebook, "NE25")  # Includes 46 PS items
+item_details <- get_item(codebook, "PS001")
+
+# Access IRT parameters
+ps018 <- get_item(codebook, "PS018")
+thresholds <- ps018$psychometric$irt_parameters$NE22$thresholds  # [-1.418, 0.167]
+```
+
+### Recent v2.6 Updates
+- **IRT Integration**: NE22 unidimensional and bifactor model parameters
+- **Array Format**: Clean threshold storage as `[-1.418, 0.167]`
+- **Multi-domain PS Items**: Bifactor loadings mapped to multiple psychosocial domains
+- **Corrected Studies**: All PS items properly assigned to NE25/NE22/NE20
+- **Special Cases**: PS033 with NE22/NE20 only and reverse scoring
+- **Response Scale**: ps_frequency (Never/Sometimes/Often/Don't Know)
+
+See `codebook/README.md` for detailed documentation.
+
 ## Project Structure
 
 ```
 Kidsights-Data-Platform/
 ├── run_ne25_pipeline.R           # Main execution script
 ├── config/
-│   └── sources/
-│       └── ne25.yaml             # Pipeline configuration
+│   ├── sources/
+│   │   └── ne25.yaml             # Pipeline configuration
+│   └── codebook_config.yaml      # Codebook validation rules
+├── codebook/
+│   ├── data/
+│   │   └── codebook.json         # JSON codebook (305 items)
+│   └── dashboard/                # Quarto dashboard files
 ├── pipelines/
 │   └── orchestration/
 │       └── ne25_pipeline.R       # Core pipeline orchestration
@@ -91,14 +136,21 @@ Kidsights-Data-Platform/
 │   ├── transform/
 │   │   ├── ne25_transforms.R    # Dashboard-style transformations
 │   │   └── ne25_metadata.R      # Metadata generation
+│   ├── codebook/                # Codebook R functions
+│   │   ├── load_codebook.R      # Loading and initialization
+│   │   ├── query_codebook.R     # Filtering and searching
+│   │   ├── validate_codebook.R  # Validation functions
+│   │   └── visualize_codebook.R # Plotting functions
 │   ├── duckdb/
 │   │   ├── connection.R         # Database operations
 │   │   └── data_dictionary.R    # Dictionary storage functions
 │   └── documentation/
 │       └── generate_data_dictionary.R  # R wrapper for docs
 ├── scripts/
-│   └── documentation/
-│       └── generate_data_dictionary.py # Python doc generator
+│   ├── documentation/
+│   │   └── generate_data_dictionary.py # Python doc generator
+│   └── codebook/
+│       └── initial_conversion.R      # CSV to JSON conversion
 ├── schemas/
 │   └── landing/
 │       └── ne25.sql            # DuckDB table definitions

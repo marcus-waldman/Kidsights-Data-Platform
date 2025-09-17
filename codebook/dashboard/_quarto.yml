@@ -1,0 +1,32 @@
+project:
+  type: website
+  output-dir: ../../docs/codebook_dashboard
+
+website:
+  title: "Kidsights Codebook Explorer"
+  navbar:
+    background: primary
+    right:
+      - icon: github
+        href: https://github.com/waldmanm/Kidsights-Data-Platform
+
+format:
+  html:
+    theme:
+      - cosmo
+      - custom.scss
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    code-summary: "Show code"
+    grid:
+      sidebar-width: 250px
+      body-width: 900px
+      margin-width: 250px
+    page-layout: full
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false

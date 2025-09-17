@@ -1,0 +1,178 @@
+---
+title: "Data Quality"
+subtitle: "Quality checks and validation reports"
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(plotly)
+
+# Load codebook
+codebook <- fromJSON("../data/codebook.json", simplifyVector = FALSE)
+```
+
+## Data Quality Assessment
+
+This page provides quality checks and validation for the codebook data.
+
+```{r quality-overview}
+#| echo: false
+#| warning: false
+
+# Load the query functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+codebook_obj <- load_codebook("../data/codebook.json", validate = FALSE)
+df <- items_to_dataframe(codebook_obj)
+
+# Quality metrics
+quality_metrics <- data.frame(
+  Metric = c(
+    "Total Items",
+    "Items with Combined Stem",
+    "Items with Response Options",
+    "Items with Domain Classification",
+    "Items with Study Information",
+    "Reverse Coded Items",
+    "Calibration Items"
+  ),
+  Count = c(
+    nrow(df),
+    sum(!is.na(df$stem_combined) & df$stem_combined != ""),
+    sum(df$has_response_opts, na.rm = TRUE),
+    sum(!is.na(df$domain) & df$domain != ""),
+    sum(!is.na(df$studies) & df$studies != ""),
+    sum(df$reverse, na.rm = TRUE),
+    sum(df$calibration_item, na.rm = TRUE)
+  ),
+  Percentage = c(
+    100,
+    round(sum(!is.na(df$stem_combined) & df$stem_combined != "") / nrow(df) * 100, 1),
+    round(sum(df$has_response_opts, na.rm = TRUE) / nrow(df) * 100, 1),
+    round(sum(!is.na(df$domain) & df$domain != "") / nrow(df) * 100, 1),
+    round(sum(!is.na(df$studies) & df$studies != "") / nrow(df) * 100, 1),
+    round(sum(df$reverse, na.rm = TRUE) / nrow(df) * 100, 1),
+    round(sum(df$calibration_item, na.rm = TRUE) / nrow(df) * 100, 1)
+  )
+)
+
+DT::datatable(
+  quality_metrics,
+  colnames = c("Quality Metric", "Count", "Percentage"),
+  caption = "Data completeness metrics",
+  options = list(
+    pageLength = 15,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:3, fontSize = '14px')
+```
+
+### Data Completeness
+
+```{r completeness-plot}
+#| echo: false
+#| warning: false
+#| fig-height: 6
+
+p <- quality_metrics %>%
+  filter(Metric != "Total Items") %>%
+  mutate(Metric = fct_reorder(Metric, Percentage)) %>%
+  ggplot(aes(x = Metric, y = Percentage, fill = Metric)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Data Completeness by Field",
+    x = "Field",
+    y = "Completeness (%)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d() +
+  ylim(0, 100)
+
+ggplotly(p)
+```
+
+### Identifier Coverage
+
+```{r identifier-coverage}
+#| echo: false
+#| warning: false
+
+# Check identifier coverage
+identifier_coverage <- df %>%
+  summarise(
+    equate = sum(!is.na(item_id) & item_id != ""),
+    ne25 = sum(!is.na(ne25) & ne25 != ""),
+    ne22 = sum(!is.na(ne22) & ne22 != ""),
+    ne20 = sum(!is.na(ne20) & ne20 != ""),
+    cahmi22 = sum(!is.na(cahmi22) & cahmi22 != ""),
+    cahmi21 = sum(!is.na(cahmi21) & cahmi21 != ""),
+    ecdi = sum(!is.na(ecdi) & ecdi != ""),
+    credi = sum(!is.na(credi) & credi != ""),
+    gsed = sum(!is.na(gsed) & gsed != "")
+  ) %>%
+  pivot_longer(everything(), names_to = "Identifier", values_to = "Count") %>%
+  mutate(Percentage = round(Count / nrow(df) * 100, 1)) %>%
+  arrange(desc(Count))
+
+DT::datatable(
+  identifier_coverage,
+  colnames = c("Identifier System", "Items with ID", "Coverage %"),
+  caption = "Coverage of different identifier systems",
+  options = list(
+    pageLength = 15,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:3, fontSize = '14px')
+```
+
+### Potential Issues
+
+```{r potential-issues}
+#| echo: false
+#| warning: false
+
+issues <- data.frame(
+  Issue = c(
+    "Items missing stems",
+    "Items missing domain classification",
+    "Items missing study information",
+    "Empty identifier fields"
+  ),
+  Count = c(
+    sum(is.na(df$stem_combined) | df$stem_combined == ""),
+    sum(is.na(df$domain) | df$domain == ""),
+    sum(is.na(df$studies) | df$studies == ""),
+    sum(is.na(df$item_id) | df$item_id == "")
+  ),
+  Severity = c("High", "Medium", "Medium", "High")
+)
+
+issues$Status <- ifelse(issues$Count == 0, "✅ No Issues",
+                       ifelse(issues$Count < 5, "⚠️ Minor Issues", "❌ Needs Attention"))
+
+DT::datatable(
+  issues,
+  colnames = c("Potential Issue", "Count", "Severity", "Status"),
+  caption = "Data quality issues",
+  options = list(
+    pageLength = 15,
+    searching = FALSE,
+    paging = FALSE
+  ),
+  escape = FALSE
+) %>%
+  formatStyle(columns = 1:4, fontSize = '14px')
+```
+
+---
+*This page is under development. Additional quality checks and validation rules will be added.*

@@ -16,6 +16,7 @@ source("R/duckdb/data_dictionary.R")
 source("R/transform/ne25_transforms.R")
 source("R/transform/ne25_metadata.R")
 source("R/documentation/generate_data_dictionary.R")
+source("R/documentation/generate_interactive_dictionary.R")
 
 #' Convert REDCap dictionary list to data frame
 #'
@@ -89,6 +90,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     processing_duration = 0,
     transformation_duration = 0,
     metadata_generation_duration = 0,
+    interactive_dictionary_duration = 0,
     total_duration = 0
   )
 
@@ -350,6 +352,35 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("Data dictionary generation skipped or failed")
     }
 
+    # STEP 9: INTERACTIVE DICTIONARY GENERATION
+    message("\n--- Step 9: Generating Interactive Dictionary ---")
+    interactive_dict_start <- Sys.time()
+
+    # Generate interactive Quarto-based data dictionary
+    interactive_dict_result <- generate_interactive_dictionary(
+      con = con,
+      output_dir = "docs/data_dictionary/ne25",
+      verbose = TRUE,
+      timeout_seconds = 120
+    )
+
+    interactive_dict_time <- as.numeric(Sys.time() - interactive_dict_start)
+    metrics$interactive_dictionary_duration <- interactive_dict_time
+
+    if (interactive_dict_result$success) {
+      message(paste("✅ Interactive dictionary generated successfully:", interactive_dict_result$main_file))
+      message(paste("📄 Files generated:", interactive_dict_result$file_count))
+      message(paste("⏱️  Render time:", round(interactive_dict_result$duration, 1), "seconds"))
+      if (!is.null(interactive_dict_result$json_export)) {
+        message(paste("📋 JSON export:", interactive_dict_result$json_export))
+      }
+    } else {
+      message(paste("❌ Interactive dictionary generation failed:", interactive_dict_result$error))
+      if (!is.null(interactive_dict_result$suggestion)) {
+        message(paste("💡 Suggestion:", interactive_dict_result$suggestion))
+      }
+    }
+
     # Calculate final metrics
     metrics$end_time <- Sys.time()
     metrics$total_duration <- as.numeric(metrics$end_time - metrics$start_time)
@@ -374,6 +405,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       transformed_data_summary = get_transformed_summary(con),
       metadata_summary = get_metadata_summary(con),
       dictionary_summary = get_data_dictionary_summary(con),
+      interactive_dictionary_result = interactive_dict_result,
       data_preview = head(transformed_data, 10),
       variable_summary = head(metadata_summary, 20)
     ))

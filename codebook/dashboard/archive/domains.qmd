@@ -1,0 +1,83 @@
+---
+title: "Domain Analysis"
+subtitle: "Analysis by developmental domains"
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(plotly)
+
+# Load codebook
+codebook <- fromJSON("../data/codebook.json", simplifyVector = FALSE)
+```
+
+## Developmental Domains
+
+This page provides detailed analysis of items organized by developmental domain.
+
+```{r domain-summary}
+#| echo: false
+#| warning: false
+
+# Load the query functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+codebook_obj <- load_codebook("../data/codebook.json", validate = FALSE)
+df <- items_to_dataframe(codebook_obj)
+
+# Create domain summary
+domain_summary <- df %>%
+  group_by(domain) %>%
+  summarise(
+    n_items = n(),
+    n_reverse_coded = sum(reverse, na.rm = TRUE),
+    n_calibration = sum(calibration_item, na.rm = TRUE),
+    studies = length(unique(unlist(str_split(studies, ";")))),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(n_items))
+
+DT::datatable(
+  domain_summary,
+  colnames = c("Domain", "Items", "Reverse Coded", "Calibration Items", "Studies"),
+  caption = "Summary statistics by developmental domain",
+  options = list(
+    pageLength = 10,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:5, fontSize = '14px')
+```
+
+### Domain Distribution
+
+```{r domain-plot}
+#| echo: false
+#| warning: false
+#| fig-height: 6
+
+p <- df %>%
+  count(domain, sort = TRUE) %>%
+  mutate(domain = fct_reorder(domain, n)) %>%
+  ggplot(aes(x = domain, y = n, fill = domain)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Number of Items by Domain",
+    x = "Domain",
+    y = "Number of Items"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d()
+
+ggplotly(p)
+```
+
+---
+*This page is under development. More detailed domain analysis will be added.*

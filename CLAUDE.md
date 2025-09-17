@@ -276,6 +276,260 @@ CENSUS_API_KEY=<Census API key>
 4. Validate schema compatibility
 5. Review harmonization rules
 
+## Codebook System
+
+The platform includes a comprehensive JSON-based codebook system for managing item metadata across multiple studies.
+
+### Architecture Overview
+
+```
+CSV Codebook → JSON Conversion → R API → Quarto Dashboard
+                     ↓              ↓           ↓
+               305 Items      Query/Filter   Web Explorer
+               8 Studies     Validation     Tree Navigation
+               4 Domains     Visualization  Interactive UI
+```
+
+### Core Components
+
+#### 1. **JSON Data Structure**
+- **Location**: `codebook/data/codebook.json`
+- **Items**: 305 total (259 original + 46 GSED_PF PS items)
+- **Studies**: NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED_PF
+- **Domains**: socemo, motor, coglan, psychosocial_problems_general
+
+#### 2. **R Function Library**
+- **Location**: `R/codebook/`
+- **Modules**: load, query, validate, visualize
+- **Key Functions**:
+  - `load_codebook()` - Load and initialize JSON
+  - `filter_items_by_domain()` - Domain-based filtering
+  - `filter_items_by_study()` - Study-based filtering
+  - `get_item()` - Retrieve specific items
+  - `items_to_dataframe()` - Convert to analysis format
+
+#### 3. **Conversion Pipeline**
+- **Location**: `scripts/codebook/initial_conversion.R`
+- **Process**: CSV + PS items → JSON with validation
+- **Features**:
+  - Automatic PS items integration
+  - Response set detection
+  - Natural alphanumeric sorting
+  - Reverse coding corrections
+
+#### 4. **Interactive Dashboard**
+- **Location**: `codebook/dashboard/`
+- **Technology**: Quarto + jsTree navigation
+- **Features**: Hierarchical JSON exploration, search, tree drill-down
+- **Output**: `docs/codebook_dashboard/index.html`
+
+### JSON Structure Conventions
+
+#### Item Structure
+```json
+{
+  "id": 2001,
+  "studies": ["NE25", "NE22", "NE20"],
+  "lexicons": {
+    "equate": "PS001",
+    "ne25": "PS001"
+  },
+  "domains": {
+    "kidsights": {
+      "value": [
+        "psychosocial_problems_general",
+        "psychosocial_problems_feeding"
+      ],
+      "studies": ["NE25", "NE22", "NE20"]
+    }
+  },
+  "content": {
+    "stems": {
+      "combined": "Do you have any concerns..."
+    },
+    "response_options": {
+      "ne25": "ps_frequency"
+    }
+  },
+  "scoring": {
+    "reverse": false,
+    "equate_group": "NE25"
+  },
+  "psychometric": {
+    "irt_parameters": {
+      "NE22": {
+        "factors": ["gen", "eat"],
+        "loadings": [0.492, 1.447],
+        "thresholds": [-2.782, -0.193],
+        "constraints": []
+      }
+    }
+  }
+}
+```
+
+#### Response Sets
+```json
+{
+  "response_sets": {
+    "ps_frequency": [
+      {"value": 0, "label": "Never or Almost Never"},
+      {"value": 1, "label": "Sometimes"},
+      {"value": 2, "label": "Often"},
+      {"value": -9, "label": "Don't Know", "missing": true}
+    ]
+  }
+}
+```
+
+### Adding New Items/Studies
+
+#### 1. **Add to Configuration**
+Update `config/codebook_config.yaml`:
+```yaml
+validation:
+  study_validation:
+    valid_studies:
+      - "NEW_STUDY"
+  domain_validation:
+    valid_domains:
+      - "new_domain"
+```
+
+#### 2. **Create Parser Function**
+Add to `scripts/codebook/initial_conversion.R`:
+```r
+parse_new_study_items <- function(csv_path) {
+  # Read and parse new items
+  # Return structured list
+}
+```
+
+#### 3. **Integrate in Conversion**
+Update `convert_csv_to_json()`:
+```r
+# Add new items
+new_items <- parse_new_study_items()
+items_list <- c(items_list, new_items)
+```
+
+#### 4. **Test Integration**
+```r
+source("scripts/codebook/initial_conversion.R")
+convert_csv_to_json()
+
+# Verify
+codebook <- load_codebook("codebook/data/codebook.json")
+new_items <- filter_items_by_study(codebook, "NEW_STUDY")
+```
+
+### Response Set System
+
+#### Adding New Response Sets
+1. **Define in config**:
+```yaml
+response_sets:
+  new_scale:
+    - value: 1
+      label: "Option 1"
+    - value: 2
+      label: "Option 2"
+```
+
+2. **Reference in items**:
+```json
+"response_options": {
+  "study_name": "new_scale"
+}
+```
+
+3. **Detection in conversion**:
+```r
+# Add to detect_response_set_or_parse()
+if (str_detect(normalized, "pattern_for_new_scale")) {
+  return("new_scale")
+}
+```
+
+### Dashboard Customization
+
+#### Rendering
+```bash
+quarto render codebook/dashboard/index.qmd
+```
+
+#### Configuration
+- **Location**: `codebook/dashboard/_quarto.yml`
+- **Styling**: `codebook/dashboard/custom.scss`
+- **Assets**: `codebook/dashboard/assets/`
+
+#### Tree Navigation
+- Uses jsTree for hierarchical display
+- Mirrors exact JSON structure
+- Supports drill-down to specific values
+- Search functionality included
+
+### Testing and Validation
+
+#### Basic Functionality Test
+```r
+source("R/codebook/load_codebook.R")
+source("R/codebook/query_codebook.R")
+
+codebook <- load_codebook("codebook/data/codebook.json", validate=FALSE)
+motor_items <- filter_items_by_domain(codebook, "motor")
+gsed_items <- filter_items_by_study(codebook, "GSED_PF")
+cat("Found", length(gsed_items), "GSED_PF items\n")
+```
+
+#### Validation
+```r
+source("R/codebook/validate_codebook.R")
+validation <- validate_codebook_structure(codebook)
+stopifnot(validation$valid)
+```
+
+### Current Status (September 2025)
+
+#### ✅ **COMPLETED v2.6**
+- **306 Items**: 260 original + 46 PS items with complete IRT parameters
+- **NE22 IRT Integration**: 203 items with empirical unidimensional IRT parameters
+- **Bifactor IRT Model**: 44 PS items with factor loadings from Mplus output
+- **Multi-domain Support**: Array-based domain assignments for PS items
+- **Corrected Studies**: PS items with proper NE25/NE22/NE20 participation
+- **Response Sets**: Added ps_frequency scale for psychosocial items
+- **Dashboard**: Dark mode toggle and updated navigation
+- **Array Format**: Clean threshold storage as `[-1.418, 0.167]` instead of named objects
+
+#### **Key Features**
+- **IRT Parameters**: 4-field structure with constraints, array-based thresholds
+- **Bifactor Model**: General factor (gen) + specific factors (eat, sle, soc, int, ext)
+- **Threshold Transformation**: Proper Mplus threshold conversion (negate and sort)
+- **Multi-domain Items**: PS items assigned to multiple psychosocial domains
+- **Special Cases**: PS033 with NE22/NE20 only and reverse scoring
+- Natural alphanumeric sorting (AA4, AA5, AA11, AA102)
+- Response set references (single source of truth)
+- Hierarchical domain structure with study groups
+- Interactive tree navigation with exact JSON mirroring
+- Complete R function library with 20+ functions
+
+### Development Notes
+
+#### File Handling
+- Use `simplifyVector = FALSE` when loading JSON in R
+- Always validate after major changes
+- Use `gtools::mixedsort()` for proper item ordering
+
+#### Performance
+- Load without validation for large operations: `validate = FALSE`
+- Cache codebook object in interactive sessions
+- Use `items_to_dataframe()` for bulk analysis
+
+#### Error Handling
+- All functions return NULL/empty for invalid inputs with warnings
+- Validation functions provide detailed error lists
+- Dashboard gracefully handles missing data
+
 ## Contact & Support
 
 - Technical Lead: [Contact Info]
@@ -316,6 +570,13 @@ The NE25 pipeline has been fully implemented and tested successfully:
 - `scripts/documentation/generate_data_dictionary.py` - Python documentation generator
 - `R/documentation/generate_data_dictionary.R` - R wrapper functions
 - `docs/data_dictionary/` - Auto-generated documentation (MD, HTML, JSON)
+
+### Codebook Management Scripts
+- `scripts/codebook/initial_conversion.R` - Convert CSV codebook to JSON format
+- `scripts/codebook/update_ne22_irt_parameters.R` - Populate NE22 unidimensional IRT parameters
+- `scripts/codebook/update_ps_bifactor_irt.R` - Parse Mplus bifactor output for PS items
+- `scripts/codebook/update_ps_studies.R` - Correct PS item study assignments
+- `scripts/codebook/assign_ps_domains.R` - Assign multi-domain values to PS items
 
 ### Development Notes
 - If you persistently run into an error along the lines of "Error: File has been unexpectedly modified", you may need to remake and save over the file

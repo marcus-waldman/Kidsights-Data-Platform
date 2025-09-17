@@ -1,0 +1,110 @@
+---
+title: "Study Analysis"
+subtitle: "Analysis by research studies"
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(plotly)
+
+# Load codebook
+codebook <- fromJSON("../data/codebook.json", simplifyVector = FALSE)
+```
+
+## Research Studies
+
+This page provides analysis of items organized by research study.
+
+```{r study-summary}
+#| echo: false
+#| warning: false
+
+# Load the query functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+codebook_obj <- load_codebook("../data/codebook.json", validate = FALSE)
+
+# Get study information from items
+df <- items_to_dataframe(codebook_obj)
+
+# Extract study counts
+study_counts <- df %>%
+  select(studies) %>%
+  filter(!is.na(studies) & studies != "") %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  count(studies, sort = TRUE, name = "Items")
+
+study_summary <- study_counts %>%
+  rename(Study = studies) %>%
+  arrange(desc(Items))
+
+DT::datatable(
+  study_summary,
+  colnames = c("Study", "Number of Items"),
+  caption = "Items per study",
+  options = list(
+    pageLength = 15,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:2, fontSize = '14px')
+```
+
+### Study Coverage
+
+```{r study-plot}
+#| echo: false
+#| warning: false
+#| fig-height: 6
+
+p <- study_summary %>%
+  mutate(Study = fct_reorder(Study, Items)) %>%
+  ggplot(aes(x = Study, y = Items, fill = Study)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "Number of Items by Study",
+    x = "Study",
+    y = "Number of Items"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_fill_viridis_d()
+
+ggplotly(p)
+```
+
+### Cross-Study Item Usage
+
+```{r study-crosstab}
+#| echo: false
+#| warning: false
+
+# Create domain × study crosstab manually
+crosstab <- df %>%
+  select(domain, studies) %>%
+  filter(!is.na(studies) & studies != "" & !is.na(domain) & domain != "") %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  count(domain, studies) %>%
+  pivot_wider(names_from = studies, values_from = n, values_fill = 0)
+
+DT::datatable(
+  crosstab,
+  caption = "Items by domain and study",
+  options = list(
+    pageLength = 10,
+    scrollX = TRUE
+  )
+) %>%
+  formatStyle(columns = 1:ncol(crosstab), fontSize = '12px')
+```
+
+---
+*This page is under development. More detailed study analysis will be added.*

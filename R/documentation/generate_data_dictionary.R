@@ -26,7 +26,7 @@ library(dplyr)
 #' dict_path <- generate_data_dictionary(format = "summary", export_json = TRUE, export_html = TRUE)
 #' }
 generate_data_dictionary <- function(
-    db_path = "C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb",
+    db_path = "data/duckdb/kidsights_local.duckdb",
     output_dir = "docs/data_dictionary",
     format = "full",
     export_json = FALSE,

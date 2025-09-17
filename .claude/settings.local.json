@@ -1,10 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_data_dictionary.R''); result <- generate_data_dictionary(format = ''summary'', export_json = TRUE, export_html = TRUE); print(paste(''Generated:'', result))\")",
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_data_dictionary.R''); result <- generate_pipeline_data_dictionary(format = ''full''); print(paste(''Pipeline result:'', result))\")"
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''docs/data_dictionary/ne25/assets/dictionary_functions.R''); cat(''✅ Dictionary functions loaded successfully\\n'')\")",
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_interactive_dictionary.R''); cat(''✅ Interactive dictionary function loaded with new default path\\n'')\")",
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" run_ne25_pipeline.R)",
+      "Bash(python:*)",
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"\nlibrary(DBI)\nlibrary(duckdb)\ncon <- dbConnect(duckdb::duckdb(), ''C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb'')\n\n# Clean existing NE25 data to avoid constraint conflicts\ntables_to_clean <- c(''ne25_data_dictionary'', ''ne25_raw'', ''ne25_transformed'', ''ne25_metadata'', ''ne25_eligibility'',\n                     ''ne25_raw_pid7679'', ''ne25_raw_pid7943'', ''ne25_raw_pid7999'', ''ne25_raw_pid8014'')\n\nfor (table in tables_to_clean) {\n  if (table %in% dbListTables(con)) {\n    dbExecute(con, paste(''DELETE FROM'', table))\n    cat(''Cleaned table:'', table, ''\\n'')\n  }\n}\n\ndbDisconnect(con)\ncat(''Database cleanup completed\\n'')\n\")"
     ],
     "deny": [],
     "ask": []
-  }
+  },
+  "outputStyle": "Explanatory"
 }

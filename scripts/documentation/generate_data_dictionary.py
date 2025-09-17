@@ -400,7 +400,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate NE25 Data Dictionary from metadata")
     parser.add_argument(
         "--db-path",
-        default="C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb",
+        default="data/duckdb/kidsights_local.duckdb",
         help="Path to DuckDB database file"
     )
     parser.add_argument(

@@ -1,0 +1,159 @@
+# Codebook Configuration
+# Settings for the JSON-based codebook system
+
+# File paths
+paths:
+  json_codebook: "codebook/data/codebook.json"
+  csv_codebook: "codebook/data/codebook.csv"
+  dashboard_output: "docs/codebook_dashboard"
+  versions_dir: "codebook/data/versions"
+
+# Validation rules
+validation:
+  required_fields:
+    - "id"
+    - "identifiers.kidsight"
+    - "studies"
+    - "classification.domain"
+
+  domain_validation:
+    valid_domains:
+      - "socemo"
+      - "motor"
+      - "coglan"
+      - "general"
+      - "psychosocial_problems_general"
+      - "psychosocial_problems_feeding"
+      - "psychosocial_problems_sleeping"
+      - "psychosocial_problems_socialemotional"
+      - "psychosocial_problems_internalizing"
+      - "psychosocial_problems_externalizing"
+
+    valid_hrtl_domains:
+      - "social_emotional"
+      - "motor"
+      - "early_learning"
+      - "self_regulation"
+
+  study_validation:
+    valid_studies:
+      - "NE25"
+      - "NE22"
+      - "NE20"
+      - "CAHMI22"
+      - "CAHMI21"
+      - "ECDI"
+      - "CREDI"
+      - "GSED"
+      - "GSED_PF"
+      - "NSCH21"
+      - "NSCH22"
+
+# Standard response sets
+response_sets:
+  standard_binary:
+    - value: 1
+      label: "Yes"
+    - value: 0
+      label: "No"
+    - value: -9
+      label: "Don't Know"
+      missing: true
+
+  likert_5:
+    - value: 1
+      label: "Never"
+    - value: 2
+      label: "Rarely"
+    - value: 3
+      label: "Sometimes"
+    - value: 4
+      label: "Often"
+    - value: 5
+      label: "Always"
+
+  ps_frequency:
+    - value: 0
+      label: "Never or Almost Never"
+    - value: 1
+      label: "Sometimes"
+    - value: 2
+      label: "Often"
+    - value: -9
+      label: "Don't Know"
+      missing: true
+
+# Dashboard settings
+dashboard:
+  title: "Kidsights Item Codebook"
+  theme: "cosmo"
+  items_per_page: 25
+  export_formats: ["csv", "excel", "json"]
+
+  # Color scheme for domains
+  domain_colors:
+    socemo: "#FF6B6B"      # Red
+    motor: "#4ECDC4"       # Teal
+    coglan: "#45B7D1"      # Blue
+    default: "#95A5A6"     # Gray
+
+# IRT model settings
+irt_models:
+  default_theta_range: [-4, 4]
+  default_model_type: "2PL"
+
+  supported_models:
+    - "1PL"
+    - "2PL"
+    - "3PL"
+    - "GRM"   # Graded Response Model
+    - "M2PL"  # Multidimensional 2PL
+
+  # Template structure for IRT parameters by study
+  parameter_template:
+    factors: []      # Factor names for multidimensional models
+    loadings: []     # Factor loadings (a-parameters)
+    thresholds: []   # Difficulty/threshold parameters
+    constraints: []  # Parameter constraints for IRT calibration
+
+  # Studies that support IRT parameters
+  supported_studies:
+    - "NE25"
+    - "NE22"
+    - "NE20"
+    - "CAHMI22"
+    - "CAHMI21"
+    - "ECDI"
+    - "CREDI"
+    - "GSED"
+    - "GSED_PF"
+
+# Conversion settings
+conversion:
+  csv_encoding: "UTF-8"
+  missing_values: ["", "NA", "NULL", "null"]
+
+  # CSV column mappings
+  csv_columns:
+    jid: "id"
+    lex_kidsight: "identifiers.kidsight"
+    lex_ne25: "identifiers.ne25"
+    lex_ne22: "identifiers.ne22"
+    lex_ne20: "identifiers.ne20"
+    lex_cahmi22: "identifiers.cahmi22"
+    lex_cahmi21: "identifiers.cahmi21"
+    lex_ecdi: "identifiers.ecdi"
+    lex_credi: "identifiers.credi"
+    lex_gsed: "identifiers.gsed"
+    domain3: "classification.domain"
+    domain_hrtl: "classification.domain_hrtl"
+    stem_combined: "content.stems.combined"
+    stem_25: "content.stems.ne25"
+    stem_22: "content.stems.ne22"
+    resp_opts25: "content.response_options.ne25"
+    resp_opts20: "content.response_options.ne20"
+    reverse: "scoring.reverse"
+    discrepancy: "scoring.discrepancy"
+    equate_group: "scoring.equate_group"
+    hrtl_calibration_item: "psychometric.calibration_item"
+    param_constraints: "psychometric.param_constraints"

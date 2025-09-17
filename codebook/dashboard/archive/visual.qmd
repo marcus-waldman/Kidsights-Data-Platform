@@ -1,0 +1,672 @@
+---
+title: "Visual Overview"
+subtitle: "Interactive visualizations of codebook structure and relationships"
+format:
+  html:
+    page-layout: full
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(plotly)
+library(networkD3)
+library(visNetwork)
+
+# Source codebook functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+# Load codebook
+codebook <- load_codebook("../data/codebook.json", validate = FALSE)
+```
+
+<style>
+.viz-container {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.viz-controls {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.control-group {
+  display: inline-block;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.control-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.control-group select, .control-group input {
+  padding: 6px 10px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.network-info {
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 2.5em;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9em;
+  opacity: 0.9;
+  margin-top: 5px;
+}
+
+#sunburst-chart {
+  height: 600px;
+}
+
+#network-chart {
+  height: 700px;
+  border: 1px solid #ddd;
+}
+
+#treemap-chart {
+  height: 500px;
+}
+
+.tooltip {
+  position: absolute;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 1000;
+}
+</style>
+
+## Overview Statistics
+
+```{r overview-stats}
+#| results: asis
+# Calculate key statistics
+total_items <- length(codebook$items)
+total_studies <- length(unique(unlist(sapply(codebook$items, function(x) x$studies))))
+total_domains <- length(unique(sapply(codebook$items, function(x) x$classification$domain)))
+
+# Items with response options
+items_with_responses <- sum(sapply(codebook$items, function(x) {
+  !is.null(x$content$response_options) && length(x$content$response_options) > 0
+}))
+
+# Calibration items
+calibration_items <- sum(sapply(codebook$items, function(x) {
+  isTRUE(x$psychometric$calibration_item)
+}))
+
+cat('<div class="stats-grid">')
+cat('<div class="stat-card"><div class="stat-number">', total_items, '</div><div class="stat-label">Total Items</div></div>')
+cat('<div class="stat-card"><div class="stat-number">', total_studies, '</div><div class="stat-label">Studies</div></div>')
+cat('<div class="stat-card"><div class="stat-number">', total_domains, '</div><div class="stat-label">Domains</div></div>')
+cat('<div class="stat-card"><div class="stat-number">', items_with_responses, '</div><div class="stat-label">Items with Responses</div></div>')
+cat('<div class="stat-card"><div class="stat-number">', calibration_items, '</div><div class="stat-label">Calibration Items</div></div>')
+cat('</div>')
+```
+
+## Interactive Hierarchical View
+
+### Sunburst Chart - Navigate the Codebook Hierarchy
+
+<div class="viz-container">
+  <div class="viz-controls">
+    <div class="control-group">
+      <label for="sunburst-level">Detail Level:</label>
+      <select id="sunburst-level">
+        <option value="1">Domain Level</option>
+        <option value="2">Domain → Items</option>
+        <option value="3">Domain → Study → Items</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label for="sunburst-metric">Size Metric:</label>
+      <select id="sunburst-metric">
+        <option value="count">Item Count</option>
+        <option value="studies">Study Coverage</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="sunburst-chart"></div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color" style="background: #FF6B6B;"></div>
+      <span>Social-Emotional</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #4ECDC4;"></div>
+      <span>Motor</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #45B7D1;"></div>
+      <span>Cognitive-Language</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #96CEB4;"></div>
+      <span>Early Learning</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background: #FECA57;"></div>
+      <span>Self-Regulation</span>
+    </div>
+  </div>
+</div>
+
+## Network Visualization
+
+### Item-Study Relationships
+
+<div class="viz-container">
+  <div class="network-info">
+    <strong>📊 Network View:</strong> This interactive network shows how items (circles) connect to studies (squares).
+    Hover over nodes to see details, click and drag to explore. Use the controls below to filter and customize the view.
+  </div>
+
+  <div class="viz-controls">
+    <div class="control-group">
+      <label for="network-filter-domain">Filter by Domain:</label>
+      <select id="network-filter-domain">
+        <option value="">All Domains</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="network-layout">Layout:</label>
+      <select id="network-layout">
+        <option value="forceAtlas2Based">Force Atlas</option>
+        <option value="barnesHut">Barnes Hut</option>
+        <option value="repulsion">Repulsion</option>
+        <option value="hierarchicalRepulsion">Hierarchical</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="show-labels">Show Labels:</label>
+      <input type="checkbox" id="show-labels" checked>
+    </div>
+
+    <div class="control-group">
+      <label for="node-size">Node Size by:</label>
+      <select id="node-size">
+        <option value="connections">Connections</option>
+        <option value="uniform">Uniform</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="network-chart"></div>
+</div>
+
+## Domain Analysis
+
+### Treemap - Items by Domain and Study
+
+<div class="viz-container">
+  <div class="viz-controls">
+    <div class="control-group">
+      <label for="treemap-grouping">Grouping:</label>
+      <select id="treemap-grouping">
+        <option value="domain-study">Domain → Study</option>
+        <option value="study-domain">Study → Domain</option>
+        <option value="domain-only">Domain Only</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="treemap-chart"></div>
+</div>
+
+```{r embed-data-for-js}
+#| results: asis
+# Prepare data for JavaScript visualizations
+df <- items_to_dataframe(codebook, flatten_identifiers = FALSE)
+
+# Create network data
+network_data <- list()
+
+# Nodes: items and studies
+item_nodes <- df %>%
+  select(id = item_id, label = item_id, domain, title = stem_combined) %>%
+  mutate(
+    group = domain,
+    type = "item",
+    title = paste0("Item: ", id, "\nDomain: ", domain, "\nText: ", substr(title, 1, 100), "...")
+  )
+
+study_nodes <- df %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  distinct(studies) %>%
+  transmute(
+    id = studies,
+    label = studies,
+    group = "study",
+    type = "study",
+    title = paste0("Study: ", studies)
+  )
+
+# Edges: item-study connections
+edges <- df %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  transmute(
+    from = item_id,
+    to = studies,
+    title = paste0(item_id, " → ", studies)
+  )
+
+network_data$nodes <- bind_rows(item_nodes, study_nodes)
+network_data$edges <- edges
+
+# Treemap data
+treemap_data <- df %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  count(domain, studies, name = "value") %>%
+  arrange(domain, studies)
+
+# Sunburst data for plotly
+sunburst_data <- df %>%
+  separate_rows(studies, sep = ";") %>%
+  filter(studies != "") %>%
+  count(domain, studies, name = "value")
+
+# Embed data as JSON
+cat("<script>")
+cat("window.networkData = ", toJSON(network_data, auto_unbox = TRUE), ";")
+cat("window.treemapData = ", toJSON(treemap_data, auto_unbox = TRUE), ";")
+cat("window.sunburstData = ", toJSON(sunburst_data, auto_unbox = TRUE), ";")
+cat("window.codebookData = ", toJSON(codebook, auto_unbox = TRUE), ";")
+cat("</script>")
+```
+
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<script>
+// Color scheme for domains
+const domainColors = {
+  'socemo': '#FF6B6B',
+  'motor': '#4ECDC4',
+  'coglan': '#45B7D1',
+  'early_learning': '#96CEB4',
+  'self_regulation': '#FECA57',
+  'study': '#95A5A6'
+};
+
+// Initialize all visualizations
+document.addEventListener('DOMContentLoaded', function() {
+  initializeSunburst();
+  initializeNetwork();
+  initializeTreemap();
+  populateFilters();
+  setupEventHandlers();
+});
+
+function initializeSunburst() {
+  const data = prepareSunburstData(1);
+
+  const layout = {
+    title: 'Codebook Hierarchy',
+    font: { size: 12 },
+    margin: { l: 0, r: 0, t: 50, b: 0 }
+  };
+
+  Plotly.newPlot('sunburst-chart', data, layout, {responsive: true});
+}
+
+function prepareSunburstData(level) {
+  const data = window.sunburstData;
+  let labels = ['Codebook'];
+  let parents = [''];
+  let values = [data.reduce((sum, d) => sum + d.value, 0)];
+  let colors = ['#2E86AB'];
+
+  if (level >= 1) {
+    // Add domains
+    const domainData = data.reduce((acc, d) => {
+      if (!acc[d.domain]) acc[d.domain] = 0;
+      acc[d.domain] += d.value;
+      return acc;
+    }, {});
+
+    Object.entries(domainData).forEach(([domain, value]) => {
+      labels.push(domain);
+      parents.push('Codebook');
+      values.push(value);
+      colors.push(domainColors[domain] || '#95A5A6');
+    });
+  }
+
+  if (level >= 2) {
+    // Add studies within domains
+    data.forEach(d => {
+      labels.push(`${d.studies} (${d.domain})`);
+      parents.push(d.domain);
+      values.push(d.value);
+      colors.push(domainColors[d.domain] || '#95A5A6');
+    });
+  }
+
+  return [{
+    type: 'sunburst',
+    labels: labels,
+    parents: parents,
+    values: values,
+    marker: { colors: colors },
+    branchvalues: 'total',
+    hovertemplate: '<b>%{label}</b><br>Items: %{value}<extra></extra>',
+    textinfo: 'label+percent parent'
+  }];
+}
+
+function initializeNetwork() {
+  const container = document.getElementById('network-chart');
+
+  // Prepare nodes with colors
+  const nodes = window.networkData.nodes.map(node => ({
+    ...node,
+    color: {
+      background: domainColors[node.group] || '#95A5A6',
+      border: '#2B2B2B',
+      highlight: {
+        background: domainColors[node.group] || '#95A5A6',
+        border: '#2B2B2B'
+      }
+    },
+    shape: node.type === 'study' ? 'box' : 'dot',
+    size: node.type === 'study' ? 25 : 15,
+    font: { color: '#2B2B2B', size: 12 }
+  }));
+
+  const edges = window.networkData.edges.map(edge => ({
+    ...edge,
+    color: { color: '#848484', highlight: '#2B2B2B' },
+    width: 1
+  }));
+
+  const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+
+  const options = {
+    physics: {
+      enabled: true,
+      forceAtlas2Based: {
+        gravitationalConstant: -26,
+        centralGravity: 0.005,
+        springLength: 230,
+        springConstant: 0.18
+      },
+      maxVelocity: 146,
+      solver: 'forceAtlas2Based',
+      timestep: 0.35,
+      stabilization: { iterations: 150 }
+    },
+    nodes: {
+      borderWidth: 2,
+      shadow: true
+    },
+    edges: {
+      shadow: true,
+      smooth: {
+        type: 'continuous'
+      }
+    },
+    interaction: {
+      hover: true,
+      tooltipDelay: 200
+    }
+  };
+
+  window.network = new vis.Network(container, data, options);
+
+  // Add click handler
+  window.network.on('click', function(params) {
+    if (params.nodes.length > 0) {
+      const nodeId = params.nodes[0];
+      const node = nodes.find(n => n.id === nodeId);
+
+      if (node && node.type === 'item') {
+        showItemDetails(nodeId);
+      }
+    }
+  });
+}
+
+function initializeTreemap() {
+  const data = prepareTreemapData('domain-study');
+
+  const layout = {
+    title: 'Items by Domain and Study',
+    font: { size: 12 },
+    margin: { l: 0, r: 0, t: 50, b: 0 }
+  };
+
+  Plotly.newPlot('treemap-chart', data, layout, {responsive: true});
+}
+
+function prepareTreemapData(grouping) {
+  const data = window.treemapData;
+
+  if (grouping === 'domain-study') {
+    return [{
+      type: 'treemap',
+      labels: data.map(d => `${d.studies}<br>(${d.value} items)`),
+      parents: data.map(d => d.domain),
+      values: data.map(d => d.value),
+      text: data.map(d => `${d.studies}: ${d.value} items`),
+      textinfo: 'label+text',
+      hovertemplate: '<b>%{label}</b><br>Domain: %{parent}<br>Items: %{value}<extra></extra>',
+      marker: {
+        colors: data.map(d => domainColors[d.domain] || '#95A5A6')
+      }
+    }];
+  }
+
+  // Add other grouping options as needed
+  return [];
+}
+
+function populateFilters() {
+  // Populate network domain filter
+  const domains = [...new Set(window.networkData.nodes
+    .filter(n => n.type === 'item')
+    .map(n => n.group))];
+
+  const domainSelect = document.getElementById('network-filter-domain');
+  domains.forEach(domain => {
+    const option = document.createElement('option');
+    option.value = domain;
+    option.textContent = domain;
+    domainSelect.appendChild(option);
+  });
+}
+
+function setupEventHandlers() {
+  // Sunburst controls
+  document.getElementById('sunburst-level').addEventListener('change', function() {
+    const level = parseInt(this.value);
+    const data = prepareSunburstData(level);
+    Plotly.react('sunburst-chart', data);
+  });
+
+  // Network controls
+  document.getElementById('network-filter-domain').addEventListener('change', function() {
+    filterNetworkByDomain(this.value);
+  });
+
+  document.getElementById('network-layout').addEventListener('change', function() {
+    updateNetworkLayout(this.value);
+  });
+
+  document.getElementById('show-labels').addEventListener('change', function() {
+    toggleNetworkLabels(this.checked);
+  });
+
+  // Treemap controls
+  document.getElementById('treemap-grouping').addEventListener('change', function() {
+    const data = prepareTreemapData(this.value);
+    Plotly.react('treemap-chart', data);
+  });
+}
+
+function filterNetworkByDomain(domain) {
+  if (!window.network) return;
+
+  const allNodes = window.networkData.nodes;
+  const allEdges = window.networkData.edges;
+
+  if (!domain) {
+    // Show all
+    window.network.setData({
+      nodes: new vis.DataSet(allNodes),
+      edges: new vis.DataSet(allEdges)
+    });
+    return;
+  }
+
+  // Filter nodes
+  const filteredNodes = allNodes.filter(node =>
+    node.type === 'study' || node.group === domain
+  );
+
+  // Filter edges
+  const nodeIds = new Set(filteredNodes.map(n => n.id));
+  const filteredEdges = allEdges.filter(edge =>
+    nodeIds.has(edge.from) && nodeIds.has(edge.to)
+  );
+
+  window.network.setData({
+    nodes: new vis.DataSet(filteredNodes),
+    edges: new vis.DataSet(filteredEdges)
+  });
+}
+
+function updateNetworkLayout(layout) {
+  if (!window.network) return;
+
+  const options = {
+    physics: {
+      solver: layout,
+      stabilization: { iterations: 150 }
+    }
+  };
+
+  window.network.setOptions(options);
+}
+
+function toggleNetworkLabels(show) {
+  if (!window.network) return;
+
+  const options = {
+    nodes: {
+      font: { color: show ? '#2B2B2B' : 'transparent' }
+    }
+  };
+
+  window.network.setOptions(options);
+}
+
+function showItemDetails(itemId) {
+  const item = window.codebookData.items[itemId];
+  if (!item) return;
+
+  const details = `
+    <div class="modal fade" id="itemModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Item: ${itemId}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Domain:</strong> ${item.classification?.domain || 'Unknown'}</p>
+            <p><strong>Studies:</strong> ${item.studies ? item.studies.join(', ') : 'None'}</p>
+            <p><strong>Text:</strong> ${item.content?.stems?.combined || 'No text available'}</p>
+            <hr>
+            <pre class="language-json"><code>${JSON.stringify(item, null, 2)}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Remove existing modal if any
+  const existingModal = document.getElementById('itemModal');
+  if (existingModal) existingModal.remove();
+
+  // Add new modal
+  document.body.insertAdjacentHTML('beforeend', details);
+
+  // Show modal
+  const modal = new bootstrap.Modal(document.getElementById('itemModal'));
+  modal.show();
+}
+</script>

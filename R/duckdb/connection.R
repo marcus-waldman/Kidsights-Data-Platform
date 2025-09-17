@@ -6,8 +6,8 @@
 library(duckdb)
 library(DBI)
 
-# Default database path
-KIDSIGHTS_DB_PATH <- "C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb"
+# Default database path (local to repository)
+KIDSIGHTS_DB_PATH <- "data/duckdb/kidsights_local.duckdb"
 
 #' Connect to Kidsights DuckDB database
 #'

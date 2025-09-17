@@ -209,8 +209,8 @@ processing:
 
 # Output configuration
 output:
-  # DuckDB database location
-  database_path: "C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb"
+  # DuckDB database location (local to repository)
+  database_path: "data/duckdb/kidsights_local.duckdb"
 
   # Landing table (raw data)
   landing_table: "ne25_raw"

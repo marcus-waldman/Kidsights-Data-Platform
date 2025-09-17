@@ -1,0 +1,127 @@
+---
+title: "Psychometric Properties"
+subtitle: "IRT parameters and calibration information"
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(jsonlite)
+library(DT)
+library(plotly)
+
+# Load codebook
+codebook <- fromJSON("../data/codebook.json", simplifyVector = FALSE)
+```
+
+## Psychometric Analysis
+
+This page provides analysis of item psychometric properties, including IRT parameters and calibration information.
+
+```{r psychometric-summary}
+#| echo: false
+#| warning: false
+
+# Load the query functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/query_codebook.R")
+
+codebook_obj <- load_codebook("../data/codebook.json", validate = FALSE)
+df <- items_to_dataframe(codebook_obj)
+
+# Create psychometric summary
+psych_summary <- df %>%
+  summarise(
+    total_items = n(),
+    calibration_items = sum(calibration_item, na.rm = TRUE),
+    items_with_irt = sum(has_irt_params, na.rm = TRUE),
+    reverse_coded = sum(reverse, na.rm = TRUE)
+  )
+
+knitr::kable(
+  psych_summary,
+  col.names = c("Total Items", "Calibration Items", "Items with IRT Parameters", "Reverse Coded Items"),
+  caption = "Psychometric Overview"
+)
+```
+
+### Calibration Items by Domain
+
+```{r calibration-by-domain}
+#| echo: false
+#| warning: false
+
+calibration_summary <- df %>%
+  group_by(domain) %>%
+  summarise(
+    total_items = n(),
+    calibration_items = sum(calibration_item, na.rm = TRUE),
+    pct_calibration = round(calibration_items / total_items * 100, 1),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(pct_calibration))
+
+DT::datatable(
+  calibration_summary,
+  colnames = c("Domain", "Total Items", "Calibration Items", "% Calibration"),
+  caption = "Calibration items by domain",
+  options = list(
+    pageLength = 10,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:4, fontSize = '14px')
+```
+
+### Reverse Coding by Domain
+
+```{r reverse-coding}
+#| echo: false
+#| warning: false
+
+reverse_summary <- df %>%
+  group_by(domain) %>%
+  summarise(
+    total_items = n(),
+    reverse_items = sum(reverse, na.rm = TRUE),
+    pct_reverse = round(reverse_items / total_items * 100, 1),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(reverse_items))
+
+DT::datatable(
+  reverse_summary,
+  colnames = c("Domain", "Total Items", "Reverse Coded", "% Reverse Coded"),
+  caption = "Reverse coding by domain",
+  options = list(
+    pageLength = 10,
+    searching = FALSE,
+    paging = FALSE
+  )
+) %>%
+  formatStyle(columns = 1:4, fontSize = '14px')
+```
+
+### IRT Model Configuration
+
+```{r irt-config}
+#| echo: false
+#| results: asis
+
+if (!is.null(codebook$irt_models)) {
+  cat("### IRT Model Information\n\n")
+
+  config <- codebook$irt_models$configurations$primary_calibration
+
+  cat("**Model Type:** ", config$model_type, "\n\n")
+  cat("**Dimensions:** ", paste(config$dimensions, collapse = ", "), "\n\n")
+  cat("**Estimation Method:** ", config$estimation_method, "\n\n")
+  cat("**Software:** ", config$software, " (version ", config$version, ")\n\n")
+} else {
+  cat("*IRT model configuration not available*\n")
+}
+```
+
+---
+*This page is under development. Detailed IRT analysis and parameter displays will be added.*
