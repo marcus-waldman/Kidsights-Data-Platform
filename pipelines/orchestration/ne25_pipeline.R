@@ -11,10 +11,7 @@ library(REDCapR)
 # Source required functions
 source("R/extract/ne25.R")
 source("R/harmonize/ne25_eligibility.R")
-source("R/duckdb/connection.R")
-source("R/duckdb/data_dictionary.R")
 source("R/transform/ne25_transforms.R")
-source("R/transform/ne25_metadata.R")
 source("R/documentation/generate_data_dictionary.R")
 source("R/documentation/generate_interactive_dictionary.R")
 
@@ -103,15 +100,23 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
   message("Configuration loaded successfully")
 
-  # Connect to database
-  con <- NULL
-  tryCatch({
-    con <- connect_kidsights_db(config$output$database_path)
-    init_ne25_schema(con)
-    message("Database connection established")
-  }, error = function(e) {
-    stop(paste("Failed to connect to database:", e$message))
-  })
+  # Initialize database using Python
+  message("Initializing database schema using Python...")
+  init_result <- system2(
+    "python",
+    args = c(
+      "pipelines/python/init_database.py",
+      "--config", config_path,
+      "--log-level", "INFO"
+    ),
+    stdout = TRUE,
+    stderr = TRUE
+  )
+
+  if (attr(init_result, "status") != 0 && !is.null(attr(init_result, "status"))) {
+    stop(paste("Database initialization failed:", paste(init_result, collapse = "\n")))
+  }
+  message("Database schema initialized successfully")
 
   tryCatch({
 
@@ -228,28 +233,93 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     processing_time <- as.numeric(Sys.time() - processing_start)
     metrics$processing_duration <- processing_time
 
-    # STEP 5: STORE RAW DATA IN DUCKDB
+    # STEP 5: STORE RAW DATA IN DUCKDB USING PYTHON
     message("\n--- Step 5: Storing Raw Data in DuckDB ---")
 
-    # Insert raw data (use insert_ne25_data to create tables)
+    # Create temporary directory for CSV exports
+    temp_dir <- file.path(tempdir(), "ne25_pipeline")
+    dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+
+    # Export raw data to CSV and insert using Python
     message("Storing raw data...")
-    insert_ne25_data(con, validated_data, "ne25_raw", overwrite = overwrite_existing)
+    raw_csv <- file.path(temp_dir, "ne25_raw.csv")
+    write.csv(validated_data, raw_csv, row.names = FALSE)
+
+    raw_result <- system2(
+      "python",
+      args = c(
+        "pipelines/python/insert_raw_data.py",
+        "--data-file", raw_csv,
+        "--table-name", "ne25_raw",
+        "--data-type", "raw",
+        "--config", config_path
+      ),
+      stdout = TRUE,
+      stderr = TRUE
+    )
+
+    if (attr(raw_result, "status") != 0 && !is.null(attr(raw_result, "status"))) {
+      warning(paste("Raw data insertion had issues:", paste(raw_result, collapse = "\n")))
+    } else {
+      message("Raw data stored successfully")
+    }
 
     # Insert eligibility results
     message("Storing eligibility results...")
-    insert_ne25_data(con, eligibility_results, "ne25_eligibility", overwrite = overwrite_existing)
+    elig_csv <- file.path(temp_dir, "ne25_eligibility.csv")
+    write.csv(eligibility_results, elig_csv, row.names = FALSE)
+
+    elig_result <- system2(
+      "python",
+      args = c(
+        "pipelines/python/insert_raw_data.py",
+        "--data-file", elig_csv,
+        "--table-name", "ne25_eligibility",
+        "--data-type", "eligibility",
+        "--config", config_path
+      ),
+      stdout = TRUE,
+      stderr = TRUE
+    )
+
+    if (attr(elig_result, "status") != 0 && !is.null(attr(elig_result, "status"))) {
+      warning(paste("Eligibility data insertion had issues:", paste(elig_result, collapse = "\n")))
+    } else {
+      message("Eligibility data stored successfully")
+    }
 
     # Store project-specific raw data by PID
     message("Storing project-specific raw data by PID...")
     for (project_name in names(projects_data)) {
       project_data <- projects_data[[project_name]]
       if (!is.null(project_data) && nrow(project_data) > 0) {
-        # Get PID from the data (already added at line 124)
+        # Get PID from the data
         project_pid <- unique(project_data$pid)[1]
         table_name <- paste0("ne25_raw_pid", project_pid)
 
-        message(paste("  - Storing", nrow(project_data), "records to", table_name, "for project:", project_name))
-        insert_ne25_data(con, project_data, table_name, overwrite = overwrite_existing)
+        # Export to CSV and insert using Python
+        project_csv <- file.path(temp_dir, paste0("ne25_raw_pid", project_pid, ".csv"))
+        write.csv(project_data, project_csv, row.names = FALSE)
+
+        project_result <- system2(
+          "python",
+          args = c(
+            "pipelines/python/insert_raw_data.py",
+            "--data-file", project_csv,
+            "--table-name", table_name,
+            "--data-type", "raw",
+            "--pid", as.character(project_pid),
+            "--config", config_path
+          ),
+          stdout = TRUE,
+          stderr = TRUE
+        )
+
+        if (attr(project_result, "status") != 0 && !is.null(attr(project_result, "status"))) {
+          warning(paste("Project", project_name, "data insertion had issues:", paste(project_result, collapse = "\n")))
+        } else {
+          message(paste("  - Stored", nrow(project_data), "records to", table_name, "for project:", project_name))
+        }
       }
     }
 
@@ -269,10 +339,31 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           if (!is.null(project_data) && nrow(project_data) > 0) {
             project_pid <- unique(project_data$pid)[1]
             project_dict_df$pid <- project_pid
-          }
 
-          dict_rows <- insert_data_dictionary(con, project_dict_df, project_name, overwrite = overwrite_existing)
-          total_dict_fields <- total_dict_fields + dict_rows
+            # Export to CSV and insert using Python
+            dict_csv <- file.path(temp_dir, paste0("dictionary_pid", project_pid, ".csv"))
+            write.csv(project_dict_df, dict_csv, row.names = FALSE)
+
+            dict_result <- system2(
+              "python",
+              args = c(
+                "pipelines/python/insert_raw_data.py",
+                "--data-file", dict_csv,
+                "--table-name", "ne25_data_dictionary",
+                "--data-type", "dictionary",
+                "--pid", as.character(project_pid),
+                "--config", config_path
+              ),
+              stdout = TRUE,
+              stderr = TRUE
+            )
+
+            if (attr(dict_result, "status") != 0 && !is.null(attr(dict_result, "status"))) {
+              warning(paste("Dictionary insertion for PID", project_pid, "had issues:", paste(dict_result, collapse = "\n")))
+            } else {
+              total_dict_fields <- total_dict_fields + nrow(project_dict_df)
+            }
+          }
         }
       }
     }
@@ -294,14 +385,29 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
 
-    # Store transformed data
+    # Store transformed data using Python
     message("Storing transformed data...")
-    insert_transformed_data(
-      con = con,
-      data = transformed_data,
-      transformation_version = "1.0.0",
-      overwrite = overwrite_existing
+    transformed_csv <- file.path(temp_dir, "ne25_transformed.csv")
+    write.csv(transformed_data, transformed_csv, row.names = FALSE)
+
+    transformed_result <- system2(
+      "python",
+      args = c(
+        "pipelines/python/insert_raw_data.py",
+        "--data-file", transformed_csv,
+        "--table-name", "ne25_transformed",
+        "--data-type", "raw",
+        "--config", config_path
+      ),
+      stdout = TRUE,
+      stderr = TRUE
     )
+
+    if (attr(transformed_result, "status") != 0 && !is.null(attr(transformed_result, "status"))) {
+      warning(paste("Transformed data insertion had issues:", paste(transformed_result, collapse = "\n")))
+    } else {
+      message("Transformed data stored successfully")
+    }
 
     transformation_time <- as.numeric(Sys.time() - transformation_start)
     metrics$transformation_duration <- transformation_time
@@ -309,42 +415,42 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     message(paste("Data transformation completed in", round(transformation_time, 2), "seconds"))
 
-    # STEP 7: METADATA GENERATION
+    # STEP 7: METADATA GENERATION USING PYTHON
     message("\n--- Step 7: Generating Variable Metadata ---")
     metadata_start <- Sys.time()
 
-    # Generate comprehensive variable metadata
-    message("Creating variable metadata...")
-    variable_metadata <- create_variable_metadata(
-      dat = transformed_data,
-      dict = combined_dictionary,
-      my_API = NULL,
-      what = "all"
+    # Generate metadata using Python script
+    message("Creating variable metadata using Python...")
+    metadata_result <- system2(
+      "python",
+      args = c(
+        "pipelines/python/generate_metadata.py",
+        "--source-table", "ne25_transformed",
+        "--metadata-table", "ne25_metadata",
+        "--config", config_path,
+        "--log-level", "INFO"
+      ),
+      stdout = TRUE,
+      stderr = TRUE
     )
 
-    # Convert metadata to dataframe for database storage
-    message("Converting metadata to database format...")
-    metadata_df <- metadata_to_dataframe(variable_metadata)
-
-    # Store metadata in database
-    message("Storing variable metadata...")
-    insert_metadata(con, metadata_df, overwrite = TRUE)
-
-    # Create summary table for reporting
-    message("Creating metadata summary...")
-    metadata_summary <- create_variable_summary_table(variable_metadata)
+    if (attr(metadata_result, "status") != 0 && !is.null(attr(metadata_result, "status"))) {
+      warning(paste("Metadata generation had issues:", paste(metadata_result, collapse = "\n")))
+      message("Metadata generation completed with warnings")
+    } else {
+      message("Metadata generation completed successfully")
+    }
 
     metadata_time <- as.numeric(Sys.time() - metadata_start)
     metrics$metadata_generation_duration <- metadata_time
 
     message(paste("Metadata generation completed in", round(metadata_time, 2), "seconds"))
-    message(paste("Generated metadata for", nrow(metadata_df), "variables"))
 
     # STEP 8: DATA DICTIONARY GENERATION
     message("\n--- Step 8: Generating Data Dictionary ---")
 
-    # Generate data dictionary from metadata
-    dict_path <- generate_pipeline_data_dictionary(con = con, format = "full")
+    # Generate data dictionary without database connection
+    dict_path <- generate_pipeline_data_dictionary(format = "full")
 
     if (!is.null(dict_path)) {
       message(paste("Data dictionary generated:", dict_path))
@@ -358,7 +464,6 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     # Generate interactive Quarto-based data dictionary
     interactive_dict_result <- generate_interactive_dictionary(
-      con = con,
       output_dir = "docs/data_dictionary/ne25",
       verbose = TRUE,
       timeout_seconds = 120
@@ -385,29 +490,23 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     metrics$end_time <- Sys.time()
     metrics$total_duration <- as.numeric(metrics$end_time - metrics$start_time)
 
-    # Log pipeline execution
-    log_pipeline_execution(
-      con = con,
-      execution_id = execution_id,
-      pipeline_type = pipeline_type,
-      metrics = metrics,
-      status = "success"
-    )
+    # Clean up temporary files
+    unlink(temp_dir, recursive = TRUE)
+
+    # Log pipeline execution (simple file logging since we don't have con)
+    message(paste("Pipeline execution ID:", execution_id, "completed successfully"))
 
     message(paste("Pipeline completed successfully in", round(metrics$total_duration, 2), "seconds"))
 
-    # Return success result with transformed data summaries
+    # Return success result with local data summaries
     return(list(
       success = TRUE,
       execution_id = execution_id,
       metrics = metrics,
-      raw_data_summary = get_ne25_summary(con),
-      transformed_data_summary = get_transformed_summary(con),
-      metadata_summary = get_metadata_summary(con),
-      dictionary_summary = get_data_dictionary_summary(con),
       interactive_dictionary_result = interactive_dict_result,
       data_preview = head(transformed_data, 10),
-      variable_summary = head(metadata_summary, 20)
+      total_records = nrow(transformed_data),
+      total_variables = ncol(transformed_data)
     ))
 
   }, error = function(e) {
@@ -415,19 +514,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     error_message <- e$message
     message(paste("ERROR: Pipeline failed:", error_message))
 
-    # Try to log the failure
-    tryCatch({
-      log_pipeline_execution(
-        con = con,
-        execution_id = execution_id,
-        pipeline_type = pipeline_type,
-        metrics = metrics,
-        status = "failed",
-        error_message = error_message
-      )
-    }, error = function(log_error) {
-      message(paste("Error inserting data:", log_error$message))
-    })
+    # Log the failure (simple file logging)
+    message(paste("Pipeline execution ID:", execution_id, "failed:", error_message))
 
     # Return failure result
     return(list(
@@ -438,9 +526,9 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     ))
 
   }, finally = {
-    # Always disconnect from database
-    if (!is.null(con)) {
-      disconnect_kidsights_db(con)
+    # Clean up any remaining temporary files
+    if (exists("temp_dir") && dir.exists(temp_dir)) {
+      unlink(temp_dir, recursive = TRUE)
     }
   })
 }

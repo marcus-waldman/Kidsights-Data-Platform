@@ -293,8 +293,7 @@ CREATE VIEW IF NOT EXISTS v_ne25_eligible_participants AS
 SELECT
     h.*,
     e.eligibility,
-    e.authenticity,
-    e.exclusion_reason
+    e.authenticity
 FROM ne25_harmonized h
 LEFT JOIN ne25_eligibility e ON h.record_id = e.record_id AND h.pid = e.pid AND h.retrieved_date = e.retrieved_date
 WHERE h.include = TRUE;
@@ -302,12 +301,12 @@ WHERE h.include = TRUE;
 CREATE VIEW IF NOT EXISTS v_ne25_recruitment_summary AS
 SELECT
     DATE(retrieved_date) as recruitment_date,
-    source_project,
+    pid,
     COUNT(*) as total_recruited,
     COUNT(CASE WHEN include = TRUE THEN 1 END) as eligible_recruited,
     ROUND(100.0 * COUNT(CASE WHEN include = TRUE THEN 1 END) / COUNT(*), 1) as eligibility_rate
 FROM ne25_harmonized
-GROUP BY DATE(retrieved_date), source_project
+GROUP BY DATE(retrieved_date), pid
 ORDER BY recruitment_date DESC;
 
 CREATE VIEW IF NOT EXISTS v_ne25_demographics_summary AS

@@ -1,0 +1,25 @@
+# Python dependencies for Kidsights Data Platform
+# Database operations
+duckdb>=0.9.0
+pandas>=2.0.0
+pyarrow>=13.0.0
+
+# Configuration and utilities
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# Data processing
+numpy>=1.24.0
+
+# Documentation and export
+markdown2>=2.4.0
+
+# Development and testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Logging and monitoring
+structlog>=23.0.0

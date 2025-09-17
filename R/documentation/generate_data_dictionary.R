@@ -228,32 +228,13 @@ install_python_dependencies <- function(python_path = NULL) {
 #' Wrapper function specifically for pipeline integration that handles
 #' all error checking and provides appropriate feedback
 #'
-#' @param con DuckDB connection object (optional, for validation)
 #' @param format Format type for dictionary
 #' @return Path to generated dictionary or NULL if failed
-generate_pipeline_data_dictionary <- function(con = NULL, format = "full") {
+generate_pipeline_data_dictionary <- function(format = "full") {
 
   message("\\n--- Generating Data Dictionary ---")
 
   tryCatch({
-
-    # Check if metadata exists in database
-    if (!is.null(con)) {
-      tables <- DBI::dbListTables(con)
-      if (!"ne25_metadata" %in% tables) {
-        warning("Metadata table not found in database. Skipping data dictionary generation.")
-        return(NULL)
-      }
-
-      # Check if metadata has content
-      metadata_count <- DBI::dbGetQuery(con, "SELECT COUNT(*) as n FROM ne25_metadata")$n
-      if (metadata_count == 0) {
-        warning("No metadata records found. Skipping data dictionary generation.")
-        return(NULL)
-      }
-
-      message(paste("Found", metadata_count, "metadata records"))
-    }
 
     # Check Python dependencies
     if (!check_python_dependencies()) {

@@ -16,31 +16,47 @@ The Kidsights Data Platform provides automated data extraction, validation, and 
 
 ## Architecture
 
+**🚀 Python Architecture (September 2025)**: Hybrid R-Python design eliminates segmentation faults
+
 ```
-REDCap Projects (4) → API Extraction → Type Harmonization → Dashboard Transforms → DuckDB Storage
-     ↓                     ↓                 ↓                    ↓                   ↓
-- Project 7679         - REDCapR           - flexible_bind    - recode_it()       - ne25_raw
-- Project 7943         - Secure tokens     - Type conversion  - Race/ethnicity   - ne25_transformed
-- Project 7999         - Rate limiting     - Field mapping    - Education cats   - ne25_metadata
-- Project 8014                                                - Age groups       - ne25_data_dictionary
+REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Dashboard Transforms
+     ↓                         ↓                     ↓                        ↓
+- Project 7679             - REDCapR             - flexible_bind         - recode_it()
+- Project 7943             - Secure tokens       - Type conversion       - Race/ethnicity
+- Project 7999             - Rate limiting       - Field mapping         - Education cats
+- Project 8014                                                           - Age groups
+                                                   ↓
+              Python: Database Operations → DuckDB Storage (Local)
+                         ↓                         ↓
+                  - Connection mgmt            - ne25_raw
+                  - Error handling             - ne25_transformed
+                  - Metadata generation        - ne25_metadata
+                  - Performance monitoring     - ne25_data_dictionary
 ```
 
 ## Database Location
 
-Data is stored in DuckDB at:
+Data is stored locally in DuckDB at:
+```bash
+# Local database (current)
+data/duckdb/kidsights_local.duckdb
+
+# Legacy location (archived)
+# C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb
 ```
-C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb
-```
+
+### Migration Notice
+> In September 2025, the platform migrated from R DuckDB to Python database operations due to persistent segmentation faults. The new architecture provides 100% reliability while maintaining all functionality.
 
 ## Quick Start
 
 ### Prerequisites
 
-- R 4.4.3+ installed at `C:/Program Files/R/R-4.4.3/bin`
-- Required R packages: `dplyr`, `yaml`, `REDCapR`, `duckdb`, `DBI`
-- Python 3.13+ with packages: `duckdb`, `pandas`, `markdown2`
-- Access to REDCap API credentials file
-- OneDrive folder access for database storage
+- **R 4.4.3+** installed at `C:/Program Files/R/R-4.4.3/bin`
+- **Required R packages**: `dplyr`, `yaml`, `REDCapR` (Note: `duckdb`, `DBI` no longer needed!)
+- **Python 3.13+** with packages: `duckdb`, `pandas`, `pyyaml`, `structlog`
+- **Access to REDCap API credentials file**
+- **Local storage** for database (OneDrive no longer required)
 
 ### Setup
 

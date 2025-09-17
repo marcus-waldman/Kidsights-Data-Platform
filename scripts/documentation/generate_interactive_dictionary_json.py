@@ -116,29 +116,25 @@ class InteractiveDictionaryExporter:
             # Get unique variables with their labels
             unique_vars = raw_vars_df[['field_name', 'field_label', 'pid']].drop_duplicates()
 
-            # Create pivot table to show presence across projects
-            matrix = unique_vars.pivot_table(
-                index=['field_name', 'field_label'],
-                columns='pid',
-                values='pid',  # Use pid as value (will be non-null where present)
-                aggfunc='first'
-            ).reset_index()
+            # Create variable-project presence matrix
+            project_pids = [7679, 7943, 7999, 8014]  # Use integers to match the data
 
-            # Convert to boolean presence indicators with PID_ prefix
-            project_pids = ['7679', '7943', '7999', '8014']
-            pid_columns = [col for col in matrix.columns if str(col) in project_pids]
+            # Ensure PID column is the right data type
+            unique_vars['pid'] = unique_vars['pid'].astype(int)
 
+            # Get unique field names and labels
+            unique_fields = unique_vars[['field_name', 'field_label']].drop_duplicates()
+
+            # For each project, create a boolean indicator
+            matrix = unique_fields.copy()
             for pid in project_pids:
                 col_name = f'PID_{pid}'
-                if int(pid) in matrix.columns:
-                    matrix[col_name] = ~matrix[int(pid)].isna()
-                    matrix = matrix.drop(columns=[int(pid)])
-                else:
-                    matrix[col_name] = False
+                # Check which variables exist in this PID
+                vars_in_pid = set(unique_vars[unique_vars['pid'] == pid]['field_name'])
+                matrix[col_name] = matrix['field_name'].isin(vars_in_pid)
 
-            # Reorder columns
-            final_columns = ['field_name', 'field_label'] + [f'PID_{pid}' for pid in project_pids]
-            matrix = matrix[final_columns].sort_values('field_name')
+            # Sort by field name
+            matrix = matrix.sort_values('field_name')
 
             print(f"[SUCCESS] Created variable-project matrix with {len(matrix)} variables")
             return matrix
@@ -205,6 +201,95 @@ class InteractiveDictionaryExporter:
 
         return df.sort_values(['category_mapped', 'variable_name'])
 
+    def get_aggregated_summaries(self, raw_vars_df, transformed_vars_df, conn):
+        """Generate summary statistics and aggregations needed by Quarto"""
+        summaries = {}
+
+        try:
+            # Raw variable type summary
+            if not raw_vars_df.empty:
+                # Get unique variables first to avoid duplicates across projects
+                unique_raw_vars = raw_vars_df.groupby('field_name').first().reset_index()
+                type_summary = unique_raw_vars['field_type'].value_counts().reset_index()
+                type_summary.columns = ['field_type', 'count']
+                type_summary['percentage'] = (type_summary['count'] / type_summary['count'].sum() * 100).round(1)
+                type_summary = type_summary.sort_values('count', ascending=False)
+
+                summaries['raw_variable_types'] = {
+                    "description": "Distribution of field types in raw variables",
+                    "total_unique_variables": len(unique_raw_vars),
+                    "data": type_summary.to_dict(orient='records')
+                }
+
+            # Transformed variable category summary
+            if not transformed_vars_df.empty:
+                category_summary = transformed_vars_df['category_mapped'].value_counts().reset_index()
+                category_summary.columns = ['category', 'count']
+                category_summary['percentage'] = (category_summary['count'] / category_summary['count'].sum() * 100).round(1)
+                category_summary = category_summary.sort_values('count', ascending=False)
+
+                summaries['transformed_variable_categories'] = {
+                    "description": "Distribution of categories in transformed variables",
+                    "total_variables": len(transformed_vars_df),
+                    "data": category_summary.to_dict(orient='records')
+                }
+
+                # Missing data summary
+                if 'missing_percentage' in transformed_vars_df.columns:
+                    missing_summary = {
+                        "description": "Missing data statistics across transformed variables",
+                        "variables_with_no_missing": len(transformed_vars_df[transformed_vars_df['missing_percentage'] == 0]),
+                        "variables_with_some_missing": len(transformed_vars_df[(transformed_vars_df['missing_percentage'] > 0) & (transformed_vars_df['missing_percentage'] < 50)]),
+                        "variables_with_high_missing": len(transformed_vars_df[transformed_vars_df['missing_percentage'] >= 50]),
+                        "average_missing_percentage": transformed_vars_df['missing_percentage'].mean().round(2),
+                        "median_missing_percentage": transformed_vars_df['missing_percentage'].median().round(2)
+                    }
+                    summaries['missing_data_summary'] = missing_summary
+
+            # Project coverage summary
+            if not raw_vars_df.empty:
+                project_coverage = raw_vars_df.groupby('pid').agg({
+                    'field_name': 'nunique',
+                    'form_name': 'nunique'
+                }).reset_index()
+                project_coverage.columns = ['pid', 'unique_variables', 'unique_forms']
+
+                summaries['project_coverage'] = {
+                    "description": "Variable and form counts by project",
+                    "data": project_coverage.to_dict(orient='records')
+                }
+
+            # Database freshness check
+            try:
+                db_stats_query = """
+                SELECT
+                    COUNT(*) as total_records,
+                    MAX(retrieved_date) as last_extraction
+                FROM ne25_raw
+                """
+                db_stats = pd.read_sql(db_stats_query, conn)
+
+                summaries['database_freshness'] = {
+                    "description": "Database freshness and size information",
+                    "total_records": int(db_stats['total_records'].iloc[0]),
+                    "last_extraction": str(db_stats['last_extraction'].iloc[0]) if db_stats['last_extraction'].iloc[0] else None,
+                    "database_path": str(self.db_path),
+                    "database_size_mb": round(self.db_path.stat().st_size / 1024 / 1024, 2)
+                }
+            except Exception as e:
+                print(f"[WARNING] Could not get database freshness info: {e}")
+                summaries['database_freshness'] = {
+                    "description": "Database freshness information unavailable",
+                    "error": str(e)
+                }
+
+            print(f"[SUCCESS] Generated {len(summaries)} summary sections")
+            return summaries
+
+        except Exception as e:
+            print(f"[ERROR] Error generating summaries: {e}")
+            return {}
+
     def export_comprehensive_json(self):
         """Export all dictionary data to comprehensive JSON file"""
         print("[INFO] Starting comprehensive JSON export...")
@@ -224,17 +309,26 @@ class InteractiveDictionaryExporter:
             if not transformed_vars_df.empty:
                 transformed_vars_df = self.apply_category_mapping(transformed_vars_df)
 
+            # Get aggregated summaries for Quarto
+            summaries = self.get_aggregated_summaries(raw_vars_df, transformed_vars_df, conn)
+
             # Build comprehensive JSON structure
             dictionary_json = {
                 "metadata": {
                     "generated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "generated_timestamp": datetime.now().isoformat(),
                     "study": "ne25",
+                    "version": "2.0.0",
+                    "source_database": str(self.db_path),
                     "total_raw_variables": len(raw_vars_df),
                     "total_transformed_variables": len(transformed_vars_df),
                     "total_projects": len(raw_vars_df['pid'].unique()) if not raw_vars_df.empty else 0,
                     "project_pids": sorted(raw_vars_df['pid'].unique().tolist()) if not raw_vars_df.empty else [],
-                    "generated_by": "Kidsights Data Platform - Interactive Dictionary (Python)"
+                    "unique_raw_variables": len(raw_vars_df.groupby('field_name').first()) if not raw_vars_df.empty else 0,
+                    "generated_by": "Kidsights Data Platform - Interactive Dictionary (Python)",
+                    "schema_version": "1.0"
                 },
+                "summaries": summaries,
                 "variable_project_matrix": {
                     "description": "Matrix showing which variables appear in which REDCap projects",
                     "total_variables": len(matrix_df),

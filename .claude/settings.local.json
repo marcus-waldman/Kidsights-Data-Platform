@@ -1,11 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''docs/data_dictionary/ne25/assets/dictionary_functions.R''); cat(''✅ Dictionary functions loaded successfully\\n'')\")",
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"source(''R/documentation/generate_interactive_dictionary.R''); cat(''✅ Interactive dictionary function loaded with new default path\\n'')\")",
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" run_ne25_pipeline.R)",
+      "Bash(echo \"=== Demonstrating Complete NE25 Pipeline (Segfault-Free) ===\nDatabase → Python → JSON → Quarto → HTML\n\nStep 1: Generate JSON Dictionary (Python accesses DuckDB)\")",
       "Bash(python:*)",
-      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"\nlibrary(DBI)\nlibrary(duckdb)\ncon <- dbConnect(duckdb::duckdb(), ''C:/Users/waldmanm/OneDrive - The University of Colorado Denver/Kidsights-duckDB/kidsights.duckdb'')\n\n# Clean existing NE25 data to avoid constraint conflicts\ntables_to_clean <- c(''ne25_data_dictionary'', ''ne25_raw'', ''ne25_transformed'', ''ne25_metadata'', ''ne25_eligibility'',\n                     ''ne25_raw_pid7679'', ''ne25_raw_pid7943'', ''ne25_raw_pid7999'', ''ne25_raw_pid8014'')\n\nfor (table in tables_to_clean) {\n  if (table %in% dbListTables(con)) {\n    dbExecute(con, paste(''DELETE FROM'', table))\n    cat(''Cleaned table:'', table, ''\\n'')\n  }\n}\n\ndbDisconnect(con)\ncat(''Database cleanup completed\\n'')\n\")"
+      "Bash(\"C:/Program Files/R/R-4.4.3/bin/Rscript.exe\" -e \"\n# Test R arrow package after session restart\ncat(''Testing R arrow package...\\n'')\n\n# Test basic functionality first\nlibrary(arrow)\ncat(''Arrow library loaded successfully\\n'')\n\n# Create simple test data\ntest_data <- data.frame(\n  x = 1:5,\n  y = letters[1:5],\n  stringsAsFactors = FALSE\n)\n\ncat(''Test data created\\n'')\n\n# Try to write parquet\ntemp_file <- tempfile(fileext = ''.parquet'')\ncat(''Attempting to write parquet file...\\n'')\n\narrow::write_parquet(test_data, temp_file)\ncat(''SUCCESS: Parquet file written!\\n'')\n\n# Verify file exists\nif (file.exists(temp_file)) {\n  cat(''File exists, size:'', file.info(temp_file)$size, ''bytes\\n'')\n} else {\n  cat(''ERROR: File was not created\\n'')\n}\n\")"
     ],
     "deny": [],
     "ask": []

@@ -3,7 +3,7 @@
 #' Main Execution Script for NE25 Kidsights Pipeline
 #'
 #' Simple script to run the complete end-to-end NE25 data pipeline
-#' from REDCap extraction to DuckDB storage on OneDrive.
+#' from REDCap extraction to DuckDB storage in local repository.
 #'
 #' Usage:
 #'   source("run_ne25_pipeline.R")

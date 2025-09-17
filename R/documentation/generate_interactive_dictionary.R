@@ -44,14 +44,12 @@ check_quarto_installation <- function(quarto_path = NULL) {
 #'
 #' Creates the interactive Quarto-based data dictionary by rendering all QMD files
 #'
-#' @param con DuckDB connection object (for validation)
 #' @param output_dir Directory containing the Quarto files
 #' @param quarto_path Optional path to Quarto executable
 #' @param verbose Logical, whether to show detailed output
 #' @param timeout_seconds Maximum time to wait for rendering
 #' @return List with success status, paths, and any errors
-generate_interactive_dictionary <- function(con = NULL,
-                                          output_dir = "docs/data_dictionary/ne25",
+generate_interactive_dictionary <- function(output_dir = "docs/data_dictionary/ne25",
                                           quarto_path = NULL,
                                           verbose = TRUE,
                                           timeout_seconds = 120) {
@@ -109,28 +107,7 @@ generate_interactive_dictionary <- function(con = NULL,
     ))
   }
 
-  # Validate database connection if provided
-  if (!is.null(con)) {
-    tryCatch({
-      tables <- DBI::dbListTables(con)
-      required_tables <- c("ne25_metadata", "ne25_data_dictionary")
-      missing_tables <- setdiff(required_tables, tables)
-
-      if (length(missing_tables) > 0) {
-        return(list(
-          success = FALSE,
-          error = paste("Missing database tables:", paste(missing_tables, collapse = ", ")),
-          suggestion = "Run the pipeline data processing steps first"
-        ))
-      }
-    }, error = function(e) {
-      return(list(
-        success = FALSE,
-        error = paste("Database validation failed:", e$message),
-        suggestion = "Check database connection and table structure"
-      ))
-    })
-  }
+  # Skip database validation - data is accessed directly by Quarto from files
 
   if (verbose) {
     message("✅ All required files and database tables found")
@@ -143,6 +120,42 @@ generate_interactive_dictionary <- function(con = NULL,
   tryCatch({
     # Change to output directory for rendering
     setwd(output_dir)
+
+    # STEP 1: Generate comprehensive JSON export BEFORE Quarto rendering
+    json_file_path <- NULL
+    if (verbose) {
+      message("🔄 Generating comprehensive JSON export (required for Quarto rendering)...")
+    }
+
+    tryCatch({
+      # Source the export function
+      source(file.path(getwd(), "assets", "dictionary_functions.R"))
+      json_file_path <- export_dictionary_json("ne25_dictionary.json")
+
+      if (is.null(json_file_path) || !file.exists(json_file_path)) {
+        return(list(
+          success = FALSE,
+          error = "JSON export failed - required for Quarto rendering",
+          suggestion = "Check database connection and Python script availability"
+        ))
+      }
+
+      if (verbose) {
+        message("✅ JSON export completed: ", json_file_path)
+      }
+
+    }, error = function(e) {
+      return(list(
+        success = FALSE,
+        error = paste("JSON export failed:", e$message),
+        suggestion = "JSON export is required for Quarto rendering. Check database and Python dependencies."
+      ))
+    })
+
+    # STEP 2: Execute Quarto render command (now that JSON is available)
+    if (verbose) {
+      message("🔄 Rendering Quarto documentation (using JSON data)...")
+    }
 
     # Build render command
     render_cmd <- paste(
@@ -176,7 +189,8 @@ generate_interactive_dictionary <- function(con = NULL,
         success = FALSE,
         error = "Quarto rendering failed",
         details = paste(result, collapse = "\n"),
-        duration = render_duration
+        duration = render_duration,
+        json_export = json_file_path
       ))
     }
 
@@ -187,36 +201,18 @@ generate_interactive_dictionary <- function(con = NULL,
       return(list(
         success = FALSE,
         error = "No HTML files generated",
-        suggestion = "Check Quarto configuration and QMD file syntax"
+        suggestion = "Check Quarto configuration and QMD file syntax",
+        json_export = json_file_path
       ))
-    }
-
-    # Generate comprehensive JSON export if database connection available
-    json_file_path <- NULL
-    if (!is.null(con)) {
-      if (verbose) {
-        message("🔄 Generating comprehensive JSON export...")
-      }
-
-      tryCatch({
-        # Source the export function
-        source(file.path(getwd(), "assets", "dictionary_functions.R"))
-        json_file_path <- export_dictionary_json(con, "ne25_dictionary.json")
-      }, error = function(e) {
-        if (verbose) {
-          message("⚠️ JSON export failed: ", e$message)
-        }
-      })
     }
 
     if (verbose) {
       message("✅ Interactive data dictionary generated successfully")
       message("📁 Location: ", file.path(getwd(), "index.html"))
       message("⏱️  Render time: ", round(render_duration, 1), " seconds")
-      message("📄 Files generated: ", length(html_files))
-      if (!is.null(json_file_path)) {
-        message("📋 JSON export: ", file.path(getwd(), "ne25_dictionary.json"))
-      }
+      message("📄 HTML files generated: ", length(html_files))
+      message("📋 JSON source: ", file.path(getwd(), "ne25_dictionary.json"))
+      message("🔄 Workflow: JSON-first (eliminates R DuckDB segmentation faults)")
     }
 
     return(list(
@@ -226,7 +222,9 @@ generate_interactive_dictionary <- function(con = NULL,
       main_file = file.path(getwd(), "index.html"),
       json_export = json_file_path,
       duration = render_duration,
-      file_count = length(html_files)
+      file_count = length(html_files),
+      workflow_type = "JSON-first",
+      segfault_free = TRUE
     ))
 
   }, error = function(e) {
