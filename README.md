@@ -19,19 +19,19 @@ The Kidsights Data Platform provides automated data extraction, validation, and 
 **🚀 Python Architecture (September 2025)**: Hybrid R-Python design eliminates segmentation faults
 
 ```
-REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Dashboard Transforms
-     ↓                         ↓                     ↓                        ↓
-- Project 7679             - REDCapR             - flexible_bind         - recode_it()
-- Project 7943             - Secure tokens       - Type conversion       - Race/ethnicity
-- Project 7999             - Rate limiting       - Field mapping         - Education cats
-- Project 8014                                                           - Age groups
-                                                   ↓
-              Python: Database Operations → DuckDB Storage (Local)
-                         ↓                         ↓
-                  - Connection mgmt            - ne25_raw
-                  - Error handling             - ne25_transformed
-                  - Metadata generation        - ne25_metadata
-                  - Performance monitoring     - ne25_data_dictionary
+REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Derived Variables → Python: Database Ops
+     ↓                         ↓                     ↓                        ↓                    ↓
+- Project 7679             - REDCapR             - flexible_bind         - recode_it()      - Connection mgmt
+- Project 7943             - Secure tokens       - Type conversion       - 21 variables     - Error handling
+- Project 7999             - Rate limiting       - Field mapping         - 7 categories     - Chunked processing
+- Project 8014             - 588 raw vars        - 3,906 records         - Factor levels    - Metadata generation
+                                                   ↓                        ↓                    ↓
+                                          Raw Data (588 vars)    Transformed Data (609 vars)   DuckDB Storage
+                                                                         ↓                         ↓
+                                                                - eligible, authentic      - ne25_raw
+                                                                - hisp, race, raceG        - ne25_transformed
+                                                                - educ_max, educ4_max      - ne25_metadata
+                                                                - Reference levels set     - Interactive docs
 ```
 
 ## Database Location
@@ -87,6 +87,117 @@ A successful run will:
 - Generate comprehensive documentation in multiple formats
 - Display execution metrics and database summary
 - Create pipeline execution log entry
+
+## Derived Variables System
+
+The platform includes a sophisticated derived variables system that transforms raw REDCap data into analysis-ready variables. This system creates **21 derived variables** across 7 categories through the `recode_it()` transformation process.
+
+### Key Concepts
+
+**Raw vs. Derived Variables**:
+- **Raw Variables**: 588 variables directly extracted from REDCap (original field names and values)
+- **Derived Variables**: 21 new variables created by transforming and harmonizing raw data
+- **Total Variables**: 609 variables in the final `ne25_transformed` table
+
+**Purpose of Derived Variables**:
+- **Statistical Analysis**: Reference levels set for meaningful comparisons
+- **Data Harmonization**: Consistent categories across different data sources
+- **Missing Data Handling**: Systematic treatment of missing/invalid responses
+- **Analysis Flexibility**: Multiple category structures (4, 6, 8 categories) for education
+
+### The 21 Derived Variables
+
+#### **Inclusion & Eligibility (3 variables)**
+```r
+eligible   # Logical: Meets study inclusion criteria
+authentic   # Logical: Passes authenticity screening
+include     # Logical: Final inclusion (eligible + authentic)
+```
+
+#### **Race & Ethnicity (6 variables)**
+```r
+# Child demographics
+hisp        # Factor: Hispanic/Latino ethnicity
+race        # Factor: Race with collapsed categories
+raceG       # Factor: Combined race/ethnicity
+
+# Primary caregiver demographics
+a1_hisp     # Factor: Caregiver Hispanic/Latino ethnicity
+a1_race     # Factor: Caregiver race with collapsed categories
+a1_raceG    # Factor: Caregiver combined race/ethnicity
+```
+
+#### **Education Levels (12 variables)**
+```r
+# 8-category education (detailed)
+educ_max, educ_a1, educ_a2, educ_mom
+
+# 4-category education (simplified)
+educ4_max, educ4_a1, educ4_a2, educ4_mom
+
+# 6-category education (intermediate)
+educ6_max, educ6_a1, educ6_a2, educ6_mom
+```
+
+### Transformation Process
+
+The `recode_it()` function orchestrates transformations across 7 categories:
+
+```r
+# Apply all transformations
+transformed_data <- recode_it(raw_data, redcap_dict)
+
+# Or apply specific categories
+race_vars <- recode_it(raw_data, redcap_dict, what = "race")
+educ_vars <- recode_it(raw_data, redcap_dict, what = "education")
+```
+
+**Transformation Categories**:
+1. **include**: Eligibility determination from 9 CID criteria
+2. **race**: Race/ethnicity harmonization with collapsed categories
+3. **education**: Education with 3 different category structures
+4. **caregiver relationship**: Family structure variables
+5. **sex**: Child sex variables
+6. **age**: Age calculations in multiple units
+7. **income**: Income and Federal Poverty Level categories
+
+### Configuration & Documentation
+
+**Configuration**: `config/derived_variables.yaml`
+- Complete list of all 21 derived variables
+- Variable labels and descriptions
+- Transformation category mapping
+
+**Full Documentation**: `R/transform/README.md`
+- Detailed transformation logic for each category
+- Code examples and usage instructions
+- Factor level management and reference categories
+
+**Interactive Documentation**: `docs/data_dictionary/ne25/transformed-variables.html`
+- Enhanced factor metadata display
+- Value counts and missing data analysis
+- Searchable, sortable variable table
+
+### Usage Example
+
+```r
+# Load transformed data
+library(duckdb)
+con <- dbConnect(duckdb::duckdb(), "data/duckdb/kidsights_local.duckdb")
+transformed_data <- dbGetQuery(con, "SELECT * FROM ne25_transformed")
+
+# Access derived variables
+table(transformed_data$raceG)          # Race/ethnicity distribution
+table(transformed_data$educ4_max)      # Education levels (4 categories)
+summary(transformed_data$include)      # Final inclusion rates
+
+# Use in analysis with proper reference levels
+library(broom)
+model <- glm(include ~ raceG + educ4_max,
+             data = transformed_data,
+             family = binomial)
+tidy(model)  # Reference levels: "White, non-Hisp." and "College Degree"
+```
 
 ## Codebook System
 

@@ -1,0 +1,124 @@
+# NE25 Derived Variables Configuration
+# These are the variables CREATED by the recode_it() transformation process
+# NOT the raw input variables
+
+derived_variables:
+  include_eligibility:
+    description: "Inclusion and eligibility variables"
+    variables:
+      - eligible
+      - authentic
+      - include
+    transformation: "include"
+
+  race_ethnicity:
+    description: "Child race and ethnicity variables"
+    variables:
+      - hisp
+      - race
+      - raceG
+    transformation: "race"
+
+  caregiver_race_ethnicity:
+    description: "Primary caregiver race and ethnicity variables"
+    variables:
+      - a1_hisp
+      - a1_race
+      - a1_raceG
+    transformation: "race"
+
+  education_8_categories:
+    description: "Education variables with 8 categories"
+    variables:
+      - educ_max
+      - educ_a1
+      - educ_a2
+      - educ_mom
+    transformation: "education"
+
+  education_4_categories:
+    description: "Education variables with 4 categories"
+    variables:
+      - educ4_max
+      - educ4_a1
+      - educ4_a2
+      - educ4_mom
+    transformation: "education"
+
+  education_6_categories:
+    description: "Education variables with 6 categories"
+    variables:
+      - educ6_max
+      - educ6_a1
+      - educ6_a2
+      - educ6_mom
+    transformation: "education"
+
+# Complete flat list of all derived variables for easy filtering
+all_derived_variables:
+  # Include/Eligibility
+  - eligible
+  - authentic
+  - include
+
+  # Child Race/Ethnicity
+  - hisp
+  - race
+  - raceG
+
+  # Caregiver Race/Ethnicity
+  - a1_hisp
+  - a1_race
+  - a1_raceG
+
+  # Education (8 categories)
+  - educ_max
+  - educ_a1
+  - educ_a2
+  - educ_mom
+
+  # Education (4 categories)
+  - educ4_max
+  - educ4_a1
+  - educ4_a2
+  - educ4_mom
+
+  # Education (6 categories)
+  - educ6_max
+  - educ6_a1
+  - educ6_a2
+  - educ6_mom
+
+# Variable labels for documentation
+variable_labels:
+  eligible: "Meets study inclusion criteria"
+  authentic: "Passes authenticity screening"
+  include: "Meets inclusion criteria (inclusion + authenticity)"
+  hisp: "Child Hispanic/Latino ethnicity"
+  race: "Child race (collapsed categories)"
+  raceG: "Child race/ethnicity combined"
+  a1_hisp: "Primary caregiver Hispanic/Latino ethnicity"
+  a1_race: "Primary caregiver race (collapsed categories)"
+  a1_raceG: "Primary caregiver race/ethnicity combined"
+  educ_max: "Maximum education level among caregivers (8 categories)"
+  educ_a1: "Primary caregiver education level (8 categories)"
+  educ_a2: "Secondary caregiver education level (8 categories)"
+  educ_mom: "Maternal education level (8 categories)"
+  educ4_max: "Maximum education level among caregivers (4 categories)"
+  educ4_a1: "Primary caregiver education level (4 categories)"
+  educ4_a2: "Secondary caregiver education level (4 categories)"
+  educ4_mom: "Maternal education level (4 categories)"
+  educ6_max: "Maximum education level among caregivers (6 categories)"
+  educ6_a1: "Primary caregiver education level (6 categories)"
+  educ6_a2: "Secondary caregiver education level (6 categories)"
+  educ6_mom: "Maternal education level (6 categories)"
+
+# Transformation categories for grouping
+transformation_categories:
+  include: "Inclusion and Eligibility"
+  race: "Race and Ethnicity"
+  education: "Education Levels"
+  caregiver_relationship: "Caregiver Relationships"
+  sex: "Sex and Gender"
+  age: "Age Categories"
+  income: "Income and Federal Poverty Level"

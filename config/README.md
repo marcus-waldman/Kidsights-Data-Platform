@@ -7,6 +7,7 @@ This directory contains configuration files for the Kidsights Data Platform, inc
 The configuration system uses YAML files to define:
 - **Codebook validation rules and response sets**
 - **Data source configurations for pipelines**
+- **Derived variables created by transformations**
 - **System parameters and defaults**
 
 ## Configuration Files
@@ -219,6 +220,127 @@ conversion:
 - **csv_encoding**: Character encoding for CSV files
 - **missing_values**: Values treated as missing data
 - **csv_columns**: Mapping from CSV columns to JSON paths
+
+### `derived_variables.yaml`
+
+Configuration defining the 21 derived variables created by the recode_it() transformation process in the NE25 pipeline.
+
+#### Structure Overview
+
+```yaml
+# Grouped configuration
+derived_variables:
+  include_eligibility:
+    description: "Inclusion and eligibility variables"
+    variables: [eligible, authentic, include]
+    transformation: "include"
+
+# Complete flat list for filtering
+all_derived_variables:
+  - eligible
+  - authentic
+  - include
+  # ... 18 additional variables
+
+# Human-readable labels
+variable_labels:
+  eligible: "Meets study inclusion criteria"
+  authentic: "Passes authenticity screening"
+  # ... additional labels
+
+# Transformation categories
+transformation_categories:
+  include: "Inclusion and Eligibility"
+  race: "Race and Ethnicity"
+  education: "Education Levels"
+```
+
+#### Derived Variable Categories
+
+##### **Inclusion and Eligibility (3 variables)**
+```yaml
+include_eligibility:
+  variables:
+    - eligible      # Meets study inclusion criteria
+    - authentic     # Passes authenticity screening
+    - include       # Combined inclusion + authenticity
+```
+
+These logical variables determine participant eligibility based on the 9 CID criteria.
+
+##### **Race and Ethnicity (6 variables)**
+```yaml
+race_ethnicity:
+  variables:
+    - hisp, race, raceG           # Child race/ethnicity
+    - a1_hisp, a1_race, a1_raceG  # Primary caregiver race/ethnicity
+```
+
+Harmonized race and ethnicity variables with collapsed categories for analysis.
+
+##### **Education Levels (12 variables)**
+```yaml
+education_8_categories:
+  variables: [educ_max, educ_a1, educ_a2, educ_mom]
+
+education_4_categories:
+  variables: [educ4_max, educ4_a1, educ4_a2, educ4_mom]
+
+education_6_categories:
+  variables: [educ6_max, educ6_a1, educ6_a2, educ6_mom]
+```
+
+Education variables with different category counts for various analysis needs:
+- **8 categories**: Detailed educational attainment
+- **4 categories**: Simplified for basic analysis
+- **6 categories**: Intermediate level of detail
+
+#### Usage in Python Scripts
+
+```python
+# Load derived variables configuration
+import yaml
+with open('config/derived_variables.yaml', 'r') as f:
+    config = yaml.safe_load(f)
+
+# Get all derived variable names
+derived_vars = config['all_derived_variables']  # List of 21 variables
+
+# Get variable labels
+labels = config['variable_labels']
+eligible_label = labels['eligible']  # "Meets study inclusion criteria"
+
+# Filter metadata generation to derived variables only
+python pipelines/python/generate_metadata.py \
+  --source-table ne25_transformed \
+  --derived-only \
+  --derived-config config/derived_variables.yaml
+```
+
+#### Usage in R Scripts
+
+```r
+library(yaml)
+
+# Load configuration
+config <- read_yaml("config/derived_variables.yaml")
+
+# Access derived variables by category
+include_vars <- config$derived_variables$include_eligibility$variables
+race_vars <- config$derived_variables$race_ethnicity$variables
+
+# Get all derived variables
+all_derived <- config$all_derived_variables
+
+# Check if variable is derived
+is_derived <- function(var_name) {
+  return(var_name %in% config$all_derived_variables)
+}
+
+# Example usage
+is_derived("eligible")    # TRUE
+is_derived("record_id")   # FALSE
+```
 
 ### `sources/ne25.yaml`
 
