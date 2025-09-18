@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains the JSON-based codebook system for the Kidsights Data Platform. The codebook provides comprehensive metadata about 305 items from multiple studies, including their properties, scoring rules, psychometric parameters, and response options.
+This directory contains the JSON-based codebook system for the Kidsights Data Platform. The codebook provides comprehensive metadata about 306 items from multiple studies, including their properties, scoring rules, psychometric parameters, and study-specific response options.
 
 **Current Studies Supported:**
 - **NE25, NE22, NE20**: Nebraska longitudinal studies
@@ -11,9 +11,9 @@ This directory contains the JSON-based codebook system for the Kidsights Data Pl
 - **GSED_PF**: GSED Psychosocial Frequency items (46 PS items)
 
 **Key Features:**
-- 305 total items with comprehensive metadata
+- 306 total items with comprehensive metadata
 - Hierarchical domain classification system
-- Reusable response set definitions
+- Study-specific response set definitions with proper missing value coding
 - Interactive Quarto dashboard for exploration
 - R functions for querying and analysis
 
@@ -77,6 +77,29 @@ convert_csv_to_json()  # Converts CSV + PS items to JSON
 quarto render codebook/dashboard/index.qmd
 ```
 
+## Data Quality Validation
+
+### NE25 Comprehensive Audit Results (September 2025)
+
+**Coverage:** 276 codebook items validated against 434 REDCap fields
+**Location:** `scripts/audit/ne25_codebook/`
+
+**Key Findings:**
+- **265 items (96%)** successfully matched between sources
+- **80% value/label alignment** for matched items
+- **11 items require NE25 variable mapping:** DD201, DD203, EG2_2, EG3_2, EG4a_2, EG4b_1, EG9b, EG11_2, EG13b, EG42b, EG50a
+- **52 items have minor discrepancies** (mainly missing "Don't Know" options)
+
+**Run Validation:**
+```bash
+# Complete audit pipeline
+Rscript scripts/audit/ne25_codebook/extract_codebook_responses.R
+Rscript scripts/audit/ne25_codebook/compare_sources.R
+Rscript scripts/audit/ne25_codebook/generate_audit_report.R
+```
+
+**Reports:** `scripts/audit/ne25_codebook/reports/NE25_COMPREHENSIVE_AUDIT_SUMMARY.txt`
+
 ## Data Structure
 
 The JSON codebook contains:
@@ -89,11 +112,24 @@ Core item definitions with:
 - **Scoring**: Reverse coding flags and equate groups
 - **Psychometric**: Study-specific IRT parameters and calibration metadata
 
-### Response Sets
-Reusable response option definitions:
-- `standard_binary`: Yes/No/Don't Know
-- `likert_5`: 5-point Never to Always scale
-- `ps_frequency`: PS item frequency scale (Never or Almost Never/Sometimes/Often/Don't Know)
+### Response Sets (Study-Specific)
+Study-specific response option definitions ensure proper missing value coding:
+
+**Psychosocial Frequency Scales:**
+- `ps_frequency_ne25`: PS items for NE25 (Don't Know = **9**)
+- `ps_frequency_ne22`: PS items for NE22 (Don't Know = **-9**)
+- `ps_frequency_ne20`: PS items for NE20 (Don't Know = **-9**)
+- `ps_frequency_gsed_pf`: PS items for GSED_PF (Don't Know = **-9**)
+
+**Binary Response Scales:**
+- `standard_binary_ne25`: Yes/No for NE25 (Don't Know = **9**)
+- `standard_binary`: Yes/No for other studies (Don't Know = **-9**)
+
+**Common Likert Scales (NE25-specific):**
+- `likert_5_frequency_ne25`: 5-point Always→Never (Don't Know = **9**)
+- `likert_4_skill_ne25`: 4-point Very well→Not at all (Don't Know = **9**)
+
+**⚠️ CRITICAL**: NE25 uses positive **9** for missing values, other studies use **-9**
 
 ### Domains
 - `socemo`: Social-emotional development
@@ -166,6 +202,8 @@ All studies can have IRT parameters, with template structure created automatical
 - **v2.1**: Added GSED_PF study with 46 PS items, psychosocial_problems_general domain
 - **v2.2**: Implemented study-specific IRT parameters with constraints field template
 - **v2.3**: Added NE22 IRT parameter estimates for 203 items from empirical calibration
+- **v2.7**: Fixed PS items response options for proper recoding compatibility
+- **v2.8**: ⚠️ **MAJOR**: Study-specific response sets with NE25 missing value fix (9 vs -9)
 
 ## Troubleshooting
 
@@ -184,3 +222,48 @@ A: Check that simplifyVector=FALSE when using jsonlite::fromJSON()
 A: Response options are stored as references (e.g., "ps_frequency") - check codebook$response_sets
 
 For detailed function documentation, see `R/codebook/README.md`.
+
+## Response Sets Migration (v2.8.0)
+
+### Critical Change: Study-Specific Missing Values
+
+⚠️ **BREAKING CHANGE**: Version 2.8.0 introduces study-specific response sets to fix missing value coding inconsistencies.
+
+**Key Changes:**
+- **NE25**: Missing values coded as **9** (positive)
+- **All other studies**: Missing values coded as **-9** (negative)
+- **Eliminated inline response options**: All items now reference named response sets
+- **Study-specific sets**: Each study has appropriate response sets for its coding scheme
+
+### Migration Impact
+
+**Affected Items:**
+- **47 PS items**: Now use study-specific `ps_frequency_*` response sets
+- **168 binary items**: NE25 items now use `standard_binary_ne25` (9 vs -9)
+- **62 inline response items**: Converted to response set references
+
+**Recoding Pipeline**: Ensure your data processing accounts for the NE25 missing value change from -9 to 9.
+
+### Response Set Reference
+
+```r
+# Example: PS041 item response options
+{
+  "response_options": {
+    "ne25": "ps_frequency_ne25",    # 9 = Don't Know
+    "ne22": "ps_frequency_ne22",    # -9 = Don't Know
+    "ne20": "ps_frequency_ne20"     # -9 = Don't Know
+  }
+}
+```
+
+### Update Script
+
+The migration was performed by `scripts/codebook/fix_codebook_response_sets.R`:
+
+```bash
+# Run the response sets fix
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/codebook/fix_codebook_response_sets.R
+```
+
+**Backup**: Previous version saved as `codebook_pre_response_sets_fix_TIMESTAMP.json`
