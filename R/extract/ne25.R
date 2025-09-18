@@ -78,12 +78,12 @@ extract_ne25_data <- function(config_path = "config/sources/ne25.yaml",
 
       # Add project metadata
       project_data <- project_data %>%
-        mutate(
+        dplyr::mutate(
           retrieved_date = Sys.time(),
           source_project = project_name,
           extraction_id = paste0(project_name, "_", format(Sys.time(), "%Y%m%d_%H%M%S"))
         ) %>%
-        relocate(retrieved_date, source_project, extraction_id)
+        dplyr::relocate(retrieved_date, source_project, extraction_id)
 
       # Store results
       all_data[[project_name]] <- project_data
@@ -118,7 +118,7 @@ extract_ne25_data <- function(config_path = "config/sources/ne25.yaml",
 
   # Apply minimal cleaning (like dashboard)
   cleaned_data <- combined_data %>%
-    mutate(sq001 = as.character(sq001))  # Ensure ZIP codes are character like dashboard
+    dplyr::mutate(sq001 = as.character(sq001))  # Ensure ZIP codes are character like dashboard
 
   return(list(
     data = cleaned_data,
@@ -220,7 +220,7 @@ flexible_bind_rows <- function(..., .id = NULL) {
   }
 
   # Now use dplyr::bind_rows since all conflicts are resolved
-  return(bind_rows(dfs))
+  return(dplyr::bind_rows(dfs))
 }
 
 #' Extract data from a single REDCap project
@@ -369,7 +369,7 @@ clean_ne25_initial <- function(data, config) {
   dont_know_codes <- config$validation$dont_know_codes %||% c(9, "9")
 
   cleaned_data <- data %>%
-    mutate(
+    dplyr::mutate(
       across(
         any_of(ne25_items),
         function(y) {
@@ -386,14 +386,14 @@ clean_ne25_initial <- function(data, config) {
   for (item in reverse_items) {
     if (item %in% names(cleaned_data)) {
       cleaned_data <- cleaned_data %>%
-        mutate(!!item := abs(!!sym(item) - 4))
+        dplyr::mutate(!!item := abs(!!sym(item) - 4))
     }
   }
 
   # Ensure sq001 (ZIP code) is character
   if ("sq001" %in% names(cleaned_data)) {
     cleaned_data <- cleaned_data %>%
-      mutate(sq001 = as.character(sq001))
+      dplyr::mutate(sq001 = as.character(sq001))
   }
 
   return(cleaned_data)
@@ -423,9 +423,9 @@ validate_ne25_essential_fields <- function(data, config) {
 
   # Add validation flags
   validated_data <- data %>%
-    mutate(
+    dplyr::mutate(
       # Essential field completeness
-      essential_fields_complete = rowSums(is.na(select(., any_of(essential_fields)))) == 0,
+      essential_fields_complete = rowSums(is.na(dplyr::select(., any_of(essential_fields)))) == 0,
 
       # Record quality indicators
       has_pid = !is.na(pid) & pid != "",

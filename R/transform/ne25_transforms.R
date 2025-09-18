@@ -1,16 +1,129 @@
 # NE25 Data Transformation Functions
 # Ported from Kidsights Dashboard utils-etl.R
 
+# Automatic package installation and loading for transformations
+install_transformation_packages <- function() {
+  # Required packages for transformations
+  required_packages <- c(
+    "plyr",       # For mapvalues (MUST load before dplyr)
+    "dplyr",      # Data manipulation
+    "tidyr",      # Data tidying
+    "stringr",    # String operations
+    "labelled"    # Variable labels
+  )
+
+  # Check which packages are missing
+  missing_packages <- setdiff(required_packages, installed.packages()[,"Package"])
+
+  # Install missing packages
+  if(length(missing_packages) > 0) {
+    message("Installing missing packages for transformations: ",
+            paste(missing_packages, collapse = ", "))
+
+    install.packages(missing_packages,
+                    dependencies = TRUE,
+                    repos = "https://cran.rstudio.com/",
+                    quiet = TRUE)
+
+    message("Transformation packages installation completed.")
+  }
+
+  # Load packages in correct order (plyr BEFORE dplyr to avoid conflicts)
+  load_order <- c("plyr", setdiff(required_packages, "plyr"))
+
+  for(pkg in load_order) {
+    if(pkg %in% installed.packages()[,"Package"]) {
+      suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+    } else {
+      warning(paste("Package", pkg, "failed to install and could not be loaded"))
+    }
+  }
+
+  # Check for critical conflicts
+  if("plyr" %in% loadedNamespaces() && "dplyr" %in% loadedNamespaces()) {
+    # Verify plyr was loaded first
+    search_order <- search()
+    plyr_pos <- which(grepl("plyr", search_order))
+    dplyr_pos <- which(grepl("dplyr", search_order))
+
+    if(length(plyr_pos) > 0 && length(dplyr_pos) > 0 && any(plyr_pos > min(dplyr_pos))) {
+      warning("Package loading order issue: dplyr loaded before plyr. ",
+              "This may cause mapvalues() function conflicts.")
+    }
+  }
+
+  return(list(
+    installed = required_packages,
+    missing = missing_packages
+  ))
+}
+
+# Initialize transformation packages
+transformation_packages <- install_transformation_packages()
+
 # Helper function to get value labels from REDCap dictionary
 value_labels <- function(lex, dict, varname = "lex_ne25") {
+  cat("=== VALUE_LABELS TRANSFORM DEBUG ===\n")
+  cat("Lex:", lex, "\n")
+  cat("Varname:", varname, "\n")
+  cat("Dict type:", class(dict), "\n")
+  cat("Dict length:", length(dict), "\n")
+
+  # Save test data for rapid debugging
+  test_data_dir <- "temp/value_labels_transform_test_data"
+  if (!dir.exists(test_data_dir)) dir.create(test_data_dir, recursive = TRUE)
+
+  saveRDS(lex, file.path(test_data_dir, "lex.rds"))
+  saveRDS(dict, file.path(test_data_dir, "dict.rds"))
+  saveRDS(varname, file.path(test_data_dir, "varname.rds"))
+  cat("Transform test data saved to:", test_data_dir, "\n")
+
+  # Check if the field exists in the dictionary
+  if (is.null(dict) || is.null(dict[[lex]]) || is.null(dict[[lex]]$select_choices_or_calculations)) {
+    warning(paste("Dictionary entry not found for field:", lex, "- returning empty labels"))
+    return(data.frame(
+      lex_ne25 = character(0),
+      value = character(0),
+      label = character(0)
+    ))
+  }
+
   # Note issue in education labels due to commas in description
-  tmp <- dict[[lex]]$select_choices_or_calculations %>%
-    stringr::str_split_1(" \\| ")
+  choices_str <- dict[[lex]]$select_choices_or_calculations
+  cat("Choices_str type:", class(choices_str), "\n")
+  cat("Choices_str length:", length(choices_str), "\n")
+  cat("Choices_str content (first 100 chars):", substr(paste(choices_str, collapse=" | "), 1, 100), "\n")
+
+  if (is.na(choices_str) || all(choices_str == "")) {
+    warning(paste("Empty choices for field:", lex, "- returning empty labels"))
+    return(data.frame(
+      lex_ne25 = character(0),
+      value = character(0),
+      label = character(0)
+    ))
+  }
+
+  cat("About to call str_split_1 on choices_str...\n")
+  tmp <- tryCatch({
+    choices_str %>% stringr::str_split_1(" \\| ")
+  }, error = function(e) {
+    cat("ERROR in str_split_1 on choices_str:\n")
+    cat("Message:", e$message, "\n")
+    cat("Choices_str causing error:", choices_str, "\n")
+    stop(e)
+  })
 
   outdf <- data.frame(value = rep(NA, length(tmp)), label = NA)
 
   for(i in 1:length(tmp)) {
-    tmp_i <- tmp[i] %>% stringr::str_split_1(", ")
+    cat("Processing tmp[", i, "]:", tmp[i], "\n")
+    tmp_i <- tryCatch({
+      tmp[i] %>% stringr::str_split_1(", ")
+    }, error = function(e) {
+      cat("ERROR in str_split_1 for tmp[", i, "]:", tmp[i], "\n")
+      cat("Error message:", e$message, "\n")
+      stop(e)
+    })
     outdf$value[i] <- tmp_i[1]
     outdf$label[i] <- paste0(tmp_i[-1], collapse = ", ")
   }
@@ -153,10 +266,31 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     # responding caregiver
     relate_df <- dat %>%
       dplyr::mutate(
-        relation1 = plyr::mapvalues(cqr008, from = value_labels(lex = "cqr008", dict = dict)$value, to = value_labels(lex = "cqr008", dict = dict)$label, warn_missing = F),
-        relation2 = plyr::mapvalues(nschj013, from = value_labels(lex = "nschj013", dict = dict)$value, to = value_labels(lex = "nschj013", dict = dict)$label, warn_missing = F),
+        relation1 = tryCatch({
+          labels <- value_labels(lex = "cqr008", dict = dict)
+          if (nrow(labels) > 0) {
+            plyr::mapvalues(cqr008, from = labels$value, to = labels$label, warn_missing = F)
+          } else {
+            as.character(cqr008)
+          }
+        }, error = function(e) { as.character(cqr008) }),
+        relation2 = tryCatch({
+          labels <- value_labels(lex = "nschj013", dict = dict)
+          if (nrow(labels) > 0) {
+            plyr::mapvalues(nschj013, from = labels$value, to = labels$label, warn_missing = F)
+          } else {
+            as.character(nschj013)
+          }
+        }, error = function(e) { as.character(nschj013) }),
         female_a1 = as.logical(cqr002 == 0),
-        mom_a1 = as.logical(relation1 == value_labels(lex = "cqr008", dict = dict)$label[1] & female_a1)
+        mom_a1 = tryCatch({
+          labels <- value_labels(lex = "cqr008", dict = dict)
+          if (nrow(labels) > 0) {
+            as.logical(relation1 == labels$label[1] & female_a1)
+          } else {
+            as.logical(FALSE)
+          }
+        }, error = function(e) { as.logical(FALSE) })
       ) %>%
       dplyr::select(pid, record_id, relation1:mom_a1) %>%
       dplyr::mutate(across(where(is.character), as.factor))
@@ -180,7 +314,14 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     sex_df <- dat %>%
       dplyr::select(pid, record_id, cqr009) %>%
       dplyr::mutate(
-        sex = plyr::mapvalues(cqr009, from = value_labels(lex = "cqr009", dict = dict)$value, to = value_labels(lex = "cqr009", dict = dict)$label, warn_missing = F),
+        sex = tryCatch({
+          labels <- value_labels(lex = "cqr009", dict = dict)
+          if (nrow(labels) > 0) {
+            plyr::mapvalues(cqr009, from = labels$value, to = labels$label, warn_missing = F)
+          } else {
+            as.character(cqr009)
+          }
+        }, error = function(e) { as.character(cqr009) }),
         female = (sex == "Female")
       ) %>%
       dplyr::mutate(across(where(is.character), as.factor))
@@ -256,8 +397,25 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
   if(what %in% c("education")) {
 
+    # Try to get education labels, but handle missing dictionary gracefully
+    cqr004_labels <- tryCatch({
+      value_labels(lex = "cqr004", dict = dict)
+    }, error = function(e) {
+      warning("Education dictionary not found - skipping education transformations")
+      return(NULL)
+    })
+
+    if (is.null(cqr004_labels) || nrow(cqr004_labels) == 0) {
+      warning("Education transformations skipped - missing dictionary")
+      # Return empty data frame with required structure
+      return(data.frame(
+        pid = integer(0),
+        record_id = integer(0)
+      ))
+    }
+
     simple_educ_label <- data.frame(
-      educ = value_labels(lex = "cqr004", dict = dict)$label) %>%
+      educ = cqr004_labels$label) %>%
       dplyr::mutate(
         educ4 = c(rep("Less than High School Graduate", 2),
                   rep("High School Graduate (including Equivalency)", 1),

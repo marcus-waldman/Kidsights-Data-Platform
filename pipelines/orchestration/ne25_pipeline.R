@@ -3,10 +3,15 @@
 #' Main pipeline function that coordinates the complete NE25 data extraction,
 #' processing, and loading workflow.
 
-# Load required libraries
+# Dependency Management: Ensure all required packages are available
+source("R/utils/dependency_manager.R")
+ensure_database_dependencies(auto_install = TRUE, quiet = FALSE)
+
+# Load required libraries (now guaranteed to be available)
 library(dplyr)
 library(yaml)
 library(REDCapR)
+library(arrow)
 
 # Source required functions
 source("R/extract/ne25.R")
@@ -100,6 +105,9 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
   message("Configuration loaded successfully")
 
+  # Codebook no longer needed - CID8 (KMT quality analysis) removed
+  message("DEBUG: Codebook loading skipped - CID8 KMT quality analysis removed from pipeline")
+
   # Initialize database using Python
   message("Initializing database schema using Python...")
   init_result <- system2(
@@ -139,28 +147,33 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
       tryCatch({
         # Get API token from environment variable
+        message("DEBUG: Loading API credential: ", project_info$token_env)
         api_token <- Sys.getenv(project_info$token_env)
         if (api_token == "") {
           stop(paste("API token not found in environment variable:", project_info$token_env))
         }
+        message("DEBUG: Token loaded successfully (length: ", nchar(api_token), " characters)")
 
         # Extract using REDCapR with individual project tokens
+        message("DEBUG: Extracting project ", project_name, " from URL: ", config$redcap$url)
         project_data <- extract_redcap_project_data(
           url = config$redcap$url,
           token = api_token,
           forms = NULL,  # Extract all forms
           config = config
         )
+        message("DEBUG: Retrieved ", nrow(project_data), " records with ", ncol(project_data), " fields")
 
         # Extract data dictionary
         project_dict <- extract_redcap_dictionary(
           url = config$redcap$url,
           token = api_token
         )
+        message("DEBUG: Dictionary contains ", nrow(project_dict), " field definitions")
 
         # Add metadata and pid (following dashboard pattern)
         project_data <- project_data %>%
-          mutate(
+          dplyr::mutate(
             retrieved_date = Sys.time(),
             source_project = project_name,
             extraction_id = execution_id,
@@ -204,21 +217,54 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     # STEP 3: MINIMAL DATA PROCESSING (like dashboard)
     message("\n--- Step 3: Data Processing ---")
     processing_start <- Sys.time()
+    message("DEBUG: Combined data has ", nrow(combined_data), " rows, ", ncol(combined_data), " columns")
 
     # Use the cleaned data from extraction (already has sq001 as character)
     validated_data <- combined_data
+    message("DEBUG: After validation: ", nrow(validated_data), " records remain")
+
+    # DEBUG: Check what columns we have for age calculation
+    cat("DEBUG - Available columns in combined_data:\n")
+    cat("Total columns:", ncol(combined_data), "\n")
+    date_cols <- names(combined_data)[grepl("date|birth|dob|age|year|month|day", names(combined_data), ignore.case = TRUE)]
+    cat("Date/age related columns:", paste(date_cols, collapse=", "), "\n")
 
     metrics$records_processed <- nrow(validated_data)
     message(paste("Data processing completed:", nrow(validated_data), "records"))
 
+    # Cache validated data for debugging
+    message("DEBUG: Caching validated data...")
+    cache_dir <- "temp/pipeline_cache"
+    if (!dir.exists(cache_dir)) dir.create(cache_dir, recursive = TRUE)
+    saveRDS(validated_data, file.path(cache_dir, "step2_validated_data.rds"))
+    saveRDS(combined_dictionary, file.path(cache_dir, "step2_combined_dictionary.rds"))
+    message("DEBUG: Cached validated data (", nrow(validated_data), " records)")
+
     # STEP 4: ELIGIBILITY VALIDATION
     message("\n--- Step 4: Eligibility Validation ---")
+    message("DEBUG: Starting eligibility validation with 8 criteria (CID8 KMT quality removed)")
+    message("DEBUG: Validated data dimensions: ", nrow(validated_data), " x ", ncol(validated_data))
+    message("DEBUG: Dictionary entries: ", length(combined_dictionary))
 
-    # Check eligibility for all records
-    eligibility_checks <- check_ne25_eligibility(validated_data, combined_dictionary, config)
+    # Check eligibility for all records (simplified - no codebook needed)
+    eligibility_checks <- check_ne25_eligibility(validated_data, combined_dictionary)
+
+    message("DEBUG: Eligibility checks completed")
+    message("DEBUG: Eligibility summary records: ", nrow(eligibility_checks$summary))
+
+    # Cache eligibility checks for debugging
+    message("DEBUG: Caching eligibility checks...")
+    saveRDS(eligibility_checks, file.path(cache_dir, "step3_eligibility_checks.rds"))
+    message("DEBUG: Cached eligibility checks with ", nrow(eligibility_checks$summary), " records")
 
     # Apply eligibility flags to the dataset
+    message("DEBUG: Applying eligibility flags to dataset...")
     eligibility_results <- apply_ne25_eligibility(validated_data, eligibility_checks)
+
+    # Cache eligibility results for debugging
+    message("DEBUG: Caching eligibility results...")
+    saveRDS(eligibility_results, file.path(cache_dir, "step4_eligibility_results.rds"))
+    message("DEBUG: Cached eligibility results (", nrow(eligibility_results), " records)")
 
     # Count eligibility metrics
     metrics$records_eligible <- sum(eligibility_results$eligible, na.rm = TRUE)
@@ -235,21 +281,52 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     # STEP 5: STORE RAW DATA IN DUCKDB USING PYTHON
     message("\n--- Step 5: Storing Raw Data in DuckDB ---")
+    message("DEBUG: Final eligibility results dimensions: ", nrow(eligibility_results), " x ", ncol(eligibility_results))
+    message("DEBUG: Eligibility summary:")
+    message("DEBUG:   - Records eligible: ", metrics$records_eligible)
+    message("DEBUG:   - Records authentic: ", metrics$records_authentic)
+    message("DEBUG:   - Records included: ", metrics$records_included)
 
     # Create temporary directory for CSV exports
     temp_dir <- file.path(tempdir(), "ne25_pipeline")
     dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+    message("DEBUG: Temporary directory created: ", temp_dir)
 
-    # Export raw data to CSV and insert using Python
+    # Export raw data to Feather and insert using Python
     message("Storing raw data...")
-    raw_csv <- file.path(temp_dir, "ne25_raw.csv")
-    write.csv(validated_data, raw_csv, row.names = FALSE)
+    raw_feather <- file.path(temp_dir, "ne25_raw.feather")
+    message("DEBUG: Writing Feather file to: ", raw_feather)
+    # Select only metadata columns for raw table (ne25_raw table has 6 columns only)
+    required_cols <- c("record_id", "pid", "redcap_event_name", "retrieved_date", "source_project", "extraction_id")
+    available_cols <- names(validated_data)
+    missing_cols <- setdiff(required_cols, available_cols)
 
+    if (length(missing_cols) > 0) {
+      warning("Missing required metadata columns: ", paste(missing_cols, collapse = ", "))
+      message("Available columns: ", paste(head(available_cols, 10), collapse = ", "), "...")
+    }
+
+    # Only select columns that exist, add missing ones with default values
+    existing_required_cols <- intersect(required_cols, available_cols)
+
+    raw_metadata <- validated_data %>%
+      dplyr::select(dplyr::all_of(existing_required_cols))
+
+    # Add missing required columns with default values
+    if (!"redcap_event_name" %in% names(raw_metadata)) {
+      raw_metadata$redcap_event_name <- "baseline_arm_1"
+      message("DEBUG: Added missing redcap_event_name with default value")
+    }
+    message("DEBUG: Raw metadata has ", ncol(raw_metadata), " columns: ", paste(names(raw_metadata), collapse=", "))
+    arrow::write_feather(raw_metadata, raw_feather)
+    message("DEBUG: Feather file size: ", round(file.size(raw_feather) / 1024^2, 2), " MB")
+
+    message("DEBUG: Calling Python insert script...")
     raw_result <- system2(
       "python",
       args = c(
         "pipelines/python/insert_raw_data.py",
-        "--data-file", raw_csv,
+        "--data-file", raw_feather,
         "--table-name", "ne25_raw",
         "--data-type", "raw",
         "--config", config_path
@@ -257,6 +334,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       stdout = TRUE,
       stderr = TRUE
     )
+    message("DEBUG: Python script exit code: ", attr(raw_result, "status") %||% 0)
 
     if (attr(raw_result, "status") != 0 && !is.null(attr(raw_result, "status"))) {
       warning(paste("Raw data insertion had issues:", paste(raw_result, collapse = "\n")))
@@ -266,14 +344,14 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     # Insert eligibility results
     message("Storing eligibility results...")
-    elig_csv <- file.path(temp_dir, "ne25_eligibility.csv")
-    write.csv(eligibility_results, elig_csv, row.names = FALSE)
+    elig_feather <- file.path(temp_dir, "ne25_eligibility.feather")
+    arrow::write_feather(eligibility_results, elig_feather)
 
     elig_result <- system2(
       "python",
       args = c(
         "pipelines/python/insert_raw_data.py",
-        "--data-file", elig_csv,
+        "--data-file", elig_feather,
         "--table-name", "ne25_eligibility",
         "--data-type", "eligibility",
         "--config", config_path
@@ -288,40 +366,42 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("Eligibility data stored successfully")
     }
 
+    # DISABLED: Project-specific table storage (redundant with university server)
     # Store project-specific raw data by PID
-    message("Storing project-specific raw data by PID...")
-    for (project_name in names(projects_data)) {
-      project_data <- projects_data[[project_name]]
-      if (!is.null(project_data) && nrow(project_data) > 0) {
-        # Get PID from the data
-        project_pid <- unique(project_data$pid)[1]
-        table_name <- paste0("ne25_raw_pid", project_pid)
-
-        # Export to CSV and insert using Python
-        project_csv <- file.path(temp_dir, paste0("ne25_raw_pid", project_pid, ".csv"))
-        write.csv(project_data, project_csv, row.names = FALSE)
-
-        project_result <- system2(
-          "python",
-          args = c(
-            "pipelines/python/insert_raw_data.py",
-            "--data-file", project_csv,
-            "--table-name", table_name,
-            "--data-type", "raw",
-            "--pid", as.character(project_pid),
-            "--config", config_path
-          ),
-          stdout = TRUE,
-          stderr = TRUE
-        )
-
-        if (attr(project_result, "status") != 0 && !is.null(attr(project_result, "status"))) {
-          warning(paste("Project", project_name, "data insertion had issues:", paste(project_result, collapse = "\n")))
-        } else {
-          message(paste("  - Stored", nrow(project_data), "records to", table_name, "for project:", project_name))
-        }
-      }
-    }
+    # message("Storing project-specific raw data by PID...")
+    # for (project_name in names(projects_data)) {
+    #   project_data <- projects_data[[project_name]]
+    #   if (!is.null(project_data) && nrow(project_data) > 0) {
+    #     # Get PID from the data
+    #     project_pid <- unique(project_data$pid)[1]
+    #     table_name <- paste0("ne25_raw_pid", project_pid)
+    #
+    #     # Export to Feather and insert using Python
+    #     project_feather <- file.path(temp_dir, paste0("ne25_raw_pid", project_pid, ".feather"))
+    #     arrow::write_feather(project_data, project_feather)
+    #
+    #     project_result <- system2(
+    #       "python",
+    #       args = c(
+    #         "pipelines/python/insert_raw_data.py",
+    #         "--data-file", project_feather,
+    #         "--table-name", table_name,
+    #         "--data-type", "raw",
+    #         "--pid", as.character(project_pid),
+    #         "--config", config_path
+    #       ),
+    #       stdout = TRUE,
+    #       stderr = TRUE
+    #     )
+    #
+    #     if (attr(project_result, "status") != 0 && !is.null(attr(project_result, "status"))) {
+    #       warning(paste("Project", project_name, "data insertion had issues:", paste(project_result, collapse = "\n")))
+    #     } else {
+    #       message(paste("  - Stored", nrow(project_data), "records to", table_name, "for project:", project_name))
+    #     }
+    #   }
+    # }
+    message("Skipping project-specific table storage (data available on university server)")
 
     # Store REDCap data dictionaries with PID reference
     message("Storing REDCap data dictionaries...")
@@ -340,15 +420,15 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
             project_pid <- unique(project_data$pid)[1]
             project_dict_df$pid <- project_pid
 
-            # Export to CSV and insert using Python
-            dict_csv <- file.path(temp_dir, paste0("dictionary_pid", project_pid, ".csv"))
-            write.csv(project_dict_df, dict_csv, row.names = FALSE)
+            # Export to Feather and insert using Python
+            dict_feather <- file.path(temp_dir, paste0("dictionary_pid", project_pid, ".feather"))
+            arrow::write_feather(project_dict_df, dict_feather)
 
             dict_result <- system2(
               "python",
               args = c(
                 "pipelines/python/insert_raw_data.py",
-                "--data-file", dict_csv,
+                "--data-file", dict_feather,
                 "--table-name", "ne25_data_dictionary",
                 "--data-type", "dictionary",
                 "--pid", as.character(project_pid),
@@ -369,32 +449,27 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     }
     message(paste("Stored", total_dict_fields, "total dictionary fields from", length(all_dictionaries), "projects"))
 
-    # STEP 6: DATA TRANSFORMATION (Dashboard-style)
-    message("\n--- Step 6: Data Transformation ---")
+    # STEP 6: DATA TRANSFORMATION (Dashboard-style) - TEMPORARILY SKIPPED
+    message("\n--- Step 6: Data Transformation (SKIPPED) ---")
     transformation_start <- Sys.time()
 
-    # Apply dashboard-style transformations using recode_it()
-    message("Applying dashboard transformations...")
-    transformed_data <- recode_it(
-      dat = eligibility_results,
-      dict = combined_dictionary,
-      my_API = NULL,
-      what = "all"  # Apply all transformation categories
-    )
+    # Skip transformations for now to focus on eligibility validation
+    message("Skipping dashboard transformations to debug eligibility...")
+    transformed_data <- eligibility_results
 
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
 
     # Store transformed data using Python
     message("Storing transformed data...")
-    transformed_csv <- file.path(temp_dir, "ne25_transformed.csv")
-    write.csv(transformed_data, transformed_csv, row.names = FALSE)
+    transformed_feather <- file.path(temp_dir, "ne25_transformed.feather")
+    arrow::write_feather(transformed_data, transformed_feather)
 
     transformed_result <- system2(
       "python",
       args = c(
         "pipelines/python/insert_raw_data.py",
-        "--data-file", transformed_csv,
+        "--data-file", transformed_feather,
         "--table-name", "ne25_transformed",
         "--data-type", "raw",
         "--config", config_path

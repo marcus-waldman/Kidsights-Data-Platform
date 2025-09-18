@@ -3,6 +3,23 @@
 #' Functions to generate the interactive Quarto-based data dictionary
 #' as part of the automated pipeline process.
 
+# Dependency Management: Ensure documentation packages are available
+if (file.exists("R/utils/dependency_manager.R")) {
+  source("R/utils/dependency_manager.R")
+  ensure_documentation_dependencies(auto_install = TRUE, quiet = FALSE)
+} else {
+  # Fallback for when called from docs/data_dictionary/ne25/ directory
+  root_paths <- c("../../../R/utils/dependency_manager.R",
+                  "../../../../R/utils/dependency_manager.R")
+  for (path in root_paths) {
+    if (file.exists(path)) {
+      source(path)
+      ensure_documentation_dependencies(auto_install = TRUE, quiet = FALSE)
+      break
+    }
+  }
+}
+
 library(dplyr)
 
 #' Check if Quarto is available on the system

@@ -24,7 +24,7 @@ REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Deriv
 - Project 7679             - REDCapR             - flexible_bind         - recode_it()      - Connection mgmt
 - Project 7943             - Secure tokens       - Type conversion       - 21 variables     - Error handling
 - Project 7999             - Rate limiting       - Field mapping         - 7 categories     - Chunked processing
-- Project 8014             - 588 raw vars        - 3,906 records         - Factor levels    - Metadata generation
+- Project 8014             - 588 raw vars        - 3,908 records         - Factor levels    - Metadata generation
                                                    ↓                        ↓                    ↓
                                           Raw Data (588 vars)    Transformed Data (609 vars)   DuckDB Storage
                                                                          ↓                         ↓
@@ -76,7 +76,7 @@ data/duckdb/kidsights_local.duckdb
    source("run_ne25_pipeline.R")
 
    # Or from command line
-   "C:/Program Files/R/R-4.4.3/bin/Rscript.exe" run_ne25_pipeline.R
+   "C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_ne25_pipeline.R
    ```
 
 ### Expected Output

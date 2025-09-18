@@ -12,6 +12,34 @@ The codebook conversion system transforms legacy CSV data and additional item so
 
 Main conversion script that transforms the legacy CSV codebook and integrates additional study items into the JSON format.
 
+### `fix_codebook_response_sets.R`
+
+**⚠️ CRITICAL SCRIPT**: Fixes codebook response options architecture by implementing study-specific response sets and correcting NE25 missing value coding (9 vs -9).
+
+**Major Changes Made:**
+- Creates study-specific response sets for each study
+- Fixes NE25 to use value **9** for "Don't Know" (not -9)
+- Converts inline response options to response set references
+- Updates all affected items to use appropriate response sets
+
+**Impact:** Affects 277+ items across all studies, critical for proper recoding operations.
+
+**Usage:**
+```bash
+# Run the complete response sets fix
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/codebook/fix_codebook_response_sets.R
+```
+
+**Results:**
+- **47 PS items updated**: Study-specific ps_frequency_* response sets
+- **168 binary items updated**: NE25 uses standard_binary_ne25 (9 vs -9)
+- **62 inline response items converted**: Now use response set references
+- **8 new response sets added**: Study-specific scales for proper missing value coding
+- **Version**: Updated from 2.7.1 → 2.8.0
+- **Backup**: Automatic backup created before changes
+
+**Output Log:** `scripts/codebook/response_sets_fix_log_TIMESTAMP.txt`
+
 ### `update_ne22_irt_parameters.R`
 
 Script to add empirical IRT parameter estimates from NE22 study calibration to the codebook JSON.
@@ -457,5 +485,49 @@ The conversion process is configured via `config/codebook_config.yaml`:
 - **v2.1**: GSED_PF PS items integration with psychosocial_problems_general domain
 - **v2.2**: Study-specific IRT parameters with constraints field template
 - **v2.3**: NE22 IRT parameter update script with empirical calibration data
+
+## NE25 Validation Scripts (September 2025)
+
+New validation system for ensuring codebook accuracy against actual REDCap data.
+
+### Scripts
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `validate_ne25_codebook.R` | Validate NE25 items exist in data | Individual validation |
+| `generate_ne25_report.R` | Create validation markdown report | Documentation |
+| `update_ne25_codebook.R` | Fix invalid NE25 assignments | Cleanup (if needed) |
+| `run_ne25_audit.R` | Complete workflow | Master script |
+
+### Quick Start
+
+**Note**: Use `R.exe` not `Rscript.exe` to avoid segmentation faults.
+
+```bash
+# Complete audit workflow
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/codebook/run_ne25_audit.R
+
+# Individual validation only
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/codebook/validate_ne25_codebook.R
+```
+
+### Current Status (September 17, 2025)
+
+✅ **All 272 NE25 items VALIDATED** - exist in actual REDCap data
+⚠️ **0 NE25 IRT parameters** - all parameter blocks empty
+💡 **226 NE22 IRT parameters available** - could be copied to NE25
+
+**Conclusion**: No cleanup needed, but IRT parameter copying recommended.
+
+### Output Files
+
+- `docs/codebook/ne25_validation_report.md` - Human-readable validation report
+- `scripts/codebook/ne25_validation_results.rds` - R data for further processing
+- `scripts/codebook/ne25_update_log.txt` - Update log (if changes made)
+- `codebook/data/codebook_pre_ne25_audit_*.json` - Backup (if updated)
+
+### Package Dependencies
+
+Scripts auto-install: `jsonlite`, `dplyr`, `tibble`, `stringr`, `purrr`, `glue`, `lubridate`, `knitr`
 
 For usage questions, see the main codebook documentation in `codebook/README.md`.

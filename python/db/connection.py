@@ -126,12 +126,18 @@ class DatabaseManager:
                 if not self.database_exists():
                     self.logger.warning(f"Database file does not exist: {self.database_path}")
 
-                # Check file permissions
-                if not os.access(self.database_path, os.R_OK):
-                    raise PermissionError(f"No read access to database: {self.database_path}")
+                # Check file permissions (only if file exists)
+                if self.database_exists():
+                    if not os.access(self.database_path, os.R_OK):
+                        raise PermissionError(f"No read access to database: {self.database_path}")
 
-                if not read_only and not os.access(self.database_path, os.W_OK):
-                    raise PermissionError(f"No write access to database: {self.database_path}")
+                    if not read_only and not os.access(self.database_path, os.W_OK):
+                        raise PermissionError(f"No write access to database: {self.database_path}")
+                else:
+                    # For new database, check directory permissions
+                    db_dir = os.path.dirname(self.database_path)
+                    if not os.access(db_dir, os.W_OK):
+                        raise PermissionError(f"No write access to database directory: {db_dir}")
 
                 connection = duckdb.connect(
                     database=self.database_path,

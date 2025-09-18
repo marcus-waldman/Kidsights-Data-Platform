@@ -1,0 +1,135 @@
+---
+title: "Codebook Utility Functions - Table Outputs"
+format:
+  html:
+    toc: true
+    code-fold: show
+    df-print: kable
+---
+
+```{r setup}
+#| include: false
+library(tidyverse)
+library(kableExtra)
+
+# Source codebook functions
+source("../../R/codebook/load_codebook.R")
+source("../../R/codebook/extract_codebook.R")
+
+# Load codebook
+codebook <- load_codebook("../../codebook/data/codebook.json", validate = FALSE)
+```
+
+## codebook_extract_lexicon_crosswalk()
+
+```{r lexicon-crosswalk}
+# Get lexicon crosswalk
+crosswalk <- codebook_extract_lexicon_crosswalk(codebook)
+
+cat("Dimensions:", nrow(crosswalk), "rows ×", ncol(crosswalk), "columns\n")
+
+kableExtra::kable(head(crosswalk, 20), caption = "Lexicon Crosswalk (first 20 rows)") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_extract_irt_parameters() - Long Format
+
+```{r irt-params-long}
+# Get NE22 IRT parameters in long format
+irt_long <- codebook_extract_irt_parameters(codebook, "NE22")
+
+cat("Dimensions:", nrow(irt_long), "rows ×", ncol(irt_long), "columns\n")
+
+kableExtra::kable(head(irt_long, 15), caption = "IRT Parameters - Long Format (first 15 rows)", digits = 3) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_extract_irt_parameters() - Wide Format
+
+```{r irt-params-wide}
+# Get NE22 IRT parameters in wide format
+irt_wide <- codebook_extract_irt_parameters(codebook, "NE22", format = "wide")
+
+cat("Dimensions:", nrow(irt_wide), "rows ×", ncol(irt_wide), "columns\n")
+
+kableExtra::kable(head(irt_wide, 10), caption = "IRT Parameters - Wide Format (first 10 rows)", digits = 3) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_extract_response_sets()
+
+```{r response-sets}
+# Get response sets for NE25
+responses <- codebook_extract_response_sets(codebook, study = "NE25")
+
+cat("Dimensions:", nrow(responses), "rows ×", ncol(responses), "columns\n")
+
+kableExtra::kable(head(responses, 20), caption = "Response Sets for NE25 (first 20 rows)") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_extract_item_stems()
+
+```{r item-stems}
+# Get item stems for all items
+stems <- codebook_extract_item_stems(codebook)
+
+cat("Dimensions:", nrow(stems), "rows ×", ncol(stems), "columns\n")
+
+# Show first 15 rows with key columns
+stems_sample <- stems %>%
+  dplyr::select(lex_equate, domain, stem, age_min, age_max, reverse_scored) %>%
+  head(15)
+
+kableExtra::kable(stems_sample, caption = "Item Stems (first 15 rows)") %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_extract_study_summary()
+
+```{r study-summaries}
+# Get summaries for all major studies
+studies <- c("NE25", "NE22", "NE20", "CREDI", "GSED_PF")
+
+summaries <- purrr::map_df(studies, function(study) {
+  tryCatch({
+    codebook_extract_study_summary(codebook, study)
+  }, error = function(e) {
+    tibble::tibble(
+      study = study,
+      total_items = NA_integer_,
+      items_with_irt = NA_integer_,
+      irt_coverage = NA_real_,
+      n_domains = NA_integer_,
+      n_response_sets = NA_integer_
+    )
+  })
+})
+
+cat("Dimensions:", nrow(summaries), "rows ×", ncol(summaries), "columns\n")
+
+# Show key summary columns
+summary_display <- summaries %>%
+  dplyr::select(study, total_items, items_with_irt, irt_coverage, n_domains, n_response_sets)
+
+kableExtra::kable(summary_display, caption = "Study Summaries", digits = 3) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+## codebook_pivot_irt_to_wide()
+
+```{r irt-wide-pivot}
+# Get IRT parameters in wide format using pivot function
+# Note: This is the same as codebook_extract_irt_parameters with format="wide"
+irt_pivot <- codebook_extract_irt_parameters(codebook, "NE22", format = "wide", include_empty = FALSE)
+
+cat("Dimensions:", nrow(irt_pivot), "rows ×", ncol(irt_pivot), "columns\n")
+
+# Show first 8 rows
+kableExtra::kable(head(irt_pivot, 8), caption = "IRT Parameters - Pivot Wide (first 8 rows)", digits = 3) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped")
+```
+
+---
+
+**Summary**: This document shows the table outputs from all 6 codebook utility functions. Each function returns a dataframe that can be used for further analysis.

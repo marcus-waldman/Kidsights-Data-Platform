@@ -99,10 +99,13 @@ def main():
         # Initialize database manager
         db_manager = DatabaseManager(args.config)
 
-        # Test connection
-        if not db_manager.test_connection():
-            logger.error("Database connection test failed")
-            sys.exit(1)
+        # Test connection (skip for new databases as they will be created)
+        if db_manager.database_exists():
+            if not db_manager.test_connection():
+                logger.error("Database connection test failed")
+                sys.exit(1)
+        else:
+            logger.info("Database does not exist yet - will be created during schema initialization")
 
         # Initialize schema
         success = init_ne25_schema(db_manager)

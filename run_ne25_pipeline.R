@@ -15,8 +15,12 @@ if (!interactive()) {
   setwd(script_dir)
 }
 
-# Clear environment and load required libraries
+# Clear environment and ensure dependencies
 rm(list = ls())
+
+# Dependency Management: Check and install required packages
+source("R/utils/dependency_manager.R")
+ensure_database_dependencies(auto_install = TRUE, quiet = FALSE)
 
 cat("===========================================\n")
 cat("   Kidsights NE25 Data Pipeline\n")

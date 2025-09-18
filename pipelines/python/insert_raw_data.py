@@ -5,8 +5,8 @@ Raw data insertion script for NE25 pipeline.
 This script handles bulk insertion of extracted REDCap data into DuckDB tables,
 replacing R's dbWriteTable functionality to avoid segmentation faults.
 
-Supports both CSV and Parquet input formats, with Parquet providing better
-data type preservation and compression.
+Supports CSV, Parquet, and Feather input formats, with Feather providing optimal
+data type preservation for R/Python interoperability.
 """
 
 import sys
@@ -35,10 +35,10 @@ def insert_raw_data(
     pid: int = None
 ) -> bool:
     """
-    Insert raw data from CSV or Parquet file into database table.
+    Insert raw data from CSV, Parquet, or Feather file into database table.
 
     Args:
-        data_file: Path to CSV or Parquet file with data
+        data_file: Path to CSV, Parquet, or Feather file with data
         table_name: Target table name
         db_ops: Database operations instance
         pid: Project ID (for logging)
@@ -49,7 +49,7 @@ def insert_raw_data(
     logger = setup_logging()
 
     try:
-        # Read data from CSV or Parquet
+        # Read data from CSV, Parquet, or Feather
         data_path = Path(data_file)
         if not data_path.exists():
             logger.error(f"Data file not found: {data_file}")
@@ -61,6 +61,9 @@ def insert_raw_data(
         if data_path.suffix.lower() == '.parquet':
             df = pd.read_parquet(data_file)
             logger.info(f"Read Parquet file with preserved data types")
+        elif data_path.suffix.lower() == '.feather':
+            df = pd.read_feather(data_file)
+            logger.info(f"Read Feather file with optimal data type preservation")
         elif data_path.suffix.lower() == '.csv':
             df = pd.read_csv(data_file)
             logger.info(f"Read CSV file with inferred data types")
@@ -79,7 +82,7 @@ def insert_raw_data(
         success = db_ops.insert_dataframe(
             df=df,
             table_name=table_name,
-            if_exists="append",
+            if_exists="replace",
             chunk_size=500
         )
 
@@ -140,7 +143,7 @@ def insert_dictionary_data(
         success = db_ops.insert_dataframe(
             df=df,
             table_name=table_name,
-            if_exists="append",
+            if_exists="replace",
             chunk_size=500
         )
 

@@ -83,7 +83,7 @@ class InteractiveDictionaryExporter:
             return pd.DataFrame()
 
     def get_transformed_variables(self, conn):
-        """Get transformed variables metadata"""
+        """Get transformed variables metadata including enhanced factor information"""
         query = """
         SELECT
             variable_name,
@@ -94,14 +94,19 @@ class InteractiveDictionaryExporter:
             transformation_notes,
             n_total,
             n_missing,
-            missing_percentage
+            missing_percentage,
+            factor_levels,
+            value_counts,
+            reference_level,
+            ordered_factor,
+            factor_type
         FROM ne25_metadata
         ORDER BY category, variable_name
         """
 
         try:
             df = pd.read_sql(query, conn)
-            print(f"[SUCCESS] Loaded {len(df)} transformed variables")
+            print(f"[SUCCESS] Loaded {len(df)} transformed variables with factor metadata")
             return df
         except Exception as e:
             print(f"[ERROR] Error loading transformed variables: {e}")

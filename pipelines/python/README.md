@@ -74,6 +74,7 @@ python pipelines/python/insert_raw_data.py --data-file data.csv --table-name ne2
 - **Error Recovery**: Automatic retry logic with exponential backoff
 - **Performance Monitoring**: Detailed timing and progress logging
 - **Connection Management**: Uses DatabaseManager for reliability
+- **Data Refresh Mode**: Uses `replace` mode to avoid duplicate records. Each pipeline run replaces existing data ensuring a clean dataset without deduplication logic.
 
 **Processing Flow**:
 ```

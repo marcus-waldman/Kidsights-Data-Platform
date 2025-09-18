@@ -11,10 +11,12 @@ import argparse
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import json
 from datetime import datetime
 import traceback
+import re
+import yaml
 
 # Add python module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "python"))
@@ -45,6 +47,34 @@ except ImportError:
             def __enter__(self): return self
             def __exit__(self, *args): pass
         return DummyContext()
+
+
+def load_derived_variables_config(config_path: str) -> Optional[List[str]]:
+    """
+    Load derived variables configuration from YAML file.
+
+    Args:
+        config_path: Path to the derived variables YAML configuration file
+
+    Returns:
+        List of derived variable names, or None if file not found or invalid
+    """
+    try:
+        config_file = Path(config_path)
+        if not config_file.exists():
+            return None
+
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+
+        if 'all_derived_variables' in config:
+            return config['all_derived_variables']
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Warning: Could not load derived variables config from {config_path}: {e}")
+        return None
 
 
 @with_logging("analyze_variable")
@@ -90,11 +120,200 @@ def analyze_variable(series: pd.Series, var_name: str) -> Dict[str, Any]:
         if metadata["unique_values"] <= 20 and metadata["unique_values"] < metadata["n_total"] * 0.5:
             metadata["data_type"] = "factor"
 
-            # Get value counts for factor levels
-            value_counts = series.value_counts(dropna=False).to_dict()
-            metadata["value_labels"] = json.dumps(value_counts)
+            # Generate enhanced factor metadata
+            factor_metadata = analyze_factor_variable(series, var_name)
+            metadata.update(factor_metadata)
 
     return metadata
+
+
+def analyze_factor_variable(series: pd.Series, var_name: str) -> Dict[str, Any]:
+    """
+    Analyze a factor variable to extract levels, labels, and ordering.
+
+    Args:
+        series: Pandas Series containing factor data
+        var_name: Variable name for context
+
+    Returns:
+        Dictionary with factor-specific metadata
+    """
+    # Get value counts (excluding missing values for ordering)
+    value_counts = series.value_counts(dropna=False)
+
+    # Create factor levels with proper ordering
+    factor_levels = []
+    value_labels = {}
+    value_counts_dict = {}
+
+    # Sort levels logically based on variable type
+    sorted_values = sort_factor_levels(list(value_counts.index), var_name)
+
+    # Build factor metadata
+    for i, level in enumerate(sorted_values):
+        if pd.isna(level):
+            level_key = "NA"
+            level_label = "Missing/Not Available"
+        else:
+            level_key = str(i + 1)  # 1-based indexing for R compatibility
+            level_label = str(level)
+
+        factor_levels.append({
+            "code": level_key,
+            "label": level_label,
+            "original_value": level,
+            "count": int(value_counts.get(level, 0)),
+            "percentage": round((value_counts.get(level, 0) / len(series)) * 100, 2)
+        })
+
+        value_labels[level_key] = level_label
+        value_counts_dict[level_key] = int(value_counts.get(level, 0))
+
+    # Identify reference level (typically the most common non-missing value)
+    non_missing_levels = [level for level in factor_levels if level["original_value"] is not pd.NA and not pd.isna(level["original_value"])]
+    reference_level = None
+    if non_missing_levels:
+        # Use the most frequent level as reference, or first level if tie
+        reference_level = max(non_missing_levels, key=lambda x: x["count"])["code"]
+
+    return {
+        "factor_levels": factor_levels,
+        "value_labels": json.dumps(value_labels, ensure_ascii=False),
+        "value_counts": json.dumps(value_counts_dict),
+        "reference_level": reference_level,
+        "ordered_factor": is_ordered_factor(var_name),
+        "factor_type": determine_factor_type(var_name)
+    }
+
+
+def sort_factor_levels(levels: List[Any], var_name: str) -> List[Any]:
+    """
+    Sort factor levels in a logical order based on variable type.
+
+    Args:
+        levels: List of factor levels to sort
+        var_name: Variable name for context
+
+    Returns:
+        Sorted list of levels
+    """
+    var_lower = var_name.lower()
+
+    # Custom sorting for specific variable types
+    if 'educ' in var_lower:
+        # Education levels: Less than HS < HS Graduate < Some College < College Degree < Graduate/Professional
+        education_order = {
+            'less than high school graduate': 1,
+            'high school graduate (including equivalency)': 2,
+            'some college or associate\'s degree': 3,
+            'college degree': 4,
+            'graduate or professional degree': 5
+        }
+
+        def edu_sort_key(level):
+            if pd.isna(level):
+                return 999  # Missing values last
+            level_str = str(level).lower()
+            return education_order.get(level_str, 100)  # Unknown levels after known ones
+
+        return sorted(levels, key=edu_sort_key)
+
+    elif 'fpl' in var_lower or 'poverty' in var_lower:
+        # Income/poverty levels: typically ordered from low to high
+        fpl_order = {
+            'below federal poverty level': 1,
+            'at or above federal poverty level': 2,
+            '<100% fpl': 1,
+            '100-199% fpl': 2,
+            '200-299% fpl': 3,
+            '300-399% fpl': 4,
+            '400%+ fpl': 5
+        }
+
+        def fpl_sort_key(level):
+            if pd.isna(level):
+                return 999
+            level_str = str(level).lower()
+            return fpl_order.get(level_str, 100)
+
+        return sorted(levels, key=fpl_sort_key)
+
+    elif 'age' in var_lower and 'cat' in var_lower:
+        # Age categories: sort numerically by age ranges
+        def age_sort_key(level):
+            if pd.isna(level):
+                return 999
+            level_str = str(level)
+            # Extract first number from age ranges like "0-11 months", "1-2 years"
+            numbers = re.findall(r'\d+', level_str)
+            return int(numbers[0]) if numbers else 100
+
+        return sorted(levels, key=age_sort_key)
+
+    else:
+        # Default sorting: missing values last, then alphabetical
+        def default_sort_key(level):
+            if pd.isna(level):
+                return ('zzz_missing', '')
+            return ('a_value', str(level))
+
+        return sorted(levels, key=default_sort_key)
+
+
+def is_ordered_factor(var_name: str) -> bool:
+    """
+    Determine if a factor variable should be treated as ordered.
+
+    Args:
+        var_name: Variable name
+
+    Returns:
+        True if factor should be ordered, False otherwise
+    """
+    var_lower = var_name.lower()
+
+    # Variables that are typically ordered
+    ordered_patterns = [
+        'educ',  # Education levels
+        'fpl',   # Income/poverty levels
+        'age',   # Age categories
+        'grade', # Grade levels
+        'level', # General level variables
+        'scale', # Scale variables
+        'severity' # Severity scales
+    ]
+
+    return any(pattern in var_lower for pattern in ordered_patterns)
+
+
+def determine_factor_type(var_name: str) -> str:
+    """
+    Determine the type/category of a factor variable.
+
+    Args:
+        var_name: Variable name
+
+    Returns:
+        Factor type string
+    """
+    var_lower = var_name.lower()
+
+    if any(term in var_lower for term in ['race', 'ethnic']):
+        return 'demographic_race'
+    elif any(term in var_lower for term in ['sex', 'gender']):
+        return 'demographic_sex'
+    elif 'educ' in var_lower:
+        return 'socioeconomic_education'
+    elif any(term in var_lower for term in ['fpl', 'poverty', 'income']):
+        return 'socioeconomic_income'
+    elif 'age' in var_lower:
+        return 'demographic_age'
+    elif any(term in var_lower for term in ['relation', 'caregiver']):
+        return 'relationship'
+    elif any(term in var_lower for term in ['county', 'state', 'zip', 'geographic']):
+        return 'geographic'
+    else:
+        return 'other'
 
 
 def categorize_variable(var_name: str) -> str:
@@ -195,7 +414,8 @@ def generate_transformation_notes(var_name: str, category: str) -> str:
 def generate_metadata_from_table(
     table_name: str,
     db_ops: DatabaseOperations,
-    exclude_columns: List[str] = None
+    exclude_columns: List[str] = None,
+    derived_variables_list: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
     Generate metadata for all columns in a table.
@@ -249,11 +469,21 @@ def generate_metadata_from_table(
         metadata_list = []
         failed_variables = []
 
-        with PerformanceLogger(logger, "variable_analysis", column_count=len(df.columns)):
-            for col_name in df.columns:
-                if col_name in exclude_columns:
-                    logger.debug(f"Skipping excluded column: {col_name}")
-                    continue
+        # Filter columns for analysis
+        columns_to_analyze = df.columns.tolist()
+
+        # Remove excluded columns
+        columns_to_analyze = [col for col in columns_to_analyze if col not in exclude_columns]
+
+        # If derived_variables_list is provided, only analyze those variables
+        if derived_variables_list is not None:
+            # Filter to only include derived variables that exist in the table
+            available_derived = [col for col in derived_variables_list if col in df.columns]
+            columns_to_analyze = available_derived
+            logger.info(f"Filtering to derived variables only: {len(available_derived)} of {len(derived_variables_list)} derived variables found in table")
+
+        with PerformanceLogger(logger, "variable_analysis", column_count=len(columns_to_analyze)):
+            for col_name in columns_to_analyze:
 
                 try:
                     with error_context(logger, "variable_analysis", variable=col_name):
@@ -269,8 +499,9 @@ def generate_metadata_from_table(
                         var_metadata["transformation_notes"] = generate_transformation_notes(col_name, category)
                         var_metadata["creation_date"] = datetime.now().isoformat()
 
-                        # Add empty fields for compatibility
-                        var_metadata["summary_statistics"] = "{}"
+                        # Add empty fields for compatibility (only if not already set by factor analysis)
+                        if "summary_statistics" not in var_metadata:
+                            var_metadata["summary_statistics"] = "{}"
                         if "value_labels" not in var_metadata:
                             var_metadata["value_labels"] = "{}"
 
@@ -318,6 +549,87 @@ def generate_metadata_from_table(
             }
         )
         return []
+
+
+@with_logging("export_metadata_to_feather")
+def export_metadata_to_feather(
+    metadata_list: List[Dict[str, Any]],
+    output_path: str = "temp/ne25_metadata.feather"
+) -> bool:
+    """
+    Export metadata to Feather file for reliable import via insert_raw_data.py.
+
+    This approach mirrors the successful R → Feather → Python → DuckDB workflow,
+    avoiding DataFrame insertion issues while preserving data types.
+
+    Args:
+        metadata_list: List of metadata dictionaries
+        output_path: Path to output Feather file
+
+    Returns:
+        True if successful, False otherwise
+    """
+    logger = setup_logging()
+
+    if not metadata_list:
+        logger.warning("No metadata to export")
+        return True
+
+    try:
+        from pathlib import Path
+
+        # Ensure output directory exists
+        output_file = Path(output_path)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Convert to DataFrame with validation
+        logger.info(f"Converting {len(metadata_list)} metadata records to DataFrame")
+        df = pd.DataFrame(metadata_list)
+
+        # Validate DataFrame structure
+        required_columns = ['variable_name', 'data_type', 'category']
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            raise ValueError(f"Missing required columns in metadata: {missing_columns}")
+
+        logger.info(
+            f"Metadata DataFrame created: {len(df)} rows, {len(df.columns)} columns",
+            extra={
+                "metadata_rows": len(df),
+                "metadata_columns": len(df.columns),
+                "column_names": list(df.columns)
+            }
+        )
+
+        # Export to Feather with data type preservation
+        logger.info(f"Exporting metadata to Feather file: {output_path}")
+        df.to_feather(output_path)
+
+        # Verify export
+        file_size = output_file.stat().st_size
+        logger.info(
+            f"Successfully exported metadata to Feather file",
+            extra={
+                "output_path": output_path,
+                "file_size_bytes": file_size,
+                "records_exported": len(df),
+                "columns_exported": len(df.columns)
+            }
+        )
+
+        return True
+
+    except Exception as e:
+        logger.error(
+            f"Error exporting metadata to Feather: {e}",
+            extra={
+                "output_path": output_path,
+                "metadata_count": len(metadata_list),
+                "error_type": type(e).__name__,
+                "error_message": str(e)
+            }
+        )
+        return False
 
 
 @with_logging("insert_metadata")
@@ -386,7 +698,7 @@ def insert_metadata(
                 success = db_ops.insert_dataframe(
                     df=df,
                     table_name=table_name,
-                    if_exists="append",
+                    if_exists="replace",
                     chunk_size=100
                 )
 
@@ -465,6 +777,26 @@ Examples:
         action="store_true",
         help="Generate metadata but don't insert into database"
     )
+    parser.add_argument(
+        "--output-feather",
+        default="temp/ne25_metadata.feather",
+        help="Output Feather file path (default: temp/ne25_metadata.feather)"
+    )
+    parser.add_argument(
+        "--export-only",
+        action="store_true",
+        help="Only export to Feather file, don't insert into database"
+    )
+    parser.add_argument(
+        "--derived-only",
+        action="store_true",
+        help="Only analyze derived/transformed variables (not raw variables)"
+    )
+    parser.add_argument(
+        "--derived-config",
+        default="config/derived_variables.yaml",
+        help="Configuration file with derived variable definitions (default: config/derived_variables.yaml)"
+    )
 
     args = parser.parse_args()
 
@@ -515,20 +847,56 @@ Examples:
 
             logger.info(f"Source table {args.source_table} validated: {row_count} rows")
 
+        # Load derived variables configuration if requested
+        derived_variables_list = None
+        if args.derived_only:
+            logger.info(f"Loading derived variables configuration from: {args.derived_config}")
+            derived_variables_list = load_derived_variables_config(args.derived_config)
+
+            if derived_variables_list is None:
+                raise FileNotFoundError(f"Could not load derived variables config from {args.derived_config}")
+
+            logger.info(f"Loaded {len(derived_variables_list)} derived variables from configuration")
+
         # Generate metadata
         with PerformanceLogger(logger, "metadata_generation", source_table=args.source_table):
             logger.info(f"Generating metadata from table: {args.source_table}")
-            metadata_list = generate_metadata_from_table(args.source_table, db_ops)
+
+            if derived_variables_list is not None:
+                logger.info("Filtering to derived variables only")
+
+            metadata_list = generate_metadata_from_table(
+                args.source_table,
+                db_ops,
+                derived_variables_list=derived_variables_list
+            )
 
             if not metadata_list:
                 raise ValueError("No metadata generated - check source table structure")
 
             logger.info(f"Generated metadata for {len(metadata_list)} variables")
 
-        # Insert metadata (unless dry run)
+        # Export metadata to Feather file
+        # Adjust output filename for derived variables
+        output_feather = args.output_feather
+        if args.derived_only and not args.output_feather.endswith("_derived.feather"):
+            output_feather = args.output_feather.replace(".feather", "_derived.feather")
+
+        with PerformanceLogger(logger, "metadata_export", records=len(metadata_list)):
+            logger.info(f"Exporting metadata to Feather file: {output_feather}")
+            export_success = export_metadata_to_feather(metadata_list, output_feather)
+
+            if not export_success:
+                raise RuntimeError("Failed to export metadata to Feather file")
+
+        # Insert metadata (unless dry run or export-only)
         if args.dry_run:
             logger.info("Dry run mode: skipping database insertion")
             logger.info(f"Would have inserted {len(metadata_list)} metadata records")
+            success = True
+        elif args.export_only:
+            logger.info("Export-only mode: skipping database insertion")
+            logger.info(f"Metadata exported to {args.output_feather}")
             success = True
         else:
             with PerformanceLogger(logger, "metadata_insertion", records=len(metadata_list)):
