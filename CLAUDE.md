@@ -194,6 +194,46 @@ REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Dashb
 - SQL schemas: `snake_case.sql` (e.g., `core_participants.sql`)
 - Documentation: `UPPER_CASE.md` for key docs, `snake_case.md` for others
 
+### R Coding Standards
+
+**CRITICAL: All R function calls MUST use explicit package namespacing**
+
+To prevent namespace conflicts and ensure maintainable code, ALL R function calls must include explicit package prefixes:
+
+**✅ CORRECT:**
+```r
+library(dplyr)
+library(tidyr)
+
+data %>%
+  dplyr::select(pid, record_id) %>%
+  dplyr::mutate(new_var = old_var * 2) %>%
+  tidyr::pivot_longer(cols = -c(1:2), names_to = "variable")
+```
+
+**❌ INCORRECT:**
+```r
+library(dplyr)
+library(tidyr)
+
+data %>%
+  select(pid, record_id) %>%
+  mutate(new_var = old_var * 2) %>%
+  pivot_longer(cols = -c(1:2), names_to = "variable")
+```
+
+**Common Package Prefixes Required:**
+- `dplyr::` - select(), filter(), mutate(), summarise(), group_by(), left_join(), rename(), arrange(), relocate()
+- `tidyr::` - pivot_longer(), pivot_wider(), separate(), unite()
+- `stringr::` - str_split(), str_extract(), str_detect(), str_replace()
+- `yaml::` - read_yaml(), write_yaml()
+- `arrow::` - read_feather(), write_feather()
+- `readr::` - read_csv(), write_csv()
+
+**Exception:** Base R functions (e.g., `mean()`, `length()`, `paste()`) do not require prefixes.
+
+**Rationale:** Eliminates namespace conflicts (like plyr/dplyr issues), makes dependencies explicit, improves code maintainability.
+
 ### Code Organization Principles
 
 1. **Separation of Concerns**
@@ -1003,3 +1043,48 @@ Fixed fundamental response options issues that were blocking proper recoding ope
 - **Backup integrity**: Previous version preserved
 
 This architectural fix ensures that the codebook properly supports the recoding pipeline by providing study-appropriate missing value coding and eliminating redundant inline response definitions.
+
+## Current Pipeline Status (September 17, 2025)
+
+### 🔧 **CID8 FUNCTION STATUS** - PARTIALLY RESOLVED
+
+**✅ Problem Solved**: CID8 now finds 187 quality items (was 0) and processes 2,308 participants
+
+**✅ Fixes Applied**:
+- **Namespace conflicts resolved** with explicit `dplyr::` prefixes throughout function
+- **Data flow fixed** by storing `pivoted_data` before calibration merge step
+- **Quality filtering working** with proper debug output showing item statistics
+- **Pipeline reliability** improved from ~50% to stable execution
+
+**⚠️ Remaining Investigation**:
+- **TO INVESTIGATE**: "item categories must start with 0" error in `pairwise::pair()` IRT analysis
+  - Function gracefully falls back to simplified scoring (currently working)
+  - May indicate response coding issues (1,2,3 vs 0,1,2) or missing response categories
+  - Need to examine actual item response patterns in the 187 quality items
+  - Consider if REDCap data needs recoding or if IRT parameters need adjustment
+  - Verify if simplified scoring vs IRT analysis gives substantially different authenticity results
+
+**Current Metrics**:
+- Total participants: 3,907
+- Items found: 226 total, 187 pass quality filters
+- Authenticity pass rate: 59% (2,308 participants)
+
+### 📋 **IMMEDIATE PRIORITIES**
+
+#### **Priority 1: Complete CID8 Investigation**
+When running CID8, if you see "item categories must start with 0", investigate:
+1. **Check actual response values**: `table(item_column, useNA="ifany")` for sample items
+2. **Verify coding expectations**: Expected 0,1,2 vs actual 1,2,3 patterns
+3. **Identify problematic items**: Look for items with missing categories or constant values
+4. **Review codebook mappings**: Consider if response option mappings need adjustment
+5. **Compare scoring methods**: Test if simplified scoring vs IRT gives substantially different results
+
+#### **Priority 2: Pipeline Completion Debug**
+- **Issue**: Pipeline fails after CID8 completes but before `apply_ne25_eligibility` runs
+- **Status**: `apply_ne25_eligibility` debug statements never appear in pipeline output
+- **Next Step**: Investigate failure point between eligibility validation and application steps
+
+#### **Priority 3: End-to-End Validation**
+- Run complete pipeline without errors
+- Verify all 21 derived variables created correctly
+- Confirm ~2,255 participants meet final eligibility criteria
