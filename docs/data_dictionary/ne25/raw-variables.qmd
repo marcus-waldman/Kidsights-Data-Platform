@@ -1,0 +1,92 @@
+---
+title: "Raw Variables"
+subtitle: "Variables extracted directly from REDCap projects"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Ensure required packages are available
+source("assets/ensure_dependencies.R")
+
+# Load required libraries
+library(dplyr)
+library(DT)
+library(knitr)
+
+# Source the dictionary functions (now JSON-based)
+source("assets/dictionary_functions.R")
+
+# Initialize dictionary data from JSON
+dict_data <- initialize_dictionary()
+
+# Load data from JSON
+raw_vars_data <- get_raw_variables_data(dict_data)
+```
+
+# Raw Variables
+
+```{r freshness-warning, results='asis', echo=FALSE}
+# Display freshness warning if data is stale
+cat(display_freshness_warning(dict_data))
+```
+
+Raw variables are extracted directly from REDCap projects with minimal processing. This section shows all unique variables across projects without redundancy, maintaining the column order as they appear in the original datasets.
+
+## Key Features
+
+- **Column ID**: Preserves the original column order from REDCap datasets
+- **Variable Names**: REDCap field names as they appear in the database
+- **PIDs**: Shows which project IDs (7679, 7943, 7999, 8014) contain each variable
+- **Value Labels**: For categorical variables, shows the available response options
+- **No Redundancy**: Each unique variable is listed once, regardless of how many projects contain it
+
+## Raw Variables Table
+
+Use the search box to find specific variables, or sort by any column. The table includes all raw variables with their metadata and project associations.
+
+```{r raw-variables-table}
+# Create and display the raw variables table
+format_raw_variables_table(raw_vars_data)
+```
+
+## Variable Type Summary
+
+```{r variable-type-summary}
+# Get pre-computed type summary from JSON
+summaries <- get_summary_data(dict_data)
+
+if ("raw_variable_types" %in% names(summaries)) {
+  type_summary <- summaries$raw_variable_types$data
+
+  # Convert to data frame if needed
+  if (is.list(type_summary)) {
+    type_summary <- do.call(rbind, lapply(type_summary, data.frame))
+  }
+
+  knitr::kable(type_summary,
+               col.names = c("Field Type", "Count", "Percentage (%)"),
+               caption = "Distribution of Variable Types")
+} else {
+  # Fallback: calculate from loaded data
+  type_summary <- raw_vars_data %>%
+    group_by(field_name) %>%
+    summarise(field_type = first(field_type), .groups = "drop") %>%
+    count(field_type, name = "count") %>%
+    mutate(percentage = round(count / sum(count) * 100, 1)) %>%
+    arrange(desc(count))
+
+  knitr::kable(type_summary,
+               col.names = c("Field Type", "Count", "Percentage (%)"),
+               caption = "Distribution of Variable Types (computed from JSON data)")
+}
+```
+
+```{r generation-info, echo=FALSE}
+# Display generation information
+if ("metadata" %in% names(dict_data)) {
+  cat("\n**Data Dictionary Generated:** ", dict_data$metadata$generated, "\n")
+  cat("**Total Raw Variables:** ", dict_data$metadata$total_raw_variables, "\n")
+  cat("**Projects:** ", paste(dict_data$metadata$project_pids, collapse = ", "), "\n")
+}
+```

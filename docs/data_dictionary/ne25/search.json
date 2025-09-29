@@ -1,0 +1,317 @@
+[
+  {
+    "objectID": "transformed-variables.html",
+    "href": "transformed-variables.html",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "⚠️ Data Dictionary Notice: This dictionary was generated 16.9 hours ago. The data may not reflect the most recent database updates.\n\nTransformed variables are created through the data processing pipeline, applying standardizations, calculations, and categorizations to raw variables. Each transformed variable includes information about its source variables and transformation process.\n\n\n\nSource Variables: Shows which raw variables were used to create each transformed variable\nTransformation Category: Groups variables by type of transformation (race/ethnicity, education, etc.)\nVariable Lineage: Clear mapping from raw inputs to transformed outputs\nMissing Data: Percentage of missing values for each variable\nData Types: R data types for each variable\n\n\n\n\nThis table shows all variables created through the data processing pipeline, organized by transformation category. Factor variables now include value-label mappings and ordering information.\n\n\n\n\n\n\n\n\n\nFactor variables are categorical variables with defined levels and labels. This section provides enhanced documentation for all factor variables in the dataset.\n\n\n\nFactor Variables Summary\n\n\nStatistic\nCount\n\n\n\n\nTotal factor variables\n18\n\n\nOrdered factors (↕️)\n0\n\n\nUnordered factors (•)\n18\n\n\nFactors with complete metadata\n0\n\n\n\n\n\n\n\nThis specialized view shows only factor variables with their complete value-label mappings, ordering information, and reference levels for statistical modeling.\n\n\n\n\n\n\n\n\n\n\nType: Semantic category (demographic_race, socioeconomic_education, etc.)\nOrdered: Whether factor levels have natural ordering\n\n↕️: Ordered factor (e.g., education levels: less than HS &lt; HS &lt; college)\n•: Unordered factor (e.g., race categories have no natural order)\n\nRef: Reference level used for statistical modeling (typically most frequent level)\nValue Labels: Shows code-to-label mappings (e.g., 1=White, 2=Black, etc.)\n\n\n\n\n\n\n\n\nVariables by Transformation Category\n\n\nCount\nPercentage (%)\n\n\n\n\ncategory.1\nEducation Categories\n\n\ncategory.2\nrace_ethnicity\n\n\ncategory.3\nEligibility Flags\n\n\ncount.1\n12\n\n\ncount.2\n6\n\n\ncount.3\n3\n\n\npercentage.1\n57.1\n\n\npercentage.2\n28.6\n\n\npercentage.3\n14.3\n\n\n\n\n\n\n\n\n\n\n\nMissing Data Summary Across Transformed Variables\n\n\nMetric\nValue\n\n\n\n\nVariables with no missing data\n21\n\n\nVariables with some missing data (1-49%)\n0\n\n\nVariables with high missing data (≥50%)\n0\n\n\nAverage missing percentage\n0%\n\n\nMedian missing percentage\n0%\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 16:55:47 \n**Total Transformed Variables:**  21 \n**Source Records:**  11718 \n**Last Data Extraction:**  2025-09-17 21:22:00.185979"
+  },
+  {
+    "objectID": "transformed-variables.html#key-features",
+    "href": "transformed-variables.html#key-features",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "Source Variables: Shows which raw variables were used to create each transformed variable\nTransformation Category: Groups variables by type of transformation (race/ethnicity, education, etc.)\nVariable Lineage: Clear mapping from raw inputs to transformed outputs\nMissing Data: Percentage of missing values for each variable\nData Types: R data types for each variable"
+  },
+  {
+    "objectID": "transformed-variables.html#transformed-variables-table",
+    "href": "transformed-variables.html#transformed-variables-table",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "This table shows all variables created through the data processing pipeline, organized by transformation category. Factor variables now include value-label mappings and ordering information."
+  },
+  {
+    "objectID": "transformed-variables.html#transformation-categories",
+    "href": "transformed-variables.html#transformation-categories",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "Variables by Transformation Category\n\n\nCount\nPercentage (%)\n\n\n\n\ncategory.1\nEducation Categories\n\n\ncategory.2\nrace_ethnicity\n\n\ncategory.3\nEligibility Flags\n\n\ncount.1\n12\n\n\ncount.2\n6\n\n\ncount.3\n3\n\n\npercentage.1\n57.1\n\n\npercentage.2\n28.6\n\n\npercentage.3\n14.3"
+  },
+  {
+    "objectID": "transformed-variables.html#missing-data-summary",
+    "href": "transformed-variables.html#missing-data-summary",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "Missing Data Summary Across Transformed Variables\n\n\nMetric\nValue\n\n\n\n\nVariables with no missing data\n21\n\n\nVariables with some missing data (1-49%)\n0\n\n\nVariables with high missing data (≥50%)\n0\n\n\nAverage missing percentage\n0%\n\n\nMedian missing percentage\n0%\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 16:55:47 \n**Total Transformed Variables:**  21 \n**Source Records:**  11718 \n**Last Data Extraction:**  2025-09-17 21:22:00.185979"
+  },
+  {
+    "objectID": "raw-variables.html",
+    "href": "raw-variables.html",
+    "title": "Raw Variables",
+    "section": "",
+    "text": "⚠️ Data Dictionary Notice: This dictionary was generated 15.5 hours ago. The data may not reflect the most recent database updates.\n\nRaw variables are extracted directly from REDCap projects with minimal processing. This section shows all unique variables across projects without redundancy, maintaining the column order as they appear in the original datasets.\n\n\n\nColumn ID: Preserves the original column order from REDCap datasets\nVariable Names: REDCap field names as they appear in the database\nPIDs: Shows which project IDs (7679, 7943, 7999, 8014) contain each variable\nValue Labels: For categorical variables, shows the available response options\nNo Redundancy: Each unique variable is listed once, regardless of how many projects contain it\n\n\n\n\nUse the search box to find specific variables, or sort by any column. The table includes all raw variables with their metadata and project associations.\n\n\n\n\n\n\n\n\n\n\n\n\nDistribution of Variable Types\n\n\nCount\nPercentage (%)\n\n\n\n\nfield_type.1\nradio\n\n\nfield_type.2\ncalc\n\n\nfield_type.3\ndescriptive\n\n\nfield_type.4\ntext\n\n\nfield_type.5\ncheckbox\n\n\nfield_type.6\nslider\n\n\nfield_type.7\ndropdown\n\n\nfield_type.8\nyesno\n\n\nfield_type.9\nnotes\n\n\ncount.1\n392\n\n\ncount.2\n21\n\n\ncount.3\n16\n\n\ncount.4\n15\n\n\ncount.5\n10\n\n\ncount.6\n6\n\n\ncount.7\n6\n\n\ncount.8\n5\n\n\ncount.9\n1\n\n\npercentage.1\n83.1\n\n\npercentage.2\n4.4\n\n\npercentage.3\n3.4\n\n\npercentage.4\n3.2\n\n\npercentage.5\n2.1\n\n\npercentage.6\n1.3\n\n\npercentage.7\n1.3\n\n\npercentage.8\n1.1\n\n\npercentage.9\n0.2\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 14:03:45 \n**Total Raw Variables:**  1880 \n**Projects:**  7679, 7943, 7999, 8014"
+  },
+  {
+    "objectID": "raw-variables.html#key-features",
+    "href": "raw-variables.html#key-features",
+    "title": "Raw Variables",
+    "section": "",
+    "text": "Column ID: Preserves the original column order from REDCap datasets\nVariable Names: REDCap field names as they appear in the database\nPIDs: Shows which project IDs (7679, 7943, 7999, 8014) contain each variable\nValue Labels: For categorical variables, shows the available response options\nNo Redundancy: Each unique variable is listed once, regardless of how many projects contain it"
+  },
+  {
+    "objectID": "raw-variables.html#raw-variables-table",
+    "href": "raw-variables.html#raw-variables-table",
+    "title": "Raw Variables",
+    "section": "",
+    "text": "Use the search box to find specific variables, or sort by any column. The table includes all raw variables with their metadata and project associations."
+  },
+  {
+    "objectID": "raw-variables.html#variable-type-summary",
+    "href": "raw-variables.html#variable-type-summary",
+    "title": "Raw Variables",
+    "section": "",
+    "text": "Distribution of Variable Types\n\n\nCount\nPercentage (%)\n\n\n\n\nfield_type.1\nradio\n\n\nfield_type.2\ncalc\n\n\nfield_type.3\ndescriptive\n\n\nfield_type.4\ntext\n\n\nfield_type.5\ncheckbox\n\n\nfield_type.6\nslider\n\n\nfield_type.7\ndropdown\n\n\nfield_type.8\nyesno\n\n\nfield_type.9\nnotes\n\n\ncount.1\n392\n\n\ncount.2\n21\n\n\ncount.3\n16\n\n\ncount.4\n15\n\n\ncount.5\n10\n\n\ncount.6\n6\n\n\ncount.7\n6\n\n\ncount.8\n5\n\n\ncount.9\n1\n\n\npercentage.1\n83.1\n\n\npercentage.2\n4.4\n\n\npercentage.3\n3.4\n\n\npercentage.4\n3.2\n\n\npercentage.5\n2.1\n\n\npercentage.6\n1.3\n\n\npercentage.7\n1.3\n\n\npercentage.8\n1.1\n\n\npercentage.9\n0.2\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 14:03:45 \n**Total Raw Variables:**  1880 \n**Projects:**  7679, 7943, 7999, 8014"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html",
+    "href": "legacy/ne25_data_dictionary_summary.html",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Generated: 2025-09-15 22:52:48\nTotal Records: 3903\nTotal Variables: 28\nCategories: 5\n\n\nThis data dictionary describes all variables in the NE25 transformed dataset. The data comes from REDCap surveys and has been processed through the Kidsights data transformation pipeline, which applies standardized harmonization rules for race/ethnicity, education categories, and other demographic variables.\n\n\n\nDescription: Race and ethnicity variables for children and primary caregivers, including harmonized categories\nVariables: 6\nAverage Missing: 37.3%\nData Types: 6 factors, 0 numeric, 0 logical, 0 character\nVariables: a1_hisp, a1_race, a1_raceG, hisp, race, raceG\n\n\n\nDescription: Variables describing relationships between caregivers and children, including gender and maternal status\nVariables: 4\nAverage Missing: 36.6%\nData Types: 2 factors, 0 numeric, 2 logical, 0 character\nVariables: female_a1, mom_a1, relation1, relation2\n\n\n\nDescription: Education level variables using multiple categorization systems (4, 6, and 8 categories)\nVariables: 12\nAverage Missing: 40.8%\nData Types: 12 factors, 0 numeric, 0 logical, 0 character\nVariables: educ4_a1, educ4_a2, educ4_max, educ4_mom, educ6_a1, educ6_a2, educ6_max, educ6_mom, educ_a1, educ_a2, educ_max, educ_mom\n\n\n\nDescription: Child’s biological sex and gender indicator variables\nVariables: 2\nAverage Missing: 36.4%\nData Types: 1 factors, 0 numeric, 1 logical, 0 character\nVariables: female, sex\n\n\n\nDescription: Age variables for children and caregivers in different units (days, months, years)\nVariables: 4\nAverage Missing: 26.2%\nData Types: 0 factors, 4 numeric, 0 logical, 0 character\nVariables: a1_years_old, days_old, months_old, years_old\n\n\n\n\n\nMissing percentages are calculated as (missing values / total records) × 100\nFactor variables show the most common levels with their counts\nNumeric variables display min, max, and mean values where available\nLogical variables show counts of TRUE and FALSE values\n\nGenerated automatically from metadata on 2025-09-15 by the Kidsights Data Platform"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#overview",
+    "href": "legacy/ne25_data_dictionary_summary.html#overview",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "This data dictionary describes all variables in the NE25 transformed dataset. The data comes from REDCap surveys and has been processed through the Kidsights data transformation pipeline, which applies standardized harmonization rules for race/ethnicity, education categories, and other demographic variables."
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#race",
+    "href": "legacy/ne25_data_dictionary_summary.html#race",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Race and ethnicity variables for children and primary caregivers, including harmonized categories\nVariables: 6\nAverage Missing: 37.3%\nData Types: 6 factors, 0 numeric, 0 logical, 0 character\nVariables: a1_hisp, a1_race, a1_raceG, hisp, race, raceG"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#caregiver-relationship",
+    "href": "legacy/ne25_data_dictionary_summary.html#caregiver-relationship",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Variables describing relationships between caregivers and children, including gender and maternal status\nVariables: 4\nAverage Missing: 36.6%\nData Types: 2 factors, 0 numeric, 2 logical, 0 character\nVariables: female_a1, mom_a1, relation1, relation2"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#education",
+    "href": "legacy/ne25_data_dictionary_summary.html#education",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Education level variables using multiple categorization systems (4, 6, and 8 categories)\nVariables: 12\nAverage Missing: 40.8%\nData Types: 12 factors, 0 numeric, 0 logical, 0 character\nVariables: educ4_a1, educ4_a2, educ4_max, educ4_mom, educ6_a1, educ6_a2, educ6_max, educ6_mom, educ_a1, educ_a2, educ_max, educ_mom"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#sex",
+    "href": "legacy/ne25_data_dictionary_summary.html#sex",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Child’s biological sex and gender indicator variables\nVariables: 2\nAverage Missing: 36.4%\nData Types: 1 factors, 0 numeric, 1 logical, 0 character\nVariables: female, sex"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#age",
+    "href": "legacy/ne25_data_dictionary_summary.html#age",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Age variables for children and caregivers in different units (days, months, years)\nVariables: 4\nAverage Missing: 26.2%\nData Types: 0 factors, 4 numeric, 0 logical, 0 character\nVariables: a1_years_old, days_old, months_old, years_old"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_summary.html#notes",
+    "href": "legacy/ne25_data_dictionary_summary.html#notes",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Missing percentages are calculated as (missing values / total records) × 100\nFactor variables show the most common levels with their counts\nNumeric variables display min, max, and mean values where available\nLogical variables show counts of TRUE and FALSE values\n\nGenerated automatically from metadata on 2025-09-15 by the Kidsights Data Platform"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Overview",
+    "section": "",
+    "text": "⚠️ Data Dictionary Notice: This dictionary was generated 15.4 hours ago. The data may not reflect the most recent database updates.\n\nThe NE25 (Nebraska 2025) dataset represents a comprehensive longitudinal study of childhood development in Nebraska. This interactive data dictionary provides detailed documentation for both raw variables extracted from REDCap projects and transformed variables created through the data processing pipeline.\n\n\n\nData Sources: 4 REDCap projects (PIDs: 7679, 7943, 7999, 8014)\nRaw Variables: 0 unique fields\nTransformed Variables: 554 processed variables\nDatabase Location: Local DuckDB in repository\nLast Updated: 2025-09-18\n\n\n\n\n\n\n\nPID\nDescription\n\n\n\n\n7679\nKidsights Data Survey\n\n\n7943\nKidsights Email Registration\n\n\n7999\nKidsights Public\n\n\n8014\nKidsights Public Birth\n\n\n\n\n\n\nUse the navigation bar above to explore different sections of the data dictionary:\n\nVariable-Project Matrix: See which variables appear in which projects\nRaw Variables: Detailed listing of all raw variables with column ordering\nTransformed Variables: Variables created through data processing\nTransformations: How raw variables are transformed into analysis-ready variables\n\n\n\n\nDatabase Connection:\nLocation: data/duckdb/kidsights_local.duckdb (local repository)\nTables: ne25_raw, ne25_transformed, ne25_metadata, ne25_data_dictionary\nKey Tables: - ne25_raw: Combined raw data from all REDCap projects - ne25_raw_pid{XXXX}: Project-specific raw data tables - ne25_transformed: Dashboard-style transformed variables - ne25_metadata: Comprehensive variable metadata - ne25_data_dictionary: REDCap field definitions with project tracking\n\n\n\n---\n\n**Data Dictionary Generated:**  2025-09-18 15:24:18 \n\n**Source Database:**  data\\duckdb\\kidsights_local.duckdb \n\n**Total Raw Variables:**  0 \n\n**Total Transformed Variables:**  554 \n\n**Projects:**   \n\n**Platform:** Kidsights Data Platform v 2.0.0  (JSON-based)\n\n**Workflow:** Segmentation fault-free JSON architecture"
+  },
+  {
+    "objectID": "index.html#dataset-summary",
+    "href": "index.html#dataset-summary",
+    "title": "Overview",
+    "section": "",
+    "text": "Data Sources: 4 REDCap projects (PIDs: 7679, 7943, 7999, 8014)\nRaw Variables: 0 unique fields\nTransformed Variables: 554 processed variables\nDatabase Location: Local DuckDB in repository\nLast Updated: 2025-09-18"
+  },
+  {
+    "objectID": "index.html#redcap-projects",
+    "href": "index.html#redcap-projects",
+    "title": "Overview",
+    "section": "",
+    "text": "PID\nDescription\n\n\n\n\n7679\nKidsights Data Survey\n\n\n7943\nKidsights Email Registration\n\n\n7999\nKidsights Public\n\n\n8014\nKidsights Public Birth"
+  },
+  {
+    "objectID": "index.html#navigation",
+    "href": "index.html#navigation",
+    "title": "Overview",
+    "section": "",
+    "text": "Use the navigation bar above to explore different sections of the data dictionary:\n\nVariable-Project Matrix: See which variables appear in which projects\nRaw Variables: Detailed listing of all raw variables with column ordering\nTransformed Variables: Variables created through data processing\nTransformations: How raw variables are transformed into analysis-ready variables"
+  },
+  {
+    "objectID": "index.html#data-access-information",
+    "href": "index.html#data-access-information",
+    "title": "Overview",
+    "section": "",
+    "text": "Database Connection:\nLocation: data/duckdb/kidsights_local.duckdb (local repository)\nTables: ne25_raw, ne25_transformed, ne25_metadata, ne25_data_dictionary\nKey Tables: - ne25_raw: Combined raw data from all REDCap projects - ne25_raw_pid{XXXX}: Project-specific raw data tables - ne25_transformed: Dashboard-style transformed variables - ne25_metadata: Comprehensive variable metadata - ne25_data_dictionary: REDCap field definitions with project tracking\n\n\n\n---\n\n**Data Dictionary Generated:**  2025-09-18 15:24:18 \n\n**Source Database:**  data\\duckdb\\kidsights_local.duckdb \n\n**Total Raw Variables:**  0 \n\n**Total Transformed Variables:**  554 \n\n**Projects:**   \n\n**Platform:** Kidsights Data Platform v 2.0.0  (JSON-based)\n\n**Workflow:** Segmentation fault-free JSON architecture"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html",
+    "href": "legacy/ne25_data_dictionary_full.html",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Generated: 2025-09-15 22:53:00\nTotal Records: 3903\nTotal Variables: 28\nCategories: 5\n\n\nThis data dictionary describes all variables in the NE25 transformed dataset. The data comes from REDCap surveys and has been processed through the Kidsights data transformation pipeline, which applies standardized harmonization rules for race/ethnicity, education categories, and other demographic variables.\n\n\n\n\nRace (6 variables)\nCaregiver Relationship (4 variables)\nEducation (12 variables)\nSex (2 variables)\nAge (4 variables)\n\n\n\n\nDescription: Race and ethnicity variables for children and primary caregivers, including harmonized categories\nVariables: 6\nAverage Missing: 37.3%\nData Types: 6 factors, 0 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\na1_hisp\nPrimary caregiver Hispanic/Latino ethnicity\nfactor\n37.9%\nnon-Hisp. (1950), Hispanic (474), 3 (1479)\n\n\na1_race\nPrimary caregiver race (collapsed categories)\nfactor\n37.2%\nWhite (1893), American Indian or Alaska Native (22), Asian or Pacific Islander (80), Black or African American (177), Other Asian (28)…\n\n\na1_raceG\nPrimary caregiver race/ethnicity combined\nfactor\n37.9%\nWhite, non-Hisp. (1573), American Indian or Alaska Native, non-Hisp. (11), Asian or Pacific Islander, non-Hisp. (102), Black or African American, non-Hisp. (159), Hispanic (474)…\n\n\nhisp\nChild Hispanic/Latino ethnicity\nfactor\n37.2%\nnon-Hisp. (1931), Hispanic (521), 3 (1451)\n\n\nrace\nChild race (collapsed categories)\nfactor\n36.3%\nWhite (1828), American Indian or Alaska Native (25), Asian or Pacific Islander (54), Black or African American (191), Other Asian (32)…\n\n\nraceG\nChild race/ethnicity combined\nfactor\n37.2%\nWhite, non-Hisp. (1483), American Indian or Alaska Native, non-Hisp. (13), Asian or Pacific Islander, non-Hisp. (82), Black or African American, non-Hisp. (164), Hispanic (521)…\n\n\n\n\n\n\nDescription: Variables describing relationships between caregivers and children, including gender and maternal status\nVariables: 4\nAverage Missing: 36.6%\nData Types: 2 factors, 0 numeric, 2 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\nfemale_a1\nPrimary caregiver is female\nlogical\n33.0%\nTrue: 2154, False: 463\n\n\nmom_a1\nPrimary caregiver is mother\nlogical\n33.5%\nTrue: 2093, False: 503\n\n\nrelation1\nPrimary caregiver relationship to child\nfactor\n33.3%\nBiological or Adoptive Parent (2527), Foster Parent (21), Grandparent (23), Other: Non-Relative (6), Other: Relative (8)…\n\n\nrelation2\nSecondary caregiver relationship to child\nfactor\n46.7%\nBiological or Adoptive Parent (1988), Foster Parent (7), Grandparent (43), Other: Non-Relative (8), Other: Relative (13)…\n\n\n\n\n\n\nDescription: Education level variables using multiple categorization systems (4, 6, and 8 categories)\nVariables: 12\nAverage Missing: 40.8%\nData Types: 12 factors, 0 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\neduc4_a1\nPrimary caregiver education level (4 categories)\nfactor\n33.0%\nCollege Degree (1559), Less than High School Graduate (153), High School Graduate (including Equivalency) (316), Some College or Associate’s Degree (588), 5 (1287)\n\n\neduc4_a2\nSecondary caregiver education level (4 categories)\nfactor\n46.8%\nCollege Degree (1017), Less than High School Graduate (143), High School Graduate (including Equivalency) (298), Some College or Associate’s Degree (618), 5 (1827)\n\n\neduc4_max\nMaximum education level among caregivers (4 categories)\nfactor\n32.7%\nCollege Degree (1654), Less than High School Graduate (126), High School Graduate (including Equivalency) (293), Some College or Associate’s Degree (555), 5 (1275)\n\n\neduc4_mom\nMaternal education level (4 categories)\nfactor\n50.7%\nLess than High School Graduate (14), High School Graduate (including Equivalency) (47), Some College or Associate’s Degree (558), College Degree (1304), 5 (1980)\n\n\neduc6_a1\nPrimary caregiver education level (6 categories)\nfactor\n33.0%\nBachelor’s Degree (863), Less than High School Graduate (153), High School Graduate (including Equivalency) (316), Some College or Associate’s Degree (588), Master’s Degree (507)…\n\n\neduc6_a2\nSecondary caregiver education level (6 categories)\nfactor\n46.8%\nBachelor’s Degree (618), Less than High School Graduate (143), High School Graduate (including Equivalency) (298), Some College or Associate’s Degree (618), Master’s Degree (276)…\n\n\neduc6_max\nMaximum education level among caregivers (6 categories)\nfactor\n32.7%\nBachelor’s Degree (779), Less than High School Graduate (126), High School Graduate (including Equivalency) (293), Some College or Associate’s Degree (555), Master’s Degree (606)…\n\n\neduc6_mom\nMaternal education level (6 categories)\nfactor\n50.7%\nLess than High School Graduate (14), High School Graduate (including Equivalency) (47), Some College or Associate’s Degree (558), Bachelor’s Degree (165), Master’s Degree (700)…\n\n\neduc_a1\nPrimary caregiver education level (8 categories)\nfactor\n33.0%\nBachelor’s Degree (BA, BS, AB) (863), 8th grade or less (48), 9th-12th grade, No diploma (105), High School Graduate or GED Completed (316), Completed a vocational, trade, or business school program (54)…\n\n\neduc_a2\nSecondary caregiver education level (8 categories)\nfactor\n46.8%\nBachelor’s Degree (BA, BS, AB) (618), 8th grade or less (56), 9th-12th grade, No diploma (87), High School Graduate or GED Completed (298), Completed a vocational, trade, or business school program (77)…\n\n\neduc_max\nMaximum education level among caregivers (8 categories)\nfactor\n32.7%\nBachelor’s Degree (BA, BS, AB) (779), 8th grade or less (42), 9th-12th grade, No diploma (84), High School Graduate or GED Completed (293), Completed a vocational, trade, or business school program (47)…\n\n\neduc_mom\nMaternal education level (8 categories)\nfactor\n50.7%\n9th-12th grade, No diploma (14), High School Graduate or GED Completed (47), Completed a vocational, trade, or business school program (248), Some College Credit, but No Degree (48), Associate Degree (AA, AS) (262)…\n\n\n\n\n\n\nDescription: Child’s biological sex and gender indicator variables\nVariables: 2\nAverage Missing: 36.4%\nData Types: 1 factors, 0 numeric, 1 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\nfemale\nChild is female\nlogical\n36.4%\nTrue: 1221, False: 1261\n\n\nsex\nChild’s sex\nfactor\n36.4%\nFemale (1221), Male (1261), 3 (1421)\n\n\n\n\n\n\nDescription: Age variables for children and caregivers in different units (days, months, years)\nVariables: 4\nAverage Missing: 26.2%\nData Types: 0 factors, 4 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\na1_years_old\nPrimary caregiver age (years)\nnumeric\n34.0%\nMin: 0, Max: 60, Mean: 32.97\n\n\ndays_old\nChild’s age (days)\nnumeric\n23.7%\nMin: 0, Max: 13175, Mean: 1360.54\n\n\nmonths_old\nChild’s age (months)\nnumeric\n23.7%\nMin: 0, Max: 432.8542, Mean: 44.70\n\n\nyears_old\nChild’s age (years)\nnumeric\n23.7%\nMin: 0, Max: 36.0712, Mean: 3.73\n\n\n\n\n\n\n\n\nMissing percentages are calculated as (missing values / total records) × 100\nFactor variables show the most common levels with their counts\nNumeric variables display min, max, and mean values where available\nLogical variables show counts of TRUE and FALSE values\n\nGenerated automatically from metadata on 2025-09-15 by the Kidsights Data Platform"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#overview",
+    "href": "legacy/ne25_data_dictionary_full.html#overview",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "This data dictionary describes all variables in the NE25 transformed dataset. The data comes from REDCap surveys and has been processed through the Kidsights data transformation pipeline, which applies standardized harmonization rules for race/ethnicity, education categories, and other demographic variables."
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#table-of-contents",
+    "href": "legacy/ne25_data_dictionary_full.html#table-of-contents",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Race (6 variables)\nCaregiver Relationship (4 variables)\nEducation (12 variables)\nSex (2 variables)\nAge (4 variables)"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#race",
+    "href": "legacy/ne25_data_dictionary_full.html#race",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Race and ethnicity variables for children and primary caregivers, including harmonized categories\nVariables: 6\nAverage Missing: 37.3%\nData Types: 6 factors, 0 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\na1_hisp\nPrimary caregiver Hispanic/Latino ethnicity\nfactor\n37.9%\nnon-Hisp. (1950), Hispanic (474), 3 (1479)\n\n\na1_race\nPrimary caregiver race (collapsed categories)\nfactor\n37.2%\nWhite (1893), American Indian or Alaska Native (22), Asian or Pacific Islander (80), Black or African American (177), Other Asian (28)…\n\n\na1_raceG\nPrimary caregiver race/ethnicity combined\nfactor\n37.9%\nWhite, non-Hisp. (1573), American Indian or Alaska Native, non-Hisp. (11), Asian or Pacific Islander, non-Hisp. (102), Black or African American, non-Hisp. (159), Hispanic (474)…\n\n\nhisp\nChild Hispanic/Latino ethnicity\nfactor\n37.2%\nnon-Hisp. (1931), Hispanic (521), 3 (1451)\n\n\nrace\nChild race (collapsed categories)\nfactor\n36.3%\nWhite (1828), American Indian or Alaska Native (25), Asian or Pacific Islander (54), Black or African American (191), Other Asian (32)…\n\n\nraceG\nChild race/ethnicity combined\nfactor\n37.2%\nWhite, non-Hisp. (1483), American Indian or Alaska Native, non-Hisp. (13), Asian or Pacific Islander, non-Hisp. (82), Black or African American, non-Hisp. (164), Hispanic (521)…"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#caregiver-relationship",
+    "href": "legacy/ne25_data_dictionary_full.html#caregiver-relationship",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Variables describing relationships between caregivers and children, including gender and maternal status\nVariables: 4\nAverage Missing: 36.6%\nData Types: 2 factors, 0 numeric, 2 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\nfemale_a1\nPrimary caregiver is female\nlogical\n33.0%\nTrue: 2154, False: 463\n\n\nmom_a1\nPrimary caregiver is mother\nlogical\n33.5%\nTrue: 2093, False: 503\n\n\nrelation1\nPrimary caregiver relationship to child\nfactor\n33.3%\nBiological or Adoptive Parent (2527), Foster Parent (21), Grandparent (23), Other: Non-Relative (6), Other: Relative (8)…\n\n\nrelation2\nSecondary caregiver relationship to child\nfactor\n46.7%\nBiological or Adoptive Parent (1988), Foster Parent (7), Grandparent (43), Other: Non-Relative (8), Other: Relative (13)…"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#education",
+    "href": "legacy/ne25_data_dictionary_full.html#education",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Education level variables using multiple categorization systems (4, 6, and 8 categories)\nVariables: 12\nAverage Missing: 40.8%\nData Types: 12 factors, 0 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\neduc4_a1\nPrimary caregiver education level (4 categories)\nfactor\n33.0%\nCollege Degree (1559), Less than High School Graduate (153), High School Graduate (including Equivalency) (316), Some College or Associate’s Degree (588), 5 (1287)\n\n\neduc4_a2\nSecondary caregiver education level (4 categories)\nfactor\n46.8%\nCollege Degree (1017), Less than High School Graduate (143), High School Graduate (including Equivalency) (298), Some College or Associate’s Degree (618), 5 (1827)\n\n\neduc4_max\nMaximum education level among caregivers (4 categories)\nfactor\n32.7%\nCollege Degree (1654), Less than High School Graduate (126), High School Graduate (including Equivalency) (293), Some College or Associate’s Degree (555), 5 (1275)\n\n\neduc4_mom\nMaternal education level (4 categories)\nfactor\n50.7%\nLess than High School Graduate (14), High School Graduate (including Equivalency) (47), Some College or Associate’s Degree (558), College Degree (1304), 5 (1980)\n\n\neduc6_a1\nPrimary caregiver education level (6 categories)\nfactor\n33.0%\nBachelor’s Degree (863), Less than High School Graduate (153), High School Graduate (including Equivalency) (316), Some College or Associate’s Degree (588), Master’s Degree (507)…\n\n\neduc6_a2\nSecondary caregiver education level (6 categories)\nfactor\n46.8%\nBachelor’s Degree (618), Less than High School Graduate (143), High School Graduate (including Equivalency) (298), Some College or Associate’s Degree (618), Master’s Degree (276)…\n\n\neduc6_max\nMaximum education level among caregivers (6 categories)\nfactor\n32.7%\nBachelor’s Degree (779), Less than High School Graduate (126), High School Graduate (including Equivalency) (293), Some College or Associate’s Degree (555), Master’s Degree (606)…\n\n\neduc6_mom\nMaternal education level (6 categories)\nfactor\n50.7%\nLess than High School Graduate (14), High School Graduate (including Equivalency) (47), Some College or Associate’s Degree (558), Bachelor’s Degree (165), Master’s Degree (700)…\n\n\neduc_a1\nPrimary caregiver education level (8 categories)\nfactor\n33.0%\nBachelor’s Degree (BA, BS, AB) (863), 8th grade or less (48), 9th-12th grade, No diploma (105), High School Graduate or GED Completed (316), Completed a vocational, trade, or business school program (54)…\n\n\neduc_a2\nSecondary caregiver education level (8 categories)\nfactor\n46.8%\nBachelor’s Degree (BA, BS, AB) (618), 8th grade or less (56), 9th-12th grade, No diploma (87), High School Graduate or GED Completed (298), Completed a vocational, trade, or business school program (77)…\n\n\neduc_max\nMaximum education level among caregivers (8 categories)\nfactor\n32.7%\nBachelor’s Degree (BA, BS, AB) (779), 8th grade or less (42), 9th-12th grade, No diploma (84), High School Graduate or GED Completed (293), Completed a vocational, trade, or business school program (47)…\n\n\neduc_mom\nMaternal education level (8 categories)\nfactor\n50.7%\n9th-12th grade, No diploma (14), High School Graduate or GED Completed (47), Completed a vocational, trade, or business school program (248), Some College Credit, but No Degree (48), Associate Degree (AA, AS) (262)…"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#sex",
+    "href": "legacy/ne25_data_dictionary_full.html#sex",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Child’s biological sex and gender indicator variables\nVariables: 2\nAverage Missing: 36.4%\nData Types: 1 factors, 0 numeric, 1 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\nfemale\nChild is female\nlogical\n36.4%\nTrue: 1221, False: 1261\n\n\nsex\nChild’s sex\nfactor\n36.4%\nFemale (1221), Male (1261), 3 (1421)"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#age",
+    "href": "legacy/ne25_data_dictionary_full.html#age",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Description: Age variables for children and caregivers in different units (days, months, years)\nVariables: 4\nAverage Missing: 26.2%\nData Types: 0 factors, 4 numeric, 0 logical, 0 character\n\n\n\n\n\n\n\n\n\n\nVariable\nLabel\nType\nMissing\nDetails\n\n\n\n\na1_years_old\nPrimary caregiver age (years)\nnumeric\n34.0%\nMin: 0, Max: 60, Mean: 32.97\n\n\ndays_old\nChild’s age (days)\nnumeric\n23.7%\nMin: 0, Max: 13175, Mean: 1360.54\n\n\nmonths_old\nChild’s age (months)\nnumeric\n23.7%\nMin: 0, Max: 432.8542, Mean: 44.70\n\n\nyears_old\nChild’s age (years)\nnumeric\n23.7%\nMin: 0, Max: 36.0712, Mean: 3.73"
+  },
+  {
+    "objectID": "legacy/ne25_data_dictionary_full.html#notes",
+    "href": "legacy/ne25_data_dictionary_full.html#notes",
+    "title": "NE25 Data Dictionary",
+    "section": "",
+    "text": "Missing percentages are calculated as (missing values / total records) × 100\nFactor variables show the most common levels with their counts\nNumeric variables display min, max, and mean values where available\nLogical variables show counts of TRUE and FALSE values\n\nGenerated automatically from metadata on 2025-09-15 by the Kidsights Data Platform"
+  },
+  {
+    "objectID": "matrix.html",
+    "href": "matrix.html",
+    "title": "Variable-Project Matrix",
+    "section": "",
+    "text": "⚠️ Data Dictionary Notice: This dictionary was generated 15.5 hours ago. The data may not reflect the most recent database updates.\n\nThis matrix shows which variables appear in which REDCap projects. Variables are identified by their field name, and checkmarks (✓) indicate presence in each project.\n\n\n\n\n\nPID\nDescription\n\n\n\n\n7679\nKidsights Data Survey\n\n\n7943\nKidsights Email Registration\n\n\n7999\nKidsights Public\n\n\n8014\nKidsights Public Birth\n\n\n\n\n\n\nThe table below shows all unique variables and their presence across the four REDCap projects. Use the search box to find specific variables, or sort by clicking column headers.\n\n\n\n\n\n\n\n\n\n\n\n\nVariable and Form Counts by Project\n\n\nUnique Variables\nUnique Forms\n\n\n\n\npid.1\n7679\n\n\npid.2\n7943\n\n\npid.3\n7999\n\n\npid.4\n8014\n\n\nunique_variables.1\n470\n\n\nunique_variables.2\n472\n\n\nunique_variables.3\n468\n\n\nunique_variables.4\n470\n\n\nunique_forms.1\n17\n\n\nunique_forms.2\n18\n\n\nunique_forms.3\n17\n\n\nunique_forms.4\n17\n\n\n\n\n\n\nVariable Distribution Across Projects\n\n\nStatistic\nCount\nPercentage (%)\n\n\n\n\nTotal unique variables\n605\n100.0\n\n\nVariables in all 4 projects\n600\n99.2\n\n\nVariables in only 1 project\n2\n0.3\n\n\nVariables in multiple projects\n603\n99.7\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 14:03:45 \n**Total Raw Variables:**  1880 \n**Projects:**  7679, 7943, 7999, 8014"
+  },
+  {
+    "objectID": "matrix.html#project-information",
+    "href": "matrix.html#project-information",
+    "title": "Variable-Project Matrix",
+    "section": "",
+    "text": "PID\nDescription\n\n\n\n\n7679\nKidsights Data Survey\n\n\n7943\nKidsights Email Registration\n\n\n7999\nKidsights Public\n\n\n8014\nKidsights Public Birth"
+  },
+  {
+    "objectID": "matrix.html#interactive-matrix",
+    "href": "matrix.html#interactive-matrix",
+    "title": "Variable-Project Matrix",
+    "section": "",
+    "text": "The table below shows all unique variables and their presence across the four REDCap projects. Use the search box to find specific variables, or sort by clicking column headers."
+  },
+  {
+    "objectID": "matrix.html#summary-statistics",
+    "href": "matrix.html#summary-statistics",
+    "title": "Variable-Project Matrix",
+    "section": "",
+    "text": "Variable and Form Counts by Project\n\n\nUnique Variables\nUnique Forms\n\n\n\n\npid.1\n7679\n\n\npid.2\n7943\n\n\npid.3\n7999\n\n\npid.4\n8014\n\n\nunique_variables.1\n470\n\n\nunique_variables.2\n472\n\n\nunique_variables.3\n468\n\n\nunique_variables.4\n470\n\n\nunique_forms.1\n17\n\n\nunique_forms.2\n18\n\n\nunique_forms.3\n17\n\n\nunique_forms.4\n17\n\n\n\n\n\n\nVariable Distribution Across Projects\n\n\nStatistic\nCount\nPercentage (%)\n\n\n\n\nTotal unique variables\n605\n100.0\n\n\nVariables in all 4 projects\n600\n99.2\n\n\nVariables in only 1 project\n2\n0.3\n\n\nVariables in multiple projects\n603\n99.7\n\n\n\n\n\n\n\n\n**Data Dictionary Generated:**  2025-09-17 14:03:45 \n**Total Raw Variables:**  1880 \n**Projects:**  7679, 7943, 7999, 8014"
+  },
+  {
+    "objectID": "transformations.html",
+    "href": "transformations.html",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "This section details how raw variables are transformed into analysis-ready variables, organized by transformation category. Each category shows the specific raw variables used as inputs and the transformed variables created as outputs.\n\n\nDescription: Child and caregiver race/ethnicity variables created from checkbox responses\nRaw Variables Used: cqr010_1_1 through cqr010_15_1, cqr011, sq002_1_1 through sq002_15_1, sq003\nTransformed Variables Created: hisp, race, raceG, a1_hisp, a1_race, a1_raceG\nTransformation Process: Multiple race checkboxes are collapsed into categories; Hispanic ethnicity is combined with race to create composite variables\n\n\n\n\nDescription: Education levels recoded into 4, 6, and 8 category systems\nRaw Variables Used: education-related fields from surveys\nTransformed Variables Created: educ4_, educ6_, educ8_*, educ_max, educ_mom\nTransformation Process: Raw education responses are mapped to standardized categories for analysis\n\n\n\n\nDescription: Federal Poverty Level calculations based on income and family size\nRaw Variables Used: household income fields, family size fields\nTransformed Variables Created: income, inc99, family_size, federal_poverty_threshold, fpl, fplcat\nTransformation Process: Income is adjusted for inflation; FPL calculated using HHS poverty guidelines; categorical FPL groups created\n\n\n\n\nDescription: Age calculations in multiple units\nRaw Variables Used: child_dob, age_in_days, caregiver_dob\nTransformed Variables Created: years_old, months_old, days_old, a1_years_old\nTransformation Process: Dates converted to age in years, months, and days; age groups created for analysis\n\n\n\n\nDescription: Eligibility determination based on 9 criteria (CID1-CID9)\nRaw Variables Used: eq001, eq002, eq003, compensation acknowledgment fields, geographic fields, survey completion fields\nTransformed Variables Created: eligible, authentic, include\nTransformation Process: Multiple eligibility criteria evaluated; overall inclusion flags created\n\n\n\n\nThe data transformation pipeline follows these general steps:\n\nData Extraction: Raw data is extracted from REDCap projects via API\nType Harmonization: Data types are standardized across projects using flexible_bind_rows\nDashboard Transformations: The recode_it() function family is applied for standardized variables\nEligibility Assessment: 9-criteria validation system (CID1-CID9) determines participant eligibility\nFinal Output: Analysis-ready dataset stored in ne25_transformed table\n\n\n\n\nThe transformations are implemented through these main functions:\n\nrecode_it(): Main transformation function for dashboard-style variables\nvalue_labels(): Extracts and formats REDCap value labels\nRace/ethnicity functions: Collapse multiple checkbox responses into standardized categories\nEducation functions: Create 4, 6, and 8-category education variables\nIncome functions: Calculate Federal Poverty Level and adjust for inflation\nEligibility functions: Implement CID1-CID9 validation criteria\n\n\n\n\nAll transformations include quality control measures:\n\nMissing value standardization\nRange checks for numeric variables\nConsistency validation across related variables\nAudit trail preservation linking transformed variables to raw sources"
+  },
+  {
+    "objectID": "transformations.html#raceethnicity",
+    "href": "transformations.html#raceethnicity",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "Description: Child and caregiver race/ethnicity variables created from checkbox responses\nRaw Variables Used: cqr010_1_1 through cqr010_15_1, cqr011, sq002_1_1 through sq002_15_1, sq003\nTransformed Variables Created: hisp, race, raceG, a1_hisp, a1_race, a1_raceG\nTransformation Process: Multiple race checkboxes are collapsed into categories; Hispanic ethnicity is combined with race to create composite variables"
+  },
+  {
+    "objectID": "transformations.html#education-categories",
+    "href": "transformations.html#education-categories",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "Description: Education levels recoded into 4, 6, and 8 category systems\nRaw Variables Used: education-related fields from surveys\nTransformed Variables Created: educ4_, educ6_, educ8_*, educ_max, educ_mom\nTransformation Process: Raw education responses are mapped to standardized categories for analysis"
+  },
+  {
+    "objectID": "transformations.html#income-and-poverty",
+    "href": "transformations.html#income-and-poverty",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "Description: Federal Poverty Level calculations based on income and family size\nRaw Variables Used: household income fields, family size fields\nTransformed Variables Created: income, inc99, family_size, federal_poverty_threshold, fpl, fplcat\nTransformation Process: Income is adjusted for inflation; FPL calculated using HHS poverty guidelines; categorical FPL groups created"
+  },
+  {
+    "objectID": "transformations.html#age-variables",
+    "href": "transformations.html#age-variables",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "Description: Age calculations in multiple units\nRaw Variables Used: child_dob, age_in_days, caregiver_dob\nTransformed Variables Created: years_old, months_old, days_old, a1_years_old\nTransformation Process: Dates converted to age in years, months, and days; age groups created for analysis"
+  },
+  {
+    "objectID": "transformations.html#eligibility-flags",
+    "href": "transformations.html#eligibility-flags",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "Description: Eligibility determination based on 9 criteria (CID1-CID9)\nRaw Variables Used: eq001, eq002, eq003, compensation acknowledgment fields, geographic fields, survey completion fields\nTransformed Variables Created: eligible, authentic, include\nTransformation Process: Multiple eligibility criteria evaluated; overall inclusion flags created"
+  },
+  {
+    "objectID": "transformations.html#transformation-pipeline-overview",
+    "href": "transformations.html#transformation-pipeline-overview",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "The data transformation pipeline follows these general steps:\n\nData Extraction: Raw data is extracted from REDCap projects via API\nType Harmonization: Data types are standardized across projects using flexible_bind_rows\nDashboard Transformations: The recode_it() function family is applied for standardized variables\nEligibility Assessment: 9-criteria validation system (CID1-CID9) determines participant eligibility\nFinal Output: Analysis-ready dataset stored in ne25_transformed table"
+  },
+  {
+    "objectID": "transformations.html#key-transformation-functions",
+    "href": "transformations.html#key-transformation-functions",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "The transformations are implemented through these main functions:\n\nrecode_it(): Main transformation function for dashboard-style variables\nvalue_labels(): Extracts and formats REDCap value labels\nRace/ethnicity functions: Collapse multiple checkbox responses into standardized categories\nEducation functions: Create 4, 6, and 8-category education variables\nIncome functions: Calculate Federal Poverty Level and adjust for inflation\nEligibility functions: Implement CID1-CID9 validation criteria"
+  },
+  {
+    "objectID": "transformations.html#quality-control",
+    "href": "transformations.html#quality-control",
+    "title": "Variable Transformations",
+    "section": "",
+    "text": "All transformations include quality control measures:\n\nMissing value standardization\nRange checks for numeric variables\nConsistency validation across related variables\nAudit trail preservation linking transformed variables to raw sources"
+  },
+  {
+    "objectID": "transformed-variables.html#factor-variables-detail",
+    "href": "transformed-variables.html#factor-variables-detail",
+    "title": "Transformed Variables",
+    "section": "",
+    "text": "Factor variables are categorical variables with defined levels and labels. This section provides enhanced documentation for all factor variables in the dataset.\n\n\n\nFactor Variables Summary\n\n\nStatistic\nCount\n\n\n\n\nTotal factor variables\n18\n\n\nOrdered factors (↕️)\n0\n\n\nUnordered factors (•)\n18\n\n\nFactors with complete metadata\n0\n\n\n\n\n\n\n\nThis specialized view shows only factor variables with their complete value-label mappings, ordering information, and reference levels for statistical modeling.\n\n\n\n\n\n\n\n\n\n\nType: Semantic category (demographic_race, socioeconomic_education, etc.)\nOrdered: Whether factor levels have natural ordering\n\n↕️: Ordered factor (e.g., education levels: less than HS &lt; HS &lt; college)\n•: Unordered factor (e.g., race categories have no natural order)\n\nRef: Reference level used for statistical modeling (typically most frequent level)\nValue Labels: Shows code-to-label mappings (e.g., 1=White, 2=Black, etc.)"
+  }
+]

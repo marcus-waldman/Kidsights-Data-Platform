@@ -1,0 +1,90 @@
+---
+title: "Overview"
+subtitle: "NE25 Interactive Data Dictionary"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Ensure required packages are available
+source("assets/ensure_dependencies.R")
+
+# Load required libraries
+library(dplyr)
+library(DT)
+library(knitr)
+
+# Source the dictionary functions (now JSON-based)
+source("assets/dictionary_functions.R")
+
+# Initialize dictionary data from JSON
+dict_data <- initialize_dictionary()
+
+# Load data from JSON
+raw_vars_data <- get_raw_variables_data(dict_data)
+transformed_vars_data <- get_transformed_variables_data(dict_data)
+```
+
+# NE25 Interactive Data Dictionary
+
+```{r freshness-warning, results='asis', echo=FALSE}
+# Display freshness warning if data is stale
+cat(display_freshness_warning(dict_data))
+```
+
+The NE25 (Nebraska 2025) dataset represents a comprehensive longitudinal study of childhood development in Nebraska. This interactive data dictionary provides detailed documentation for both raw variables extracted from REDCap projects and transformed variables created through the data processing pipeline.
+
+## Dataset Summary
+
+- **Data Sources**: 4 REDCap projects (PIDs: 7679, 7943, 7999, 8014)
+- **Raw Variables**: `r if(nrow(raw_vars_data) > 0 && "field_name" %in% names(raw_vars_data)) nrow(distinct(raw_vars_data, field_name)) else 0` unique fields
+- **Transformed Variables**: `r nrow(transformed_vars_data)` processed variables
+- **Database Location**: Local DuckDB in repository
+- **Last Updated**: `r Sys.Date()`
+
+## REDCap Projects
+
+| PID | Description |
+|-----|-------------|
+| **7679** | Kidsights Data Survey |
+| **7943** | Kidsights Email Registration |
+| **7999** | Kidsights Public |
+| **8014** | Kidsights Public Birth |
+
+## Navigation
+
+Use the navigation bar above to explore different sections of the data dictionary:
+
+- **Variable-Project Matrix**: See which variables appear in which projects
+- **Raw Variables**: Detailed listing of all raw variables with column ordering
+- **Transformed Variables**: Variables created through data processing
+- **Transformations**: How raw variables are transformed into analysis-ready variables
+
+## Data Access Information
+
+**Database Connection:**
+```
+Location: data/duckdb/kidsights_local.duckdb (local repository)
+Tables: ne25_raw, ne25_transformed, ne25_metadata, ne25_data_dictionary
+```
+
+**Key Tables:**
+- `ne25_raw`: Combined raw data from all REDCap projects
+- `ne25_raw_pid{XXXX}`: Project-specific raw data tables
+- `ne25_transformed`: Dashboard-style transformed variables
+- `ne25_metadata`: Comprehensive variable metadata
+- `ne25_data_dictionary`: REDCap field definitions with project tracking
+
+```{r generation-info, echo=FALSE}
+# Display generation information
+if ("metadata" %in% names(dict_data)) {
+  cat("\n---\n\n")
+  cat("**Data Dictionary Generated:** ", dict_data$metadata$generated, "\n\n")
+  cat("**Source Database:** ", dict_data$metadata$source_database, "\n\n")
+  cat("**Total Raw Variables:** ", dict_data$metadata$total_raw_variables, "\n\n")
+  cat("**Total Transformed Variables:** ", dict_data$metadata$total_transformed_variables, "\n\n")
+  cat("**Projects:** ", paste(dict_data$metadata$project_pids, collapse = ", "), "\n\n")
+  cat("**Platform:** Kidsights Data Platform v", dict_data$metadata$version, " (JSON-based)\n\n")
+  cat("**Workflow:** Segmentation fault-free JSON architecture\n\n")
+}
+```

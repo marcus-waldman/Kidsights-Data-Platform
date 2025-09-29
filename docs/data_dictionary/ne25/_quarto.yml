@@ -1,0 +1,35 @@
+project:
+  type: website
+  output-dir: .
+
+website:
+  title: "NE25 Data Dictionary"
+  navbar:
+    left:
+      - text: "Overview"
+        href: index.html
+      - text: "Variable-Project Matrix"
+        href: matrix.html
+      - text: "Raw Variables"
+        href: raw-variables.html
+      - text: "Transformed Variables"
+        href: transformed-variables.html
+      - text: "Transformations"
+        href: transformations.html
+
+format:
+  html:
+    theme: default
+    css: custom.css
+    toc: true
+    toc-depth: 3
+    number-sections: false
+    code-fold: true
+    code-tools: false
+    df-print: paged
+    embed-resources: false
+    page-layout: full
+    grid:
+      sidebar-width: 0px
+      body-width: 1200px
+      margin-width: 100px

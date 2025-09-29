@@ -1,0 +1,4063 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NE25 Data Dictionary</title>
+    
+        <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1, h2, h3 { color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 0.3rem; }
+        h1 { font-size: 2.5rem; }
+        h2 { font-size: 2rem; margin-top: 2rem; }
+        h3 { font-size: 1.5rem; }
+        table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f8f9fa; font-weight: 600; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        code { background-color: #f1f2f6; padding: 2px 4px; border-radius: 3px; font-family: 'Consolas', monospace; }
+        .toc { background-color: #f8f9fa; padding: 1rem; border-radius: 5px; margin: 1rem 0; }
+        .metadata-header { background-color: #e8f4fd; padding: 1rem; border-radius: 5px; margin: 1rem 0; }
+        .category-description { font-style: italic; color: #7f8c8d; margin: 0.5rem 0; }
+        .stats { background-color: #f0f8ff; padding: 0.5rem; border-radius: 3px; margin: 0.5rem 0; }
+        .footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #ecf0f1; text-align: center; color: #7f8c8d; }
+        </style>
+        
+</head>
+<body>
+    <h1>NE25 Data Dictionary</h1>
+
+<p><strong>Generated:</strong> 2025-09-29 14:00:29<br />
+<strong>Total Records:</strong> 4826<br />
+<strong>Total Variables:</strong> 554<br />
+<strong>Categories:</strong> 5  </p>
+
+<h2>Overview</h2>
+
+<p>This data dictionary describes all variables in the NE25 transformed dataset. 
+The data comes from REDCap surveys and has been processed through the Kidsights 
+data transformation pipeline, which applies standardized harmonization rules 
+for race/ethnicity, education categories, and other demographic variables.</p>
+
+<h2>Table of Contents</h2>
+
+<ul>
+<li><a href="#caregiver-relationship">Caregiver Relationship</a> (2 variables)</li>
+<li><a href="#age">Age</a> (3 variables)</li>
+<li><a href="#eligibility">Eligibility</a> (3 variables)</li>
+<li><a href="#geography">Geography</a> (3 variables)</li>
+<li><a href="#other">Other</a> (543 variables)</li>
+</ul>
+
+<h2>Caregiver Relationship</h2>
+
+<p><strong>Description:</strong> Variables describing relationships between caregivers and children, including gender and maternal status</p>
+
+<p><strong>Variables:</strong> 2<br />
+<strong>Average Missing:</strong> 23.3%<br />
+<strong>Data Types:</strong> 0 factors, 1 numeric, 0 logical, 1 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>module_7_child_emotions_and_relationships_complete</code></td>
+  <td>Module 7 Child Emotions And Relationships Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_7_child_emotions_and_relationships_timestamp</code></td>
+  <td>Module 7 Child Emotions And Relationships Timestamp</td>
+  <td>character</td>
+  <td>46.6%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Age</h2>
+
+<p><strong>Description:</strong> Age variables for children and caregivers in different units (days, months, years)</p>
+
+<p><strong>Variables:</strong> 3<br />
+<strong>Average Missing:</strong> 42.9%<br />
+<strong>Data Types:</strong> 1 factors, 2 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>age_in_days</code></td>
+  <td>Age In Days</td>
+  <td>numeric</td>
+  <td>25.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>language</code></td>
+  <td>Language</td>
+  <td>factor</td>
+  <td>3.5%</td>
+  <td>1 (en), 2 (es)</td>
+</tr>
+<tr>
+  <td><code>language_preference</code></td>
+  <td>Language Preference</td>
+  <td>numeric</td>
+  <td>100.0%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Eligibility</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 3<br />
+<strong>Average Missing:</strong> 0.0%<br />
+<strong>Data Types:</strong> 0 factors, 0 numeric, 3 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>authentic</code></td>
+  <td>Authentic</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eligible</code></td>
+  <td>Eligible</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>include</code></td>
+  <td>Include</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Geography</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 3<br />
+<strong>Average Missing:</strong> 8.5%<br />
+<strong>Data Types:</strong> 0 factors, 3 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>eqstate</code></td>
+  <td>Eqstate</td>
+  <td>numeric</td>
+  <td>25.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>state_law_prohibits_sending_compensation_electronically___1</code></td>
+  <td>State Law Prohibits Sending Compensation Electronically   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>state_law_requires_that_kidsights_data_collect_my_name___1</code></td>
+  <td>State Law Requires That Kidsights Data Collect My Name   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Other</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 543<br />
+<strong>Average Missing:</strong> 60.6%<br />
+<strong>Data Types:</strong> 5 factors, 506 numeric, 0 logical, 32 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>authenticity</code></td>
+  <td>Authenticity</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (Fail), 2 (Pass)</td>
+</tr>
+<tr>
+  <td><code>c004</code></td>
+  <td>C004</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c005</code></td>
+  <td>C005</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c007</code></td>
+  <td>C007</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c010</code></td>
+  <td>C010</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c012</code></td>
+  <td>C012</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c013</code></td>
+  <td>C013</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c014</code></td>
+  <td>C014</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c015</code></td>
+  <td>C015</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c016</code></td>
+  <td>C016</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c017</code></td>
+  <td>C017</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c018</code></td>
+  <td>C018</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c019</code></td>
+  <td>C019</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c020</code></td>
+  <td>C020</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c021</code></td>
+  <td>C021</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c022</code></td>
+  <td>C022</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c023</code></td>
+  <td>C023</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c024</code></td>
+  <td>C024</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c025</code></td>
+  <td>C025</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c026</code></td>
+  <td>C026</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c027</code></td>
+  <td>C027</td>
+  <td>numeric</td>
+  <td>99.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c028</code></td>
+  <td>C028</td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c029</code></td>
+  <td>C029</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c029x</code></td>
+  <td>C029X</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c030</code></td>
+  <td>C030</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c030x</code></td>
+  <td>C030X</td>
+  <td>numeric</td>
+  <td>99.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c031</code></td>
+  <td>C031</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c032</code></td>
+  <td>C032</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c033</code></td>
+  <td>C033</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c034</code></td>
+  <td>C034</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c035</code></td>
+  <td>C035</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c036</code></td>
+  <td>C036</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c037</code></td>
+  <td>C037</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c038</code></td>
+  <td>C038</td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c039</code></td>
+  <td>C039</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c040</code></td>
+  <td>C040</td>
+  <td>numeric</td>
+  <td>99.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c041</code></td>
+  <td>C041</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c042</code></td>
+  <td>C042</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c043</code></td>
+  <td>C043</td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c044</code></td>
+  <td>C044</td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c045</code></td>
+  <td>C045</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c046</code></td>
+  <td>C046</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c047</code></td>
+  <td>C047</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c048</code></td>
+  <td>C048</td>
+  <td>numeric</td>
+  <td>99.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c049</code></td>
+  <td>C049</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c050</code></td>
+  <td>C050</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c051</code></td>
+  <td>C051</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c052</code></td>
+  <td>C052</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c053</code></td>
+  <td>C053</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c054</code></td>
+  <td>C054</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c055</code></td>
+  <td>C055</td>
+  <td>numeric</td>
+  <td>95.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c056</code></td>
+  <td>C056</td>
+  <td>numeric</td>
+  <td>95.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c057</code></td>
+  <td>C057</td>
+  <td>numeric</td>
+  <td>95.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c058</code></td>
+  <td>C058</td>
+  <td>numeric</td>
+  <td>95.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c059</code></td>
+  <td>C059</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c060</code></td>
+  <td>C060</td>
+  <td>numeric</td>
+  <td>95.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c061</code></td>
+  <td>C061</td>
+  <td>numeric</td>
+  <td>95.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c062</code></td>
+  <td>C062</td>
+  <td>numeric</td>
+  <td>92.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c063</code></td>
+  <td>C063</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c064</code></td>
+  <td>C064</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c065</code></td>
+  <td>C065</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c066</code></td>
+  <td>C066</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c067</code></td>
+  <td>C067</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c068</code></td>
+  <td>C068</td>
+  <td>numeric</td>
+  <td>96.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c069</code></td>
+  <td>C069</td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c070</code></td>
+  <td>C070</td>
+  <td>numeric</td>
+  <td>93.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c071</code></td>
+  <td>C071</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c072</code></td>
+  <td>C072</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c073</code></td>
+  <td>C073</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c074</code></td>
+  <td>C074</td>
+  <td>numeric</td>
+  <td>94.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c075</code></td>
+  <td>C075</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c076</code></td>
+  <td>C076</td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c077</code></td>
+  <td>C077</td>
+  <td>numeric</td>
+  <td>94.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c078</code></td>
+  <td>C078</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c079</code></td>
+  <td>C079</td>
+  <td>numeric</td>
+  <td>94.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c080</code></td>
+  <td>C080</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c081</code></td>
+  <td>C081</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c082</code></td>
+  <td>C082</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c083</code></td>
+  <td>C083</td>
+  <td>numeric</td>
+  <td>94.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c084</code></td>
+  <td>C084</td>
+  <td>numeric</td>
+  <td>95.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c085</code></td>
+  <td>C085</td>
+  <td>numeric</td>
+  <td>93.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c086</code></td>
+  <td>C086</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c087</code></td>
+  <td>C087</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c088</code></td>
+  <td>C088</td>
+  <td>numeric</td>
+  <td>61.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c089</code></td>
+  <td>C089</td>
+  <td>numeric</td>
+  <td>94.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c090</code></td>
+  <td>C090</td>
+  <td>numeric</td>
+  <td>97.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c091</code></td>
+  <td>C091</td>
+  <td>numeric</td>
+  <td>92.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c092</code></td>
+  <td>C092</td>
+  <td>numeric</td>
+  <td>90.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c093</code></td>
+  <td>C093</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c094</code></td>
+  <td>C094</td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c095</code></td>
+  <td>C095</td>
+  <td>numeric</td>
+  <td>95.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c096</code></td>
+  <td>C096</td>
+  <td>numeric</td>
+  <td>96.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c097</code></td>
+  <td>C097</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c098</code></td>
+  <td>C098</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c099</code></td>
+  <td>C099</td>
+  <td>numeric</td>
+  <td>96.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c100</code></td>
+  <td>C100</td>
+  <td>numeric</td>
+  <td>96.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c101</code></td>
+  <td>C101</td>
+  <td>numeric</td>
+  <td>97.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c102</code></td>
+  <td>C102</td>
+  <td>numeric</td>
+  <td>93.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c103</code></td>
+  <td>C103</td>
+  <td>numeric</td>
+  <td>91.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c104</code></td>
+  <td>C104</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c105</code></td>
+  <td>C105</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c106</code></td>
+  <td>C106</td>
+  <td>numeric</td>
+  <td>93.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c107</code></td>
+  <td>C107</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c108</code></td>
+  <td>C108</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c109</code></td>
+  <td>C109</td>
+  <td>numeric</td>
+  <td>89.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c110</code></td>
+  <td>C110</td>
+  <td>numeric</td>
+  <td>90.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c111</code></td>
+  <td>C111</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c112</code></td>
+  <td>C112</td>
+  <td>numeric</td>
+  <td>88.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c113</code></td>
+  <td>C113</td>
+  <td>numeric</td>
+  <td>92.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c114</code></td>
+  <td>C114</td>
+  <td>numeric</td>
+  <td>90.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c115</code></td>
+  <td>C115</td>
+  <td>numeric</td>
+  <td>91.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c116</code></td>
+  <td>C116</td>
+  <td>numeric</td>
+  <td>89.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c117</code></td>
+  <td>C117</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c118</code></td>
+  <td>C118</td>
+  <td>numeric</td>
+  <td>91.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c119</code></td>
+  <td>C119</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c120</code></td>
+  <td>C120</td>
+  <td>numeric</td>
+  <td>93.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c121</code></td>
+  <td>C121</td>
+  <td>numeric</td>
+  <td>92.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c122</code></td>
+  <td>C122</td>
+  <td>numeric</td>
+  <td>93.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c123</code></td>
+  <td>C123</td>
+  <td>numeric</td>
+  <td>90.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c124</code></td>
+  <td>C124</td>
+  <td>numeric</td>
+  <td>93.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c125</code></td>
+  <td>C125</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c126</code></td>
+  <td>C126</td>
+  <td>numeric</td>
+  <td>92.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c127</code></td>
+  <td>C127</td>
+  <td>numeric</td>
+  <td>94.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c128</code></td>
+  <td>C128</td>
+  <td>numeric</td>
+  <td>94.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c129</code></td>
+  <td>C129</td>
+  <td>numeric</td>
+  <td>91.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c130</code></td>
+  <td>C130</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c131</code></td>
+  <td>C131</td>
+  <td>numeric</td>
+  <td>94.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c132</code></td>
+  <td>C132</td>
+  <td>numeric</td>
+  <td>61.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c133</code></td>
+  <td>C133</td>
+  <td>numeric</td>
+  <td>89.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c134</code></td>
+  <td>C134</td>
+  <td>numeric</td>
+  <td>89.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c135</code></td>
+  <td>C135</td>
+  <td>numeric</td>
+  <td>89.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c136</code></td>
+  <td>C136</td>
+  <td>numeric</td>
+  <td>93.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c137</code></td>
+  <td>C137</td>
+  <td>numeric</td>
+  <td>93.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c138</code></td>
+  <td>C138</td>
+  <td>numeric</td>
+  <td>91.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c139</code></td>
+  <td>C139</td>
+  <td>numeric</td>
+  <td>91.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace1</code></td>
+  <td>Cace1</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace10</code></td>
+  <td>Cace10</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace2</code></td>
+  <td>Cace2</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace3</code></td>
+  <td>Cace3</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace4</code></td>
+  <td>Cace4</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace5</code></td>
+  <td>Cace5</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace6</code></td>
+  <td>Cace6</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace7</code></td>
+  <td>Cace7</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace8</code></td>
+  <td>Cace8</td>
+  <td>numeric</td>
+  <td>36.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace9</code></td>
+  <td>Cace9</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cfqb001</code></td>
+  <td>Cfqb001</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cname1</code></td>
+  <td>Cname1</td>
+  <td>character</td>
+  <td>72.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>compensation</code></td>
+  <td>Compensation</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (Fail), 2 (Pass)</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_180_364</code></td>
+  <td>Consecutive Nos 180 364</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_365_548</code></td>
+  <td>Consecutive Nos 365 548</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_549_731</code></td>
+  <td>Consecutive Nos 549 731</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_732_914</code></td>
+  <td>Consecutive Nos 732 914</td>
+  <td>numeric</td>
+  <td>88.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_90_179</code></td>
+  <td>Consecutive Nos 90 179</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_915_1096</code></td>
+  <td>Consecutive Nos 915 1096</td>
+  <td>numeric</td>
+  <td>89.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consecutive_nos_count</code></td>
+  <td>Consecutive Nos Count</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consent_date</code></td>
+  <td>Consent Date</td>
+  <td>character</td>
+  <td>24.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consent_doc_complete</code></td>
+  <td>Consent Doc Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>consent_doc_timestamp</code></td>
+  <td>Consent Doc Timestamp</td>
+  <td>character</td>
+  <td>6.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa001</code></td>
+  <td>Cqfa001</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa002</code></td>
+  <td>Cqfa002</td>
+  <td>numeric</td>
+  <td>39.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa005</code></td>
+  <td>Cqfa005</td>
+  <td>numeric</td>
+  <td>36.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa006</code></td>
+  <td>Cqfa006</td>
+  <td>numeric</td>
+  <td>36.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa009</code></td>
+  <td>Cqfa009</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010</code></td>
+  <td>Cqfa010</td>
+  <td>numeric</td>
+  <td>35.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___1</code></td>
+  <td>Cqfa010A   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___2</code></td>
+  <td>Cqfa010A   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___3</code></td>
+  <td>Cqfa010A   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___4</code></td>
+  <td>Cqfa010A   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___5</code></td>
+  <td>Cqfa010A   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa010a___6</code></td>
+  <td>Cqfa010A   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfa013</code></td>
+  <td>Cqfa013</td>
+  <td>numeric</td>
+  <td>39.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb002</code></td>
+  <td>Cqfb002</td>
+  <td>numeric</td>
+  <td>36.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb007x</code></td>
+  <td>Cqfb007X</td>
+  <td>numeric</td>
+  <td>39.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb008</code></td>
+  <td>Cqfb008</td>
+  <td>numeric</td>
+  <td>37.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb009</code></td>
+  <td>Cqfb009</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb010</code></td>
+  <td>Cqfb010</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb011</code></td>
+  <td>Cqfb011</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb012</code></td>
+  <td>Cqfb012</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb013</code></td>
+  <td>Cqfb013</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb014</code></td>
+  <td>Cqfb014</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb015</code></td>
+  <td>Cqfb015</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqfb016</code></td>
+  <td>Cqfb016</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr0011</code></td>
+  <td>Cqr0011</td>
+  <td>numeric</td>
+  <td>39.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr002</code></td>
+  <td>Cqr002</td>
+  <td>numeric</td>
+  <td>35.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr003</code></td>
+  <td>Cqr003</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr004</code></td>
+  <td>Cqr004</td>
+  <td>numeric</td>
+  <td>35.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr006</code></td>
+  <td>Cqr006</td>
+  <td>numeric</td>
+  <td>35.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___1</code></td>
+  <td>Cqr007   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___2</code></td>
+  <td>Cqr007   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___3</code></td>
+  <td>Cqr007   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___4</code></td>
+  <td>Cqr007   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___5</code></td>
+  <td>Cqr007   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___6</code></td>
+  <td>Cqr007   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr007___7</code></td>
+  <td>Cqr007   7</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr008</code></td>
+  <td>Cqr008</td>
+  <td>numeric</td>
+  <td>36.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr009</code></td>
+  <td>Cqr009</td>
+  <td>numeric</td>
+  <td>39.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___1</code></td>
+  <td>Cqr010   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___10</code></td>
+  <td>Cqr010   10</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___11</code></td>
+  <td>Cqr010   11</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___12</code></td>
+  <td>Cqr010   12</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___13</code></td>
+  <td>Cqr010   13</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___14</code></td>
+  <td>Cqr010   14</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___15</code></td>
+  <td>Cqr010   15</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___16</code></td>
+  <td>Cqr010   16</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___2</code></td>
+  <td>Cqr010   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___3</code></td>
+  <td>Cqr010   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___4</code></td>
+  <td>Cqr010   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___5</code></td>
+  <td>Cqr010   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___6</code></td>
+  <td>Cqr010   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___7</code></td>
+  <td>Cqr010   7</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___8</code></td>
+  <td>Cqr010   8</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr010___9</code></td>
+  <td>Cqr010   9</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr011</code></td>
+  <td>Cqr011</td>
+  <td>numeric</td>
+  <td>39.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr013</code></td>
+  <td>Cqr013</td>
+  <td>numeric</td>
+  <td>40.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr014x</code></td>
+  <td>Cqr014X</td>
+  <td>numeric</td>
+  <td>39.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr015</code></td>
+  <td>Cqr015</td>
+  <td>numeric</td>
+  <td>40.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr016</code></td>
+  <td>Cqr016</td>
+  <td>numeric</td>
+  <td>39.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr017</code></td>
+  <td>Cqr017</td>
+  <td>numeric</td>
+  <td>40.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr018</code></td>
+  <td>Cqr018</td>
+  <td>numeric</td>
+  <td>39.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr019</code></td>
+  <td>Cqr019</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr020</code></td>
+  <td>Cqr020</td>
+  <td>numeric</td>
+  <td>40.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr021</code></td>
+  <td>Cqr021</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr022</code></td>
+  <td>Cqr022</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr023</code></td>
+  <td>Cqr023</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqr024</code></td>
+  <td>Cqr024</td>
+  <td>numeric</td>
+  <td>40.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cqrn012</code></td>
+  <td>Cqrn012</td>
+  <td>numeric</td>
+  <td>39.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi001</code></td>
+  <td>Credi001</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi005</code></td>
+  <td>Credi005</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi017</code></td>
+  <td>Credi017</td>
+  <td>numeric</td>
+  <td>99.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi019</code></td>
+  <td>Credi019</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi020</code></td>
+  <td>Credi020</td>
+  <td>numeric</td>
+  <td>94.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi021</code></td>
+  <td>Credi021</td>
+  <td>numeric</td>
+  <td>97.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi025</code></td>
+  <td>Credi025</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi028</code></td>
+  <td>Credi028</td>
+  <td>numeric</td>
+  <td>94.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi029</code></td>
+  <td>Credi029</td>
+  <td>numeric</td>
+  <td>93.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi030</code></td>
+  <td>Credi030</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi031</code></td>
+  <td>Credi031</td>
+  <td>numeric</td>
+  <td>95.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi036</code></td>
+  <td>Credi036</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi038</code></td>
+  <td>Credi038</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi041</code></td>
+  <td>Credi041</td>
+  <td>numeric</td>
+  <td>96.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi045</code></td>
+  <td>Credi045</td>
+  <td>numeric</td>
+  <td>94.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi046</code></td>
+  <td>Credi046</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi052</code></td>
+  <td>Credi052</td>
+  <td>numeric</td>
+  <td>91.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi058</code></td>
+  <td>Credi058</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>date_complete_check</code></td>
+  <td>Date Complete Check</td>
+  <td>numeric</td>
+  <td>40.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>dob</code></td>
+  <td>Dob</td>
+  <td>character</td>
+  <td>25.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>dob_match</code></td>
+  <td>Dob Match</td>
+  <td>numeric</td>
+  <td>24.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi007</code></td>
+  <td>Ecdi007</td>
+  <td>numeric</td>
+  <td>94.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi009x</code></td>
+  <td>Ecdi009X</td>
+  <td>numeric</td>
+  <td>94.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi010</code></td>
+  <td>Ecdi010</td>
+  <td>numeric</td>
+  <td>94.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi011</code></td>
+  <td>Ecdi011</td>
+  <td>numeric</td>
+  <td>61.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi014</code></td>
+  <td>Ecdi014</td>
+  <td>numeric</td>
+  <td>89.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi015</code></td>
+  <td>Ecdi015</td>
+  <td>numeric</td>
+  <td>93.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi015x</code></td>
+  <td>Ecdi015X</td>
+  <td>numeric</td>
+  <td>88.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi016</code></td>
+  <td>Ecdi016</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi017</code></td>
+  <td>Ecdi017</td>
+  <td>numeric</td>
+  <td>90.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi018</code></td>
+  <td>Ecdi018</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eligibility</code></td>
+  <td>Eligibility</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (Fail), 2 (Pass)</td>
+</tr>
+<tr>
+  <td><code>eligibility_form_complete</code></td>
+  <td>Eligibility Form Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eligibility_form_timestamp</code></td>
+  <td>Eligibility Form Timestamp</td>
+  <td>character</td>
+  <td>24.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>email</code></td>
+  <td>Email</td>
+  <td>character</td>
+  <td>84.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>email_followup</code></td>
+  <td>Email Followup</td>
+  <td>character</td>
+  <td>66.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>email_registration_complete</code></td>
+  <td>Email Registration Complete</td>
+  <td>numeric</td>
+  <td>84.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>email_registration_timestamp</code></td>
+  <td>Email Registration Timestamp</td>
+  <td>character</td>
+  <td>84.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eq001</code></td>
+  <td>Eq001</td>
+  <td>numeric</td>
+  <td>25.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eq002</code></td>
+  <td>Eq002</td>
+  <td>numeric</td>
+  <td>25.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eq003</code></td>
+  <td>Eq003</td>
+  <td>numeric</td>
+  <td>24.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eq004a</code></td>
+  <td>Eq004A</td>
+  <td>character</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>extraction_id</code></td>
+  <td>Extraction Id</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (ne25<em>20250929</em>135849)</td>
+</tr>
+<tr>
+  <td><code>fci_a_1</code></td>
+  <td>Fci A 1</td>
+  <td>numeric</td>
+  <td>39.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_a_2</code></td>
+  <td>Fci A 2</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_a_3</code></td>
+  <td>Fci A 3</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_b_1</code></td>
+  <td>Fci B 1</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_b_2</code></td>
+  <td>Fci B 2</td>
+  <td>numeric</td>
+  <td>42.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_1</code></td>
+  <td>Fci C 1</td>
+  <td>numeric</td>
+  <td>40.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_10</code></td>
+  <td>Fci C 10</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_11</code></td>
+  <td>Fci C 11</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_2</code></td>
+  <td>Fci C 2</td>
+  <td>numeric</td>
+  <td>40.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_3</code></td>
+  <td>Fci C 3</td>
+  <td>numeric</td>
+  <td>40.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_4</code></td>
+  <td>Fci C 4</td>
+  <td>numeric</td>
+  <td>40.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_5</code></td>
+  <td>Fci C 5</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_6</code></td>
+  <td>Fci C 6</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_7</code></td>
+  <td>Fci C 7</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_8</code></td>
+  <td>Fci C 8</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_c_9</code></td>
+  <td>Fci C 9</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_1</code></td>
+  <td>Fci D 1</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_10</code></td>
+  <td>Fci D 10</td>
+  <td>numeric</td>
+  <td>40.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_11</code></td>
+  <td>Fci D 11</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_2</code></td>
+  <td>Fci D 2</td>
+  <td>numeric</td>
+  <td>40.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_3</code></td>
+  <td>Fci D 3</td>
+  <td>numeric</td>
+  <td>40.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_4</code></td>
+  <td>Fci D 4</td>
+  <td>numeric</td>
+  <td>40.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_5</code></td>
+  <td>Fci D 5</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_6</code></td>
+  <td>Fci D 6</td>
+  <td>numeric</td>
+  <td>40.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_7</code></td>
+  <td>Fci D 7</td>
+  <td>numeric</td>
+  <td>40.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_8</code></td>
+  <td>Fci D 8</td>
+  <td>numeric</td>
+  <td>40.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fci_d_9</code></td>
+  <td>Fci D 9</td>
+  <td>numeric</td>
+  <td>40.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>financial_compensation_be_sent_to_a_nebraska_residential_address___1</code></td>
+  <td>Financial Compensation Be Sent To A Nebraska Residential Address   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_1097_2191</code></td>
+  <td>First 5 Nos 1097 2191</td>
+  <td>numeric</td>
+  <td>61.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_180_364</code></td>
+  <td>First 5 Nos 180 364</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_365_548</code></td>
+  <td>First 5 Nos 365 548</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_549_731</code></td>
+  <td>First 5 Nos 549 731</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_732_914</code></td>
+  <td>First 5 Nos 732 914</td>
+  <td>numeric</td>
+  <td>88.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_90_179</code></td>
+  <td>First 5 Nos 90 179</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>first_5_nos_915_1096</code></td>
+  <td>First 5 Nos 915 1096</td>
+  <td>numeric</td>
+  <td>89.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fq001</code></td>
+  <td>Fq001</td>
+  <td>numeric</td>
+  <td>25.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fq005</code></td>
+  <td>Fq005</td>
+  <td>numeric</td>
+  <td>39.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fqlive1_1</code></td>
+  <td>Fqlive1 1</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fqlive1_2</code></td>
+  <td>Fqlive1 2</td>
+  <td>numeric</td>
+  <td>36.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>fqlive1_3</code></td>
+  <td>Fqlive1 3</td>
+  <td>numeric</td>
+  <td>53.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ineligible_flag</code></td>
+  <td>Ineligible Flag</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>kidsights_data_reviews_all_responses_for_quality___1</code></td>
+  <td>Kidsights Data Reviews All Responses For Quality   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi000</code></td>
+  <td>Mmi000</td>
+  <td>numeric</td>
+  <td>64.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi003</code></td>
+  <td>Mmi003</td>
+  <td>numeric</td>
+  <td>65.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi003b</code></td>
+  <td>Mmi003B</td>
+  <td>numeric</td>
+  <td>66.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi009</code></td>
+  <td>Mmi009</td>
+  <td>numeric</td>
+  <td>73.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi013</code></td>
+  <td>Mmi013</td>
+  <td>numeric</td>
+  <td>39.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi014</code></td>
+  <td>Mmi014</td>
+  <td>numeric</td>
+  <td>81.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi018</code></td>
+  <td>Mmi018</td>
+  <td>numeric</td>
+  <td>64.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi019_1</code></td>
+  <td>Mmi019 1</td>
+  <td>numeric</td>
+  <td>93.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi019_2</code></td>
+  <td>Mmi019 2</td>
+  <td>numeric</td>
+  <td>93.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi019_3</code></td>
+  <td>Mmi019 3</td>
+  <td>numeric</td>
+  <td>93.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi100</code></td>
+  <td>Mmi100</td>
+  <td>numeric</td>
+  <td>39.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi101</code></td>
+  <td>Mmi101</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi110</code></td>
+  <td>Mmi110</td>
+  <td>numeric</td>
+  <td>40.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi111</code></td>
+  <td>Mmi111</td>
+  <td>numeric</td>
+  <td>40.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi112</code></td>
+  <td>Mmi112</td>
+  <td>numeric</td>
+  <td>40.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi113</code></td>
+  <td>Mmi113</td>
+  <td>numeric</td>
+  <td>40.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi120</code></td>
+  <td>Mmi120</td>
+  <td>numeric</td>
+  <td>35.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi121</code></td>
+  <td>Mmi121</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi122</code></td>
+  <td>Mmi122</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmi123</code></td>
+  <td>Mmi123</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs009</code></td>
+  <td>Mmifs009</td>
+  <td>numeric</td>
+  <td>76.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs010</code></td>
+  <td>Mmifs010</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs011</code></td>
+  <td>Mmifs011</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs012</code></td>
+  <td>Mmifs012</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs013</code></td>
+  <td>Mmifs013</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs014</code></td>
+  <td>Mmifs014</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs015</code></td>
+  <td>Mmifs015</td>
+  <td>numeric</td>
+  <td>76.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmifs016</code></td>
+  <td>Mmifs016</td>
+  <td>numeric</td>
+  <td>76.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mmihl002</code></td>
+  <td>Mmihl002</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_2_family_information_complete</code></td>
+  <td>Module 2 Family Information Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_2_family_information_timestamp</code></td>
+  <td>Module 2 Family Information Timestamp</td>
+  <td>character</td>
+  <td>35.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_3_child_information_complete</code></td>
+  <td>Module 3 Child Information Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_3_child_information_timestamp</code></td>
+  <td>Module 3 Child Information Timestamp</td>
+  <td>character</td>
+  <td>38.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_4_home_learning_environment_complete</code></td>
+  <td>Module 4 Home Learning Environment Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_4_home_learning_environment_timestamp</code></td>
+  <td>Module 4 Home Learning Environment Timestamp</td>
+  <td>character</td>
+  <td>39.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_5_birthdate_confirmation_complete</code></td>
+  <td>Module 5 Birthdate Confirmation Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_5_birthdate_confirmation_timestamp</code></td>
+  <td>Module 5 Birthdate Confirmation Timestamp</td>
+  <td>character</td>
+  <td>40.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_0_89_complete</code></td>
+  <td>Module 6 0 89 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_0_89_timestamp</code></td>
+  <td>Module 6 0 89 Timestamp</td>
+  <td>character</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_1097_2191_complete</code></td>
+  <td>Module 6 1097 2191 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_1097_2191_timestamp</code></td>
+  <td>Module 6 1097 2191 Timestamp</td>
+  <td>character</td>
+  <td>61.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_180_364_complete</code></td>
+  <td>Module 6 180 364 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_180_364_timestamp</code></td>
+  <td>Module 6 180 364 Timestamp</td>
+  <td>character</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_365_548_complete</code></td>
+  <td>Module 6 365 548 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_365_548_timestamp</code></td>
+  <td>Module 6 365 548 Timestamp</td>
+  <td>character</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_549_731_complete</code></td>
+  <td>Module 6 549 731 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_549_731_timestamp</code></td>
+  <td>Module 6 549 731 Timestamp</td>
+  <td>character</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_732_914_complete</code></td>
+  <td>Module 6 732 914 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_732_914_timestamp</code></td>
+  <td>Module 6 732 914 Timestamp</td>
+  <td>character</td>
+  <td>88.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_90_179_complete</code></td>
+  <td>Module 6 90 179 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_90_179_timestamp</code></td>
+  <td>Module 6 90 179 Timestamp</td>
+  <td>character</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_915_1096_complete</code></td>
+  <td>Module 6 915 1096 Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_6_915_1096_timestamp</code></td>
+  <td>Module 6 915 1096 Timestamp</td>
+  <td>character</td>
+  <td>89.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_8_followup_information_complete</code></td>
+  <td>Module 8 Followup Information Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_8_followup_information_timestamp</code></td>
+  <td>Module 8 Followup Information Timestamp</td>
+  <td>character</td>
+  <td>50.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_9_compensation_information_complete</code></td>
+  <td>Module 9 Compensation Information Complete</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>module_9_compensation_information_timestamp</code></td>
+  <td>Module 9 Compensation Information Timestamp</td>
+  <td>character</td>
+  <td>49.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mrw001</code></td>
+  <td>Mrw001</td>
+  <td>numeric</td>
+  <td>39.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mrw002</code></td>
+  <td>Mrw002</td>
+  <td>numeric</td>
+  <td>74.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mrw003_1</code></td>
+  <td>Mrw003 1</td>
+  <td>numeric</td>
+  <td>74.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>mrw003_2</code></td>
+  <td>Mrw003 2</td>
+  <td>numeric</td>
+  <td>65.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom001</code></td>
+  <td>Nom001</td>
+  <td>numeric</td>
+  <td>94.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom002</code></td>
+  <td>Nom002</td>
+  <td>numeric</td>
+  <td>82.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom002x</code></td>
+  <td>Nom002X</td>
+  <td>numeric</td>
+  <td>80.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom003</code></td>
+  <td>Nom003</td>
+  <td>numeric</td>
+  <td>82.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom003x</code></td>
+  <td>Nom003X</td>
+  <td>numeric</td>
+  <td>80.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom005</code></td>
+  <td>Nom005</td>
+  <td>numeric</td>
+  <td>82.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom005x</code></td>
+  <td>Nom005X</td>
+  <td>numeric</td>
+  <td>80.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom006</code></td>
+  <td>Nom006</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom006x</code></td>
+  <td>Nom006X</td>
+  <td>numeric</td>
+  <td>95.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom009</code></td>
+  <td>Nom009</td>
+  <td>numeric</td>
+  <td>94.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom012</code></td>
+  <td>Nom012</td>
+  <td>numeric</td>
+  <td>89.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom014</code></td>
+  <td>Nom014</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom014x</code></td>
+  <td>Nom014X</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom015</code></td>
+  <td>Nom015</td>
+  <td>numeric</td>
+  <td>91.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom017</code></td>
+  <td>Nom017</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom017x</code></td>
+  <td>Nom017X</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom018</code></td>
+  <td>Nom018</td>
+  <td>numeric</td>
+  <td>82.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom018x</code></td>
+  <td>Nom018X</td>
+  <td>numeric</td>
+  <td>80.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom019</code></td>
+  <td>Nom019</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom022</code></td>
+  <td>Nom022</td>
+  <td>numeric</td>
+  <td>82.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom022x</code></td>
+  <td>Nom022X</td>
+  <td>numeric</td>
+  <td>80.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom024</code></td>
+  <td>Nom024</td>
+  <td>numeric</td>
+  <td>82.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom024x</code></td>
+  <td>Nom024X</td>
+  <td>numeric</td>
+  <td>80.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom026</code></td>
+  <td>Nom026</td>
+  <td>numeric</td>
+  <td>96.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom026x</code></td>
+  <td>Nom026X</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom028</code></td>
+  <td>Nom028</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom029</code></td>
+  <td>Nom029</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom029x</code></td>
+  <td>Nom029X</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom031</code></td>
+  <td>Nom031</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom033</code></td>
+  <td>Nom033</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom033x</code></td>
+  <td>Nom033X</td>
+  <td>numeric</td>
+  <td>95.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom034</code></td>
+  <td>Nom034</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom034x</code></td>
+  <td>Nom034X</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom035</code></td>
+  <td>Nom035</td>
+  <td>numeric</td>
+  <td>81.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom035x</code></td>
+  <td>Nom035X</td>
+  <td>numeric</td>
+  <td>80.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom042x</code></td>
+  <td>Nom042X</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom044</code></td>
+  <td>Nom044</td>
+  <td>numeric</td>
+  <td>100.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom046x</code></td>
+  <td>Nom046X</td>
+  <td>numeric</td>
+  <td>39.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom047</code></td>
+  <td>Nom047</td>
+  <td>numeric</td>
+  <td>98.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom047x</code></td>
+  <td>Nom047X</td>
+  <td>numeric</td>
+  <td>98.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom048x</code></td>
+  <td>Nom048X</td>
+  <td>numeric</td>
+  <td>63.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom049</code></td>
+  <td>Nom049</td>
+  <td>numeric</td>
+  <td>98.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom049x</code></td>
+  <td>Nom049X</td>
+  <td>numeric</td>
+  <td>98.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom052y</code></td>
+  <td>Nom052Y</td>
+  <td>numeric</td>
+  <td>63.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom053</code></td>
+  <td>Nom053</td>
+  <td>numeric</td>
+  <td>81.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom053x</code></td>
+  <td>Nom053X</td>
+  <td>numeric</td>
+  <td>80.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom054x</code></td>
+  <td>Nom054X</td>
+  <td>numeric</td>
+  <td>63.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom056x</code></td>
+  <td>Nom056X</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom057</code></td>
+  <td>Nom057</td>
+  <td>numeric</td>
+  <td>91.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom059</code></td>
+  <td>Nom059</td>
+  <td>numeric</td>
+  <td>82.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom059x</code></td>
+  <td>Nom059X</td>
+  <td>numeric</td>
+  <td>80.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom060y</code></td>
+  <td>Nom060Y</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom061</code></td>
+  <td>Nom061</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom061x</code></td>
+  <td>Nom061X</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom062y</code></td>
+  <td>Nom062Y</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom102</code></td>
+  <td>Nom102</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom103</code></td>
+  <td>Nom103</td>
+  <td>numeric</td>
+  <td>62.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom104</code></td>
+  <td>Nom104</td>
+  <td>numeric</td>
+  <td>62.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom2202</code></td>
+  <td>Nom2202</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom2205</code></td>
+  <td>Nom2205</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom2208</code></td>
+  <td>Nom2208</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nos</code></td>
+  <td>Nos</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nos_count_90_179</code></td>
+  <td>Nos Count 90 179</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nschj012</code></td>
+  <td>Nschj012</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nschj013</code></td>
+  <td>Nschj013</td>
+  <td>numeric</td>
+  <td>51.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nschj017</code></td>
+  <td>Nschj017</td>
+  <td>numeric</td>
+  <td>51.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps001</code></td>
+  <td>Ps001</td>
+  <td>numeric</td>
+  <td>47.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps002</code></td>
+  <td>Ps002</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps003</code></td>
+  <td>Ps003</td>
+  <td>numeric</td>
+  <td>47.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps004</code></td>
+  <td>Ps004</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps005</code></td>
+  <td>Ps005</td>
+  <td>numeric</td>
+  <td>47.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps006</code></td>
+  <td>Ps006</td>
+  <td>numeric</td>
+  <td>47.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps007</code></td>
+  <td>Ps007</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps008</code></td>
+  <td>Ps008</td>
+  <td>numeric</td>
+  <td>47.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps009</code></td>
+  <td>Ps009</td>
+  <td>numeric</td>
+  <td>47.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps010</code></td>
+  <td>Ps010</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps011</code></td>
+  <td>Ps011</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps013</code></td>
+  <td>Ps013</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps014</code></td>
+  <td>Ps014</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps015</code></td>
+  <td>Ps015</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps016</code></td>
+  <td>Ps016</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps017</code></td>
+  <td>Ps017</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps018</code></td>
+  <td>Ps018</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps019</code></td>
+  <td>Ps019</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps020</code></td>
+  <td>Ps020</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps022</code></td>
+  <td>Ps022</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps023</code></td>
+  <td>Ps023</td>
+  <td>numeric</td>
+  <td>47.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps024</code></td>
+  <td>Ps024</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps025</code></td>
+  <td>Ps025</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps026</code></td>
+  <td>Ps026</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps027</code></td>
+  <td>Ps027</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps028</code></td>
+  <td>Ps028</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps029</code></td>
+  <td>Ps029</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps030</code></td>
+  <td>Ps030</td>
+  <td>numeric</td>
+  <td>47.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps031</code></td>
+  <td>Ps031</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps032</code></td>
+  <td>Ps032</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps034</code></td>
+  <td>Ps034</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps035</code></td>
+  <td>Ps035</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps036</code></td>
+  <td>Ps036</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps037</code></td>
+  <td>Ps037</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps038</code></td>
+  <td>Ps038</td>
+  <td>numeric</td>
+  <td>47.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps039</code></td>
+  <td>Ps039</td>
+  <td>numeric</td>
+  <td>47.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps040</code></td>
+  <td>Ps040</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps041</code></td>
+  <td>Ps041</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps042</code></td>
+  <td>Ps042</td>
+  <td>numeric</td>
+  <td>47.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps043</code></td>
+  <td>Ps043</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps044</code></td>
+  <td>Ps044</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps045</code></td>
+  <td>Ps045</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps046</code></td>
+  <td>Ps046</td>
+  <td>numeric</td>
+  <td>47.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps047</code></td>
+  <td>Ps047</td>
+  <td>numeric</td>
+  <td>48.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps048</code></td>
+  <td>Ps048</td>
+  <td>numeric</td>
+  <td>47.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ps049</code></td>
+  <td>Ps049</td>
+  <td>numeric</td>
+  <td>47.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1347</code></td>
+  <td>Q1347</td>
+  <td>numeric</td>
+  <td>50.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1348</code></td>
+  <td>Q1348</td>
+  <td>character</td>
+  <td>85.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1394</code></td>
+  <td>Q1394</td>
+  <td>character</td>
+  <td>51.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1394a</code></td>
+  <td>Q1394A</td>
+  <td>character</td>
+  <td>51.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1395</code></td>
+  <td>Q1395</td>
+  <td>character</td>
+  <td>52.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1396</code></td>
+  <td>Q1396</td>
+  <td>character</td>
+  <td>52.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1397</code></td>
+  <td>Q1397</td>
+  <td>character</td>
+  <td>52.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1398</code></td>
+  <td>Q1398</td>
+  <td>character</td>
+  <td>52.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1502</code></td>
+  <td>Q1502</td>
+  <td>numeric</td>
+  <td>36.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1503</code></td>
+  <td>Q1503</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1504</code></td>
+  <td>Q1504</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q1505</code></td>
+  <td>Q1505</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___1</code></td>
+  <td>Q939   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___2</code></td>
+  <td>Q939   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___3</code></td>
+  <td>Q939   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___4</code></td>
+  <td>Q939   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___5</code></td>
+  <td>Q939   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___6</code></td>
+  <td>Q939   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___7</code></td>
+  <td>Q939   7</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q939___8</code></td>
+  <td>Q939   8</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q940</code></td>
+  <td>Q940</td>
+  <td>numeric</td>
+  <td>64.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q941</code></td>
+  <td>Q941</td>
+  <td>numeric</td>
+  <td>64.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q943</code></td>
+  <td>Q943</td>
+  <td>numeric</td>
+  <td>36.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q958</code></td>
+  <td>Q958</td>
+  <td>character</td>
+  <td>64.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___1</code></td>
+  <td>Q959   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___2</code></td>
+  <td>Q959   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___3</code></td>
+  <td>Q959   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___4</code></td>
+  <td>Q959   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___5</code></td>
+  <td>Q959   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q959___6</code></td>
+  <td>Q959   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>q960</code></td>
+  <td>Q960</td>
+  <td>numeric</td>
+  <td>39.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>redcap_survey_identifier</code></td>
+  <td>Redcap Survey Identifier</td>
+  <td>numeric</td>
+  <td>93.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf018</code></td>
+  <td>Sf018</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf019</code></td>
+  <td>Sf019</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf021</code></td>
+  <td>Sf021</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf054</code></td>
+  <td>Sf054</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf093</code></td>
+  <td>Sf093</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf122</code></td>
+  <td>Sf122</td>
+  <td>numeric</td>
+  <td>91.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf127</code></td>
+  <td>Sf127</td>
+  <td>numeric</td>
+  <td>93.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>source_project</code></td>
+  <td>Source Project</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (kidsights<em>data</em>survey), 2 (kidsights<em>email</em>registration), 3 (kidsights<em>public), 4 (kidsights</em>public_birth)</td>
+</tr>
+<tr>
+  <td><code>sq001</code></td>
+  <td>Sq001</td>
+  <td>character</td>
+  <td>25.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___1</code></td>
+  <td>Sq002   1</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___10</code></td>
+  <td>Sq002   10</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___11</code></td>
+  <td>Sq002   11</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___12</code></td>
+  <td>Sq002   12</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___13</code></td>
+  <td>Sq002   13</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___14</code></td>
+  <td>Sq002   14</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___15</code></td>
+  <td>Sq002   15</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___16</code></td>
+  <td>Sq002   16</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___2</code></td>
+  <td>Sq002   2</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___3</code></td>
+  <td>Sq002   3</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___4</code></td>
+  <td>Sq002   4</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___5</code></td>
+  <td>Sq002   5</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___6</code></td>
+  <td>Sq002   6</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___7</code></td>
+  <td>Sq002   7</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___8</code></td>
+  <td>Sq002   8</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq002___9</code></td>
+  <td>Sq002   9</td>
+  <td>numeric</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sq003</code></td>
+  <td>Sq003</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>survey_stop</code></td>
+  <td>Survey Stop</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<hr />
+
+<h2>Notes</h2>
+
+<ul>
+<li><strong>Missing percentages</strong> are calculated as (missing values / total records) × 100</li>
+<li><strong>Factor variables</strong> show the most common levels with their counts</li>
+<li><strong>Numeric variables</strong> display min, max, and mean values where available</li>
+<li><strong>Logical variables</strong> show counts of TRUE and FALSE values</li>
+</ul>
+
+<p><em>Generated automatically from metadata on 2025-09-29 by the Kidsights Data Platform</em></p>
+
+</body>
+</html>
+        

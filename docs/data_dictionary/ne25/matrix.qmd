@@ -1,0 +1,117 @@
+---
+title: "Variable-Project Matrix"
+subtitle: "Which variables appear in which REDCap projects"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Ensure required packages are available
+source("assets/ensure_dependencies.R")
+
+# Load required libraries
+library(dplyr)
+library(DT)
+library(knitr)
+
+# Source the dictionary functions (now JSON-based)
+source("assets/dictionary_functions.R")
+
+# Initialize dictionary data from JSON
+dict_data <- initialize_dictionary()
+
+# Load data from JSON
+matrix_data <- create_variable_project_matrix(dict_data)
+```
+
+# Variable-Project Matrix
+
+```{r freshness-warning, results='asis', echo=FALSE}
+# Display freshness warning if data is stale
+cat(display_freshness_warning(dict_data))
+```
+
+This matrix shows which variables appear in which REDCap projects. Variables are identified by their field name, and checkmarks (✓) indicate presence in each project.
+
+## Project Information
+
+| PID | Description |
+|-----|-------------|
+| **7679** | Kidsights Data Survey |
+| **7943** | Kidsights Email Registration |
+| **7999** | Kidsights Public |
+| **8014** | Kidsights Public Birth |
+
+## Interactive Matrix
+
+The table below shows all unique variables and their presence across the four REDCap projects. Use the search box to find specific variables, or sort by clicking column headers.
+
+```{r variable-project-matrix}
+# Display the variable-project matrix
+if (nrow(matrix_data) > 0) {
+  format_variable_project_matrix(matrix_data)
+} else {
+  cat("No matrix data available in JSON.")
+}
+```
+
+## Summary Statistics
+
+```{r matrix-summary}
+# Get project coverage summary from JSON
+summaries <- get_summary_data(dict_data)
+
+if ("project_coverage" %in% names(summaries)) {
+  project_summary <- summaries$project_coverage$data
+
+  # Convert to data frame if needed
+  if (is.list(project_summary)) {
+    project_summary <- do.call(rbind, lapply(project_summary, data.frame))
+  }
+
+  knitr::kable(project_summary,
+               col.names = c("Project ID", "Unique Variables", "Unique Forms"),
+               caption = "Variable and Form Counts by Project")
+}
+
+# Calculate matrix statistics if data available
+if (nrow(matrix_data) > 0 && ncol(matrix_data) >= 6) {
+  total_vars <- nrow(matrix_data)
+
+  # Check if we have the expected PID columns
+  pid_cols <- grep("^PID_", names(matrix_data), value = TRUE)
+
+  if (length(pid_cols) > 0) {
+    # Calculate cross-project presence
+    vars_in_all <- sum(rowSums(matrix_data[, pid_cols, drop = FALSE]) == length(pid_cols))
+    vars_in_one <- sum(rowSums(matrix_data[, pid_cols, drop = FALSE]) == 1)
+    vars_in_multiple <- sum(rowSums(matrix_data[, pid_cols, drop = FALSE]) > 1)
+
+    # Create summary table
+    summary_stats <- data.frame(
+      Statistic = c("Total unique variables",
+                    paste("Variables in all", length(pid_cols), "projects"),
+                    "Variables in only 1 project",
+                    "Variables in multiple projects"),
+      Count = c(total_vars, vars_in_all, vars_in_one, vars_in_multiple),
+      Percentage = round(c(100,
+                          vars_in_all/total_vars*100,
+                          vars_in_one/total_vars*100,
+                          vars_in_multiple/total_vars*100), 1)
+    )
+
+    knitr::kable(summary_stats,
+                 col.names = c("Statistic", "Count", "Percentage (%)"),
+                 caption = "Variable Distribution Across Projects")
+  }
+}
+```
+
+```{r generation-info, echo=FALSE}
+# Display generation information
+if ("metadata" %in% names(dict_data)) {
+  cat("\n**Data Dictionary Generated:** ", dict_data$metadata$generated, "\n")
+  cat("**Total Raw Variables:** ", dict_data$metadata$total_raw_variables, "\n")
+  cat("**Projects:** ", paste(dict_data$metadata$project_pids, collapse = ", "), "\n")
+}
+```

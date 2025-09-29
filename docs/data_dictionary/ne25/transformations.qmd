@@ -1,0 +1,69 @@
+---
+title: "Variable Transformations"
+subtitle: "How raw variables are transformed into analysis-ready variables"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Load required libraries
+library(dplyr)
+library(DT)
+library(knitr)
+library(DBI)
+library(duckdb)
+
+# Source the dictionary functions
+source("assets/dictionary_functions.R")
+
+# Get transformation mappings
+transformation_mappings <- get_transformation_mappings()
+```
+
+# Variable Transformations
+
+This section details how raw variables are transformed into analysis-ready variables, organized by transformation category. Each category shows the specific raw variables used as inputs and the transformed variables created as outputs.
+
+```{r transformation-details, results='asis'}
+# Display transformation mappings
+for (category in names(transformation_mappings)) {
+  mapping <- transformation_mappings[[category]]
+
+  cat("## ", category, "\n\n")
+  cat("**Description:** ", mapping$description, "\n\n")
+  cat("**Raw Variables Used:** ", paste(mapping$raw_variables, collapse = ", "), "\n\n")
+  cat("**Transformed Variables Created:** ", paste(mapping$transformed_variables, collapse = ", "), "\n\n")
+  cat("**Transformation Process:** ", mapping$process, "\n\n")
+  cat("---\n\n")
+}
+```
+
+## Transformation Pipeline Overview
+
+The data transformation pipeline follows these general steps:
+
+1. **Data Extraction**: Raw data is extracted from REDCap projects via API
+2. **Type Harmonization**: Data types are standardized across projects using `flexible_bind_rows`
+3. **Dashboard Transformations**: The `recode_it()` function family is applied for standardized variables
+4. **Eligibility Assessment**: 9-criteria validation system (CID1-CID9) determines participant eligibility
+5. **Final Output**: Analysis-ready dataset stored in `ne25_transformed` table
+
+## Key Transformation Functions
+
+The transformations are implemented through these main functions:
+
+- **`recode_it()`**: Main transformation function for dashboard-style variables
+- **`value_labels()`**: Extracts and formats REDCap value labels
+- **Race/ethnicity functions**: Collapse multiple checkbox responses into standardized categories
+- **Education functions**: Create 4, 6, and 8-category education variables
+- **Income functions**: Calculate Federal Poverty Level and adjust for inflation
+- **Eligibility functions**: Implement CID1-CID9 validation criteria
+
+## Quality Control
+
+All transformations include quality control measures:
+
+- Missing value standardization
+- Range checks for numeric variables
+- Consistency validation across related variables
+- Audit trail preservation linking transformed variables to raw sources
