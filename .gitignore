@@ -88,3 +88,26 @@ data/
 config/personal/
 *personal*.yaml
 *local*.yaml
+
+# Test files and debugging artifacts
+test_*.feather
+test_*.R
+*_test.R
+debug_*.R
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.py[cod]
+
+# Stray files
+nul
+
+# Codebook backups (use git history instead)
+codebook/data/codebook_pre_*.json
+codebook/data/*_backup_*.json
+
+# Temp scripts directory (but keep README)
+scripts/temp/*.R
+!scripts/temp/README.md

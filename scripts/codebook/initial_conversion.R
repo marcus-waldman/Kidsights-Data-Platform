@@ -256,7 +256,7 @@ remove_na_recursive <- function(x) {
 #' Parse PS items from CSV for GSED_PF study
 #' @param ps_csv_path Path to PS items CSV file
 #' @return List of PS items in codebook format
-parse_ps_items <- function(ps_csv_path = "tmp/ne25_ps_items.csv") {
+parse_ps_items <- function(ps_csv_path = "temp/archive_2025/ne25_ps_items.csv") {
 
   message("Parsing PS items from: ", ps_csv_path)
 

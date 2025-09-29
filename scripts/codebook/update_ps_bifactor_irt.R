@@ -10,7 +10,7 @@ library(stringr)
 #'
 #' @param mplus_path Path to Mplus output file
 #' @return List with parsed factor loadings and thresholds
-parse_mplus_bifactor <- function(mplus_path = "tmp/bifactor5e.txt") {
+parse_mplus_bifactor <- function(mplus_path = "temp/archive_2025/bifactor5e.txt") {
 
   cat("=== Parsing Mplus Bifactor Model Output ===\n")
   cat("Loading Mplus output from:", mplus_path, "\n")
@@ -224,7 +224,7 @@ update_codebook_with_bifactor_irt <- function(codebook_path = "codebook/data/cod
 #' @param mplus_path Path to Mplus bifactor output
 #' @param codebook_path Path to codebook JSON
 #' @param output_path Path to save updated codebook (defaults to input path)
-update_ps_bifactor_irt <- function(mplus_path = "tmp/bifactor5e.txt",
+update_ps_bifactor_irt <- function(mplus_path = "temp/archive_2025/bifactor5e.txt",
                                    codebook_path = "codebook/data/codebook.json",
                                    output_path = NULL) {
 

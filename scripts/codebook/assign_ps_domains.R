@@ -11,7 +11,7 @@ library(jsonlite)
 #'
 #' @param csv_path Path to the psychosocial items CSV file
 #' @return Data frame with domain assignments
-load_ps_domain_assignments <- function(csv_path = "tmp/psychosocial-items - Sheet1.csv") {
+load_ps_domain_assignments <- function(csv_path = "temp/archive_2025/psychosocial-items - Sheet1.csv") {
 
   cat("Loading psychosocial domain assignments from:", csv_path, "\n")
 
@@ -207,7 +207,7 @@ update_codebook_with_ps_domains <- function(codebook_path = "codebook/data/codeb
 #' @param csv_path Path to psychosocial items CSV
 #' @param codebook_path Path to codebook JSON
 #' @param output_path Path to save updated codebook (defaults to input path)
-assign_ps_domains <- function(csv_path = "tmp/psychosocial-items - Sheet1.csv",
+assign_ps_domains <- function(csv_path = "temp/archive_2025/psychosocial-items - Sheet1.csv",
                              codebook_path = "codebook/data/codebook.json",
                              output_path = NULL) {
 

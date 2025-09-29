@@ -13,7 +13,7 @@ library(jsonlite)
 #'
 #' @param csv_path Path to the CSV file
 #' @return Data frame with structured parameters by item
-load_ne22_parameters <- function(csv_path = "tmp/ne22_kidsights-parameter-vlaues.csv") {
+load_ne22_parameters <- function(csv_path = "temp/archive_2025/ne22_kidsights-parameter-vlaues.csv") {
 
   cat("Loading NE22 parameter estimates from:", csv_path, "\n")
 
@@ -147,7 +147,7 @@ update_codebook_with_ne22 <- function(codebook_path = "codebook/data/codebook.js
 #' @param csv_path Path to NE22 parameter CSV
 #' @param codebook_path Path to codebook JSON
 #' @param output_path Path to save updated codebook (defaults to input path)
-update_ne22_irt_parameters <- function(csv_path = "tmp/ne22_kidsights-parameter-vlaues.csv",
+update_ne22_irt_parameters <- function(csv_path = "temp/archive_2025/ne22_kidsights-parameter-vlaues.csv",
                                        codebook_path = "codebook/data/codebook.json",
                                        output_path = NULL) {
 

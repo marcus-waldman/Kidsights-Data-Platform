@@ -141,9 +141,11 @@ success = dm.test_connection()
 
 ## Codebook System
 
-### JSON-Based Metadata (306 Items)
+### JSON-Based Metadata (305 Items)
 - **Location:** `codebook/data/codebook.json`
-- **Studies:** NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED_PF
+- **Version:** 3.0
+- **Studies:** NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED
+- **IRT Parameters:** NE22, NE25, CREDI (SF/LF), GSED (multi-calibration)
 - **Response Sets:** Study-specific (NE25 uses `9`, others use `-9` for missing)
 
 ### Key Functions
@@ -180,6 +182,35 @@ summary <- codebook_extract_study_summary(codebook, "NE25")
 # Run complete analysis example
 source("scripts/examples/codebook_utilities_examples.R")
 ```
+
+### IRT Parameters
+
+The codebook includes IRT calibration parameters for multiple studies:
+
+**NE22 Parameters** (203 items):
+- Unidimensional model: factor = "kidsights"
+- PS items: Bifactor model with general + specific factors (eat/sle/soc/int/ext)
+- Script: `scripts/codebook/update_ne22_irt_parameters.R`
+
+**CREDI Parameters** (60 items):
+- **Short Form (SF)**: 37 items, unidimensional, factor = "credi_overall"
+- **Long Form (LF)**: 60 items, multidimensional, factors = mot/cog/lang/sem
+- Nested structure: `CREDI → short_form/long_form → parameters`
+- Script: `scripts/codebook/update_credi_irt_parameters.R`
+- Source: `data/credi-mest_df.csv`
+
+**GSED Parameters** (132 items):
+- Rasch model: loading = 1.0 (all items)
+- Multiple calibrations per item (avg 3.03): gsed2406, gsed2212, gsed1912, gcdg, dutch, 293_0
+- Nested structure: `GSED → calibration_key → parameters`
+- Script: `scripts/codebook/update_gsed_irt_parameters.R`
+- Source: `dscore::builtin_itembank`
+
+**Threshold Transformations:**
+- NE22: threshold = -tau (negated and sorted)
+- CREDI SF: threshold = -delta / alpha
+- CREDI LF: threshold = -tau
+- GSED: threshold = -tau
 
 ### Dashboard
 ```bash
@@ -221,4 +252,4 @@ pip install duckdb pandas pyyaml structlog
 5. **HTML Docs:** `python scripts/documentation/generate_html_documentation.py`
 
 ---
-*Updated: September 2025 | Version: 2.8.0*
+*Updated: September 2025 | Version: 3.0.0*
