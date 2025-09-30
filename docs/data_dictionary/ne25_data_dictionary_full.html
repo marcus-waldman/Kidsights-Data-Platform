@@ -35,10 +35,10 @@
 <body>
     <h1>NE25 Data Dictionary</h1>
 
-<p><strong>Generated:</strong> 2025-09-29 14:00:29<br />
-<strong>Total Records:</strong> 4826<br />
-<strong>Total Variables:</strong> 554<br />
-<strong>Categories:</strong> 5  </p>
+<p><strong>Generated:</strong> 2025-09-30 17:42:46<br />
+<strong>Total Records:</strong> 4882<br />
+<strong>Total Variables:</strong> 610<br />
+<strong>Categories:</strong> 7  </p>
 
 <h2>Overview</h2>
 
@@ -50,20 +50,86 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 <h2>Table of Contents</h2>
 
 <ul>
-<li><a href="#caregiver-relationship">Caregiver Relationship</a> (2 variables)</li>
-<li><a href="#age">Age</a> (3 variables)</li>
-<li><a href="#eligibility">Eligibility</a> (3 variables)</li>
-<li><a href="#geography">Geography</a> (3 variables)</li>
-<li><a href="#other">Other</a> (543 variables)</li>
+<li><a href="#race">Race</a> (6 variables)</li>
+<li><a href="#caregiver-relationship">Caregiver Relationship</a> (4 variables)</li>
+<li><a href="#education">Education</a> (13 variables)</li>
+<li><a href="#sex">Sex</a> (3 variables)</li>
+<li><a href="#age">Age</a> (7 variables)</li>
+<li><a href="#geography">Geography</a> (28 variables)</li>
+<li><a href="#other">Other</a> (549 variables)</li>
 </ul>
+
+<h2>Race</h2>
+
+<p><strong>Description:</strong> Race and ethnicity variables for children and primary caregivers, including harmonized categories</p>
+
+<p><strong>Variables:</strong> 6<br />
+<strong>Average Missing:</strong> 40.1%<br />
+<strong>Data Types:</strong> 6 factors, 0 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>a1_hisp</code></td>
+  <td>Primary caregiver Hispanic/Latino ethnicity</td>
+  <td>factor</td>
+  <td>40.8%</td>
+  <td>1 (Hispanic), 2 (non-Hisp.)</td>
+</tr>
+<tr>
+  <td><code>a1_race</code></td>
+  <td>Primary caregiver race (collapsed categories)</td>
+  <td>factor</td>
+  <td>40.1%</td>
+  <td>1 (American Indian or Alaska Native), 2 (Asian or Pacific Islander), 3 (Black or African American), 4 (Other Asian), 5 (Some Other Race)...</td>
+</tr>
+<tr>
+  <td><code>a1_raceG</code></td>
+  <td>Primary caregiver race/ethnicity combined</td>
+  <td>factor</td>
+  <td>40.8%</td>
+  <td>1 (American Indian or Alaska Native, non-Hisp.), 2 (Asian or Pacific Islander, non-Hisp.), 3 (Black or African American, non-Hisp.), 4 (Hispanic), 5 (Some Other Race, non-Hisp.)...</td>
+</tr>
+<tr>
+  <td><code>hisp</code></td>
+  <td>Child Hispanic/Latino ethnicity</td>
+  <td>factor</td>
+  <td>40.0%</td>
+  <td>1 (Hispanic), 2 (non-Hisp.)</td>
+</tr>
+<tr>
+  <td><code>race</code></td>
+  <td>Child race (collapsed categories)</td>
+  <td>factor</td>
+  <td>39.2%</td>
+  <td>1 (American Indian or Alaska Native), 2 (Asian or Pacific Islander), 3 (Black or African American), 4 (Other Asian), 5 (Some Other Race)...</td>
+</tr>
+<tr>
+  <td><code>raceG</code></td>
+  <td>Child race/ethnicity combined</td>
+  <td>factor</td>
+  <td>40.0%</td>
+  <td>1 (American Indian or Alaska Native, non-Hisp.), 2 (Asian or Pacific Islander, non-Hisp.), 3 (Black or African American, non-Hisp.), 4 (Hispanic), 5 (Some Other Race, non-Hisp.)...</td>
+</tr>
+</tbody>
+</table>
 
 <h2>Caregiver Relationship</h2>
 
 <p><strong>Description:</strong> Variables describing relationships between caregivers and children, including gender and maternal status</p>
 
-<p><strong>Variables:</strong> 2<br />
-<strong>Average Missing:</strong> 23.3%<br />
-<strong>Data Types:</strong> 0 factors, 1 numeric, 0 logical, 1 character</p>
+<p><strong>Variables:</strong> 4<br />
+<strong>Average Missing:</strong> 33.5%<br />
+<strong>Data Types:</strong> 2 factors, 1 numeric, 0 logical, 1 character</p>
 
 <table>
 <thead>
@@ -87,19 +153,33 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>module_7_child_emotions_and_relationships_timestamp</code></td>
   <td>Module 7 Child Emotions And Relationships Timestamp</td>
   <td>character</td>
-  <td>46.6%</td>
+  <td>46.8%</td>
   <td>N/A</td>
+</tr>
+<tr>
+  <td><code>relation1</code></td>
+  <td>Relation1</td>
+  <td>factor</td>
+  <td>36.1%</td>
+  <td>2 (1), 3 (2), 4 (3), 5 (4), 6 (5)</td>
+</tr>
+<tr>
+  <td><code>relation2</code></td>
+  <td>Relation2</td>
+  <td>factor</td>
+  <td>51.1%</td>
+  <td>1 (Biological or Adoptive Parent), 2 (Foster Parent), 3 (Grandparent), 4 (Other: Non-Relative), 5 (Other: Relative)...</td>
 </tr>
 </tbody>
 </table>
 
-<h2>Age</h2>
+<h2>Education</h2>
 
-<p><strong>Description:</strong> Age variables for children and caregivers in different units (days, months, years)</p>
+<p><strong>Description:</strong> Education level variables using multiple categorization systems (4, 6, and 8 categories)</p>
 
-<p><strong>Variables:</strong> 3<br />
-<strong>Average Missing:</strong> 42.9%<br />
-<strong>Data Types:</strong> 1 factors, 2 numeric, 0 logical, 0 character</p>
+<p><strong>Variables:</strong> 13<br />
+<strong>Average Missing:</strong> 43.7%<br />
+<strong>Data Types:</strong> 12 factors, 0 numeric, 1 logical, 0 character</p>
 
 <table>
 <thead>
@@ -113,8 +193,178 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </thead>
 <tbody>
 <tr>
+  <td><code>educ4_a1</code></td>
+  <td>Primary caregiver education level (4 categories)</td>
+  <td>factor</td>
+  <td>35.7%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
+</tr>
+<tr>
+  <td><code>educ4_a2</code></td>
+  <td>Secondary caregiver education level (4 categories)</td>
+  <td>factor</td>
+  <td>51.2%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
+</tr>
+<tr>
+  <td><code>educ4_max</code></td>
+  <td>Maximum education level among caregivers (4 categories)</td>
+  <td>factor</td>
+  <td>35.4%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
+</tr>
+<tr>
+  <td><code>educ4_mom</code></td>
+  <td>Maternal education level (4 categories)</td>
+  <td>factor</td>
+  <td>55.0%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
+</tr>
+<tr>
+  <td><code>educ6_a1</code></td>
+  <td>Primary caregiver education level (6 categories)</td>
+  <td>factor</td>
+  <td>35.7%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)...</td>
+</tr>
+<tr>
+  <td><code>educ6_a2</code></td>
+  <td>Secondary caregiver education level (6 categories)</td>
+  <td>factor</td>
+  <td>51.2%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)...</td>
+</tr>
+<tr>
+  <td><code>educ6_max</code></td>
+  <td>Maximum education level among caregivers (6 categories)</td>
+  <td>factor</td>
+  <td>35.4%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)...</td>
+</tr>
+<tr>
+  <td><code>educ6_mom</code></td>
+  <td>Maternal education level (6 categories)</td>
+  <td>factor</td>
+  <td>55.0%</td>
+  <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Master's Degree), 5 (Doctorate or Professional Degree)...</td>
+</tr>
+<tr>
+  <td><code>educ_a1</code></td>
+  <td>Primary caregiver education level (8 categories)</td>
+  <td>factor</td>
+  <td>35.7%</td>
+  <td>1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (Some College Credit, but No Degree), 4 (High School Graduate or GED Completed), 5 (Associate Degree (AA, AS))...</td>
+</tr>
+<tr>
+  <td><code>educ_a2</code></td>
+  <td>Secondary caregiver education level (8 categories)</td>
+  <td>factor</td>
+  <td>51.2%</td>
+  <td>1 (Bachelor's Degree (BA, BS, AB)), 2 (High School Graduate or GED Completed), 3 (Master's Degree (MA, MS, MSW, MBA)), 4 (Some College Credit, but No Degree), 5 (Associate Degree (AA, AS))...</td>
+</tr>
+<tr>
+  <td><code>educ_max</code></td>
+  <td>Maximum education level among caregivers (8 categories)</td>
+  <td>factor</td>
+  <td>35.4%</td>
+  <td>1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (High School Graduate or GED Completed), 4 (Some College Credit, but No Degree), 5 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD))...</td>
+</tr>
+<tr>
+  <td><code>educ_mom</code></td>
+  <td>Maternal education level (8 categories)</td>
+  <td>factor</td>
+  <td>55.0%</td>
+  <td>1 (Master's Degree (MA, MS, MSW, MBA)), 2 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)), 3 (Associate Degree (AA, AS)), 4 (Completed a vocational, trade, or business school program), 5 (Bachelor's Degree (BA, BS, AB))...</td>
+</tr>
+<tr>
+  <td><code>mom_a1</code></td>
+  <td>Mom A1</td>
+  <td>logical</td>
+  <td>36.0%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Sex</h2>
+
+<p><strong>Description:</strong> Child's biological sex and gender indicator variables</p>
+
+<p><strong>Variables:</strong> 3<br />
+<strong>Average Missing:</strong> 38.1%<br />
+<strong>Data Types:</strong> 1 factors, 0 numeric, 2 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>female</code></td>
+  <td>Female</td>
+  <td>logical</td>
+  <td>39.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>female_a1</code></td>
+  <td>Female A1</td>
+  <td>logical</td>
+  <td>35.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sex</code></td>
+  <td>Sex</td>
+  <td>factor</td>
+  <td>39.3%</td>
+  <td>1 (Female), 2 (Male)</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Age</h2>
+
+<p><strong>Description:</strong> Age variables for children and caregivers in different units (days, months, years)</p>
+
+<p><strong>Variables:</strong> 7<br />
+<strong>Average Missing:</strong> 34.4%<br />
+<strong>Data Types:</strong> 1 factors, 6 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>a1_years_old</code></td>
+  <td>A1 Years Old</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
   <td><code>age_in_days</code></td>
   <td>Age In Days</td>
+  <td>numeric</td>
+  <td>25.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>days_old</code></td>
+  <td>Days Old</td>
   <td>numeric</td>
   <td>25.2%</td>
   <td>N/A</td>
@@ -123,7 +373,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>language</code></td>
   <td>Language</td>
   <td>factor</td>
-  <td>3.5%</td>
+  <td>3.4%</td>
   <td>1 (en), 2 (es)</td>
 </tr>
 <tr>
@@ -133,47 +383,18 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>100.0%</td>
   <td>N/A</td>
 </tr>
-</tbody>
-</table>
-
-<h2>Eligibility</h2>
-
-<p><strong>Description:</strong> No description available</p>
-
-<p><strong>Variables:</strong> 3<br />
-<strong>Average Missing:</strong> 0.0%<br />
-<strong>Data Types:</strong> 0 factors, 0 numeric, 3 logical, 0 character</p>
-
-<table>
-<thead>
 <tr>
-  <th>Variable</th>
-  <th>Label</th>
-  <th>Type</th>
-  <th>Missing</th>
-  <th>Details</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-  <td><code>authentic</code></td>
-  <td>Authentic</td>
-  <td>logical</td>
-  <td>0.0%</td>
+  <td><code>months_old</code></td>
+  <td>Months Old</td>
+  <td>numeric</td>
+  <td>25.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>eligible</code></td>
-  <td>Eligible</td>
-  <td>logical</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>include</code></td>
-  <td>Include</td>
-  <td>logical</td>
-  <td>0.0%</td>
+  <td><code>years_old</code></td>
+  <td>Years Old</td>
+  <td>numeric</td>
+  <td>25.2%</td>
   <td>N/A</td>
 </tr>
 </tbody>
@@ -183,9 +404,9 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 
 <p><strong>Description:</strong> No description available</p>
 
-<p><strong>Variables:</strong> 3<br />
-<strong>Average Missing:</strong> 8.5%<br />
-<strong>Data Types:</strong> 0 factors, 3 numeric, 0 logical, 0 character</p>
+<p><strong>Variables:</strong> 28<br />
+<strong>Average Missing:</strong> 34.4%<br />
+<strong>Data Types:</strong> 8 factors, 3 numeric, 0 logical, 17 character</p>
 
 <table>
 <thead>
@@ -199,10 +420,157 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </thead>
 <tbody>
 <tr>
+  <td><code>aiannh_afact</code></td>
+  <td>ZIP to AIANNH allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>factor</td>
+  <td>98.3%</td>
+  <td>1 (0.0006 ), 2 (0.0044 ), 3 (0.006 ), 4 (0.0063 ), 5 (0.0161 )...</td>
+</tr>
+<tr>
+  <td><code>aiannh_code</code></td>
+  <td>Native lands (AIANNH) code(s) - semicolon-separated if ZIP spans multiple areas (2021)</td>
+  <td>factor</td>
+  <td>98.3%</td>
+  <td>1 (1590), 2 (2550), 3 (2550; 4625), 4 (2625), 5 (2810)...</td>
+</tr>
+<tr>
+  <td><code>aiannh_name</code></td>
+  <td>Native lands (AIANNH) name(s) - semicolon-separated if ZIP spans multiple areas</td>
+  <td>factor</td>
+  <td>98.3%</td>
+  <td>1 (Cherokee Tribe of Northeast Alabama SDTSA), 2 (Chickasaw OTSA), 3 (Choctaw OTSA), 4 (Iowa (KS-NE) Reservation / Off-Reservation Trust Land), 5 (Omaha Reservation)...</td>
+</tr>
+<tr>
+  <td><code>cbsa</code></td>
+  <td>Core-Based Statistical Area code(s) - semicolon-separated if ZIP spans multiple CBSAs</td>
+  <td>character</td>
+  <td>27.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cbsa_afact</code></td>
+  <td>ZIP to CBSA allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>27.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cbsa_name</code></td>
+  <td>CBSA name(s) - semicolon-separated if ZIP spans multiple CBSAs</td>
+  <td>character</td>
+  <td>27.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>congress_afact</code></td>
+  <td>ZIP to congressional district allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>congress_dist</code></td>
+  <td>US Congressional district code(s) - semicolon-separated if ZIP spans multiple districts (119th Congress)</td>
+  <td>factor</td>
+  <td>31.4%</td>
+  <td>1 (01), 2 (01; 02), 3 (01; 02; 03), 4 (01; 03), 5 (02)...</td>
+</tr>
+<tr>
+  <td><code>county</code></td>
+  <td>County FIPS code(s) - semicolon-separated if ZIP spans multiple counties</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>county_afact</code></td>
+  <td>ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>county_name</code></td>
+  <td>County name(s) - semicolon-separated if ZIP spans multiple counties</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
   <td><code>eqstate</code></td>
   <td>Eqstate</td>
   <td>numeric</td>
-  <td>25.4%</td>
+  <td>25.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>extraction_id</code></td>
+  <td>Extraction Id</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (ne25<em>20250930</em>172013)</td>
+</tr>
+<tr>
+  <td><code>puma</code></td>
+  <td>Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census)</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>puma_afact</code></td>
+  <td>ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>school_afact</code></td>
+  <td>ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>school_dist</code></td>
+  <td>School district code(s) - semicolon-separated if ZIP spans multiple districts (2020)</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>school_name</code></td>
+  <td>School district name(s) - semicolon-separated if ZIP spans multiple districts</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sldl</code></td>
+  <td>State legislative district (lower/house) code(s) - semicolon-separated if ZIP spans multiple districts (2024)</td>
+  <td>factor</td>
+  <td>31.4%</td>
+  <td>1 ( )</td>
+</tr>
+<tr>
+  <td><code>sldl_afact</code></td>
+  <td>ZIP to state leg lower allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>factor</td>
+  <td>31.4%</td>
+  <td>1 (0.2759 ), 2 (0.7528 ), 3 (0.8492 ), 4 (0.8945 ), 5 (0.9756 )...</td>
+</tr>
+<tr>
+  <td><code>sldu</code></td>
+  <td>State legislative district (upper/senate) code(s) - semicolon-separated if ZIP spans multiple districts (2024)</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sldu_afact</code></td>
+  <td>ZIP to state leg upper allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -219,6 +587,34 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>0.0%</td>
   <td>N/A</td>
 </tr>
+<tr>
+  <td><code>tract</code></td>
+  <td>Census tract FIPS code(s) - semicolon-separated if ZIP spans multiple tracts</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>tract_afact</code></td>
+  <td>ZIP to census tract allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>31.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>urban_rural</code></td>
+  <td>Urban/Rural classification(s) (U=Urban, R=Rural) - semicolon-separated if ZIP is mixed (2022 Census)</td>
+  <td>factor</td>
+  <td>27.9%</td>
+  <td>1 (R), 2 (R; U), 3 (U), 4 (U; R)</td>
+</tr>
+<tr>
+  <td><code>urban_rural_afact</code></td>
+  <td>Urban/Rural allocation factor(s) - semicolon-separated, ordered by likelihood</td>
+  <td>character</td>
+  <td>27.9%</td>
+  <td>N/A</td>
+</tr>
 </tbody>
 </table>
 
@@ -226,9 +622,9 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 
 <p><strong>Description:</strong> No description available</p>
 
-<p><strong>Variables:</strong> 543<br />
-<strong>Average Missing:</strong> 60.6%<br />
-<strong>Data Types:</strong> 5 factors, 506 numeric, 0 logical, 32 character</p>
+<p><strong>Variables:</strong> 549<br />
+<strong>Average Missing:</strong> 60.0%<br />
+<strong>Data Types:</strong> 4 factors, 507 numeric, 6 logical, 32 character</p>
 
 <table>
 <thead>
@@ -241,6 +637,20 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+  <td><code>authentic.x</code></td>
+  <td>Authentic.X</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>authentic.y</code></td>
+  <td>Authentic.Y</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
 <tr>
   <td><code>authenticity</code></td>
   <td>Authenticity</td>
@@ -476,7 +886,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c038</code></td>
   <td>C038</td>
   <td>numeric</td>
-  <td>99.2%</td>
+  <td>99.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -567,35 +977,35 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c051</code></td>
   <td>C051</td>
   <td>numeric</td>
-  <td>94.9%</td>
+  <td>95.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c052</code></td>
   <td>C052</td>
   <td>numeric</td>
-  <td>94.9%</td>
+  <td>95.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c053</code></td>
   <td>C053</td>
   <td>numeric</td>
-  <td>94.9%</td>
+  <td>95.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c054</code></td>
   <td>C054</td>
   <td>numeric</td>
-  <td>94.9%</td>
+  <td>95.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c055</code></td>
   <td>C055</td>
   <td>numeric</td>
-  <td>95.4%</td>
+  <td>95.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -651,14 +1061,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c063</code></td>
   <td>C063</td>
   <td>numeric</td>
-  <td>92.2%</td>
+  <td>92.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c064</code></td>
   <td>C064</td>
   <td>numeric</td>
-  <td>94.9%</td>
+  <td>95.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -714,7 +1124,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c072</code></td>
   <td>C072</td>
   <td>numeric</td>
-  <td>92.2%</td>
+  <td>92.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -756,7 +1166,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c078</code></td>
   <td>C078</td>
   <td>numeric</td>
-  <td>92.2%</td>
+  <td>92.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -819,7 +1229,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c087</code></td>
   <td>C087</td>
   <td>numeric</td>
-  <td>92.6%</td>
+  <td>92.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -847,7 +1257,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c091</code></td>
   <td>C091</td>
   <td>numeric</td>
-  <td>92.7%</td>
+  <td>92.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -931,7 +1341,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c103</code></td>
   <td>C103</td>
   <td>numeric</td>
-  <td>91.4%</td>
+  <td>91.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -973,7 +1383,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c109</code></td>
   <td>C109</td>
   <td>numeric</td>
-  <td>89.8%</td>
+  <td>89.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1001,7 +1411,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c113</code></td>
   <td>C113</td>
   <td>numeric</td>
-  <td>92.0%</td>
+  <td>91.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1022,7 +1432,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c116</code></td>
   <td>C116</td>
   <td>numeric</td>
-  <td>89.9%</td>
+  <td>89.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1043,7 +1453,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c119</code></td>
   <td>C119</td>
   <td>numeric</td>
-  <td>92.2%</td>
+  <td>92.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1092,14 +1502,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c126</code></td>
   <td>C126</td>
   <td>numeric</td>
-  <td>92.8%</td>
+  <td>92.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c127</code></td>
   <td>C127</td>
   <td>numeric</td>
-  <td>94.8%</td>
+  <td>94.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1148,14 +1558,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c134</code></td>
   <td>C134</td>
   <td>numeric</td>
-  <td>89.9%</td>
+  <td>89.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>c135</code></td>
   <td>C135</td>
   <td>numeric</td>
-  <td>89.6%</td>
+  <td>89.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1183,7 +1593,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>c139</code></td>
   <td>C139</td>
   <td>numeric</td>
-  <td>91.1%</td>
+  <td>91.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1204,7 +1614,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cace2</code></td>
   <td>Cace2</td>
   <td>numeric</td>
-  <td>36.3%</td>
+  <td>36.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1239,7 +1649,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cace7</code></td>
   <td>Cace7</td>
   <td>numeric</td>
-  <td>36.7%</td>
+  <td>36.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1260,14 +1670,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cfqb001</code></td>
   <td>Cfqb001</td>
   <td>numeric</td>
-  <td>36.2%</td>
+  <td>36.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>cname1</code></td>
   <td>Cname1</td>
   <td>character</td>
-  <td>72.4%</td>
+  <td>72.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1295,7 +1705,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>consecutive_nos_549_731</code></td>
   <td>Consecutive Nos 549 731</td>
   <td>numeric</td>
-  <td>92.6%</td>
+  <td>92.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1344,14 +1754,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>consent_doc_timestamp</code></td>
   <td>Consent Doc Timestamp</td>
   <td>character</td>
-  <td>6.6%</td>
+  <td>6.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>cqfa001</code></td>
   <td>Cqfa001</td>
   <td>numeric</td>
-  <td>36.6%</td>
+  <td>36.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1386,7 +1796,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqfa010</code></td>
   <td>Cqfa010</td>
   <td>numeric</td>
-  <td>35.9%</td>
+  <td>36.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1442,7 +1852,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqfb002</code></td>
   <td>Cqfb002</td>
   <td>numeric</td>
-  <td>36.0%</td>
+  <td>36.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1456,7 +1866,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqfb008</code></td>
   <td>Cqfb008</td>
   <td>numeric</td>
-  <td>37.2%</td>
+  <td>37.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1470,7 +1880,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqfb010</code></td>
   <td>Cqfb010</td>
   <td>numeric</td>
-  <td>36.4%</td>
+  <td>36.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1491,7 +1901,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqfb013</code></td>
   <td>Cqfb013</td>
   <td>numeric</td>
-  <td>36.2%</td>
+  <td>36.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1750,7 +2160,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqr015</code></td>
   <td>Cqr015</td>
   <td>numeric</td>
-  <td>40.0%</td>
+  <td>39.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1820,7 +2230,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>cqrn012</code></td>
   <td>Cqrn012</td>
   <td>numeric</td>
-  <td>39.9%</td>
+  <td>39.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1848,7 +2258,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>credi019</code></td>
   <td>Credi019</td>
   <td>numeric</td>
-  <td>93.3%</td>
+  <td>93.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1897,7 +2307,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>credi031</code></td>
   <td>Credi031</td>
   <td>numeric</td>
-  <td>95.2%</td>
+  <td>95.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1932,7 +2342,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>credi046</code></td>
   <td>Credi046</td>
   <td>numeric</td>
-  <td>92.6%</td>
+  <td>92.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1974,7 +2384,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>ecdi007</code></td>
   <td>Ecdi007</td>
   <td>numeric</td>
-  <td>94.1%</td>
+  <td>94.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -1988,7 +2398,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>ecdi010</code></td>
   <td>Ecdi010</td>
   <td>numeric</td>
-  <td>94.7%</td>
+  <td>94.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2002,7 +2412,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>ecdi014</code></td>
   <td>Ecdi014</td>
   <td>numeric</td>
-  <td>89.8%</td>
+  <td>89.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2062,38 +2472,52 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>N/A</td>
 </tr>
 <tr>
+  <td><code>eligible.x</code></td>
+  <td>Eligible.X</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>eligible.y</code></td>
+  <td>Eligible.Y</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
   <td><code>email</code></td>
   <td>Email</td>
   <td>character</td>
-  <td>84.6%</td>
+  <td>84.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>email_followup</code></td>
   <td>Email Followup</td>
   <td>character</td>
-  <td>66.0%</td>
+  <td>66.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>email_registration_complete</code></td>
   <td>Email Registration Complete</td>
   <td>numeric</td>
-  <td>84.6%</td>
+  <td>84.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>email_registration_timestamp</code></td>
   <td>Email Registration Timestamp</td>
   <td>character</td>
-  <td>84.6%</td>
+  <td>84.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>eq001</code></td>
   <td>Eq001</td>
   <td>numeric</td>
-  <td>25.0%</td>
+  <td>25.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2118,13 +2542,6 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>extraction_id</code></td>
-  <td>Extraction Id</td>
-  <td>factor</td>
-  <td>0.0%</td>
-  <td>1 (ne25<em>20250929</em>135849)</td>
-</tr>
-<tr>
   <td><code>fci_a_1</code></td>
   <td>Fci A 1</td>
   <td>numeric</td>
@@ -2135,14 +2552,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>fci_a_2</code></td>
   <td>Fci A 2</td>
   <td>numeric</td>
-  <td>40.3%</td>
+  <td>40.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>fci_a_3</code></td>
   <td>Fci A 3</td>
   <td>numeric</td>
-  <td>40.2%</td>
+  <td>40.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2268,7 +2685,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>fci_d_3</code></td>
   <td>Fci D 3</td>
   <td>numeric</td>
-  <td>40.8%</td>
+  <td>40.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2282,7 +2699,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>fci_d_5</code></td>
   <td>Fci D 5</td>
   <td>numeric</td>
-  <td>40.5%</td>
+  <td>40.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2324,7 +2741,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>first_5_nos_1097_2191</code></td>
   <td>First 5 Nos 1097 2191</td>
   <td>numeric</td>
-  <td>61.8%</td>
+  <td>61.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2345,7 +2762,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>first_5_nos_549_731</code></td>
   <td>First 5 Nos 549 731</td>
   <td>numeric</td>
-  <td>92.6%</td>
+  <td>92.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2394,7 +2811,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>fqlive1_2</code></td>
   <td>Fqlive1 2</td>
   <td>numeric</td>
-  <td>36.9%</td>
+  <td>37.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2405,10 +2822,24 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>N/A</td>
 </tr>
 <tr>
+  <td><code>include.x</code></td>
+  <td>Include.X</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>include.y</code></td>
+  <td>Include.Y</td>
+  <td>logical</td>
+  <td>0.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
   <td><code>ineligible_flag</code></td>
   <td>Ineligible Flag</td>
   <td>numeric</td>
-  <td>99.4%</td>
+  <td>99.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2429,21 +2860,21 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmi003</code></td>
   <td>Mmi003</td>
   <td>numeric</td>
-  <td>65.7%</td>
+  <td>65.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmi003b</code></td>
   <td>Mmi003B</td>
   <td>numeric</td>
-  <td>66.0%</td>
+  <td>66.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmi009</code></td>
   <td>Mmi009</td>
   <td>numeric</td>
-  <td>73.6%</td>
+  <td>73.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2457,14 +2888,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmi014</code></td>
   <td>Mmi014</td>
   <td>numeric</td>
-  <td>81.3%</td>
+  <td>81.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmi018</code></td>
   <td>Mmi018</td>
   <td>numeric</td>
-  <td>64.6%</td>
+  <td>64.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2499,7 +2930,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmi101</code></td>
   <td>Mmi101</td>
   <td>numeric</td>
-  <td>36.4%</td>
+  <td>36.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2534,7 +2965,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmi120</code></td>
   <td>Mmi120</td>
   <td>numeric</td>
-  <td>35.8%</td>
+  <td>35.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2548,7 +2979,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmi122</code></td>
   <td>Mmi122</td>
   <td>numeric</td>
-  <td>36.3%</td>
+  <td>36.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2562,63 +2993,63 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mmifs009</code></td>
   <td>Mmifs009</td>
   <td>numeric</td>
-  <td>76.4%</td>
+  <td>76.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs010</code></td>
   <td>Mmifs010</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs011</code></td>
   <td>Mmifs011</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs012</code></td>
   <td>Mmifs012</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs013</code></td>
   <td>Mmifs013</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs014</code></td>
   <td>Mmifs014</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs015</code></td>
   <td>Mmifs015</td>
   <td>numeric</td>
-  <td>76.5%</td>
+  <td>76.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmifs016</code></td>
   <td>Mmifs016</td>
   <td>numeric</td>
-  <td>76.6%</td>
+  <td>76.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mmihl002</code></td>
   <td>Mmihl002</td>
   <td>numeric</td>
-  <td>36.5%</td>
+  <td>36.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2702,7 +3133,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>module_6_1097_2191_timestamp</code></td>
   <td>Module 6 1097 2191 Timestamp</td>
   <td>character</td>
-  <td>61.8%</td>
+  <td>61.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2744,7 +3175,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>module_6_549_731_timestamp</code></td>
   <td>Module 6 549 731 Timestamp</td>
   <td>character</td>
-  <td>92.6%</td>
+  <td>92.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2800,7 +3231,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>module_8_followup_information_timestamp</code></td>
   <td>Module 8 Followup Information Timestamp</td>
   <td>character</td>
-  <td>50.3%</td>
+  <td>50.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2814,7 +3245,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>module_9_compensation_information_timestamp</code></td>
   <td>Module 9 Compensation Information Timestamp</td>
   <td>character</td>
-  <td>49.7%</td>
+  <td>49.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2828,21 +3259,21 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mrw002</code></td>
   <td>Mrw002</td>
   <td>numeric</td>
-  <td>74.4%</td>
+  <td>74.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mrw003_1</code></td>
   <td>Mrw003 1</td>
   <td>numeric</td>
-  <td>74.3%</td>
+  <td>74.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>mrw003_2</code></td>
   <td>Mrw003 2</td>
   <td>numeric</td>
-  <td>65.9%</td>
+  <td>66.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2856,7 +3287,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom002</code></td>
   <td>Nom002</td>
   <td>numeric</td>
-  <td>82.0%</td>
+  <td>82.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2884,7 +3315,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom005</code></td>
   <td>Nom005</td>
   <td>numeric</td>
-  <td>82.1%</td>
+  <td>82.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2905,7 +3336,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom006x</code></td>
   <td>Nom006X</td>
   <td>numeric</td>
-  <td>95.5%</td>
+  <td>95.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2919,7 +3350,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom012</code></td>
   <td>Nom012</td>
   <td>numeric</td>
-  <td>89.9%</td>
+  <td>89.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2954,7 +3385,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom017x</code></td>
   <td>Nom017X</td>
   <td>numeric</td>
-  <td>95.0%</td>
+  <td>94.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2982,7 +3413,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom022</code></td>
   <td>Nom022</td>
   <td>numeric</td>
-  <td>82.0%</td>
+  <td>82.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -2996,7 +3427,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom024</code></td>
   <td>Nom024</td>
   <td>numeric</td>
-  <td>82.0%</td>
+  <td>82.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3010,21 +3441,21 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom026</code></td>
   <td>Nom026</td>
   <td>numeric</td>
-  <td>96.2%</td>
+  <td>96.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom026x</code></td>
   <td>Nom026X</td>
   <td>numeric</td>
-  <td>96.1%</td>
+  <td>96.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom028</code></td>
   <td>Nom028</td>
   <td>numeric</td>
-  <td>92.2%</td>
+  <td>92.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3059,7 +3490,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom033x</code></td>
   <td>Nom033X</td>
   <td>numeric</td>
-  <td>95.5%</td>
+  <td>95.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3073,7 +3504,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom034x</code></td>
   <td>Nom034X</td>
   <td>numeric</td>
-  <td>96.1%</td>
+  <td>96.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3143,7 +3574,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom049x</code></td>
   <td>Nom049X</td>
   <td>numeric</td>
-  <td>98.9%</td>
+  <td>98.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3185,14 +3616,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom057</code></td>
   <td>Nom057</td>
   <td>numeric</td>
-  <td>91.2%</td>
+  <td>91.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom059</code></td>
   <td>Nom059</td>
   <td>numeric</td>
-  <td>82.0%</td>
+  <td>82.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3206,7 +3637,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom060y</code></td>
   <td>Nom060Y</td>
   <td>numeric</td>
-  <td>62.7%</td>
+  <td>62.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3227,28 +3658,28 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom062y</code></td>
   <td>Nom062Y</td>
   <td>numeric</td>
-  <td>62.7%</td>
+  <td>62.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom102</code></td>
   <td>Nom102</td>
   <td>numeric</td>
-  <td>62.7%</td>
+  <td>62.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom103</code></td>
   <td>Nom103</td>
   <td>numeric</td>
-  <td>62.8%</td>
+  <td>62.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom104</code></td>
   <td>Nom104</td>
   <td>numeric</td>
-  <td>62.8%</td>
+  <td>62.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3262,14 +3693,14 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nom2205</code></td>
   <td>Nom2205</td>
   <td>numeric</td>
-  <td>62.9%</td>
+  <td>63.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nom2208</code></td>
   <td>Nom2208</td>
   <td>numeric</td>
-  <td>62.9%</td>
+  <td>63.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3297,273 +3728,273 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>nschj013</code></td>
   <td>Nschj013</td>
   <td>numeric</td>
-  <td>51.0%</td>
+  <td>51.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>nschj017</code></td>
   <td>Nschj017</td>
   <td>numeric</td>
-  <td>51.1%</td>
+  <td>51.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps001</code></td>
   <td>Ps001</td>
   <td>numeric</td>
-  <td>47.2%</td>
+  <td>47.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps002</code></td>
   <td>Ps002</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps003</code></td>
   <td>Ps003</td>
   <td>numeric</td>
-  <td>47.5%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps004</code></td>
   <td>Ps004</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps005</code></td>
   <td>Ps005</td>
   <td>numeric</td>
-  <td>47.4%</td>
+  <td>47.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps006</code></td>
   <td>Ps006</td>
   <td>numeric</td>
-  <td>47.5%</td>
+  <td>47.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps007</code></td>
   <td>Ps007</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps008</code></td>
   <td>Ps008</td>
   <td>numeric</td>
-  <td>47.5%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps009</code></td>
   <td>Ps009</td>
   <td>numeric</td>
-  <td>47.5%</td>
+  <td>47.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps010</code></td>
   <td>Ps010</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps011</code></td>
   <td>Ps011</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps013</code></td>
   <td>Ps013</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps014</code></td>
   <td>Ps014</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps015</code></td>
   <td>Ps015</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps016</code></td>
   <td>Ps016</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps017</code></td>
   <td>Ps017</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps018</code></td>
   <td>Ps018</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps019</code></td>
   <td>Ps019</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps020</code></td>
   <td>Ps020</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps022</code></td>
   <td>Ps022</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps023</code></td>
   <td>Ps023</td>
   <td>numeric</td>
-  <td>47.9%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps024</code></td>
   <td>Ps024</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps025</code></td>
   <td>Ps025</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps026</code></td>
   <td>Ps026</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps027</code></td>
   <td>Ps027</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps028</code></td>
   <td>Ps028</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps029</code></td>
   <td>Ps029</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps030</code></td>
   <td>Ps030</td>
   <td>numeric</td>
-  <td>47.6%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps031</code></td>
   <td>Ps031</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps032</code></td>
   <td>Ps032</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps034</code></td>
   <td>Ps034</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps035</code></td>
   <td>Ps035</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps036</code></td>
   <td>Ps036</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps037</code></td>
   <td>Ps037</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps038</code></td>
   <td>Ps038</td>
   <td>numeric</td>
-  <td>47.9%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps039</code></td>
   <td>Ps039</td>
   <td>numeric</td>
-  <td>47.9%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps040</code></td>
   <td>Ps040</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3577,7 +4008,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>ps042</code></td>
   <td>Ps042</td>
   <td>numeric</td>
-  <td>47.9%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3591,49 +4022,49 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>ps044</code></td>
   <td>Ps044</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps045</code></td>
   <td>Ps045</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps046</code></td>
   <td>Ps046</td>
   <td>numeric</td>
-  <td>47.9%</td>
+  <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps047</code></td>
   <td>Ps047</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps048</code></td>
   <td>Ps048</td>
   <td>numeric</td>
-  <td>47.8%</td>
+  <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps049</code></td>
   <td>Ps049</td>
   <td>numeric</td>
-  <td>47.7%</td>
+  <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1347</code></td>
   <td>Q1347</td>
   <td>numeric</td>
-  <td>50.5%</td>
+  <td>50.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3647,42 +4078,42 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>q1394</code></td>
   <td>Q1394</td>
   <td>character</td>
-  <td>51.6%</td>
+  <td>51.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1394a</code></td>
   <td>Q1394A</td>
   <td>character</td>
-  <td>51.6%</td>
+  <td>51.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1395</code></td>
   <td>Q1395</td>
   <td>character</td>
-  <td>52.2%</td>
+  <td>52.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1396</code></td>
   <td>Q1396</td>
   <td>character</td>
-  <td>52.2%</td>
+  <td>52.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1397</code></td>
   <td>Q1397</td>
   <td>character</td>
-  <td>52.1%</td>
+  <td>52.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>q1398</code></td>
   <td>Q1398</td>
   <td>character</td>
-  <td>52.1%</td>
+  <td>52.2%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -3878,7 +4309,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>sf054</code></td>
   <td>Sf054</td>
   <td>numeric</td>
-  <td>95.0%</td>
+  <td>95.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
@@ -4042,6 +4473,13 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>99.4%</td>
   <td>N/A</td>
 </tr>
+<tr>
+  <td><code>urban_pct</code></td>
+  <td>Percentage of ZIP population in urban areas (0-100)</td>
+  <td>numeric</td>
+  <td>27.9%</td>
+  <td>N/A</td>
+</tr>
 </tbody>
 </table>
 
@@ -4056,7 +4494,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 <li><strong>Logical variables</strong> show counts of TRUE and FALSE values</li>
 </ul>
 
-<p><em>Generated automatically from metadata on 2025-09-29 by the Kidsights Data Platform</em></p>
+<p><em>Generated automatically from metadata on 2025-09-30 by the Kidsights Data Platform</em></p>
 
 </body>
 </html>

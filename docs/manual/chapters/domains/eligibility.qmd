@@ -1,0 +1,1 @@
+# Eligibility Variables {#sec-eligibility}\n\n*To be completed based on education.qmd template*

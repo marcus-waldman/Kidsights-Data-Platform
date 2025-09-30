@@ -47,7 +47,10 @@
       "Bash(done)",
       "Bash(sed:*)",
       "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/codebook/update_credi_irt_parameters.R)",
-      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/codebook/update_gsed_irt_parameters.R)"
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/codebook/update_gsed_irt_parameters.R)",
+      "WebFetch(domain:developer.ipums.org)",
+      "WebSearch",
+      "WebFetch(domain:usa.ipums.org)"
     ],
     "deny": [],
     "ask": []

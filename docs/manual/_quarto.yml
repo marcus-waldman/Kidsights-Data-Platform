@@ -1,0 +1,60 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Kidsights Data Transformation & Metadata Manual"
+  subtitle: "Specifications and Implementation Guide"
+  author: "Kidsights Research Team"
+  date: today
+  chapters:
+    - index.qmd
+    - part: "Part I: Foundations"
+      chapters:
+        - chapters/foundations/overview.qmd
+        - chapters/foundations/architecture.qmd
+        - chapters/foundations/standards.qmd
+    - part: "Part II: Variable Domains"
+      chapters:
+        - chapters/domains/eligibility.qmd
+        - chapters/domains/demographics.qmd
+        - chapters/domains/race-ethnicity.qmd
+        - chapters/domains/education.qmd
+        - chapters/domains/income.qmd
+        - chapters/domains/relationships.qmd
+        - chapters/domains/geography.qmd
+    - part: "Part III: Transformation Specifications"
+      chapters:
+        - chapters/specifications/patterns.qmd
+        - chapters/specifications/factors.qmd
+        - chapters/specifications/missing-data.qmd
+        - chapters/specifications/harmonization.qmd
+    - part: "Part IV: Implementation Guide"
+      chapters:
+        - chapters/implementation/development.qmd
+        - chapters/implementation/testing.qmd
+        - chapters/implementation/documentation.qmd
+        - chapters/implementation/contribution.qmd
+    - references.qmd
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    number-depth: 3
+    code-fold: false
+    code-tools: true
+    code-copy: true
+  pdf:
+    documentclass: book
+    toc: true
+    number-sections: true
+    colorlinks: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  eval: false

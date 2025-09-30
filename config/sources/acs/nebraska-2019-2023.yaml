@@ -1,0 +1,49 @@
+# Nebraska ACS 2019-2023 Extract Configuration
+# This config merges with acs-template.yaml (state-specific values override template)
+
+# State identification
+state: nebraska
+state_fip: 31
+state_abbrev: NE
+
+# ACS sample specification
+acs_sample: us2023b  # 2019-2023 5-year ACS
+year_range: 2019-2023
+sample_type: 5-year
+
+# IPUMS collection settings
+collection: usa
+data_format: csv
+
+# Extract description
+description: "Nebraska ACS 2019-2023 5-year, children 0-5 for Kidsights raking"
+
+# Population filters
+filters:
+  age_min: 0
+  age_max: 5
+
+# Cache settings
+cache:
+  enabled: true              # Use caching system to avoid re-downloading
+  max_age_days: 365          # Remove caches older than 1 year
+  validate_checksums: true   # Verify file integrity on cache load
+  auto_cleanup: false        # Manual cleanup only
+
+# Notes and metadata
+metadata:
+  purpose: "Extract ACS data for statistical raking of Kidsights NE25 survey data"
+  target_population: "Children aged 0-5 years in Nebraska"
+  geographic_scope: "Nebraska (FIPS 31)"
+  raking_variables: ["race", "ethnicity", "parent_education", "household_income", "metro_status"]
+  contact: "Kidsights Data Platform"
+
+# Variables are inherited from acs-template.yaml
+# Template includes:
+#   - Core demographics (AGE, SEX, RACE, HISPAN, etc.)
+#   - Economic variables (HHINCOME, POVERTY, etc.)
+#   - Government programs (FOODSTMP, HINSCAID, HCOVANY)
+#   - Education with attached characteristics (EDUC_mom, EDUC_pop, etc.)
+#   - Household structure (MARST_head, MOMLOC, POPLOC)
+#   - Geographic identifiers (PUMA, METRO)
+#   - Sampling weights (HHWT, PERWT)

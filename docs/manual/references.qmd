@@ -1,0 +1,73 @@
+# References {.unnumbered}
+
+## Cited Works
+
+This section will contain citations for:
+- Literature supporting transformation decisions
+- Methodological references
+- Standards and guidelines followed
+- Related documentation
+
+## Related Documentation
+
+### Internal Documentation
+
+- **Main Project README:** `../../README.md`
+- **CLAUDE.md:** Development guidelines for Claude Code
+- **Pipeline Documentation:** `../../docs/pipeline/README.md`
+- **Architecture Documentation:** `../../docs/architecture/README.md`
+- **Codebook Documentation:** `../../docs/codebook/README.md`
+
+### Code References
+
+- **Transformation Functions:** `../../R/transform/ne25_transforms.R`
+- **Metadata Generation:** `../../pipelines/python/generate_metadata.py`
+- **Database Operations:** `../../python/db/`
+
+### Configuration Files
+
+- **Derived Variables:** `../../config/derived_variables.yaml`
+- **Data Sources:** `../../config/sources/ne25.yaml`
+- **Database Configuration:** `../../config/duckdb.yaml`
+
+## External Resources
+
+### Statistical Methods
+
+- Item Response Theory (IRT) for CREDI, GSED, and developmental scales
+- Socioeconomic classification systems (education, income)
+- Race and ethnicity categorization standards
+
+### Data Standards
+
+- REDCap data dictionary specifications
+- US Census Bureau demographic categories
+- Federal Poverty Level guidelines
+
+### Development Tools
+
+- **Quarto:** https://quarto.org/
+- **Apache Arrow/Feather:** https://arrow.apache.org/
+- **DuckDB:** https://duckdb.org/
+
+## Glossary
+
+**Derived Variable:** A variable created through transformation of raw data, not directly collected
+
+**Factor:** Categorical variable in R with defined levels and (optionally) ordering
+
+**REDCap:** Research Electronic Data Capture system used for data collection
+
+**Feather Format:** Binary columnar format for data frame interchange
+
+**Reference Level:** The baseline category in a factor used for comparisons in statistical models
+
+**Ordered Factor:** Factor variable with inherent ordering (e.g., education levels)
+
+**Transformation:** Process of converting raw data into analysis-ready variables
+
+**Specification:** Formal documentation of how a variable should be created
+
+**Validation:** Process of checking that implementation matches specification
+
+**recode_it():** Master transformation function in the Kidsights platform

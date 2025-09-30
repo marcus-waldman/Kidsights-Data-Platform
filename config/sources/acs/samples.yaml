@@ -1,0 +1,105 @@
+# ACS Sample Codes for IPUMS USA
+# Reference: https://usa.ipums.org/usa-action/samples
+
+# Sample type definitions
+sample_types:
+  1_year:
+    description: "1-year ACS estimates"
+    coverage: "Areas with population 65,000+"
+    sample_size: "~1% of U.S. population"
+    use_case: "Current estimates for large areas"
+
+  5_year:
+    description: "5-year ACS estimates"
+    coverage: "All geographic areas including small PUMAs"
+    sample_size: "~5% of U.S. population (pooled)"
+    use_case: "Most reliable estimates, especially for small areas"
+
+# ACS 5-year samples (RECOMMENDED for state-level children 0-5 analysis)
+acs_5year:
+  2019_2023:
+    code: us2023b
+    years: [2019, 2020, 2021, 2022, 2023]
+    release_date: 2024-12
+    notes: "Most recent 5-year ACS. Race variable updates in 2023."
+    recommended: true
+
+  2018_2022:
+    code: us2022b
+    years: [2018, 2019, 2020, 2021, 2022]
+    release_date: 2023-12
+    notes: "Previous 5-year ACS"
+
+  2017_2021:
+    code: us2021b
+    years: [2017, 2018, 2019, 2020, 2021]
+    release_date: 2022-12
+    notes: "Includes COVID-19 pandemic years"
+
+  2016_2020:
+    code: us2020b
+    years: [2016, 2017, 2018, 2019, 2020]
+    release_date: 2021-12
+    notes: "Includes first year of COVID-19 pandemic"
+
+  2015_2019:
+    code: us2019b
+    years: [2015, 2016, 2017, 2018, 2019]
+    release_date: 2020-12
+    notes: "Pre-pandemic baseline"
+
+# ACS 1-year samples (Less recommended for children 0-5 due to smaller sample sizes)
+acs_1year:
+  2023:
+    code: us2023a
+    year: 2023
+    release_date: 2024-09
+    notes: "Most recent 1-year ACS. Race variable updates implemented."
+
+  2022:
+    code: us2022a
+    year: 2022
+    release_date: 2023-09
+    notes: "Previous 1-year ACS"
+
+  2021:
+    code: us2021a
+    year: 2021
+    release_date: 2022-09
+    notes: "Second year of COVID-19 pandemic"
+
+  2019:
+    code: us2019a
+    year: 2019
+    release_date: 2020-09
+    notes: "Pre-pandemic year. 2020 1-year ACS was cancelled due to COVID-19."
+
+# Important notes for sample selection
+notes:
+  puma_geography:
+    - "5-year samples: PUMAs based on 2020 Census geography starting with 2023 5-year"
+    - "Earlier samples use 2010 Census PUMA definitions"
+    - "PUMA boundaries may not align across different sample periods"
+
+  race_ethnicity_changes:
+    - "2023 ACS implemented changes to race/ethnicity questions"
+    - "May affect comparability with earlier years"
+    - "See IPUMS documentation for harmonization guidance"
+
+  covid_impact:
+    - "2020 ACS had reduced response rates due to pandemic"
+    - "2020 1-year ACS was experimental and later cancelled"
+    - "Use 5-year samples for more stable estimates during this period"
+
+  sample_size_recommendations:
+    - "For state-level children 0-5: 5-year samples strongly recommended"
+    - "1-year samples may have insufficient children 0-5 in smaller states"
+    - "5-year samples provide ~5x larger sample size"
+
+# Quick reference: Year range → Sample code
+quick_reference:
+  "2019-2023": "us2023b"
+  "2018-2022": "us2022b"
+  "2017-2021": "us2021b"
+  "2016-2020": "us2020b"
+  "2015-2019": "us2019b"

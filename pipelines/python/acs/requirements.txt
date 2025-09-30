@@ -1,0 +1,26 @@
+# Python Dependencies for ACS Pipeline
+# Install with: pip install -r requirements.txt
+
+# IPUMS API client
+ipumspy>=0.4.1
+
+# Data manipulation
+pandas>=2.0.0
+numpy>=1.24.0
+
+# File I/O
+pyarrow>=12.0.0          # For Feather format (fast R ↔ Python exchange)
+pyyaml>=6.0              # For YAML configuration files
+
+# Database
+duckdb>=0.9.0            # For local database operations
+
+# Logging and utilities
+structlog>=23.1.0        # Structured logging
+python-dateutil>=2.8.2   # Date/time utilities
+
+# HTTP requests (dependency of ipumspy, but explicit for clarity)
+requests>=2.31.0
+
+# Optional: Progress bars for long-running operations
+tqdm>=4.65.0

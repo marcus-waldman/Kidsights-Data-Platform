@@ -1,0 +1,248 @@
+# DuckDB Database Configuration
+# Centralized database schema definitions and settings
+
+database:
+  # Database file location (relative to project root)
+  path: "data/duckdb/kidsights_local.duckdb"
+
+  # Connection settings
+  memory_limit: "4GB"
+  threads: 4
+
+  # Performance settings
+  checkpoint_threshold: "10MB"
+
+# Table Definitions
+tables:
+
+  # NE25 Survey Data (existing table)
+  ne25_raw:
+    description: "Nebraska 2025 survey raw data from REDCap"
+    primary_key: ["pid", "record_id"]
+    indexes:
+      - columns: ["pid"]
+      - columns: ["record_id"]
+      - columns: ["eligible"]
+
+  ne25_transformed:
+    description: "Nebraska 2025 survey with derived variables"
+    primary_key: ["pid", "record_id"]
+    indexes:
+      - columns: ["pid"]
+      - columns: ["eligible"]
+      - columns: ["race"]
+
+  # ACS Data Table (new for Phase 6)
+  acs_data:
+    description: |
+      American Community Survey (ACS) data from IPUMS USA API.
+      Child-level records (ages 0-5) for statistical raking.
+      Contains raw IPUMS variables without harmonization.
+
+    # Primary key: unique child within state/year
+    primary_key: ["state", "year_range", "SERIAL", "PERNUM"]
+
+    # Indexes for query performance
+    indexes:
+      - columns: ["state"]
+        description: "State filter for queries"
+      - columns: ["year_range"]
+        description: "Year range filter"
+      - columns: ["state", "year_range"]
+        description: "Composite state+year index"
+      - columns: ["AGE"]
+        description: "Age-based filtering"
+      - columns: ["STATEFIP"]
+        description: "State FIPS code"
+
+    # Column definitions
+    # NOTE: All IPUMS variables are stored in original form (no renaming/recoding)
+    columns:
+      # Multi-state tracking columns
+      state:
+        type: VARCHAR
+        description: "State name (e.g., 'nebraska', 'iowa')"
+        nullable: false
+
+      year_range:
+        type: VARCHAR
+        description: "ACS year range (e.g., '2019-2023')"
+        nullable: false
+
+      # Core IPUMS identifiers (REQUIRED)
+      SERIAL:
+        type: BIGINT
+        description: "Household serial number (IPUMS identifier)"
+        nullable: false
+
+      PERNUM:
+        type: INTEGER
+        description: "Person number within household (IPUMS identifier)"
+        nullable: false
+
+      # Sampling weights (REQUIRED for raking)
+      HHWT:
+        type: DOUBLE
+        description: "Household weight"
+        nullable: true
+
+      PERWT:
+        type: DOUBLE
+        description: "Person weight"
+        nullable: true
+
+      # Core demographic variables (REQUIRED)
+      AGE:
+        type: INTEGER
+        description: "Age in years (0-5 for children filter)"
+        nullable: false
+
+      SEX:
+        type: INTEGER
+        description: "Sex (1=Male, 2=Female) - IPUMS coding"
+        nullable: true
+
+      RACE:
+        type: INTEGER
+        description: "Race (IPUMS coding, detailed)"
+        nullable: true
+
+      HISPAN:
+        type: INTEGER
+        description: "Hispanic origin (IPUMS coding)"
+        nullable: true
+
+      # Geographic identifiers
+      STATEFIP:
+        type: INTEGER
+        description: "State FIPS code"
+        nullable: false
+
+      PUMA:
+        type: INTEGER
+        description: "Public Use Microdata Area"
+        nullable: true
+
+      METRO:
+        type: INTEGER
+        description: "Metropolitan status (IPUMS coding)"
+        nullable: true
+
+      # Education variables (parent characteristics via attached characteristics)
+      EDUC:
+        type: INTEGER
+        description: "Educational attainment (general version) - IPUMS coding"
+        nullable: true
+
+      EDUC_mom:
+        type: INTEGER
+        description: "Mother's education (attached characteristic)"
+        nullable: true
+
+      EDUC_pop:
+        type: INTEGER
+        description: "Father's education (attached characteristic)"
+        nullable: true
+
+      EDUCD:
+        type: INTEGER
+        description: "Educational attainment (detailed version) - IPUMS coding"
+        nullable: true
+
+      EDUCD_mom:
+        type: INTEGER
+        description: "Mother's education detailed (attached characteristic)"
+        nullable: true
+
+      EDUCD_pop:
+        type: INTEGER
+        description: "Father's education detailed (attached characteristic)"
+        nullable: true
+
+      # Household economics
+      HHINCOME:
+        type: INTEGER
+        description: "Total household income (dollars)"
+        nullable: true
+
+      FTOTINC:
+        type: INTEGER
+        description: "Total family income (dollars)"
+        nullable: true
+
+      POVERTY:
+        type: INTEGER
+        description: "Poverty status (percentage of poverty threshold)"
+        nullable: true
+
+      GRPIP:
+        type: INTEGER
+        description: "Gross rent as percentage of household income"
+        nullable: true
+
+      # Government programs
+      FOODSTMP:
+        type: INTEGER
+        description: "Food stamp/SNAP participation - IPUMS coding"
+        nullable: true
+
+      HINSCAID:
+        type: INTEGER
+        description: "Medicaid coverage - IPUMS coding"
+        nullable: true
+
+      HCOVANY:
+        type: INTEGER
+        description: "Any health insurance coverage - IPUMS coding"
+        nullable: true
+
+      # Household composition
+      RELATE:
+        type: INTEGER
+        description: "Relationship to household head - IPUMS coding"
+        nullable: true
+
+      MARST:
+        type: INTEGER
+        description: "Marital status - IPUMS coding"
+        nullable: true
+
+      MARST_head:
+        type: INTEGER
+        description: "Household head's marital status (attached characteristic)"
+        nullable: true
+
+      MOMLOC:
+        type: INTEGER
+        description: "Mother's location in household (line number, 0=not present)"
+        nullable: true
+
+      POPLOC:
+        type: INTEGER
+        description: "Father's location in household (line number, 0=not present)"
+        nullable: true
+
+    # Data quality notes
+    notes: |
+      - All IPUMS variables use original IPUMS coding (not harmonized)
+      - Missing values follow IPUMS conventions (varies by variable)
+      - Attached characteristics (_mom, _pop, _head) link to parent/household head
+      - Data filtered to children ages 0-5 only
+      - One row per child
+      - Supports multiple states and time periods via state/year_range columns
+
+      For IPUMS variable documentation:
+      https://usa.ipums.org/usa-action/variables/
+
+# Data Management
+data_management:
+  # Duplicate handling strategy
+  duplicates:
+    strategy: "state + year_range + SERIAL + PERNUM uniqueness"
+    action_on_conflict: "REPLACE (default) or APPEND (with manual deduplication)"
+
+  # Recommended maintenance
+  maintenance:
+    vacuum: "monthly"
+    analyze: "after major inserts"
+    checkpoint: "after large batch operations"

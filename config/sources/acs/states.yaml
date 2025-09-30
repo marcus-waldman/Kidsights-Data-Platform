@@ -1,0 +1,275 @@
+# State FIPS Code Mappings for ACS Extracts
+# Reference: https://www.census.gov/library/reference/code-lists/ansi.html
+
+# Current priority states for Kidsights project
+priority_states:
+  - nebraska
+
+# Future expansion states
+future_states:
+  - iowa
+  - kansas
+  - missouri
+  - south_dakota
+
+# State mappings: name → FIPS code, abbreviation
+states:
+  alabama:
+    fip: 1
+    abbrev: AL
+    name: Alabama
+
+  alaska:
+    fip: 2
+    abbrev: AK
+    name: Alaska
+
+  arizona:
+    fip: 4
+    abbrev: AZ
+    name: Arizona
+
+  arkansas:
+    fip: 5
+    abbrev: AR
+    name: Arkansas
+
+  california:
+    fip: 6
+    abbrev: CA
+    name: California
+
+  colorado:
+    fip: 8
+    abbrev: CO
+    name: Colorado
+
+  connecticut:
+    fip: 9
+    abbrev: CT
+    name: Connecticut
+
+  delaware:
+    fip: 10
+    abbrev: DE
+    name: Delaware
+
+  district_of_columbia:
+    fip: 11
+    abbrev: DC
+    name: District of Columbia
+
+  florida:
+    fip: 12
+    abbrev: FL
+    name: Florida
+
+  georgia:
+    fip: 13
+    abbrev: GA
+    name: Georgia
+
+  hawaii:
+    fip: 15
+    abbrev: HI
+    name: Hawaii
+
+  idaho:
+    fip: 16
+    abbrev: ID
+    name: Idaho
+
+  illinois:
+    fip: 17
+    abbrev: IL
+    name: Illinois
+
+  indiana:
+    fip: 18
+    abbrev: IN
+    name: Indiana
+
+  iowa:
+    fip: 19
+    abbrev: IA
+    name: Iowa
+
+  kansas:
+    fip: 20
+    abbrev: KS
+    name: Kansas
+
+  kentucky:
+    fip: 21
+    abbrev: KY
+    name: Kentucky
+
+  louisiana:
+    fip: 22
+    abbrev: LA
+    name: Louisiana
+
+  maine:
+    fip: 23
+    abbrev: ME
+    name: Maine
+
+  maryland:
+    fip: 24
+    abbrev: MD
+    name: Maryland
+
+  massachusetts:
+    fip: 25
+    abbrev: MA
+    name: Massachusetts
+
+  michigan:
+    fip: 26
+    abbrev: MI
+    name: Michigan
+
+  minnesota:
+    fip: 27
+    abbrev: MN
+    name: Minnesota
+
+  mississippi:
+    fip: 28
+    abbrev: MS
+    name: Mississippi
+
+  missouri:
+    fip: 29
+    abbrev: MO
+    name: Missouri
+
+  montana:
+    fip: 30
+    abbrev: MT
+    name: Montana
+
+  nebraska:
+    fip: 31
+    abbrev: NE
+    name: Nebraska
+
+  nevada:
+    fip: 32
+    abbrev: NV
+    name: Nevada
+
+  new_hampshire:
+    fip: 33
+    abbrev: NH
+    name: New Hampshire
+
+  new_jersey:
+    fip: 34
+    abbrev: NJ
+    name: New Jersey
+
+  new_mexico:
+    fip: 35
+    abbrev: NM
+    name: New Mexico
+
+  new_york:
+    fip: 36
+    abbrev: NY
+    name: New York
+
+  north_carolina:
+    fip: 37
+    abbrev: NC
+    name: North Carolina
+
+  north_dakota:
+    fip: 38
+    abbrev: ND
+    name: North Dakota
+
+  ohio:
+    fip: 39
+    abbrev: OH
+    name: Ohio
+
+  oklahoma:
+    fip: 40
+    abbrev: OK
+    name: Oklahoma
+
+  oregon:
+    fip: 41
+    abbrev: OR
+    name: Oregon
+
+  pennsylvania:
+    fip: 42
+    abbrev: PA
+    name: Pennsylvania
+
+  rhode_island:
+    fip: 44
+    abbrev: RI
+    name: Rhode Island
+
+  south_carolina:
+    fip: 45
+    abbrev: SC
+    name: South Carolina
+
+  south_dakota:
+    fip: 46
+    abbrev: SD
+    name: South Dakota
+
+  tennessee:
+    fip: 47
+    abbrev: TN
+    name: Tennessee
+
+  texas:
+    fip: 48
+    abbrev: TX
+    name: Texas
+
+  utah:
+    fip: 49
+    abbrev: UT
+    name: Utah
+
+  vermont:
+    fip: 50
+    abbrev: VT
+    name: Vermont
+
+  virginia:
+    fip: 51
+    abbrev: VA
+    name: Virginia
+
+  washington:
+    fip: 53
+    abbrev: WA
+    name: Washington
+
+  west_virginia:
+    fip: 54
+    abbrev: WV
+    name: West Virginia
+
+  wisconsin:
+    fip: 55
+    abbrev: WI
+    name: Wisconsin
+
+  wyoming:
+    fip: 56
+    abbrev: WY
+    name: Wyoming
+
+  puerto_rico:
+    fip: 72
+    abbrev: PR
+    name: Puerto Rico

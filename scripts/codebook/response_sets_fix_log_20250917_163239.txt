@@ -1,0 +1,18 @@
+Codebook Response Sets Fix Log
+Date: 2025-09-17 16:32:40.381818
+Script: fix_codebook_response_sets.R
+
+SUMMARY:
+- Total items: 306
+- PS items updated: 47
+- Binary items updated for NE25: 168
+- Inline response options converted: 62
+- Backup: codebook/data/codebook_pre_response_sets_fix_20250917_163239.json
+- Version: 2.7.1 → 2.8.0
+
+KEY CHANGES:
+- NE25 now uses value 9 (not -9) for 'Don't Know'
+- All studies have study-specific response sets
+- Eliminated inline response options where possible
+- Maintained single source of truth for response labels
+

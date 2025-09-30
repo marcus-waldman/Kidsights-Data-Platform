@@ -54,6 +54,36 @@ derived_variables:
       - educ6_mom
     transformation: "education"
 
+  geographic:
+    description: "Geographic identifiers derived from ZIP code"
+    variables:
+      - puma
+      - puma_afact
+      - county
+      - county_name
+      - county_afact
+      - tract
+      - tract_afact
+      - cbsa
+      - cbsa_name
+      - cbsa_afact
+      - urban_rural
+      - urban_rural_afact
+      - urban_pct
+      - school_dist
+      - school_name
+      - school_afact
+      - sldl
+      - sldl_afact
+      - sldu
+      - sldu_afact
+      - congress_dist
+      - congress_afact
+      - aiannh_code
+      - aiannh_name
+      - aiannh_afact
+    transformation: "geographic"
+
 # Complete flat list of all derived variables for easy filtering
 all_derived_variables:
   # Include/Eligibility
@@ -89,6 +119,33 @@ all_derived_variables:
   - educ6_a2
   - educ6_mom
 
+  # Geographic
+  - puma
+  - puma_afact
+  - county
+  - county_name
+  - county_afact
+  - tract
+  - tract_afact
+  - cbsa
+  - cbsa_name
+  - cbsa_afact
+  - urban_rural
+  - urban_rural_afact
+  - urban_pct
+  - school_dist
+  - school_name
+  - school_afact
+  - sldl
+  - sldl_afact
+  - sldu
+  - sldu_afact
+  - congress_dist
+  - congress_afact
+  - aiannh_code
+  - aiannh_name
+  - aiannh_afact
+
 # Variable labels for documentation
 variable_labels:
   eligible: "Meets study inclusion criteria"
@@ -112,6 +169,31 @@ variable_labels:
   educ6_a1: "Primary caregiver education level (6 categories)"
   educ6_a2: "Secondary caregiver education level (6 categories)"
   educ6_mom: "Maternal education level (6 categories)"
+  puma: "Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census)"
+  puma_afact: "ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood"
+  county: "County FIPS code(s) - semicolon-separated if ZIP spans multiple counties"
+  county_name: "County name(s) - semicolon-separated if ZIP spans multiple counties"
+  county_afact: "ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood"
+  tract: "Census tract FIPS code(s) - semicolon-separated if ZIP spans multiple tracts"
+  tract_afact: "ZIP to census tract allocation factor(s) - semicolon-separated, ordered by likelihood"
+  cbsa: "Core-Based Statistical Area code(s) - semicolon-separated if ZIP spans multiple CBSAs"
+  cbsa_name: "CBSA name(s) - semicolon-separated if ZIP spans multiple CBSAs"
+  cbsa_afact: "ZIP to CBSA allocation factor(s) - semicolon-separated, ordered by likelihood"
+  urban_rural: "Urban/Rural classification(s) (U=Urban, R=Rural) - semicolon-separated if ZIP is mixed (2022 Census)"
+  urban_rural_afact: "Urban/Rural allocation factor(s) - semicolon-separated, ordered by likelihood"
+  urban_pct: "Percentage of ZIP population in urban areas (0-100)"
+  school_dist: "School district code(s) - semicolon-separated if ZIP spans multiple districts (2020)"
+  school_name: "School district name(s) - semicolon-separated if ZIP spans multiple districts"
+  school_afact: "ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood"
+  sldl: "State legislative district (lower/house) code(s) - semicolon-separated if ZIP spans multiple districts (2024)"
+  sldl_afact: "ZIP to state leg lower allocation factor(s) - semicolon-separated, ordered by likelihood"
+  sldu: "State legislative district (upper/senate) code(s) - semicolon-separated if ZIP spans multiple districts (2024)"
+  sldu_afact: "ZIP to state leg upper allocation factor(s) - semicolon-separated, ordered by likelihood"
+  congress_dist: "US Congressional district code(s) - semicolon-separated if ZIP spans multiple districts (119th Congress)"
+  congress_afact: "ZIP to congressional district allocation factor(s) - semicolon-separated, ordered by likelihood"
+  aiannh_code: "Native lands (AIANNH) code(s) - semicolon-separated if ZIP spans multiple areas (2021)"
+  aiannh_name: "Native lands (AIANNH) name(s) - semicolon-separated if ZIP spans multiple areas"
+  aiannh_afact: "ZIP to AIANNH allocation factor(s) - semicolon-separated, ordered by likelihood"
 
 # Transformation categories for grouping
 transformation_categories:
@@ -122,3 +204,4 @@ transformation_categories:
   sex: "Sex and Gender"
   age: "Age Categories"
   income: "Income and Federal Poverty Level"
+  geographic: "Geographic Identifiers"

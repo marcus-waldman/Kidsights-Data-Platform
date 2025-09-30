@@ -1,0 +1,15 @@
+NE25 Response Options Fix Log
+Date: 2025-09-17 15:57:27.682517
+Script: fix_ne25_response_options.R
+
+SUMMARY:
+- Total items: 306
+- PS items checked: 47
+- PS items modified: 46
+- Backup: codebook/data/codebook_pre_response_fix_20250917_155727.json
+- Version: 2.6 -> 2.7.1
+
+CHANGES MADE:
+- Added response_options.ne25 = 'ps_frequency' to PS items
+- Ensures compatibility with recoding functions
+- Links PS items to existing ps_frequency response set

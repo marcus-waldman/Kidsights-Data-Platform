@@ -1,0 +1,114 @@
+# ACS Data Extract Template
+# This template defines the standard structure for state-specific ACS extracts
+#
+# HOW TO USE:
+# 1. Create a state-specific config file: config/sources/acs/{state}-{year_range}.yaml
+#    Example: config/sources/acs/nebraska-2019-2023.yaml
+#
+# 2. In your state config, override only the state-specific fields:
+#    - state, state_fip, state_abbrev
+#    - year_range, acs_sample
+#    - description, metadata
+#
+# 3. The config system will automatically merge your state config with this template
+#    (state values override template defaults)
+#
+# 4. All variables defined below are included by default (no need to repeat them)
+#
+# See config/sources/acs/nebraska-2019-2023.yaml for a complete example
+
+# State identification (OVERRIDE THESE IN STATE-SPECIFIC CONFIG)
+state: TEMPLATE_STATE_NAME
+state_fip: 0  # FIPS code (e.g., 31 for Nebraska)
+state_abbrev: XX
+
+# ACS sample specification
+acs_sample: us2023b  # 2019-2023 5-year ACS
+year_range: 2019-2023
+sample_type: 5-year
+
+# IPUMS collection settings
+collection: usa
+data_format: csv  # Options: csv, fixed-width
+
+# Extract description (auto-generated from state/year)
+description: "${state} ACS ${year_range} ${sample_type}, children 0-5 for Kidsights raking"
+
+# Population filters
+filters:
+  age_min: 0
+  age_max: 5
+  # Additional filters can be added here
+  # e.g., specific counties, PUMAs, etc.
+
+# Cache settings
+cache:
+  enabled: true              # Use caching system to avoid re-downloading
+  max_age_days: 365          # Remove caches older than 1 year
+  validate_checksums: true   # Verify file integrity on cache load
+  auto_cleanup: false        # Manual cleanup only (set true for automatic)
+
+# IPUMS variables to extract
+# See config/acs_variables.yaml for full variable definitions
+variables:
+  # Core demographic and identifier variables
+  core:
+    - YEAR         # Census year
+    - AGE          # Age
+    - SEX          # Sex
+    - RACE         # Race (detailed)
+    - HISPAN       # Hispanic origin
+    - SERIAL       # Household serial number
+    - PERNUM       # Person number within household
+    - HHWT         # Household weight
+    - PERWT        # Person weight
+    - STATEFIP     # State FIPS code
+    - PUMA         # Public Use Microdata Area
+    - METRO        # Metropolitan status
+    - RELATE       # Relationship to household head
+
+  # Economic variables
+  economic:
+    - HHINCOME     # Total household income
+    - FTOTINC      # Total family income
+    - POVERTY      # Poverty status (ratio to poverty threshold)
+    - GRPIP        # Gross rent as percentage of household income
+
+  # Government program participation
+  programs:
+    - FOODSTMP     # Food stamp (SNAP) receipt
+    - HINSCAID     # Medicaid coverage
+    - HCOVANY      # Any health insurance coverage
+
+  # Education variables (with attached parent characteristics)
+  education:
+    - name: EDUC
+      attach_characteristics: [mother, father]
+    - name: EDUCD
+      attach_characteristics: [mother, father]
+
+  # Household structure
+  household:
+    - name: MARST
+      attach_characteristics: [head]
+    - MOMLOC       # Mother's location in household
+    - POPLOC       # Father's location in household
+
+# Case selections (applied via IPUMS API)
+# Note: These are built automatically from state_fip and filters
+# by the extract_builder.py module. You can add explicit overrides here.
+case_selections: {}
+
+# Notes and metadata
+metadata:
+  purpose: "Extract ACS data for statistical raking of Kidsights survey data"
+  target_population: "Children aged 0-5 years"
+  geographic_scope: "Single state"
+  raking_variables: ["race", "ethnicity", "parent_education", "household_income", "metro_status"]
+
+# Future enhancements (not yet implemented)
+# harmonization:
+#   enabled: false  # Will be true when harmonization module is complete
+#   recode_race: true
+#   recode_education: true
+#   create_income_categories: true

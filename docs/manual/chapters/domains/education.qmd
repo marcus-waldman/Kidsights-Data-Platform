@@ -1,0 +1,494 @@
+# Education Variables {#sec-education}
+
+## Overview
+
+Education variables are among the most complex transformations in the platform, creating **12 derived variables** from **2 raw variables**. This domain exemplifies the transformation system's ability to produce multiple category structures from a single source, providing flexibility for different analytical needs.
+
+### Research Importance
+
+Educational attainment is a key socioeconomic indicator associated with: - Child developmental outcomes - Healthcare access and utilization - Parenting practices and knowledge - Economic resources and stability
+
+### Variables Created
+
+| Variable Name | Categories | Population | Purpose |
+|----|----|----|----|
+| `educ_max` | 8 | Caregivers | Highest education in household |
+| `educ_a1` | 8 | Primary caregiver | Individual education level |
+| `educ_a2` | 8 | Secondary caregiver | Individual education level |
+| `educ_mom` | 8 | Mother | Maternal education specifically |
+| `educ4_max` | 4 | Caregivers | Collapsed for coarse analysis |
+| `educ4_a1` | 4 | Primary caregiver | Collapsed version |
+| `educ4_a2` | 4 | Secondary caregiver | Collapsed version |
+| `educ4_mom` | 4 | Mother | Collapsed maternal education |
+| `educ6_max` | 6 | Caregivers | Medium-detail categories |
+| `educ6_a1` | 6 | Primary caregiver | Medium-detail version |
+| `educ6_a2` | 6 | Secondary caregiver | Medium-detail version |
+| `educ6_mom` | 6 | Mother | Medium-detail maternal education |
+
+## Source Variables
+
+### REDCap Fields
+
+**Primary Caregiver Education:** `cqr004` - **Project:** 7679 (Main NE25) - **Form:** Demographics - **Type:** Radio button - **Question:** "What is the highest grade or level of school you have completed?"
+
+**Secondary Caregiver Education:** `nschj017` - **Project:** 7999 (CAHMI) - **Form:** Household Information - **Type:** Radio button - **Question:** "What is the highest grade or level of school the other parent/guardian has completed?"
+
+### Raw Response Options (8 Categories)
+
+| Value | Label |
+|----|----|
+| 1 | 8th grade or less |
+| 2 | 9th through 11th grade; 12th grade, no diploma |
+| 3 | High school graduate or GED completed |
+| 4 | Vocational, trade, or business school program after high school but no four year college degree |
+| 5 | Some college but no four-year college degree |
+| 6 | Associate Degree (AA, AS) |
+| 7 | Bachelor's Degree (BA, BS, AB) |
+| 8 | Master's Degree (MA, MS, MSW, MBA) |
+| 9 | Doctorate (PhD, EdD) or Professional Degree (MD, DDS, JD, LLB) |
+
+Note: Values are numeric 1-9, with 9 being the highest education level.
+
+## Transformation Logic
+
+### Category Mapping Systems
+
+#### 8-Category System (Original)
+
+**Use Case:** Maximum detail for specialized analyses
+
+**Mapping:** Direct from REDCap (values 1-9 preserved)
+
+**Implementation:**
+
+``` r
+educ_a1 <- factor(cqr004,
+                  levels = value_labels("cqr004", dict)$value,
+                  labels = value_labels("cqr004", dict)$label)
+```
+
+#### 4-Category System (Collapsed)
+
+**Use Case:** Standard socioeconomic analyses, regression models with limited sample size
+
+**Mapping:**
+
+| Original Categories (8-cat) | Collapsed Category (4-cat) | Value |
+|----|----|----|
+| 8th grade or less<br>9th through 11th grade | Less than High School Graduate | 0 |
+| High school graduate or GED | High School Graduate (including Equivalency) | 1 |
+| Vocational/trade school<br>Some college<br>Associate Degree | Some College or Associate's Degree | 2 |
+| Bachelor's Degree<br>Master's Degree<br>Doctorate/Professional | College Degree | 3 |
+
+**Rationale:** - Groups pre-high school education levels (limited sample sizes) - Separates high school completion (critical threshold) - Combines post-secondary sub-baccalaureate education - Combines all bachelor's and graduate degrees
+
+#### 6-Category System (Medium Detail)
+
+**Use Case:** Distinguishing graduate education from bachelor's while maintaining statistical power
+
+**Mapping:**
+
+| Original Categories (8-cat) | Medium Category (6-cat) | Value |
+|----|----|----|
+| 8th grade or less<br>9th through 11th grade | Less than High School Graduate | 0 |
+| High school graduate or GED | High School Graduate (including Equivalency) | 1 |
+| Vocational/trade school<br>Some college<br>Associate Degree | Some College or Associate's Degree | 2 |
+| Bachelor's Degree | Bachelor's Degree | 3 |
+| Master's Degree | Master's Degree | 4 |
+| Doctorate/Professional | Doctorate or Professional Degree | 5 |
+
+**Rationale:** - Preserves graduate education distinction - Useful for graduate-level parent samples - Differentiates professional development trajectories
+
+### Variable Creation Algorithms
+
+#### Maximum Education (`educ_max`, `educ4_max`, `educ6_max`)
+
+**Purpose:** Capture household educational resources by taking highest education level among available caregivers
+
+**Algorithm:**
+
+```{mermaid}
+flowchart TD
+    A[Start: cqr004, nschj017] --> B{Both available?}
+    B -->|Yes| C[Compare values]
+    B -->|No| D[Use available value]
+    C --> E[Select maximum]
+    D --> F[Convert to factor]
+    E --> F
+    F --> G[Apply category mapping]
+    G --> H[Relevel to reference]
+    H --> I[End: educ_max/4/6]
+```
+
+**R Implementation:**
+
+``` r
+educ_max <- dplyr::case_when(
+  nschj017 > cqr004 ~ nschj017,           # Secondary higher
+  is.na(cqr004) & !is.na(nschj017) ~ nschj017,  # Only secondary available
+  .default = cqr004                        # Primary higher or only available
+) %>%
+  factor(levels = value_labels("cqr004", dict)$value,
+         labels = value_labels("cqr004", dict)$label)
+
+# Then collapse to 4 or 6 categories using plyr::mapvalues
+```
+
+**Edge Cases:** - If both missing: `educ_max = NA` - If only one available: Use that value - If equal: Use primary caregiver (cqr004) by default
+
+#### Individual Caregiver Education (`educ_a1`, `educ_a2`)
+
+**Purpose:** Analyze individual caregiver characteristics and dyadic patterns
+
+**Algorithm:**
+
+``` r
+# Primary caregiver (direct mapping)
+educ_a1 <- factor(cqr004,
+                  levels = value_labels("cqr004", dict)$value,
+                  labels = value_labels("cqr004", dict)$label)
+
+# Secondary caregiver (direct mapping from different variable)
+educ_a2 <- factor(nschj017,
+                  levels = value_labels("nschj017", dict)$value,
+                  labels = value_labels("nschj017", dict)$label)
+```
+
+**Note:** `educ_a2` will be `NA` for single-caregiver households
+
+#### Maternal Education (`educ_mom`, `educ4_mom`, `educ6_mom`)
+
+**Purpose:** Specific maternal education variable for maternal health and child development analyses
+
+**Dependencies:** Requires caregiver relationship variables: - `mom_a1`: Logical indicator of whether primary caregiver is mother
+
+**Algorithm:**
+
+```{mermaid}
+flowchart TD
+    A[Start: educ_a1, mom_a1] --> B{mom_a1 == TRUE?}
+    B -->|Yes| C[educ_mom = educ_a1]
+    B -->|No| D[educ_mom = NA]
+    C --> E[Apply category mapping]
+    D --> E
+    E --> F[End: educ_mom/4/6]
+```
+
+**R Implementation:**
+
+``` r
+# First, get relationship variables
+relate_vars <- recode__(dat, dict, what = "caregiver relationship")
+
+# Then create maternal education
+educ_mom <- ifelse(mom_a1, educ_a1, NA) %>%
+  factor(levels = value_labels("cqr004", dict)$value,
+         labels = value_labels("cqr004", dict)$label)
+```
+
+**Missing Patterns:** - `NA` if primary caregiver is not mother - `NA` if primary caregiver is mother but education missing - Valid value only when primary caregiver is mother AND education reported
+
+### Category Collapsing Process
+
+**Two-Step Mapping:** Category collapsing uses `plyr::mapvalues()` twice to ensure proper factor structure
+
+``` r
+# Step 1: Map 8-category labels to 4-category labels
+educ4_max <- plyr::mapvalues(
+  as.character(educ_max),
+  from = simple_educ_label$educ,    # 8-category labels
+  to = simple_educ_label$educ4      # 4-category labels
+)
+
+# Step 2: Map 4-category labels to numeric codes for proper ordering
+educ4_max <- plyr::mapvalues(
+  educ4_max,
+  from = simple_educ_label$educ4,   # 4-category labels
+  to = simple_educ_value$educ4      # Numeric codes (0, 1, 2, 3)
+)
+
+# Step 3: Convert to factor with proper levels and labels
+educ4_max <- factor(
+  educ4_max,
+  levels = simple_educ_value$educ4,  # Numeric codes
+  labels = simple_educ_label$educ4   # Text labels
+)
+```
+
+**Why Two Steps?** 1. First step groups similar education levels 2. Second step ensures numeric ordering (0 \< 1 \< 2 \< 3) 3. Final factor creation applies proper labels with ordering
+
+## Factor Specifications
+
+### Ordering
+
+**All education variables are ordered factors:** Higher values = higher education
+
+**Justification:** Education has inherent hierarchical ordering that should be preserved for: - Ordinal regression models - Trend testing - Visualization (natural ordering in plots)
+
+### Reference Levels
+
+**Default Reference:** "College Degree" (highest common category)
+
+**Rationale:** - Regression coefficients interpretable as "compared to college-educated" - Aligns with research questions about educational disparities - Most stable reference group in this sample (large n)
+
+**Setting Reference:**
+
+``` r
+# 8-category: BA/BS as reference (7th level)
+educ_max <- relevel(educ_max, ref = simple_educ_label$educ[7])
+
+# 4-category: "College Degree" as reference
+educ4_max <- relevel(educ4_max, ref = "College Degree")
+
+# 6-category: "Bachelor's Degree" as reference
+educ6_max <- relevel(educ6_max, ref = "Bachelor's Degree")
+```
+
+**Alternative Reference Levels:** For specific analyses, you may want different references: - "High School Graduate" for examining college effects - "Some College" for comparing BA+ to less than BA - "Less than High School" for examining any high school effect
+
+## Metadata Specifications
+
+### Variable Labels
+
+**8-Category Variables:**
+
+``` r
+var_label(educ_max) <- "Maximum education level among caregivers (8 categories)"
+var_label(educ_a1) <- "Primary caregiver education level (8 categories)"
+var_label(educ_a2) <- "Secondary caregiver education level (8 categories)"
+var_label(educ_mom) <- "Maternal education level (8 categories)"
+```
+
+**4-Category Variables:**
+
+``` r
+var_label(educ4_max) <- "Maximum education level among caregivers (4 categories)"
+var_label(educ4_a1) <- "Primary caregiver education level (4 categories)"
+var_label(educ4_a2) <- "Secondary caregiver education level (4 categories)"
+var_label(educ4_mom) <- "Maternal education level (4 categories)"
+```
+
+**6-Category Variables:**
+
+``` r
+var_label(educ6_max) <- "Maximum education level among caregivers (6 categories)"
+var_label(educ6_a1) <- "Primary caregiver education level (6 categories)"
+var_label(educ6_a2) <- "Secondary caregiver education level (6 categories)"
+var_label(educ6_mom) <- "Maternal education level (6 categories)"
+```
+
+### Value Labels
+
+**4-Category System:**
+
+``` r
+levels(educ4_max):
+  [1] "Less than High School Graduate"
+  [2] "High School Graduate (including Equivalency)"
+  [3] "Some College or Associate's Degree"
+  [4] "College Degree"
+```
+
+**6-Category System:**
+
+``` r
+levels(educ6_max):
+  [1] "Less than High School Graduate"
+  [2] "High School Graduate (including Equivalency)"
+  [3] "Some College or Associate's Degree"
+  [4] "Bachelor's Degree"
+  [5] "Master's Degree"
+  [6] "Doctorate or Professional Degree"
+```
+
+## Validation Rules
+
+### Expected Distributions
+
+**NE25 Sample (n=3,906):**
+
+Approximate expected distribution for `educ4_max`: - Less than HS: 5-10% - HS Graduate: 15-20% - Some College: 25-35% - College Degree: 40-50%
+
+**Quality Flags:** - If \>15% missing: Investigate data collection - If \<5% in any category: Consider collapsing further - If \>75% in one category: May limit analytical utility
+
+### Cross-Variable Consistency
+
+**Maximum Education Logic:**
+
+``` r
+# educ_max should always be >= both individual education levels
+all(educ_max >= educ_a1, na.rm = TRUE)  # Should be TRUE
+all(educ_max >= educ_a2, na.rm = TRUE)  # Should be TRUE
+
+# If only one caregiver, max should equal that caregiver
+single_caregiver <- is.na(educ_a2)
+all(educ_max[single_caregiver] == educ_a1[single_caregiver], na.rm = TRUE)
+```
+
+**Maternal Education Logic:**
+
+``` r
+# educ_mom should only have values when mom_a1 is TRUE
+all(is.na(educ_mom[!mom_a1]))  # Should be TRUE
+
+# When mom_a1 is TRUE, educ_mom should equal educ_a1
+all(educ_mom[mom_a1] == educ_a1[mom_a1], na.rm = TRUE)
+```
+
+**Category Consistency:**
+
+``` r
+# Collapsed categories should preserve ordering
+# Higher 8-category should never map to lower 4-category
+verify_monotonic_collapse(educ_max, educ4_max)
+```
+
+### Data Quality Checks
+
+Run after transformation:
+
+``` r
+# 1. Check for unexpected missing patterns
+cat("Missing rates:\n")
+cat("  educ_a1:", mean(is.na(educ_a1)), "\n")
+cat("  educ_a2:", mean(is.na(educ_a2)), "\n")
+cat("  educ_max:", mean(is.na(educ_max)), "\n")
+cat("  educ_mom:", mean(is.na(educ_mom)), "\n")
+
+# 2. Verify factor structure
+cat("\nFactor levels:\n")
+cat("  educ4_max:", nlevels(educ4_max), "levels\n")
+cat("  educ6_max:", nlevels(educ6_max), "levels\n")
+
+# 3. Check reference levels
+cat("\nReference levels:\n")
+cat("  educ4_max:", levels(educ4_max)[1], "\n")
+cat("  educ6_max:", levels(educ6_max)[1], "\n")
+
+# 4. Verify max education logic
+if (any(educ_max < educ_a1, na.rm = TRUE)) {
+  warning("educ_max less than educ_a1 detected!")
+}
+
+# 5. Verify maternal education logic
+mom_but_no_educ <- mom_a1 & is.na(educ_mom) & !is.na(educ_a1)
+if (sum(mom_but_no_educ, na.rm = TRUE) > 0) {
+  warning("Maternal education missing when should be present")
+}
+```
+
+## Common Analysis Patterns
+
+### Regression Models
+
+**Using 4-Category Education:**
+
+``` r
+# Linear regression with education as predictor
+model <- lm(child_outcome ~ educ4_max + age + sex, data = analysis_data)
+
+# Interpretation: Coefficients show difference compared to "College Degree" reference
+# educ4_max[Less than HS] = -0.5 means 0.5 units lower than college degree
+```
+
+**Using Education as Ordinal:**
+
+``` r
+library(MASS)
+# Ordinal logistic regression treats education as ordered
+model <- polr(outcome_category ~ educ6_max + covariates, data = analysis_data)
+```
+
+### Descriptive Statistics
+
+**Household Education:**
+
+``` r
+# Summary of maximum education in household
+table(educ4_max)
+prop.table(table(educ4_max))
+
+# Compare primary and secondary caregiver education
+table(educ_a1, educ_a2, useNA = "ifany")
+```
+
+**Maternal vs. Paternal Education:**
+
+``` r
+# Compare education levels between mothers and non-mothers
+tapply(as.numeric(educ_a1), mom_a1, summary)
+
+# Educational similarity in two-caregiver households
+educ_diff <- abs(as.numeric(educ_a1) - as.numeric(educ_a2))
+table(educ_diff, useNA = "ifany")
+```
+
+### Subgroup Analyses
+
+**By Educational Attainment:**
+
+``` r
+# Create binary high/low education split
+high_educ <- educ4_max %in% c("Some College or Associate's Degree", "College Degree")
+
+# Analyze outcomes by education level
+t.test(child_outcome ~ high_educ)
+
+# Stratified analyses
+by(analysis_data, high_educ, function(x) {
+  lm(outcome ~ predictor + age + sex, data = x)
+})
+```
+
+## Implementation Notes
+
+### Processing Order
+
+Education transformation has **dependencies**: 1. Must run AFTER "caregiver relationship" transformation (needs `mom_a1`) 2. Must load `plyr` package BEFORE `dplyr` (mapvalues function) 3. Value labels must be extracted from data dictionary first
+
+### Performance Considerations
+
+**Efficiency:** Education transformations are moderately fast (\~1-2 seconds for 3,906 records)
+
+**Memory:** Creating 12 variables increases dataset size by \~30KB (factors are efficient)
+
+### Common Errors and Solutions
+
+**Error:** `mapvalues` not found **Solution:** Ensure `plyr` loaded before `dplyr`, use `plyr::mapvalues()`
+
+**Error:** Factor levels don't match **Solution:** Verify value labels extracted correctly from dictionary
+
+**Error:** `educ_mom` all NA **Solution:** Check that caregiver relationship transformation ran successfully
+
+**Warning:** Reference level not found **Solution:** Verify category labels exactly match expected text (including parentheses)
+
+## Change History
+
+### Version 1.0 (Current)
+
+-   Initial specification
+-   8/4/6 category systems
+-   Maximum, individual, and maternal education variables
+-   College degree as reference level
+
+### Planned Enhancements
+
+**Under Consideration:** - Add `educ_min` (minimum household education) for educational homogeneity analyses - Create `educ_diff` (difference between caregivers) as pre-computed variable - Add `educ_yrs` (estimated years of education) for continuous measure - Harmonize with historical NE20/NE22 education categories
+
+## References and Rationale
+
+### Literature Support
+
+Educational attainment categories based on: - US Census Bureau education classifications - National Center for Education Statistics (NCES) categories - Established developmental science literature
+
+### Sample Characteristics
+
+NE25 is a community-based sample with higher-than-average educational attainment: - Recruitment from pediatric primary care - Midwest US urban/suburban setting - English-speaking requirement may select for more education
+
+**Implication:** Reference level set to college degree reflects sample composition
+
+------------------------------------------------------------------------
+
+**Next:** See @sec-income for socioeconomic status variables including federal poverty level calculations.
+
+**Related:** @sec-relationships for caregiver relationship variables used in maternal education determination.

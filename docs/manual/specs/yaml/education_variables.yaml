@@ -1,0 +1,429 @@
+# Education Variables Specification
+# Machine-readable specification for education transformation
+# Version: 1.0.0
+# Last Updated: 2025-09-30
+
+metadata:
+  domain: education
+  category: socioeconomic
+  version: "1.0.0"
+  specification_file: "docs/manual/chapters/domains/education.qmd"
+  implementation_file: "R/transform/ne25_transforms.R"
+  function_name: "recode__"
+  what_parameter: "education"
+  variables_created: 12
+  complexity: high
+
+source_variables:
+  redcap:
+    - name: cqr004
+      project_id: 7679
+      form: demographics
+      type: radio
+      question: "What is the highest grade or level of school you have completed?"
+      values: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      value_labels:
+        1: "8th grade or less"
+        2: "9th through 11th grade; 12th grade, no diploma"
+        3: "High school graduate or GED completed"
+        4: "Vocational, trade, or business school program after high school but no four year college degree"
+        5: "Some college but no four-year college degree"
+        6: "Associate Degree (AA, AS)"
+        7: "Bachelor's Degree (BA, BS, AB)"
+        8: "Master's Degree (MA, MS, MSW, MBA)"
+        9: "Doctorate (PhD, EdD) or Professional Degree (MD, DDS, JD, LLB)"
+      population: "Primary caregiver"
+
+    - name: nschj017
+      project_id: 7999
+      form: household_information
+      type: radio
+      question: "What is the highest grade or level of school the other parent/guardian has completed?"
+      values: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      value_labels: # Same as cqr004
+      population: "Secondary caregiver"
+
+  derived:
+    - name: mom_a1
+      description: "Logical indicator: primary caregiver is mother"
+      required_for: ["educ_mom", "educ4_mom", "educ6_mom"]
+
+category_systems:
+  eight_category:
+    name: "8-category (original)"
+    levels: 9
+    use_case: "Maximum detail for specialized analyses"
+    mapping: "Direct from REDCap"
+    variables: ["educ_max", "educ_a1", "educ_a2", "educ_mom"]
+
+  four_category:
+    name: "4-category (collapsed)"
+    levels: 4
+    use_case: "Standard socioeconomic analyses"
+    mapping:
+      - collapsed_level: "Less than High School Graduate"
+        value: 0
+        original_levels: [1, 2]
+        original_labels:
+          - "8th grade or less"
+          - "9th through 11th grade; 12th grade, no diploma"
+
+      - collapsed_level: "High School Graduate (including Equivalency)"
+        value: 1
+        original_levels: [3]
+        original_labels:
+          - "High school graduate or GED completed"
+
+      - collapsed_level: "Some College or Associate's Degree"
+        value: 2
+        original_levels: [4, 5, 6]
+        original_labels:
+          - "Vocational, trade, or business school program"
+          - "Some college but no four-year college degree"
+          - "Associate Degree (AA, AS)"
+
+      - collapsed_level: "College Degree"
+        value: 3
+        original_levels: [7, 8, 9]
+        original_labels:
+          - "Bachelor's Degree (BA, BS, AB)"
+          - "Master's Degree (MA, MS, MSW, MBA)"
+          - "Doctorate (PhD, EdD) or Professional Degree"
+    variables: ["educ4_max", "educ4_a1", "educ4_a2", "educ4_mom"]
+
+  six_category:
+    name: "6-category (medium detail)"
+    levels: 6
+    use_case: "Distinguishing graduate education"
+    mapping:
+      - collapsed_level: "Less than High School Graduate"
+        value: 0
+        original_levels: [1, 2]
+
+      - collapsed_level: "High School Graduate (including Equivalency)"
+        value: 1
+        original_levels: [3]
+
+      - collapsed_level: "Some College or Associate's Degree"
+        value: 2
+        original_levels: [4, 5, 6]
+
+      - collapsed_level: "Bachelor's Degree"
+        value: 3
+        original_levels: [7]
+
+      - collapsed_level: "Master's Degree"
+        value: 4
+        original_levels: [8]
+
+      - collapsed_level: "Doctorate or Professional Degree"
+        value: 5
+        original_levels: [9]
+    variables: ["educ6_max", "educ6_a1", "educ6_a2", "educ6_mom"]
+
+variables:
+  - name: educ_max
+    description: "Maximum education level among caregivers"
+    categories: 8
+    data_type: factor_ordered
+    population: "Household caregivers"
+    algorithm: |
+      IF nschj017 > cqr004:
+        educ_max = nschj017
+      ELSE IF cqr004 is NA AND nschj017 is not NA:
+        educ_max = nschj017
+      ELSE:
+        educ_max = cqr004
+    reference_level: "Bachelor's Degree (BA, BS, AB)"
+    reference_level_index: 7
+    variable_label: "Maximum education level among caregivers (8 categories)"
+    ordered: true
+    missing_handling: "NA if both caregivers missing"
+    implementation:
+      r_code: |
+        educ_max <- dplyr::case_when(
+          nschj017 > cqr004 ~ nschj017,
+          is.na(cqr004) & !is.na(nschj017) ~ nschj017,
+          .default = cqr004
+        ) %>%
+          factor(levels = value_labels("cqr004", dict)$value,
+                 labels = value_labels("cqr004", dict)$label)
+
+  - name: educ_a1
+    description: "Primary caregiver education level"
+    categories: 8
+    data_type: factor_ordered
+    population: "Primary caregiver"
+    algorithm: "Direct mapping from cqr004"
+    reference_level: "Bachelor's Degree (BA, BS, AB)"
+    reference_level_index: 7
+    variable_label: "Primary caregiver education level (8 categories)"
+    ordered: true
+    missing_handling: "NA if cqr004 is missing"
+    implementation:
+      r_code: |
+        educ_a1 <- factor(cqr004,
+                          levels = value_labels("cqr004", dict)$value,
+                          labels = value_labels("cqr004", dict)$label)
+
+  - name: educ_a2
+    description: "Secondary caregiver education level"
+    categories: 8
+    data_type: factor_ordered
+    population: "Secondary caregiver"
+    algorithm: "Direct mapping from nschj017"
+    reference_level: "Bachelor's Degree (BA, BS, AB)"
+    reference_level_index: 7
+    variable_label: "Secondary caregiver education level (8 categories)"
+    ordered: true
+    missing_handling: "NA if nschj017 is missing or no secondary caregiver"
+    implementation:
+      r_code: |
+        educ_a2 <- factor(nschj017,
+                          levels = value_labels("nschj017", dict)$value,
+                          labels = value_labels("nschj017", dict)$label)
+
+  - name: educ_mom
+    description: "Maternal education level"
+    categories: 8
+    data_type: factor_ordered
+    population: "Mother (when primary caregiver)"
+    algorithm: "IF mom_a1 == TRUE THEN educ_a1 ELSE NA"
+    dependencies: ["mom_a1", "educ_a1"]
+    reference_level: "Bachelor's Degree (BA, BS, AB)"
+    reference_level_index: 7
+    variable_label: "Maternal education level (8 categories)"
+    ordered: true
+    missing_handling: "NA if primary caregiver is not mother"
+    implementation:
+      r_code: |
+        educ_mom <- ifelse(mom_a1, educ_a1, NA) %>%
+          factor(levels = value_labels("cqr004", dict)$value,
+                 labels = value_labels("cqr004", dict)$label)
+
+  - name: educ4_max
+    description: "Maximum education level among caregivers (4 categories)"
+    categories: 4
+    data_type: factor_ordered
+    population: "Household caregivers"
+    algorithm: "Collapse educ_max to 4 categories using mapping table"
+    source_variable: educ_max
+    reference_level: "College Degree"
+    reference_level_index: 3
+    variable_label: "Maximum education level among caregivers (4 categories)"
+    ordered: true
+    levels:
+      - "Less than High School Graduate"
+      - "High School Graduate (including Equivalency)"
+      - "Some College or Associate's Degree"
+      - "College Degree"
+    implementation:
+      r_code: |
+        educ4_max <- plyr::mapvalues(as.character(educ_max),
+                                     from = simple_educ_label$educ,
+                                     to = simple_educ_label$educ4) %>%
+          plyr::mapvalues(from = simple_educ_label$educ4,
+                         to = simple_educ_value$educ4) %>%
+          factor(levels = simple_educ_value$educ4,
+                 labels = simple_educ_label$educ4)
+
+  - name: educ4_a1
+    description: "Primary caregiver education level (4 categories)"
+    categories: 4
+    data_type: factor_ordered
+    population: "Primary caregiver"
+    algorithm: "Collapse educ_a1 to 4 categories"
+    source_variable: educ_a1
+    reference_level: "College Degree"
+    variable_label: "Primary caregiver education level (4 categories)"
+    ordered: true
+
+  - name: educ4_a2
+    description: "Secondary caregiver education level (4 categories)"
+    categories: 4
+    data_type: factor_ordered
+    population: "Secondary caregiver"
+    algorithm: "Collapse educ_a2 to 4 categories"
+    source_variable: educ_a2
+    reference_level: "College Degree"
+    variable_label: "Secondary caregiver education level (4 categories)"
+    ordered: true
+
+  - name: educ4_mom
+    description: "Maternal education level (4 categories)"
+    categories: 4
+    data_type: factor_ordered
+    population: "Mother (when primary caregiver)"
+    algorithm: "Collapse educ_mom to 4 categories"
+    source_variable: educ_mom
+    reference_level: "College Degree"
+    variable_label: "Maternal education level (4 categories)"
+    ordered: true
+
+  - name: educ6_max
+    description: "Maximum education level among caregivers (6 categories)"
+    categories: 6
+    data_type: factor_ordered
+    population: "Household caregivers"
+    algorithm: "Collapse educ_max to 6 categories"
+    source_variable: educ_max
+    reference_level: "Bachelor's Degree"
+    variable_label: "Maximum education level among caregivers (6 categories)"
+    ordered: true
+    levels:
+      - "Less than High School Graduate"
+      - "High School Graduate (including Equivalency)"
+      - "Some College or Associate's Degree"
+      - "Bachelor's Degree"
+      - "Master's Degree"
+      - "Doctorate or Professional Degree"
+
+  - name: educ6_a1
+    description: "Primary caregiver education level (6 categories)"
+    categories: 6
+    data_type: factor_ordered
+    population: "Primary caregiver"
+    algorithm: "Collapse educ_a1 to 6 categories"
+    source_variable: educ_a1
+    reference_level: "Bachelor's Degree"
+    variable_label: "Primary caregiver education level (6 categories)"
+    ordered: true
+
+  - name: educ6_a2
+    description: "Secondary caregiver education level (6 categories)"
+    categories: 6
+    data_type: factor_ordered
+    population: "Secondary caregiver"
+    algorithm: "Collapse educ_a2 to 6 categories"
+    source_variable: educ_a2
+    reference_level: "Bachelor's Degree"
+    variable_label: "Secondary caregiver education level (6 categories)"
+    ordered: true
+
+  - name: educ6_mom
+    description: "Maternal education level (6 categories)"
+    categories: 6
+    data_type: factor_ordered
+    population: "Mother (when primary caregiver)"
+    algorithm: "Collapse educ_mom to 6 categories"
+    source_variable: educ_mom
+    reference_level: "Bachelor's Degree"
+    variable_label: "Maternal education level (6 categories)"
+    ordered: true
+
+validation:
+  expected_distributions:
+    educ4_max:
+      sample_size: 3906
+      levels:
+        "Less than High School Graduate": "5-10%"
+        "High School Graduate (including Equivalency)": "15-20%"
+        "Some College or Associate's Degree": "25-35%"
+        "College Degree": "40-50%"
+      missing_threshold: 15%
+
+  quality_checks:
+    - name: max_education_logic
+      description: "educ_max >= educ_a1 and educ_max >= educ_a2"
+      type: cross_variable
+      severity: error
+
+    - name: maternal_education_logic
+      description: "educ_mom only has values when mom_a1 is TRUE"
+      type: conditional
+      severity: error
+
+    - name: category_consistency
+      description: "Collapsed categories preserve ordering"
+      type: transformation
+      severity: error
+
+    - name: missing_rate
+      description: "Missing rate should be < 15% for educ_max"
+      type: completeness
+      threshold: 0.15
+      severity: warning
+
+  test_cases:
+    - name: both_caregivers_present
+      inputs:
+        cqr004: 7  # Bachelor's
+        nschj017: 8  # Master's
+        mom_a1: true
+      expected_outputs:
+        educ_max: "Master's Degree"
+        educ_a1: "Bachelor's Degree"
+        educ_a2: "Master's Degree"
+        educ_mom: "Bachelor's Degree"
+        educ4_max: "College Degree"
+
+    - name: only_primary_caregiver
+      inputs:
+        cqr004: 5  # Some college
+        nschj017: NA
+        mom_a1: true
+      expected_outputs:
+        educ_max: "Some college but no four-year college degree"
+        educ_a1: "Some college but no four-year college degree"
+        educ_a2: NA
+        educ_mom: "Some college but no four-year college degree"
+        educ4_max: "Some College or Associate's Degree"
+
+    - name: not_mother_primary
+      inputs:
+        cqr004: 7  # Bachelor's
+        nschj017: 6  # Associate
+        mom_a1: false
+      expected_outputs:
+        educ_max: "Bachelor's Degree"
+        educ_a1: "Bachelor's Degree"
+        educ_a2: "Associate Degree"
+        educ_mom: NA
+        educ4_max: "College Degree"
+
+usage_guidance:
+  common_analyses:
+    - type: regression_predictor
+      description: "Use educ4_max as covariate in models"
+      code: |
+        model <- lm(outcome ~ educ4_max + age + sex, data = data)
+
+    - type: subgroup_analysis
+      description: "Stratify by high vs low education"
+      code: |
+        high_educ <- educ4_max %in% c("Some College or Associate's Degree", "College Degree")
+
+    - type: ordinal_regression
+      description: "Use ordered factor in ordinal models"
+      code: |
+        library(MASS)
+        model <- polr(outcome ~ educ6_max + covariates, data = data)
+
+  interpretation_notes:
+    - "Reference level is college degree; coefficients show difference from college-educated"
+    - "Ordered factor allows for trend testing across education levels"
+    - "4-category system provides more stable estimates with limited sample sizes"
+    - "6-category system useful for graduate-level samples"
+
+change_history:
+  - version: "1.0.0"
+    date: "2025-09-30"
+    author: "Kidsights Data Team"
+    changes:
+      - "Initial specification"
+      - "8/4/6 category systems implemented"
+      - "Maximum, individual, and maternal education variables"
+      - "College degree as reference level"
+
+  future_enhancements:
+    - name: "educ_min"
+      description: "Minimum household education for homogeneity analyses"
+      priority: low
+
+    - name: "educ_diff"
+      description: "Difference between caregivers"
+      priority: medium
+
+    - name: "educ_yrs"
+      description: "Estimated years of education (continuous)"
+      priority: low

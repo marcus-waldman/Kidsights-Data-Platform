@@ -449,13 +449,13 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     }
     message(paste("Stored", total_dict_fields, "total dictionary fields from", length(all_dictionaries), "projects"))
 
-    # STEP 6: DATA TRANSFORMATION (Dashboard-style) - TEMPORARILY SKIPPED
-    message("\n--- Step 6: Data Transformation (SKIPPED) ---")
+    # STEP 6: DATA TRANSFORMATION (Including Geographic Variables)
+    message("\n--- Step 6: Data Transformation ---")
     transformation_start <- Sys.time()
 
-    # Skip transformations for now to focus on eligibility validation
-    message("Skipping dashboard transformations to debug eligibility...")
-    transformed_data <- eligibility_results
+    # Apply all transformations including geographic crosswalks (48 derived variables)
+    message("Applying all transformations (eligibility, race, education, geographic, etc.)...")
+    transformed_data <- recode_it(dat = eligibility_results, dict = combined_dictionary, what = "all")
 
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
@@ -503,6 +503,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
         "--source-table", "ne25_transformed",
         "--metadata-table", "ne25_metadata",
         "--config", config_path,
+        "--derived-config", "config/derived_variables.yaml",
         "--log-level", "INFO"
       ),
       stdout = TRUE,

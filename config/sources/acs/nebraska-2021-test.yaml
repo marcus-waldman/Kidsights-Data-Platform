@@ -1,0 +1,49 @@
+# Nebraska ACS 2021 Test Extract Configuration
+# Small, fast test extract using 1-year ACS sample
+# Purpose: Quick testing of API connection and pipeline functionality
+
+# State identification
+state: nebraska
+state_fip: 31
+state_abbrev: NE
+
+# ACS sample specification - 1-YEAR SAMPLE FOR SPEED
+acs_sample: us2021a  # 2021 1-year ACS (much smaller than 5-year)
+year_range: "2021"
+sample_type: 1-year
+
+# IPUMS collection settings
+collection: usa
+data_format: csv
+
+# Extract description
+description: "TEST: Nebraska ACS 2021 1-year, children 0-5 for pipeline testing"
+
+# Population filters
+filters:
+  age_min: 0
+  age_max: 5
+
+# Cache settings
+cache:
+  enabled: true
+  max_age_days: 30  # Shorter retention for test data
+  validate_checksums: true
+  auto_cleanup: false
+
+# Notes and metadata
+metadata:
+  purpose: "Quick test extract for pipeline validation and development"
+  target_population: "Children aged 0-5 years in Nebraska"
+  geographic_scope: "Nebraska (FIPS 31)"
+  sample_size: "Approximately 1/5 of 5-year sample (faster processing)"
+  processing_time: "Expected 5-15 minutes (vs 45+ min for 5-year sample)"
+  test_use: true
+
+# Variables inherited from acs-template.yaml
+# Same 25 variables as production config including:
+#   - Core demographics (AGE, SEX, RACE, HISPAN)
+#   - Education with attached characteristics (EDUC_mom, EDUC_pop)
+#   - Economic variables (HHINCOME, POVERTY)
+#   - Geographic identifiers (PUMA, METRO)
+#   - Sampling weights (HHWT, PERWT)

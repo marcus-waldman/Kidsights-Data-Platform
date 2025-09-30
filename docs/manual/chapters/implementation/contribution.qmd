@@ -1,0 +1,444 @@
+# Contributing to the Manual {#sec-contribution}
+
+## Overview
+
+This manual is a **living document** that evolves with research needs. Team members are encouraged to contribute specifications for new variables, improvements to existing transformations, and corrections to documentation.
+
+## Contribution Process
+
+```{mermaid}
+flowchart TD
+    A[Identify Need] --> B[Create Specification]
+    B --> C[Submit for Review]
+    C --> D{Technical Feasible?}
+    D -->|No| E[Revise Specification]
+    E --> C
+    D -->|Yes| F{Domain Expert Approves?}
+    F -->|No| E
+    F -->|Yes| G[Merge into Manual]
+    G --> H[Developer Implements]
+    H --> I[Tests Validate]
+    I --> J{Tests Pass?}
+    J -->|No| K[Fix Implementation]
+    K --> I
+    J -->|Yes| L[Deploy to Pipeline]
+    L --> M[Update Documentation]
+```
+
+## Specification Template
+
+### New Variable Specification
+
+Use this template when proposing a new derived variable:
+
+```markdown
+# [Variable Name] Specification
+
+**Proposed by:** [Your Name]
+**Date:** [YYYY-MM-DD]
+**Status:** Draft | Under Review | Approved | Implemented
+**Version:** 0.1.0
+
+## Research Justification
+
+### Why is this variable needed?
+[Describe the research question or analysis this variable enables]
+
+### What construct does it measure?
+[Define the theoretical or clinical construct]
+
+### How will it be used?
+[Describe typical analyses: predictor, outcome, stratification, etc.]
+
+## Source Variables
+
+### REDCap Fields
+
+| Field Name | Project | Form | Type | Question Text |
+|------------|---------|------|------|---------------|
+| [lex_ne25] | [pid] | [form] | [type] | [question] |
+
+### Existing Derived Variables
+
+If this variable depends on other derived variables, list them:
+- `existing_var_1`: Description
+- `existing_var_2`: Description
+
+## Transformation Logic
+
+### Algorithm Description
+
+[Describe transformation in plain language, step-by-step]
+
+1. First step...
+2. Second step...
+3. Final step...
+
+### Pseudocode
+
+```
+IF condition1:
+    result = value1
+ELSE IF condition2:
+    result = value2
+ELSE:
+    result = value3
+```
+
+### Example Cases
+
+| Input Values | Expected Output | Notes |
+|-------------|-----------------|-------|
+| var1=5, var2=10 | 15 | Simple addition |
+| var1=NA, var2=10 | NA | Missing propagates |
+| var1=5, var2=NA | NA | Missing propagates |
+
+### Edge Cases
+
+How should the transformation handle:
+- **Missing data:** [Specify behavior]
+- **Out-of-range values:** [Specify behavior]
+- **Logical inconsistencies:** [Specify behavior]
+
+## Variable Specifications
+
+### Data Type
+
+- [ ] Numeric (continuous)
+- [ ] Numeric (count/discrete)
+- [ ] Logical (TRUE/FALSE)
+- [ ] Factor (unordered)
+- [ ] Factor (ordered)
+- [ ] Character (text)
+- [ ] Date/Time
+
+### For Factor Variables
+
+**Number of Levels:** [X]
+
+**Factor Levels (in order):**
+1. "[Level 1 label]" - [Description]
+2. "[Level 2 label]" - [Description]
+3. ...
+
+**Ordering:**
+- [ ] Ordered (inherent rank)
+- [ ] Unordered (categorical)
+
+**Reference Level:** "[Which level]"
+
+**Rationale for Reference:** [Why this level as reference?]
+
+### Variable Label
+
+```r
+var_label([var_name]) <- "[Concise, informative label]"
+```
+
+### Value Labels (if factor)
+
+```r
+levels([var_name]):
+  [1] "[First level]"
+  [2] "[Second level]"
+  ...
+```
+
+## Metadata
+
+### Domain Category
+
+Which domain does this variable belong to?
+
+- [ ] Eligibility
+- [ ] Demographics (Age, Sex)
+- [ ] Race/Ethnicity
+- [ ] Education
+- [ ] Socioeconomic Status
+- [ ] Family/Relationships
+- [ ] Geography
+- [ ] Health Status
+- [ ] Development
+- [ ] Other: [Specify]
+
+### Keywords
+
+Tags for searchability: [keyword1, keyword2, keyword3]
+
+### Related Variables
+
+Variables that are commonly used together:
+- `related_var_1`
+- `related_var_2`
+
+## Validation
+
+### Expected Distribution
+
+**In NE25 sample (n=3,906):**
+- Mean (if numeric): [X]
+- SD (if numeric): [X]
+- Range (if numeric): [min - max]
+- Frequency distribution (if factor):
+  - Level 1: [X%]
+  - Level 2: [X%]
+  - ...
+
+### Quality Checks
+
+**Automated Checks:**
+1. [ ] Range validation: [min <= value <= max]
+2. [ ] Logical consistency: [Describe check]
+3. [ ] Cross-variable validation: [Describe check]
+4. [ ] Missing data threshold: [< X% missing]
+
+**Manual Review Triggers:**
+- If >X% missing, flag for review
+- If distribution differs from expected, flag for review
+- If [specific condition], flag for review
+
+### Test Cases
+
+Provide specific test cases for validation:
+
+```r
+# Test Case 1: [Description]
+test_data_1 <- data.frame(
+  input1 = c(...),
+  input2 = c(...)
+)
+expected_output_1 <- c(...)
+
+# Test Case 2: [Description]
+test_data_2 <- ...
+expected_output_2 <- ...
+```
+
+## Implementation Guidance
+
+### R Function Signature
+
+```r
+transform_[varname] <- function(dat, dict, ...) {
+  # Implementation will go here
+  return(result)
+}
+```
+
+### Required Packages
+
+- [ ] dplyr
+- [ ] tidyr
+- [ ] stringr
+- [ ] plyr
+- [ ] Other: [Specify]
+
+### Estimated Complexity
+
+- [ ] Low (< 10 lines of code, simple logic)
+- [ ] Medium (10-50 lines, moderate complexity)
+- [ ] High (> 50 lines, complex logic or dependencies)
+
+### Performance Considerations
+
+- Expected runtime: [X seconds for 4,000 records]
+- Memory usage: [Estimate if significant]
+- Bottlenecks: [Describe if any]
+
+## Review Checklist
+
+Before submitting for review, verify:
+
+### Completeness
+- [ ] All required sections filled out
+- [ ] Examples provided
+- [ ] Test cases specified
+- [ ] Edge cases documented
+
+### Clarity
+- [ ] Logic described in plain language
+- [ ] Pseudocode provided
+- [ ] Examples are clear and comprehensive
+
+### Feasibility
+- [ ] Source variables exist in REDCap
+- [ ] Required dependencies available
+- [ ] No conflicts with existing variables
+
+### Scientific Validity
+- [ ] Transformation logic is statistically sound
+- [ ] Categories/cutpoints justified
+- [ ] Reference level appropriate
+
+## Approval Signatures
+
+**Domain Expert:** [Name] Date: [YYYY-MM-DD]
+- [ ] Research justification approved
+- [ ] Transformation logic approved
+- [ ] Factor structure approved
+
+**Statistical Reviewer:** [Name] Date: [YYYY-MM-DD]
+- [ ] Statistical approach sound
+- [ ] Reference level appropriate
+- [ ] Validation plan adequate
+
+**Technical Lead:** [Name] Date: [YYYY-MM-DD]
+- [ ] Implementation feasible
+- [ ] Performance acceptable
+- [ ] No technical conflicts
+
+## Implementation Notes
+
+**Assigned to:** [Developer Name]
+**Target Date:** [YYYY-MM-DD]
+**Implementation File:** [R/transform/...]
+
+**Implementation Checklist:**
+- [ ] Function implemented per specification
+- [ ] Unit tests written and passing
+- [ ] Integration tests passing
+- [ ] Documentation updated
+- [ ] Code reviewed
+- [ ] Merged to main branch
+
+## Post-Implementation
+
+**Deployment Date:** [YYYY-MM-DD]
+**Final Version:** [X.Y.Z]
+
+**Validation Results:**
+- [ ] Distribution matches expected
+- [ ] Quality checks passing
+- [ ] No unexpected missing patterns
+- [ ] Cross-variable validations pass
+
+**Known Issues:** [None or describe]
+
+**Future Enhancements:** [Ideas for improvement]
+
+---
+
+## Change Log
+
+| Version | Date | Author | Changes |
+|---------|------|--------|---------|
+| 0.1.0 | YYYY-MM-DD | [Name] | Initial draft |
+| 0.2.0 | YYYY-MM-DD | [Name] | Revisions after review |
+| 1.0.0 | YYYY-MM-DD | [Name] | Approved and implemented |
+```
+
+## Quick Start Templates
+
+### Simple Binary Variable
+
+For creating a simple yes/no variable:
+
+```yaml
+variable_name: has_condition
+source_vars:
+  - redcap_field: condition_diagnosed
+transformation: "has_condition <- (condition_diagnosed == 1)"
+data_type: logical
+variable_label: "Child has been diagnosed with condition"
+```
+
+### Categorized Continuous Variable
+
+For binning a continuous variable:
+
+```yaml
+variable_name: age_category
+source_vars:
+  - derived: age_years
+transformation: |
+  age_category <- cut(age_years,
+                      breaks = c(0, 2, 5, 11, 18),
+                      labels = c("0-2 years", "2-5 years", "5-11 years", "11-18 years"),
+                      right = FALSE)
+data_type: factor_ordered
+reference_level: "5-11 years"
+```
+
+### Collapsed Category Variable
+
+For collapsing an existing factor:
+
+```yaml
+variable_name: educ3_max
+source_vars:
+  - derived: educ4_max
+transformation: |
+  educ3_max <- fct_collapse(educ4_max,
+    "Less than College" = c("Less than High School Graduate",
+                            "High School Graduate (including Equivalency)",
+                            "Some College or Associate's Degree"),
+    "College Degree" = "College Degree"
+  )
+data_type: factor_unordered
+reference_level: "College Degree"
+```
+
+## Submitting Your Specification
+
+### Via Git (Preferred)
+
+1. **Create branch:**
+   ```bash
+   git checkout -b spec/your-variable-name
+   ```
+
+2. **Add specification file:**
+   ```bash
+   # Save your spec as: docs/manual/specs/[varname]_spec.md
+   git add docs/manual/specs/[varname]_spec.md
+   ```
+
+3. **Commit:**
+   ```bash
+   git commit -m "spec: Add specification for [varname]"
+   ```
+
+4. **Push and create pull request:**
+   ```bash
+   git push origin spec/your-variable-name
+   # Then create PR on GitHub
+   ```
+
+### Via Email
+
+If you're not comfortable with Git:
+1. Fill out the specification template
+2. Save as `[varname]_spec.md`
+3. Email to technical lead with subject: "Variable Specification: [varname]"
+
+### Via Shared Document
+
+For collaborative drafting:
+1. Copy template to shared Google Doc or Word document
+2. Share link with "comment" access
+3. Notify team via email or Slack
+4. Technical lead will transfer to Git once approved
+
+## Getting Help
+
+### Questions About the Process
+
+- Review this guide thoroughly
+- Check existing variable specifications for examples
+- Ask technical lead for clarification
+
+### Questions About Science/Research
+
+- Consult domain expert for your area
+- Review relevant literature
+- Check similar variables in other studies
+
+### Questions About Implementation
+
+- Consult with developer early (before finalizing spec)
+- Review @sec-development for coding standards
+- Check @sec-standards for naming conventions
+
+---
+
+**Next:** @sec-development provides detailed implementation guidance for developers coding transformations.

@@ -77,6 +77,34 @@ def load_derived_variables_config(config_path: str) -> Optional[List[str]]:
         return None
 
 
+def load_variable_labels(config_path: str) -> Dict[str, str]:
+    """
+    Load variable labels from derived variables YAML configuration.
+
+    Args:
+        config_path: Path to the derived variables YAML configuration file
+
+    Returns:
+        Dictionary mapping variable names to descriptive labels
+    """
+    try:
+        config_file = Path(config_path)
+        if not config_file.exists():
+            return {}
+
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+
+        if 'variable_labels' in config:
+            return config['variable_labels']
+        else:
+            return {}
+
+    except Exception as e:
+        print(f"Warning: Could not load variable labels from {config_path}: {e}")
+        return {}
+
+
 @with_logging("analyze_variable")
 def analyze_variable(series: pd.Series, var_name: str) -> Dict[str, Any]:
     """
@@ -361,7 +389,12 @@ def categorize_variable(var_name: str) -> str:
         return 'caregiver relationship'
 
     # Geographic variables
-    if any(geo_term in var_lower for geo_term in ['zip', 'county', 'state', 'geographic']):
+    if any(geo_term in var_lower for geo_term in [
+        'zip', 'county', 'state', 'geographic',
+        'puma', 'tract', 'cbsa', 'urban_rural',
+        'school', 'sldl', 'sldu', 'congress',
+        'aiannh'
+    ]):
         return 'geography'
 
     return 'other'
@@ -415,7 +448,8 @@ def generate_metadata_from_table(
     table_name: str,
     db_ops: DatabaseOperations,
     exclude_columns: List[str] = None,
-    derived_variables_list: Optional[List[str]] = None
+    derived_variables_list: Optional[List[str]] = None,
+    variable_labels: Optional[Dict[str, str]] = None
 ) -> List[Dict[str, Any]]:
     """
     Generate metadata for all columns in a table.
@@ -424,11 +458,16 @@ def generate_metadata_from_table(
         table_name: Name of the table to analyze
         db_ops: Database operations instance
         exclude_columns: Columns to exclude from metadata generation
+        derived_variables_list: List of derived variables to filter to
+        variable_labels: Dictionary of variable names to descriptive labels
 
     Returns:
         List of metadata dictionaries
     """
     logger = setup_logging()
+
+    if variable_labels is None:
+        variable_labels = {}
 
     if exclude_columns is None:
         exclude_columns = ['record_id', 'pid', 'retrieved_date', 'transformation_version', 'transformed_at']
@@ -495,7 +534,13 @@ def generate_metadata_from_table(
                         # Add category and transformation notes
                         category = categorize_variable(col_name)
                         var_metadata["category"] = category
-                        var_metadata["variable_label"] = col_name.replace('_', ' ').title()
+
+                        # Use custom label if available, otherwise generate from variable name
+                        if col_name in variable_labels:
+                            var_metadata["variable_label"] = variable_labels[col_name]
+                        else:
+                            var_metadata["variable_label"] = col_name.replace('_', ' ').title()
+
                         var_metadata["transformation_notes"] = generate_transformation_notes(col_name, category)
                         var_metadata["creation_date"] = datetime.now().isoformat()
 
@@ -858,6 +903,14 @@ Examples:
 
             logger.info(f"Loaded {len(derived_variables_list)} derived variables from configuration")
 
+        # Load variable labels from configuration
+        logger.info(f"Loading variable labels from: {args.derived_config}")
+        variable_labels = load_variable_labels(args.derived_config)
+        if variable_labels:
+            logger.info(f"Loaded {len(variable_labels)} variable labels from configuration")
+        else:
+            logger.warning("No variable labels found in configuration - using auto-generated labels")
+
         # Generate metadata
         with PerformanceLogger(logger, "metadata_generation", source_table=args.source_table):
             logger.info(f"Generating metadata from table: {args.source_table}")
@@ -868,7 +921,8 @@ Examples:
             metadata_list = generate_metadata_from_table(
                 args.source_table,
                 db_ops,
-                derived_variables_list=derived_variables_list
+                derived_variables_list=derived_variables_list,
+                variable_labels=variable_labels
             )
 
             if not metadata_list:

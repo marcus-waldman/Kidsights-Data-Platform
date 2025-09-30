@@ -1,0 +1,309 @@
+# IPUMS USA Variables for ACS Extracts
+# Complete variable definitions for Kidsights statistical raking
+# Reference: https://usa.ipums.org/usa-action/variables/group
+
+# Variable categories for extraction
+variable_groups:
+  # Core demographic and identifier variables (REQUIRED)
+  core:
+    AGE:
+      label: "Age"
+      type: integer
+      description: "Age in years at time of survey"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/AGE"
+      raking_use: "Age categories for raking"
+      required: true
+
+    SEX:
+      label: "Sex"
+      type: categorical
+      description: "Sex of respondent"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/SEX"
+      values:
+        1: "Male"
+        2: "Female"
+      raking_use: "Sex for demographic raking"
+      required: true
+
+    RACE:
+      label: "Race"
+      type: categorical
+      description: "Race (detailed coding)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/RACE"
+      raking_use: "Race categories for raking"
+      notes: "2023+ has updated coding. Use IPUMS harmonization guidance."
+      required: true
+
+    HISPAN:
+      label: "Hispanic origin"
+      type: categorical
+      description: "Hispanic origin or descent"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/HISPAN"
+      raking_use: "Ethnicity for raking (Hispanic vs non-Hispanic)"
+      required: true
+
+    SERIAL:
+      label: "Household serial number"
+      type: integer
+      description: "Unique household identifier"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/SERIAL"
+      required: true
+      notes: "Required for household-level linkage"
+
+    PERNUM:
+      label: "Person number"
+      type: integer
+      description: "Person number within household"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/PERNUM"
+      required: true
+      notes: "Combined with SERIAL for unique person ID"
+
+    HHWT:
+      label: "Household weight"
+      type: numeric
+      description: "Household-level sampling weight"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/HHWT"
+      required: true
+      notes: "Use for household-level analyses"
+
+    PERWT:
+      label: "Person weight"
+      type: numeric
+      description: "Person-level sampling weight"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/PERWT"
+      required: true
+      notes: "Use for person-level analyses and raking"
+
+    STATEFIP:
+      label: "State FIPS code"
+      type: categorical
+      description: "State Federal Information Processing Standard code"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/STATEFIP"
+      required: true
+      notes: "Used for state filtering"
+
+    PUMA:
+      label: "Public Use Microdata Area"
+      type: categorical
+      description: "Census PUMA (100,000+ residents)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/PUMA"
+      required: true
+      raking_use: "Geographic stratification"
+
+    METRO:
+      label: "Metropolitan status"
+      type: categorical
+      description: "Metropolitan/non-metropolitan status"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/METRO"
+      raking_use: "Urban/rural for raking"
+      required: true
+
+    RELATE:
+      label: "Relationship to household head"
+      type: categorical
+      description: "Relationship to householder"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/RELATE"
+      required: true
+      notes: "Used with MOMLOC/POPLOC for family structure"
+
+  # Economic variables
+  economic:
+    HHINCOME:
+      label: "Total household income"
+      type: integer
+      description: "Total household income in past 12 months"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/HHINCOME"
+      raking_use: "Income categories for raking"
+      notes: "Adjusted to final year dollars in 5-year samples"
+
+    FTOTINC:
+      label: "Total family income"
+      type: integer
+      description: "Total family income in past 12 months"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/FTOTINC"
+      notes: "Family income (related household members only)"
+
+    POVERTY:
+      label: "Poverty status"
+      type: numeric
+      description: "Income as percentage of poverty threshold"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/POVERTY"
+      raking_use: "Poverty status for raking"
+      notes: "Values below 100 indicate below poverty line"
+
+    GRPIP:
+      label: "Gross rent as % of income"
+      type: numeric
+      description: "Gross rent as percentage of household income"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/GRPIP"
+      notes: "Housing cost burden indicator"
+
+  # Government program participation
+  programs:
+    FOODSTMP:
+      label: "Food stamp (SNAP) receipt"
+      type: categorical
+      description: "Whether household received food stamps/SNAP in past 12 months"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/FOODSTMP"
+      values:
+        1: "No"
+        2: "Yes"
+      raking_use: "SNAP participation for raking"
+
+    HINSCAID:
+      label: "Medicaid coverage"
+      type: categorical
+      description: "Medicaid or other government health insurance"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/HINSCAID"
+      values:
+        1: "No coverage"
+        2: "Medicaid/govt insurance"
+      raking_use: "Medicaid enrollment for raking"
+
+    HCOVANY:
+      label: "Any health insurance"
+      type: categorical
+      description: "Any health insurance coverage"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/HCOVANY"
+      values:
+        1: "No coverage"
+        2: "Has coverage"
+      notes: "Composite of all insurance types"
+
+  # Education variables (WITH ATTACHED CHARACTERISTICS)
+  education:
+    EDUC:
+      label: "Educational attainment"
+      type: categorical
+      description: "Educational attainment (general recode)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/EDUC"
+      attach_characteristics: ["mother", "father"]
+      raking_use: "Parent education for raking"
+      notes: "Creates EDUC_mom, EDUC_pop variables"
+
+    EDUCD:
+      label: "Educational attainment (detailed)"
+      type: categorical
+      description: "Educational attainment (detailed recode)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/EDUCD"
+      attach_characteristics: ["mother", "father"]
+      raking_use: "Detailed parent education"
+      notes: "Creates EDUCD_mom, EDUCD_pop variables"
+
+  # Household structure variables
+  household:
+    MARST:
+      label: "Marital status"
+      type: categorical
+      description: "Marital status"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/MARST"
+      attach_characteristics: ["head"]
+      raking_use: "Household marital status for raking"
+      notes: "Creates MARST_head variable"
+
+    MOMLOC:
+      label: "Mother's location in household"
+      type: integer
+      description: "Person number of mother in household (0 if not present)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/MOMLOC"
+      notes: "Used by attach_characteristics for mother linkage"
+
+    POPLOC:
+      label: "Father's location in household"
+      type: integer
+      description: "Person number of father in household (0 if not present)"
+      ipums_url: "https://usa.ipums.org/usa-action/variables/POPLOC"
+      notes: "Used by attach_characteristics for father linkage"
+
+# Attached characteristics configuration
+attached_characteristics:
+  description: "Variables automatically created by IPUMS attach_characteristics feature"
+
+  mother:
+    suffix: "_mom"
+    pointer_variable: "MOMLOC"
+    description: "Characteristics attached from mother to child"
+    variables:
+      - EDUC    # Creates EDUC_mom
+      - EDUCD   # Creates EDUCD_mom
+    notes: "If child has two mothers, creates _mom and _mom2 variables"
+
+  father:
+    suffix: "_pop"
+    pointer_variable: "POPLOC"
+    description: "Characteristics attached from father to child"
+    variables:
+      - EDUC    # Creates EDUC_pop
+      - EDUCD   # Creates EDUCD_pop
+    notes: "If child has two fathers, creates _pop and _pop2 variables"
+
+  head:
+    suffix: "_head"
+    description: "Characteristics attached from household head to all members"
+    variables:
+      - MARST   # Creates MARST_head
+
+# Raking variable mappings (for future harmonization)
+raking_dimensions:
+  age:
+    source: "AGE"
+    categories: ["0-2", "3-5"]
+    notes: "Collapse ages 0-5 into categories"
+
+  sex:
+    source: "SEX"
+    categories: ["Male", "Female"]
+
+  race_ethnicity:
+    source: ["RACE", "HISPAN"]
+    categories: ["Hispanic", "White non-Hispanic", "Black non-Hispanic", "Other non-Hispanic"]
+    notes: "Combine RACE and HISPAN per OMB standards"
+
+  parent_education:
+    source: ["EDUC_mom", "EDUC_pop"]
+    categories: ["Less than HS", "HS/Some college", "Bachelor's+"]
+    notes: "Use maximum of mother/father education"
+
+  household_income:
+    source: ["HHINCOME", "POVERTY"]
+    categories: ["<100% FPL", "100-200% FPL", "200-400% FPL", "400%+ FPL"]
+    notes: "Federal poverty level categories"
+
+  metro_status:
+    source: "METRO"
+    categories: ["Metro", "Non-metro"]
+
+  snap_participation:
+    source: "FOODSTMP"
+    categories: ["SNAP recipient", "Not SNAP recipient"]
+
+  medicaid:
+    source: "HINSCAID"
+    categories: ["Medicaid", "Not Medicaid"]
+
+# Variable validation rules
+validation:
+  required_variables:
+    - AGE
+    - SEX
+    - RACE
+    - HISPAN
+    - SERIAL
+    - PERNUM
+    - HHWT
+    - PERWT
+    - STATEFIP
+
+  required_attached:
+    - EDUC_mom
+    - EDUC_pop
+
+  expected_ranges:
+    AGE: [0, 5]
+    SEX: [1, 2]
+
+# Missing value codes (IPUMS conventions)
+missing_values:
+  general: 0
+  not_applicable: [-1, -9]
+  notes: "IPUMS uses 0 for 'N/A' and negative values for missing. Check variable-specific codes."

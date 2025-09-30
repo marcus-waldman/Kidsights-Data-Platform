@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidsights Data Transformation & Metadata Manual - Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }
+        h3 { color: #7f8c8d; margin-top: 20px; }
+        .status { display: inline-block; padding: 3px 8px; border-radius: 3px; font-size: 0.85em; font-weight: bold; }
+        .complete { background-color: #2ecc71; color: white; }
+        .pending { background-color: #f39c12; color: white; }
+        .chapter { margin: 15px 0; padding: 15px; background: #ecf0f1; border-radius: 5px; }
+        .chapter-title { font-weight: bold; color: #2c3e50; }
+        .chapter-desc { color: #7f8c8d; font-size: 0.95em; margin-top: 5px; }
+        .file-path { font-family: monospace; font-size: 0.85em; color: #e74c3c; }
+        .stats { background: #3498db; color: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 10px; }
+        .stat-item { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 3px; }
+        .stat-number { font-size: 1.8em; font-weight: bold; }
+        .section { margin-bottom: 40px; }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .note { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; margin: 15px 0; }
+        .success { background: #d4edda; border-left: 4px solid #28a745; padding: 10px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <h1>🔬 Kidsights Data Transformation & Metadata Manual</h1>
+
+    <div class="success">
+        <strong>✅ Manual Created Successfully</strong><br>
+        The manual structure has been created with comprehensive documentation. Since Quarto rendering is experiencing issues,
+        you can view the source files directly or open them in RStudio/VS Code to preview the markdown.
+    </div>
+
+    <div class="stats">
+        <h3 style="margin-top:0; color: white;">📊 Documentation Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number">~25,000</div>
+                <div>Words Written</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">13</div>
+                <div>Chapters Created</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">12</div>
+                <div>Variables Documented</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">400+</div>
+                <div>Lines of YAML Specs</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📖 Part I: Foundations <span class="status complete">100% Complete</span></h2>
+
+        <div class="chapter">
+            <div class="chapter-title">1. Overview</div>
+            <div class="chapter-desc">System philosophy, transformation problem, recode_it() architecture (~3,800 words)</div>
+            <div class="file-path">📄 chapters/foundations/overview.qmd</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">2. Technical Architecture</div>
+            <div class="chapter-desc">Hybrid R-Python design, components, data flow, performance (~5,200 words)</div>
+            <div class="file-path">📄 chapters/foundations/architecture.qmd</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">3. Standards</div>
+            <div class="chapter-desc">Naming conventions, factor specifications, coding standards (~4,600 words)</div>
+            <div class="file-path">📄 chapters/foundations/standards.qmd</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Part II: Variable Domains</h2>
+
+        <div class="chapter" style="border-left: 4px solid #2ecc71;">
+            <div class="chapter-title">4. Education Variables <span class="status complete">Complete Model</span></div>
+            <div class="chapter-desc">
+                <strong>Comprehensive documentation for 12 education variables (~6,000 words)</strong>
+                <ul>
+                    <li>Source variables: cqr004 (primary), nschj017 (secondary)</li>
+                    <li>8/4/6-category mapping systems fully documented</li>
+                    <li>Transformation algorithms with flowcharts</li>
+                    <li>Factor specifications (ordering, reference levels)</li>
+                    <li>Validation rules and test cases</li>
+                    <li>Common analysis patterns with R code</li>
+                    <li>Machine-readable YAML specification included</li>
+                </ul>
+            </div>
+            <div class="file-path">
+                📄 chapters/domains/education.qmd<br>
+                📄 specs/yaml/education_variables.yaml
+            </div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">5. Eligibility Variables <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Eligibility criteria: eligible, authentic, include (3 variables)</div>
+            <div class="file-path">📄 chapters/domains/eligibility.qmd (placeholder)</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">6. Demographics <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Age and sex variables</div>
+            <div class="file-path">📄 chapters/domains/demographics.qmd (placeholder)</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">7. Race & Ethnicity <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Child and caregiver race/ethnicity (6 variables)</div>
+            <div class="file-path">📄 chapters/domains/race-ethnicity.qmd (placeholder)</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">8. Income & Socioeconomic <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Federal poverty level calculations</div>
+            <div class="file-path">📄 chapters/domains/income.qmd (placeholder)</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">9. Caregiver Relationships <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Relationship and role variables</div>
+            <div class="file-path">📄 chapters/domains/relationships.qmd (placeholder)</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">10. Geography <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Location and residence variables</div>
+            <div class="file-path">📄 chapters/domains/geography.qmd (placeholder)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>⚙️ Part III: Transformation Specifications <span class="status pending">To Be Completed</span></h2>
+        <p>Technical patterns for cross-cutting concerns (placeholders created)</p>
+    </div>
+
+    <div class="section">
+        <h2>🛠️ Part IV: Implementation Guide</h2>
+
+        <div class="chapter" style="border-left: 4px solid #2ecc71;">
+            <div class="chapter-title">14. Contributing to the Manual <span class="status complete">Complete</span></div>
+            <div class="chapter-desc">
+                <strong>Complete contribution system (~3,500 words)</strong>
+                <ul>
+                    <li>New variable specification template</li>
+                    <li>Quick-start templates (binary, categorical, collapsed)</li>
+                    <li>Review checklist and workflow</li>
+                    <li>Submission process (Git, email, shared docs)</li>
+                </ul>
+            </div>
+            <div class="file-path">📄 chapters/implementation/contribution.qmd</div>
+        </div>
+
+        <div class="chapter">
+            <div class="chapter-title">15-17. Development, Testing, Documentation <span class="status pending">To Be Completed</span></div>
+            <div class="chapter-desc">Implementation guides (placeholders created)</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🚀 Quick Start</h2>
+
+        <div class="note">
+            <strong>Viewing the Manual:</strong><br><br>
+
+            <strong>Option 1: Open in RStudio (Recommended)</strong><br>
+            1. Open RStudio<br>
+            2. Navigate to <code>docs/manual/</code><br>
+            3. Open any <code>.qmd</code> file<br>
+            4. Click "Render" button to preview individual chapters<br><br>
+
+            <strong>Option 2: View Source Files Directly</strong><br>
+            1. Navigate to <code>docs/manual/chapters/</code><br>
+            2. Open <code>.qmd</code> files in any text editor<br>
+            3. Markdown is readable as plain text<br><br>
+
+            <strong>Option 3: Use VS Code with Quarto Extension</strong><br>
+            1. Install Quarto extension in VS Code<br>
+            2. Open <code>.qmd</code> files<br>
+            3. Use preview pane<br><br>
+
+            <strong>Key Files to Review:</strong><br>
+            • <code>README.md</code> - Project overview<br>
+            • <code>GETTING_STARTED.md</code> - Quick start guide<br>
+            • <code>chapters/domains/education.qmd</code> - Complete model chapter<br>
+            • <code>chapters/implementation/contribution.qmd</code> - Templates<br>
+            • <code>specs/yaml/education_variables.yaml</code> - Machine-readable spec
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📁 File Structure</h2>
+        <pre style="background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto;">
+docs/manual/
+├── index.qmd                      ✅ Welcome page
+├── README.md                      ✅ Project documentation
+├── GETTING_STARTED.md             ✅ Quick start guide
+├── references.qmd                 ✅ Bibliography
+├── _quarto.yml                    ✅ Book configuration
+├── chapters/
+│   ├── foundations/
+│   │   ├── overview.qmd          ✅ 3,800 words
+│   │   ├── architecture.qmd      ✅ 5,200 words
+│   │   └── standards.qmd         ✅ 4,600 words
+│   ├── domains/
+│   │   ├── education.qmd         ✅ 6,000 words (MODEL)
+│   │   └── [6 more domains]      ⏳ Placeholders
+│   └── implementation/
+│       └── contribution.qmd      ✅ 3,500 words
+└── specs/
+    └── yaml/
+        └── education_variables.yaml  ✅ 400 lines
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>💡 Next Steps</h2>
+        <ol>
+            <li><strong>Review the Education chapter</strong> - Open <code>chapters/domains/education.qmd</code> to see the comprehensive model</li>
+            <li><strong>Check the contribution template</strong> - Review <code>chapters/implementation/contribution.qmd</code> for team workflow</li>
+            <li><strong>Examine the YAML spec</strong> - Look at <code>specs/yaml/education_variables.yaml</code> for machine-readable format</li>
+            <li><strong>Complete remaining domains</strong> - Use education chapter as template for 6 remaining domains</li>
+            <li><strong>Try the rendering again later</strong> - The Quarto/pandoc hang may be environment-specific</li>
+        </ol>
+    </div>
+
+    <div class="success">
+        <strong>✨ What You Have:</strong><br>
+        A complete manual structure with ~25,000 words of documentation, including a comprehensive model chapter (Education)
+        that demonstrates how to document all aspects of data transformation. The manual is ready for your team to review
+        the existing content and complete the remaining domain chapters using the education chapter as a template.
+    </div>
+
+    <footer style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #bdc3c7; color: #7f8c8d; text-align: center;">
+        <p>Kidsights Data Transformation & Metadata Manual v1.0.0<br>
+        Created: 2025-09-30</p>
+    </footer>
+</body>
+</html>

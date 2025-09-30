@@ -1,0 +1,120 @@
+# Welcome {.unnumbered}
+
+This manual serves as the **authoritative specification** for data transformation and metadata management in the Kidsights Data Platform. It bridges the gap between research requirements and technical implementation, providing a single source of truth that both domain experts and developers can reference.
+
+## Purpose
+
+This manual:
+
+1. **Documents transformation logic** for converting raw REDCap data into analysis-ready variables
+2. **Specifies metadata standards** for variable documentation and categorization
+3. **Guides implementation** of transformation functions in R and Python
+4. **Enables collaboration** between researchers and developers through clear specifications
+5. **Ensures consistency** across studies, time points, and analysis workflows
+
+## How This Manual Drives Development
+
+```{mermaid}
+flowchart TD
+    A[Domain Expert writes specification] --> B[Team reviews & approves]
+    B --> C[Developer implements from spec]
+    C --> D[Automated tests validate]
+    D --> E{Tests pass?}
+    E -->|Yes| F[Code merged]
+    E -->|No| G[Fix code or update spec]
+    G --> B
+    F --> H[Documentation auto-generated]
+```
+
+## Philosophy
+
+**Specification-First Development:** Unlike traditional documentation that follows code, this manual is written FIRST. Code is then developed to match the specifications documented here. When discrepancies arise, the manual is the authority—code must be corrected.
+
+**Human-Readable Specifications:** Transformation rules are written in clear language that domain experts can verify, with technical details added to support implementation.
+
+**Machine-Readable Metadata:** Alongside human documentation, structured YAML/JSON specifications enable automated code generation, validation, and documentation.
+
+## Manual Organization
+
+### Part I: Foundations
+Core concepts, architecture, and standards that apply across all transformations.
+
+### Part II: Variable Domains
+Detailed specifications for each functional domain (eligibility, demographics, education, etc.). Each chapter follows a consistent template covering source variables, transformation rules, metadata, and validation.
+
+### Part III: Transformation Specifications
+Technical patterns for handling factors, missing data, harmonization, and other cross-cutting concerns.
+
+### Part IV: Implementation Guide
+Guidelines for developers implementing transformations, writing tests, and contributing to the manual.
+
+## Current System Overview
+
+The Kidsights Data Platform processes data from **4 REDCap projects** containing **1,880 raw variables** from **3,906 participants**. Through documented transformations, it produces **21 derived variables** optimized for statistical analysis.
+
+### Key Statistics
+
+| Metric | Count |
+|--------|-------|
+| REDCap Projects | 4 (PIDs: 7679, 7943, 7999, 8014) |
+| Raw Variables | 1,880 |
+| Unique Variables | 472 |
+| Derived Variables | 21 |
+| Variable Domains | 7 |
+| Studies Harmonized | NE25, NE22, NE20, CREDI, GSED, CAHMI |
+
+### Transformation Categories
+
+The 21 derived variables span 7 transformation categories:
+
+1. **Eligibility** (3 variables): `eligible`, `authentic`, `include`
+2. **Race/Ethnicity** (6 variables): Child and caregiver race/ethnicity combinations
+3. **Education** (12 variables): 8/4/6-category education levels for multiple caregivers
+4. **Demographics** (varies): Age, sex, family composition
+5. **Income** (varies): Income levels, federal poverty calculations
+6. **Relationships** (varies): Caregiver relationships and roles
+7. **Geography** (varies): Location and residence variables
+
+## How to Use This Manual
+
+**For Domain Experts:**
+Read Part II chapters for your domain. Verify transformation logic matches research requirements. Propose changes through contribution templates.
+
+**For Developers:**
+Use Part II specifications to implement transformation functions. Reference Part III for technical patterns. Follow Part IV guidelines for coding standards.
+
+**For Data Analysts:**
+Part II provides complete variable documentation including factor levels, reference categories, and appropriate usage guidance.
+
+**For Project Managers:**
+Part I explains the overall system. Use this manual to coordinate between research and technical teams.
+
+## Version Control
+
+This manual is version-controlled alongside code. Each variable specification includes:
+
+- **Version number**: Semantic versioning for specification changes
+- **Change log**: History of modifications and rationale
+- **Implementation status**: Whether code matches current specification
+- **Review status**: Approval by domain experts and technical leads
+
+## Getting Started
+
+New to the manual? Start here:
+
+1. Read @sec-overview for system philosophy and architecture
+2. Review @sec-standards for naming conventions and coding standards
+3. Explore one domain chapter (Education @sec-education is a good example)
+4. See @sec-contribution for how to propose new transformations
+
+## Maintenance
+
+This manual is a **living document**. As research needs evolve and new studies are added, specifications are updated through a formal review process documented in @sec-contribution.
+
+**Current Version:** 1.0.0
+**Last Updated:** `r Sys.Date()`
+**Maintainer:** Kidsights Data Team
+
+---
+
+*This manual replaces scattered documentation across code comments, wikis, and individual knowledge. It represents the collective expertise of the research and technical teams.*

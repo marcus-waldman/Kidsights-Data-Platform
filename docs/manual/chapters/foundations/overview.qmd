@@ -1,0 +1,270 @@
+# Overview {#sec-overview}
+
+## System Philosophy
+
+The Kidsights Data Platform is built on a fundamental principle: **transformation logic should be documented before it is coded**. This inverts the traditional software development model where documentation follows implementation.
+
+### Why Specification-First?
+
+**Problem:** Research teams often discover that data transformations don't match their intentions. By the time code is written, reviewed, and deployed, the original research logic may have been lost or misinterpreted.
+
+**Solution:** This manual captures research requirements as precise specifications. Developers implement from these specifications, and automated tests verify compliance. When questions arise, the manual is authoritative.
+
+### Benefits
+
+1. **Domain expertise preserved:** Statistical and clinical knowledge embedded in transformations is documented independent of code
+2. **Team collaboration enabled:** Non-programmers can contribute specifications that programmers implement consistently
+3. **Quality improved:** Clear specifications catch errors before coding begins
+4. **Onboarding accelerated:** New team members learn from specifications rather than reverse-engineering code
+5. **Reproducibility ensured:** Transformations can be reimplemented in new languages while maintaining fidelity
+
+## The Transformation Problem
+
+### Raw Data Challenges
+
+REDCap collects data in formats optimized for data entry, not analysis:
+
+- **Checkbox variables:** Each option becomes a separate binary variable (`cqr010___1`, `cqr010___2`, etc.)
+- **Text responses:** Free-text fields requiring parsing and categorization
+- **Calculated fields:** Complex logic embedded in REDCap that may need verification
+- **Missing data codes:** Study-specific conventions (NE25 uses `9`, others use `-9`)
+- **Multi-project data:** Same construct measured differently across studies
+
+### Analysis Requirements
+
+Researchers need variables that are:
+
+- **Statistically appropriate:** Factors with proper ordering and reference levels
+- **Theoretically meaningful:** Categories that reflect underlying constructs
+- **Consistently coded:** Harmonized across studies and time points
+- **Well-documented:** Clear labels, value definitions, and usage guidance
+- **Validated:** Known distributions and quality checks
+
+### The Transformation Bridge
+
+This platform bridges raw data to analysis-ready variables through:
+
+```{mermaid}
+flowchart LR
+    A[Raw REDCap Data] -->|Extract| B[Python/R Extraction]
+    B -->|Transform| C[Transformation Functions]
+    C -->|Validate| D[Quality Checks]
+    D -->|Store| E[DuckDB Tables]
+    E -->|Document| F[Metadata Generation]
+    F -->|Publish| G[Interactive Documentation]
+
+    H[This Manual] -.Specifies.-> C
+    H -.Defines.-> D
+    H -.Guides.-> F
+```
+
+## Architecture Overview
+
+### Hybrid R-Python Design
+
+The platform uses **R for transformations** and **Python for database operations**, combining the strengths of both:
+
+**R responsibilities:**
+- Extract data from REDCap (via REDCapR)
+- Apply statistical transformations (recode_it function)
+- Create factors with proper ordering and labels
+- Calculate derived variables using domain logic
+
+**Python responsibilities:**
+- Initialize and manage DuckDB database
+- Insert/update data with chunked processing
+- Generate comprehensive metadata
+- Produce interactive documentation
+
+**Communication layer:**
+- Apache Feather files for fast, type-safe data exchange
+- Perfect preservation of R factors as pandas categories
+- 3x faster than CSV with no data corruption
+
+### Data Flow
+
+```{mermaid}
+flowchart TD
+    subgraph REDCap
+        P1[Project 7679]
+        P2[Project 7943]
+        P3[Project 7999]
+        P4[Project 8014]
+    end
+
+    subgraph R Processing
+        E[Extract via REDCapR]
+        T[Transform via recode_it]
+        F[Export to Feather]
+    end
+
+    subgraph Python Processing
+        I[Insert to DuckDB]
+        M[Generate Metadata]
+        D[Create Documentation]
+    end
+
+    subgraph Storage
+        DB[(DuckDB)]
+        DOC[HTML Documentation]
+    end
+
+    P1 & P2 & P3 & P4 --> E
+    E --> T
+    T --> F
+    F --> I
+    I --> DB
+    DB --> M
+    M --> D
+    D --> DOC
+```
+
+### Key Components
+
+**Configuration System:**
+- YAML files define data sources, transformations, and metadata
+- `config/sources/ne25.yaml` specifies REDCap projects and variables
+- `config/derived_variables.yaml` lists all derived variables
+
+**Transformation Engine:**
+- `R/transform/ne25_transforms.R` implements recode_it() function
+- Modular design: separate functions for each domain
+- Consistent interface: all transformations receive (data, dictionary, parameters)
+
+**Metadata System:**
+- `pipelines/python/generate_metadata.py` analyzes transformed data
+- Produces factor levels, value counts, distributions
+- Categorizes variables by domain automatically
+
+**Documentation Generator:**
+- Quarto-based interactive HTML documentation
+- JSON exports for programmatic access
+- DataTables for searchable variable catalogs
+
+## The recode_it() Function
+
+The heart of the transformation system is `recode_it()`, a master function that applies domain-specific transformations:
+
+```{mermaid}
+flowchart LR
+    A[Raw Data + Dictionary] --> B[recode_it]
+    B --> C{what = ?}
+    C -->|include| D[Eligibility Logic]
+    C -->|race| E[Race/Ethnicity Collapsing]
+    C -->|education| F[Education Recoding]
+    C -->|sex| G[Sex Variables]
+    C -->|age| H[Age Calculations]
+    C -->|income| I[FPL Calculations]
+    C -->|caregiver relationship| J[Relationship Parsing]
+    C -->|all| K[All Transformations]
+
+    D & E & F & G & H & I & J --> L[Derived Variables]
+```
+
+### Transformation Categories
+
+Each `what` parameter triggers a specific transformation category:
+
+| Category | Variables Created | Complexity |
+|----------|-------------------|------------|
+| include | 3 | Low - Boolean logic |
+| race | 6 | High - Pivoting & collapsing |
+| education | 12 | Medium - Multi-level mapping |
+| sex | 2 | Low - Direct mapping |
+| age | 4 | Low - Arithmetic |
+| income | 5 | Medium - FPL calculations |
+| caregiver relationship | 4 | Medium - Conditional logic |
+
+### Design Principles
+
+1. **Modularity:** Each transformation is independent and can be tested separately
+2. **Transparency:** Logic is explicit, not hidden in complex pipelines
+3. **Validation:** Built-in error checking and quality assurance
+4. **Documentation:** Variable labels and metadata created alongside data
+5. **Reversibility:** Transformations can be traced back to source variables
+
+## Quality Assurance
+
+### Multi-Layer Validation
+
+Transformations undergo quality checks at multiple stages:
+
+**1. Specification Review**
+- Domain experts verify transformation logic
+- Statistical reviewers check factor construction
+- Team approval before implementation
+
+**2. Implementation Testing**
+- Unit tests for each transformation function
+- Integration tests for full pipeline
+- Edge case coverage (missing data, outliers)
+
+**3. Data Validation**
+- Distribution checks against expected patterns
+- Cross-variable consistency checks
+- Completeness and quality metrics
+
+**4. Documentation Verification**
+- Metadata accuracy confirmed
+- Examples tested against actual data
+- User documentation reviewed
+
+### Audit Trail
+
+Every transformation maintains provenance:
+
+- **Source variables:** Which raw variables were used
+- **Transformation version:** Which specification was implemented
+- **Execution timestamp:** When transformation occurred
+- **Configuration:** What parameters were used
+- **Quality metrics:** Pass/fail status of validation checks
+
+## Evolution and Maintenance
+
+### Change Management
+
+Transformation specifications evolve through a formal process:
+
+1. **Proposal:** Team member submits specification using template
+2. **Review:** Domain experts and developers assess feasibility
+3. **Approval:** Specification merged into manual
+4. **Implementation:** Developers code to specification
+5. **Validation:** Tests confirm implementation matches specification
+6. **Deployment:** New transformation added to pipeline
+
+### Version Control
+
+- **Manual versions:** Semantic versioning (MAJOR.MINOR.PATCH)
+- **Specification versions:** Each variable has version history
+- **Code versions:** Git tags link code to manual versions
+- **Data versions:** Transformation metadata stored with each dataset
+
+### Backward Compatibility
+
+When specifications change:
+
+- **Additions:** New variables or categories can be added freely
+- **Modifications:** Existing logic changes require deprecation period
+- **Removals:** Variables marked deprecated before removal
+- **Breaking changes:** Trigger major version increment
+
+## Getting Help
+
+### For Questions About Specifications
+- Check relevant domain chapter (Part II)
+- Review transformation patterns (Part III)
+- Consult change log for variable
+
+### For Implementation Issues
+- See development guide (@sec-development)
+- Check troubleshooting section
+- Contact technical lead
+
+### For New Transformations
+- Use contribution template (@sec-contribution)
+- Review standards (@sec-standards)
+- Discuss with domain expert and developer
+
+---
+
+**Next:** @sec-architecture provides detailed technical architecture, while @sec-standards covers naming conventions and coding standards.

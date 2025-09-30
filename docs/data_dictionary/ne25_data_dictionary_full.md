@@ -1,9 +1,9 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-09-29 14:00:29  
-**Total Records:** 4826  
-**Total Variables:** 554  
-**Categories:** 5  
+**Generated:** 2025-09-30 17:42:46  
+**Total Records:** 4882  
+**Total Variables:** 610  
+**Categories:** 7  
 
 ## Overview
 
@@ -14,77 +14,153 @@ for race/ethnicity, education categories, and other demographic variables.
 
 ## Table of Contents
 
-- [Caregiver Relationship](#caregiver-relationship) (2 variables)
-- [Age](#age) (3 variables)
-- [Eligibility](#eligibility) (3 variables)
-- [Geography](#geography) (3 variables)
-- [Other](#other) (543 variables)
+- [Race](#race) (6 variables)
+- [Caregiver Relationship](#caregiver-relationship) (4 variables)
+- [Education](#education) (13 variables)
+- [Sex](#sex) (3 variables)
+- [Age](#age) (7 variables)
+- [Geography](#geography) (28 variables)
+- [Other](#other) (549 variables)
+
+## Race
+
+**Description:** Race and ethnicity variables for children and primary caregivers, including harmonized categories
+
+**Variables:** 6  
+**Average Missing:** 40.1%  
+**Data Types:** 6 factors, 0 numeric, 0 logical, 0 character
+
+| Variable | Label | Type | Missing | Details |
+|----------|-------|------|---------|---------|
+| `a1_hisp` | Primary caregiver Hispanic/Latino ethnicity | factor | 40.8% | 1 (Hispanic), 2 (non-Hisp.) |
+| `a1_race` | Primary caregiver race (collapsed categories) | factor | 40.1% | 1 (American Indian or Alaska Native), 2 (Asian or Pacific Islander), 3 (Black or African American), 4 (Other Asian), 5 (Some Other Race)... |
+| `a1_raceG` | Primary caregiver race/ethnicity combined | factor | 40.8% | 1 (American Indian or Alaska Native, non-Hisp.), 2 (Asian or Pacific Islander, non-Hisp.), 3 (Black or African American, non-Hisp.), 4 (Hispanic), 5 (Some Other Race, non-Hisp.)... |
+| `hisp` | Child Hispanic/Latino ethnicity | factor | 40.0% | 1 (Hispanic), 2 (non-Hisp.) |
+| `race` | Child race (collapsed categories) | factor | 39.2% | 1 (American Indian or Alaska Native), 2 (Asian or Pacific Islander), 3 (Black or African American), 4 (Other Asian), 5 (Some Other Race)... |
+| `raceG` | Child race/ethnicity combined | factor | 40.0% | 1 (American Indian or Alaska Native, non-Hisp.), 2 (Asian or Pacific Islander, non-Hisp.), 3 (Black or African American, non-Hisp.), 4 (Hispanic), 5 (Some Other Race, non-Hisp.)... |
 
 ## Caregiver Relationship
 
 **Description:** Variables describing relationships between caregivers and children, including gender and maternal status
 
-**Variables:** 2  
-**Average Missing:** 23.3%  
-**Data Types:** 0 factors, 1 numeric, 0 logical, 1 character
+**Variables:** 4  
+**Average Missing:** 33.5%  
+**Data Types:** 2 factors, 1 numeric, 0 logical, 1 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
 | `module_7_child_emotions_and_relationships_complete` | Module 7 Child Emotions And Relationships Complete | numeric | 0.0% | N/A |
-| `module_7_child_emotions_and_relationships_timestamp` | Module 7 Child Emotions And Relationships Timestamp | character | 46.6% | N/A |
+| `module_7_child_emotions_and_relationships_timestamp` | Module 7 Child Emotions And Relationships Timestamp | character | 46.8% | N/A |
+| `relation1` | Relation1 | factor | 36.1% | 2 (1), 3 (2), 4 (3), 5 (4), 6 (5) |
+| `relation2` | Relation2 | factor | 51.1% | 1 (Biological or Adoptive Parent), 2 (Foster Parent), 3 (Grandparent), 4 (Other: Non-Relative), 5 (Other: Relative)... |
+
+## Education
+
+**Description:** Education level variables using multiple categorization systems (4, 6, and 8 categories)
+
+**Variables:** 13  
+**Average Missing:** 43.7%  
+**Data Types:** 12 factors, 0 numeric, 1 logical, 0 character
+
+| Variable | Label | Type | Missing | Details |
+|----------|-------|------|---------|---------|
+| `educ4_a1` | Primary caregiver education level (4 categories) | factor | 35.7% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree) |
+| `educ4_a2` | Secondary caregiver education level (4 categories) | factor | 51.2% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree) |
+| `educ4_max` | Maximum education level among caregivers (4 categories) | factor | 35.4% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree) |
+| `educ4_mom` | Maternal education level (4 categories) | factor | 55.0% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree) |
+| `educ6_a1` | Primary caregiver education level (6 categories) | factor | 35.7% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)... |
+| `educ6_a2` | Secondary caregiver education level (6 categories) | factor | 51.2% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)... |
+| `educ6_max` | Maximum education level among caregivers (6 categories) | factor | 35.4% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)... |
+| `educ6_mom` | Maternal education level (6 categories) | factor | 55.0% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Master's Degree), 5 (Doctorate or Professional Degree)... |
+| `educ_a1` | Primary caregiver education level (8 categories) | factor | 35.7% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (Some College Credit, but No Degree), 4 (High School Graduate or GED Completed), 5 (Associate Degree (AA, AS))... |
+| `educ_a2` | Secondary caregiver education level (8 categories) | factor | 51.2% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (High School Graduate or GED Completed), 3 (Master's Degree (MA, MS, MSW, MBA)), 4 (Some College Credit, but No Degree), 5 (Associate Degree (AA, AS))... |
+| `educ_max` | Maximum education level among caregivers (8 categories) | factor | 35.4% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (High School Graduate or GED Completed), 4 (Some College Credit, but No Degree), 5 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD))... |
+| `educ_mom` | Maternal education level (8 categories) | factor | 55.0% | 1 (Master's Degree (MA, MS, MSW, MBA)), 2 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)), 3 (Associate Degree (AA, AS)), 4 (Completed a vocational, trade, or business school program), 5 (Bachelor's Degree (BA, BS, AB))... |
+| `mom_a1` | Mom A1 | logical | 36.0% | N/A |
+
+## Sex
+
+**Description:** Child's biological sex and gender indicator variables
+
+**Variables:** 3  
+**Average Missing:** 38.1%  
+**Data Types:** 1 factors, 0 numeric, 2 logical, 0 character
+
+| Variable | Label | Type | Missing | Details |
+|----------|-------|------|---------|---------|
+| `female` | Female | logical | 39.3% | N/A |
+| `female_a1` | Female A1 | logical | 35.7% | N/A |
+| `sex` | Sex | factor | 39.3% | 1 (Female), 2 (Male) |
 
 ## Age
 
 **Description:** Age variables for children and caregivers in different units (days, months, years)
 
-**Variables:** 3  
-**Average Missing:** 42.9%  
-**Data Types:** 1 factors, 2 numeric, 0 logical, 0 character
+**Variables:** 7  
+**Average Missing:** 34.4%  
+**Data Types:** 1 factors, 6 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
+| `a1_years_old` | A1 Years Old | numeric | 36.7% | N/A |
 | `age_in_days` | Age In Days | numeric | 25.2% | N/A |
-| `language` | Language | factor | 3.5% | 1 (en), 2 (es) |
+| `days_old` | Days Old | numeric | 25.2% | N/A |
+| `language` | Language | factor | 3.4% | 1 (en), 2 (es) |
 | `language_preference` | Language Preference | numeric | 100.0% | N/A |
-
-## Eligibility
-
-**Description:** No description available
-
-**Variables:** 3  
-**Average Missing:** 0.0%  
-**Data Types:** 0 factors, 0 numeric, 3 logical, 0 character
-
-| Variable | Label | Type | Missing | Details |
-|----------|-------|------|---------|---------|
-| `authentic` | Authentic | logical | 0.0% | N/A |
-| `eligible` | Eligible | logical | 0.0% | N/A |
-| `include` | Include | logical | 0.0% | N/A |
+| `months_old` | Months Old | numeric | 25.2% | N/A |
+| `years_old` | Years Old | numeric | 25.2% | N/A |
 
 ## Geography
 
 **Description:** No description available
 
-**Variables:** 3  
-**Average Missing:** 8.5%  
-**Data Types:** 0 factors, 3 numeric, 0 logical, 0 character
+**Variables:** 28  
+**Average Missing:** 34.4%  
+**Data Types:** 8 factors, 3 numeric, 0 logical, 17 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
-| `eqstate` | Eqstate | numeric | 25.4% | N/A |
+| `aiannh_afact` | ZIP to AIANNH allocation factor(s) - semicolon-separated, ordered by likelihood | factor | 98.3% | 1 (0.0006 ), 2 (0.0044 ), 3 (0.006 ), 4 (0.0063 ), 5 (0.0161 )... |
+| `aiannh_code` | Native lands (AIANNH) code(s) - semicolon-separated if ZIP spans multiple areas (2021) | factor | 98.3% | 1 (1590), 2 (2550), 3 (2550; 4625), 4 (2625), 5 (2810)... |
+| `aiannh_name` | Native lands (AIANNH) name(s) - semicolon-separated if ZIP spans multiple areas | factor | 98.3% | 1 (Cherokee Tribe of Northeast Alabama SDTSA), 2 (Chickasaw OTSA), 3 (Choctaw OTSA), 4 (Iowa (KS-NE) Reservation / Off-Reservation Trust Land), 5 (Omaha Reservation)... |
+| `cbsa` | Core-Based Statistical Area code(s) - semicolon-separated if ZIP spans multiple CBSAs | character | 27.9% | N/A |
+| `cbsa_afact` | ZIP to CBSA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 27.9% | N/A |
+| `cbsa_name` | CBSA name(s) - semicolon-separated if ZIP spans multiple CBSAs | character | 27.9% | N/A |
+| `congress_afact` | ZIP to congressional district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
+| `congress_dist` | US Congressional district code(s) - semicolon-separated if ZIP spans multiple districts (119th Congress) | factor | 31.4% | 1 (01), 2 (01; 02), 3 (01; 02; 03), 4 (01; 03), 5 (02)... |
+| `county` | County FIPS code(s) - semicolon-separated if ZIP spans multiple counties | character | 31.4% | N/A |
+| `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
+| `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.4% | N/A |
+| `eqstate` | Eqstate | numeric | 25.5% | N/A |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20250930_172013) |
+| `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.4% | N/A |
+| `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
+| `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
+| `school_dist` | School district code(s) - semicolon-separated if ZIP spans multiple districts (2020) | character | 31.4% | N/A |
+| `school_name` | School district name(s) - semicolon-separated if ZIP spans multiple districts | character | 31.4% | N/A |
+| `sldl` | State legislative district (lower/house) code(s) - semicolon-separated if ZIP spans multiple districts (2024) | factor | 31.4% | 1 ( ) |
+| `sldl_afact` | ZIP to state leg lower allocation factor(s) - semicolon-separated, ordered by likelihood | factor | 31.4% | 1 (0.2759 ), 2 (0.7528 ), 3 (0.8492 ), 4 (0.8945 ), 5 (0.9756 )... |
+| `sldu` | State legislative district (upper/senate) code(s) - semicolon-separated if ZIP spans multiple districts (2024) | character | 31.4% | N/A |
+| `sldu_afact` | ZIP to state leg upper allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
 | `state_law_prohibits_sending_compensation_electronically___1` | State Law Prohibits Sending Compensation Electronically   1 | numeric | 0.0% | N/A |
 | `state_law_requires_that_kidsights_data_collect_my_name___1` | State Law Requires That Kidsights Data Collect My Name   1 | numeric | 0.0% | N/A |
+| `tract` | Census tract FIPS code(s) - semicolon-separated if ZIP spans multiple tracts | character | 31.4% | N/A |
+| `tract_afact` | ZIP to census tract allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
+| `urban_rural` | Urban/Rural classification(s) (U=Urban, R=Rural) - semicolon-separated if ZIP is mixed (2022 Census) | factor | 27.9% | 1 (R), 2 (R; U), 3 (U), 4 (U; R) |
+| `urban_rural_afact` | Urban/Rural allocation factor(s) - semicolon-separated, ordered by likelihood | character | 27.9% | N/A |
 
 ## Other
 
 **Description:** No description available
 
-**Variables:** 543  
-**Average Missing:** 60.6%  
-**Data Types:** 5 factors, 506 numeric, 0 logical, 32 character
+**Variables:** 549  
+**Average Missing:** 60.0%  
+**Data Types:** 4 factors, 507 numeric, 6 logical, 32 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
+| `authentic.x` | Authentic.X | logical | 0.0% | N/A |
+| `authentic.y` | Authentic.Y | logical | 0.0% | N/A |
 | `authenticity` | Authenticity | factor | 0.0% | 1 (Fail), 2 (Pass) |
 | `c004` | C004 | numeric | 99.5% | N/A |
 | `c005` | C005 | numeric | 99.5% | N/A |
@@ -118,7 +194,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c035` | C035 | numeric | 99.0% | N/A |
 | `c036` | C036 | numeric | 94.9% | N/A |
 | `c037` | C037 | numeric | 99.0% | N/A |
-| `c038` | C038 | numeric | 99.2% | N/A |
+| `c038` | C038 | numeric | 99.1% | N/A |
 | `c039` | C039 | numeric | 99.5% | N/A |
 | `c040` | C040 | numeric | 99.3% | N/A |
 | `c041` | C041 | numeric | 99.5% | N/A |
@@ -131,11 +207,11 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c048` | C048 | numeric | 99.3% | N/A |
 | `c049` | C049 | numeric | 99.5% | N/A |
 | `c050` | C050 | numeric | 94.9% | N/A |
-| `c051` | C051 | numeric | 94.9% | N/A |
-| `c052` | C052 | numeric | 94.9% | N/A |
-| `c053` | C053 | numeric | 94.9% | N/A |
-| `c054` | C054 | numeric | 94.9% | N/A |
-| `c055` | C055 | numeric | 95.4% | N/A |
+| `c051` | C051 | numeric | 95.0% | N/A |
+| `c052` | C052 | numeric | 95.0% | N/A |
+| `c053` | C053 | numeric | 95.0% | N/A |
+| `c054` | C054 | numeric | 95.0% | N/A |
+| `c055` | C055 | numeric | 95.5% | N/A |
 | `c056` | C056 | numeric | 95.2% | N/A |
 | `c057` | C057 | numeric | 95.3% | N/A |
 | `c058` | C058 | numeric | 95.2% | N/A |
@@ -143,8 +219,8 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c060` | C060 | numeric | 95.5% | N/A |
 | `c061` | C061 | numeric | 95.8% | N/A |
 | `c062` | C062 | numeric | 92.8% | N/A |
-| `c063` | C063 | numeric | 92.2% | N/A |
-| `c064` | C064 | numeric | 94.9% | N/A |
+| `c063` | C063 | numeric | 92.3% | N/A |
+| `c064` | C064 | numeric | 95.0% | N/A |
 | `c065` | C065 | numeric | 92.2% | N/A |
 | `c066` | C066 | numeric | 93.3% | N/A |
 | `c067` | C067 | numeric | 93.3% | N/A |
@@ -152,13 +228,13 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c069` | C069 | numeric | 93.4% | N/A |
 | `c070` | C070 | numeric | 93.1% | N/A |
 | `c071` | C071 | numeric | 92.6% | N/A |
-| `c072` | C072 | numeric | 92.2% | N/A |
+| `c072` | C072 | numeric | 92.3% | N/A |
 | `c073` | C073 | numeric | 94.0% | N/A |
 | `c074` | C074 | numeric | 94.8% | N/A |
 | `c075` | C075 | numeric | 94.0% | N/A |
 | `c076` | C076 | numeric | 93.4% | N/A |
 | `c077` | C077 | numeric | 94.1% | N/A |
-| `c078` | C078 | numeric | 92.2% | N/A |
+| `c078` | C078 | numeric | 92.3% | N/A |
 | `c079` | C079 | numeric | 94.6% | N/A |
 | `c080` | C080 | numeric | 95.0% | N/A |
 | `c081` | C081 | numeric | 96.7% | N/A |
@@ -167,11 +243,11 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c084` | C084 | numeric | 95.3% | N/A |
 | `c085` | C085 | numeric | 93.0% | N/A |
 | `c086` | C086 | numeric | 92.2% | N/A |
-| `c087` | C087 | numeric | 92.6% | N/A |
+| `c087` | C087 | numeric | 92.5% | N/A |
 | `c088` | C088 | numeric | 61.9% | N/A |
 | `c089` | C089 | numeric | 94.8% | N/A |
 | `c090` | C090 | numeric | 97.0% | N/A |
-| `c091` | C091 | numeric | 92.7% | N/A |
+| `c091` | C091 | numeric | 92.6% | N/A |
 | `c092` | C092 | numeric | 90.7% | N/A |
 | `c093` | C093 | numeric | 97.5% | N/A |
 | `c094` | C094 | numeric | 93.4% | N/A |
@@ -183,72 +259,72 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c100` | C100 | numeric | 96.8% | N/A |
 | `c101` | C101 | numeric | 97.1% | N/A |
 | `c102` | C102 | numeric | 93.2% | N/A |
-| `c103` | C103 | numeric | 91.4% | N/A |
+| `c103` | C103 | numeric | 91.3% | N/A |
 | `c104` | C104 | numeric | 97.5% | N/A |
 | `c105` | C105 | numeric | 92.6% | N/A |
 | `c106` | C106 | numeric | 93.8% | N/A |
 | `c107` | C107 | numeric | 94.0% | N/A |
 | `c108` | C108 | numeric | 94.0% | N/A |
-| `c109` | C109 | numeric | 89.8% | N/A |
+| `c109` | C109 | numeric | 89.7% | N/A |
 | `c110` | C110 | numeric | 90.5% | N/A |
 | `c111` | C111 | numeric | 88.2% | N/A |
 | `c112` | C112 | numeric | 88.8% | N/A |
-| `c113` | C113 | numeric | 92.0% | N/A |
+| `c113` | C113 | numeric | 91.9% | N/A |
 | `c114` | C114 | numeric | 90.8% | N/A |
 | `c115` | C115 | numeric | 91.6% | N/A |
-| `c116` | C116 | numeric | 89.9% | N/A |
+| `c116` | C116 | numeric | 89.8% | N/A |
 | `c117` | C117 | numeric | 88.2% | N/A |
 | `c118` | C118 | numeric | 91.1% | N/A |
-| `c119` | C119 | numeric | 92.2% | N/A |
+| `c119` | C119 | numeric | 92.1% | N/A |
 | `c120` | C120 | numeric | 93.0% | N/A |
 | `c121` | C121 | numeric | 92.5% | N/A |
 | `c122` | C122 | numeric | 93.6% | N/A |
 | `c123` | C123 | numeric | 90.1% | N/A |
 | `c124` | C124 | numeric | 93.9% | N/A |
 | `c125` | C125 | numeric | 88.2% | N/A |
-| `c126` | C126 | numeric | 92.8% | N/A |
-| `c127` | C127 | numeric | 94.8% | N/A |
+| `c126` | C126 | numeric | 92.7% | N/A |
+| `c127` | C127 | numeric | 94.7% | N/A |
 | `c128` | C128 | numeric | 94.2% | N/A |
 | `c129` | C129 | numeric | 91.4% | N/A |
 | `c130` | C130 | numeric | 97.5% | N/A |
 | `c131` | C131 | numeric | 94.4% | N/A |
 | `c132` | C132 | numeric | 61.9% | N/A |
 | `c133` | C133 | numeric | 89.8% | N/A |
-| `c134` | C134 | numeric | 89.9% | N/A |
-| `c135` | C135 | numeric | 89.6% | N/A |
+| `c134` | C134 | numeric | 89.8% | N/A |
+| `c135` | C135 | numeric | 89.5% | N/A |
 | `c136` | C136 | numeric | 93.5% | N/A |
 | `c137` | C137 | numeric | 93.9% | N/A |
 | `c138` | C138 | numeric | 91.2% | N/A |
-| `c139` | C139 | numeric | 91.1% | N/A |
+| `c139` | C139 | numeric | 91.0% | N/A |
 | `cace1` | Cace1 | numeric | 36.3% | N/A |
 | `cace10` | Cace10 | numeric | 36.6% | N/A |
-| `cace2` | Cace2 | numeric | 36.3% | N/A |
+| `cace2` | Cace2 | numeric | 36.4% | N/A |
 | `cace3` | Cace3 | numeric | 36.5% | N/A |
 | `cace4` | Cace4 | numeric | 36.6% | N/A |
 | `cace5` | Cace5 | numeric | 36.7% | N/A |
 | `cace6` | Cace6 | numeric | 36.7% | N/A |
-| `cace7` | Cace7 | numeric | 36.7% | N/A |
+| `cace7` | Cace7 | numeric | 36.8% | N/A |
 | `cace8` | Cace8 | numeric | 36.9% | N/A |
 | `cace9` | Cace9 | numeric | 36.7% | N/A |
-| `cfqb001` | Cfqb001 | numeric | 36.2% | N/A |
-| `cname1` | Cname1 | character | 72.4% | N/A |
+| `cfqb001` | Cfqb001 | numeric | 36.3% | N/A |
+| `cname1` | Cname1 | character | 72.5% | N/A |
 | `compensation` | Compensation | factor | 0.0% | 1 (Fail), 2 (Pass) |
 | `consecutive_nos_180_364` | Consecutive Nos 180 364 | numeric | 94.9% | N/A |
 | `consecutive_nos_365_548` | Consecutive Nos 365 548 | numeric | 92.2% | N/A |
-| `consecutive_nos_549_731` | Consecutive Nos 549 731 | numeric | 92.6% | N/A |
+| `consecutive_nos_549_731` | Consecutive Nos 549 731 | numeric | 92.5% | N/A |
 | `consecutive_nos_732_914` | Consecutive Nos 732 914 | numeric | 88.1% | N/A |
 | `consecutive_nos_90_179` | Consecutive Nos 90 179 | numeric | 99.0% | N/A |
 | `consecutive_nos_915_1096` | Consecutive Nos 915 1096 | numeric | 89.7% | N/A |
 | `consecutive_nos_count` | Consecutive Nos Count | numeric | 99.4% | N/A |
 | `consent_date` | Consent Date | character | 24.9% | N/A |
 | `consent_doc_complete` | Consent Doc Complete | numeric | 0.0% | N/A |
-| `consent_doc_timestamp` | Consent Doc Timestamp | character | 6.6% | N/A |
-| `cqfa001` | Cqfa001 | numeric | 36.6% | N/A |
+| `consent_doc_timestamp` | Consent Doc Timestamp | character | 6.5% | N/A |
+| `cqfa001` | Cqfa001 | numeric | 36.7% | N/A |
 | `cqfa002` | Cqfa002 | numeric | 39.4% | N/A |
 | `cqfa005` | Cqfa005 | numeric | 36.0% | N/A |
 | `cqfa006` | Cqfa006 | numeric | 36.1% | N/A |
 | `cqfa009` | Cqfa009 | numeric | 36.2% | N/A |
-| `cqfa010` | Cqfa010 | numeric | 35.9% | N/A |
+| `cqfa010` | Cqfa010 | numeric | 36.0% | N/A |
 | `cqfa010a___1` | Cqfa010A   1 | numeric | 0.0% | N/A |
 | `cqfa010a___2` | Cqfa010A   2 | numeric | 0.0% | N/A |
 | `cqfa010a___3` | Cqfa010A   3 | numeric | 0.0% | N/A |
@@ -256,14 +332,14 @@ for race/ethnicity, education categories, and other demographic variables.
 | `cqfa010a___5` | Cqfa010A   5 | numeric | 0.0% | N/A |
 | `cqfa010a___6` | Cqfa010A   6 | numeric | 0.0% | N/A |
 | `cqfa013` | Cqfa013 | numeric | 39.5% | N/A |
-| `cqfb002` | Cqfb002 | numeric | 36.0% | N/A |
+| `cqfb002` | Cqfb002 | numeric | 36.1% | N/A |
 | `cqfb007x` | Cqfb007X | numeric | 39.1% | N/A |
-| `cqfb008` | Cqfb008 | numeric | 37.2% | N/A |
+| `cqfb008` | Cqfb008 | numeric | 37.3% | N/A |
 | `cqfb009` | Cqfb009 | numeric | 36.2% | N/A |
-| `cqfb010` | Cqfb010 | numeric | 36.4% | N/A |
+| `cqfb010` | Cqfb010 | numeric | 36.5% | N/A |
 | `cqfb011` | Cqfb011 | numeric | 36.2% | N/A |
 | `cqfb012` | Cqfb012 | numeric | 36.4% | N/A |
-| `cqfb013` | Cqfb013 | numeric | 36.2% | N/A |
+| `cqfb013` | Cqfb013 | numeric | 36.3% | N/A |
 | `cqfb014` | Cqfb014 | numeric | 36.5% | N/A |
 | `cqfb015` | Cqfb015 | numeric | 36.6% | N/A |
 | `cqfb016` | Cqfb016 | numeric | 36.4% | N/A |
@@ -300,7 +376,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `cqr011` | Cqr011 | numeric | 39.1% | N/A |
 | `cqr013` | Cqr013 | numeric | 40.0% | N/A |
 | `cqr014x` | Cqr014X | numeric | 39.4% | N/A |
-| `cqr015` | Cqr015 | numeric | 40.0% | N/A |
+| `cqr015` | Cqr015 | numeric | 39.9% | N/A |
 | `cqr016` | Cqr016 | numeric | 39.7% | N/A |
 | `cqr017` | Cqr017 | numeric | 40.0% | N/A |
 | `cqr018` | Cqr018 | numeric | 39.9% | N/A |
@@ -310,33 +386,33 @@ for race/ethnicity, education categories, and other demographic variables.
 | `cqr022` | Cqr022 | numeric | 40.3% | N/A |
 | `cqr023` | Cqr023 | numeric | 40.3% | N/A |
 | `cqr024` | Cqr024 | numeric | 40.1% | N/A |
-| `cqrn012` | Cqrn012 | numeric | 39.9% | N/A |
+| `cqrn012` | Cqrn012 | numeric | 39.8% | N/A |
 | `credi001` | Credi001 | numeric | 99.5% | N/A |
 | `credi005` | Credi005 | numeric | 99.5% | N/A |
 | `credi017` | Credi017 | numeric | 99.1% | N/A |
-| `credi019` | Credi019 | numeric | 93.3% | N/A |
+| `credi019` | Credi019 | numeric | 93.2% | N/A |
 | `credi020` | Credi020 | numeric | 94.7% | N/A |
 | `credi021` | Credi021 | numeric | 97.4% | N/A |
 | `credi025` | Credi025 | numeric | 95.7% | N/A |
 | `credi028` | Credi028 | numeric | 94.5% | N/A |
 | `credi029` | Credi029 | numeric | 93.2% | N/A |
 | `credi030` | Credi030 | numeric | 96.7% | N/A |
-| `credi031` | Credi031 | numeric | 95.2% | N/A |
+| `credi031` | Credi031 | numeric | 95.3% | N/A |
 | `credi036` | Credi036 | numeric | 94.0% | N/A |
 | `credi038` | Credi038 | numeric | 94.0% | N/A |
 | `credi041` | Credi041 | numeric | 96.6% | N/A |
 | `credi045` | Credi045 | numeric | 94.6% | N/A |
-| `credi046` | Credi046 | numeric | 92.6% | N/A |
+| `credi046` | Credi046 | numeric | 92.5% | N/A |
 | `credi052` | Credi052 | numeric | 91.2% | N/A |
 | `credi058` | Credi058 | numeric | 88.2% | N/A |
 | `date_complete_check` | Date Complete Check | numeric | 40.4% | N/A |
 | `dob` | Dob | character | 25.2% | N/A |
 | `dob_match` | Dob Match | numeric | 24.8% | N/A |
-| `ecdi007` | Ecdi007 | numeric | 94.1% | N/A |
+| `ecdi007` | Ecdi007 | numeric | 94.0% | N/A |
 | `ecdi009x` | Ecdi009X | numeric | 94.5% | N/A |
-| `ecdi010` | Ecdi010 | numeric | 94.7% | N/A |
+| `ecdi010` | Ecdi010 | numeric | 94.6% | N/A |
 | `ecdi011` | Ecdi011 | numeric | 61.9% | N/A |
-| `ecdi014` | Ecdi014 | numeric | 89.8% | N/A |
+| `ecdi014` | Ecdi014 | numeric | 89.7% | N/A |
 | `ecdi015` | Ecdi015 | numeric | 93.6% | N/A |
 | `ecdi015x` | Ecdi015X | numeric | 88.1% | N/A |
 | `ecdi016` | Ecdi016 | numeric | 94.0% | N/A |
@@ -345,18 +421,19 @@ for race/ethnicity, education categories, and other demographic variables.
 | `eligibility` | Eligibility | factor | 0.0% | 1 (Fail), 2 (Pass) |
 | `eligibility_form_complete` | Eligibility Form Complete | numeric | 0.0% | N/A |
 | `eligibility_form_timestamp` | Eligibility Form Timestamp | character | 24.7% | N/A |
-| `email` | Email | character | 84.6% | N/A |
-| `email_followup` | Email Followup | character | 66.0% | N/A |
-| `email_registration_complete` | Email Registration Complete | numeric | 84.6% | N/A |
-| `email_registration_timestamp` | Email Registration Timestamp | character | 84.6% | N/A |
-| `eq001` | Eq001 | numeric | 25.0% | N/A |
+| `eligible.x` | Eligible.X | logical | 0.0% | N/A |
+| `eligible.y` | Eligible.Y | logical | 0.0% | N/A |
+| `email` | Email | character | 84.7% | N/A |
+| `email_followup` | Email Followup | character | 66.1% | N/A |
+| `email_registration_complete` | Email Registration Complete | numeric | 84.7% | N/A |
+| `email_registration_timestamp` | Email Registration Timestamp | character | 84.7% | N/A |
+| `eq001` | Eq001 | numeric | 25.1% | N/A |
 | `eq002` | Eq002 | numeric | 25.1% | N/A |
 | `eq003` | Eq003 | numeric | 24.9% | N/A |
 | `eq004a` | Eq004A | character | 40.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20250929_135849) |
 | `fci_a_1` | Fci A 1 | numeric | 39.7% | N/A |
-| `fci_a_2` | Fci A 2 | numeric | 40.3% | N/A |
-| `fci_a_3` | Fci A 3 | numeric | 40.2% | N/A |
+| `fci_a_2` | Fci A 2 | numeric | 40.2% | N/A |
+| `fci_a_3` | Fci A 3 | numeric | 40.1% | N/A |
 | `fci_b_1` | Fci B 1 | numeric | 40.5% | N/A |
 | `fci_b_2` | Fci B 2 | numeric | 42.9% | N/A |
 | `fci_c_1` | Fci C 1 | numeric | 40.1% | N/A |
@@ -374,57 +451,59 @@ for race/ethnicity, education categories, and other demographic variables.
 | `fci_d_10` | Fci D 10 | numeric | 40.4% | N/A |
 | `fci_d_11` | Fci D 11 | numeric | 40.3% | N/A |
 | `fci_d_2` | Fci D 2 | numeric | 40.2% | N/A |
-| `fci_d_3` | Fci D 3 | numeric | 40.8% | N/A |
+| `fci_d_3` | Fci D 3 | numeric | 40.7% | N/A |
 | `fci_d_4` | Fci D 4 | numeric | 40.4% | N/A |
-| `fci_d_5` | Fci D 5 | numeric | 40.5% | N/A |
+| `fci_d_5` | Fci D 5 | numeric | 40.4% | N/A |
 | `fci_d_6` | Fci D 6 | numeric | 40.3% | N/A |
 | `fci_d_7` | Fci D 7 | numeric | 40.4% | N/A |
 | `fci_d_8` | Fci D 8 | numeric | 40.5% | N/A |
 | `fci_d_9` | Fci D 9 | numeric | 40.6% | N/A |
 | `financial_compensation_be_sent_to_a_nebraska_residential_address___1` | Financial Compensation Be Sent To A Nebraska Residential Address   1 | numeric | 0.0% | N/A |
-| `first_5_nos_1097_2191` | First 5 Nos 1097 2191 | numeric | 61.8% | N/A |
+| `first_5_nos_1097_2191` | First 5 Nos 1097 2191 | numeric | 61.9% | N/A |
 | `first_5_nos_180_364` | First 5 Nos 180 364 | numeric | 94.9% | N/A |
 | `first_5_nos_365_548` | First 5 Nos 365 548 | numeric | 92.2% | N/A |
-| `first_5_nos_549_731` | First 5 Nos 549 731 | numeric | 92.6% | N/A |
+| `first_5_nos_549_731` | First 5 Nos 549 731 | numeric | 92.5% | N/A |
 | `first_5_nos_732_914` | First 5 Nos 732 914 | numeric | 88.1% | N/A |
 | `first_5_nos_90_179` | First 5 Nos 90 179 | numeric | 99.0% | N/A |
 | `first_5_nos_915_1096` | First 5 Nos 915 1096 | numeric | 89.7% | N/A |
 | `fq001` | Fq001 | numeric | 25.4% | N/A |
 | `fq005` | Fq005 | numeric | 39.6% | N/A |
 | `fqlive1_1` | Fqlive1 1 | numeric | 36.7% | N/A |
-| `fqlive1_2` | Fqlive1 2 | numeric | 36.9% | N/A |
+| `fqlive1_2` | Fqlive1 2 | numeric | 37.0% | N/A |
 | `fqlive1_3` | Fqlive1 3 | numeric | 53.9% | N/A |
-| `ineligible_flag` | Ineligible Flag | numeric | 99.4% | N/A |
+| `include.x` | Include.X | logical | 0.0% | N/A |
+| `include.y` | Include.Y | logical | 0.0% | N/A |
+| `ineligible_flag` | Ineligible Flag | numeric | 99.3% | N/A |
 | `kidsights_data_reviews_all_responses_for_quality___1` | Kidsights Data Reviews All Responses For Quality   1 | numeric | 0.0% | N/A |
 | `mmi000` | Mmi000 | numeric | 64.3% | N/A |
-| `mmi003` | Mmi003 | numeric | 65.7% | N/A |
-| `mmi003b` | Mmi003B | numeric | 66.0% | N/A |
-| `mmi009` | Mmi009 | numeric | 73.6% | N/A |
+| `mmi003` | Mmi003 | numeric | 65.8% | N/A |
+| `mmi003b` | Mmi003B | numeric | 66.1% | N/A |
+| `mmi009` | Mmi009 | numeric | 73.5% | N/A |
 | `mmi013` | Mmi013 | numeric | 39.1% | N/A |
-| `mmi014` | Mmi014 | numeric | 81.3% | N/A |
-| `mmi018` | Mmi018 | numeric | 64.6% | N/A |
+| `mmi014` | Mmi014 | numeric | 81.1% | N/A |
+| `mmi018` | Mmi018 | numeric | 64.7% | N/A |
 | `mmi019_1` | Mmi019 1 | numeric | 93.5% | N/A |
 | `mmi019_2` | Mmi019 2 | numeric | 93.5% | N/A |
 | `mmi019_3` | Mmi019 3 | numeric | 93.5% | N/A |
 | `mmi100` | Mmi100 | numeric | 39.5% | N/A |
-| `mmi101` | Mmi101 | numeric | 36.4% | N/A |
+| `mmi101` | Mmi101 | numeric | 36.5% | N/A |
 | `mmi110` | Mmi110 | numeric | 40.6% | N/A |
 | `mmi111` | Mmi111 | numeric | 40.6% | N/A |
 | `mmi112` | Mmi112 | numeric | 40.8% | N/A |
 | `mmi113` | Mmi113 | numeric | 40.7% | N/A |
-| `mmi120` | Mmi120 | numeric | 35.8% | N/A |
+| `mmi120` | Mmi120 | numeric | 35.9% | N/A |
 | `mmi121` | Mmi121 | numeric | 36.2% | N/A |
-| `mmi122` | Mmi122 | numeric | 36.3% | N/A |
+| `mmi122` | Mmi122 | numeric | 36.4% | N/A |
 | `mmi123` | Mmi123 | numeric | 36.5% | N/A |
-| `mmifs009` | Mmifs009 | numeric | 76.4% | N/A |
-| `mmifs010` | Mmifs010 | numeric | 76.5% | N/A |
-| `mmifs011` | Mmifs011 | numeric | 76.5% | N/A |
-| `mmifs012` | Mmifs012 | numeric | 76.5% | N/A |
-| `mmifs013` | Mmifs013 | numeric | 76.5% | N/A |
-| `mmifs014` | Mmifs014 | numeric | 76.5% | N/A |
-| `mmifs015` | Mmifs015 | numeric | 76.5% | N/A |
-| `mmifs016` | Mmifs016 | numeric | 76.6% | N/A |
-| `mmihl002` | Mmihl002 | numeric | 36.5% | N/A |
+| `mmifs009` | Mmifs009 | numeric | 76.2% | N/A |
+| `mmifs010` | Mmifs010 | numeric | 76.3% | N/A |
+| `mmifs011` | Mmifs011 | numeric | 76.3% | N/A |
+| `mmifs012` | Mmifs012 | numeric | 76.3% | N/A |
+| `mmifs013` | Mmifs013 | numeric | 76.3% | N/A |
+| `mmifs014` | Mmifs014 | numeric | 76.3% | N/A |
+| `mmifs015` | Mmifs015 | numeric | 76.3% | N/A |
+| `mmifs016` | Mmifs016 | numeric | 76.4% | N/A |
+| `mmihl002` | Mmihl002 | numeric | 36.6% | N/A |
 | `module_2_family_information_complete` | Module 2 Family Information Complete | numeric | 0.0% | N/A |
 | `module_2_family_information_timestamp` | Module 2 Family Information Timestamp | character | 35.1% | N/A |
 | `module_3_child_information_complete` | Module 3 Child Information Complete | numeric | 0.0% | N/A |
@@ -436,13 +515,13 @@ for race/ethnicity, education categories, and other demographic variables.
 | `module_6_0_89_complete` | Module 6 0 89 Complete | numeric | 0.0% | N/A |
 | `module_6_0_89_timestamp` | Module 6 0 89 Timestamp | character | 99.4% | N/A |
 | `module_6_1097_2191_complete` | Module 6 1097 2191 Complete | numeric | 0.0% | N/A |
-| `module_6_1097_2191_timestamp` | Module 6 1097 2191 Timestamp | character | 61.8% | N/A |
+| `module_6_1097_2191_timestamp` | Module 6 1097 2191 Timestamp | character | 61.9% | N/A |
 | `module_6_180_364_complete` | Module 6 180 364 Complete | numeric | 0.0% | N/A |
 | `module_6_180_364_timestamp` | Module 6 180 364 Timestamp | character | 94.9% | N/A |
 | `module_6_365_548_complete` | Module 6 365 548 Complete | numeric | 0.0% | N/A |
 | `module_6_365_548_timestamp` | Module 6 365 548 Timestamp | character | 92.2% | N/A |
 | `module_6_549_731_complete` | Module 6 549 731 Complete | numeric | 0.0% | N/A |
-| `module_6_549_731_timestamp` | Module 6 549 731 Timestamp | character | 92.6% | N/A |
+| `module_6_549_731_timestamp` | Module 6 549 731 Timestamp | character | 92.5% | N/A |
 | `module_6_732_914_complete` | Module 6 732 914 Complete | numeric | 0.0% | N/A |
 | `module_6_732_914_timestamp` | Module 6 732 914 Timestamp | character | 88.1% | N/A |
 | `module_6_90_179_complete` | Module 6 90 179 Complete | numeric | 0.0% | N/A |
@@ -450,46 +529,46 @@ for race/ethnicity, education categories, and other demographic variables.
 | `module_6_915_1096_complete` | Module 6 915 1096 Complete | numeric | 0.0% | N/A |
 | `module_6_915_1096_timestamp` | Module 6 915 1096 Timestamp | character | 89.7% | N/A |
 | `module_8_followup_information_complete` | Module 8 Followup Information Complete | numeric | 0.0% | N/A |
-| `module_8_followup_information_timestamp` | Module 8 Followup Information Timestamp | character | 50.3% | N/A |
+| `module_8_followup_information_timestamp` | Module 8 Followup Information Timestamp | character | 50.5% | N/A |
 | `module_9_compensation_information_complete` | Module 9 Compensation Information Complete | numeric | 0.0% | N/A |
-| `module_9_compensation_information_timestamp` | Module 9 Compensation Information Timestamp | character | 49.7% | N/A |
+| `module_9_compensation_information_timestamp` | Module 9 Compensation Information Timestamp | character | 49.9% | N/A |
 | `mrw001` | Mrw001 | numeric | 39.0% | N/A |
-| `mrw002` | Mrw002 | numeric | 74.4% | N/A |
-| `mrw003_1` | Mrw003 1 | numeric | 74.3% | N/A |
-| `mrw003_2` | Mrw003 2 | numeric | 65.9% | N/A |
+| `mrw002` | Mrw002 | numeric | 74.3% | N/A |
+| `mrw003_1` | Mrw003 1 | numeric | 74.2% | N/A |
+| `mrw003_2` | Mrw003 2 | numeric | 66.0% | N/A |
 | `nom001` | Nom001 | numeric | 94.3% | N/A |
-| `nom002` | Nom002 | numeric | 82.0% | N/A |
+| `nom002` | Nom002 | numeric | 82.1% | N/A |
 | `nom002x` | Nom002X | numeric | 80.4% | N/A |
 | `nom003` | Nom003 | numeric | 82.1% | N/A |
 | `nom003x` | Nom003X | numeric | 80.5% | N/A |
-| `nom005` | Nom005 | numeric | 82.1% | N/A |
+| `nom005` | Nom005 | numeric | 82.2% | N/A |
 | `nom005x` | Nom005X | numeric | 80.5% | N/A |
 | `nom006` | Nom006 | numeric | 95.7% | N/A |
-| `nom006x` | Nom006X | numeric | 95.5% | N/A |
+| `nom006x` | Nom006X | numeric | 95.4% | N/A |
 | `nom009` | Nom009 | numeric | 94.5% | N/A |
-| `nom012` | Nom012 | numeric | 89.9% | N/A |
+| `nom012` | Nom012 | numeric | 89.8% | N/A |
 | `nom014` | Nom014 | numeric | 96.0% | N/A |
 | `nom014x` | Nom014X | numeric | 96.0% | N/A |
 | `nom015` | Nom015 | numeric | 91.2% | N/A |
 | `nom017` | Nom017 | numeric | 94.9% | N/A |
-| `nom017x` | Nom017X | numeric | 95.0% | N/A |
+| `nom017x` | Nom017X | numeric | 94.9% | N/A |
 | `nom018` | Nom018 | numeric | 82.2% | N/A |
 | `nom018x` | Nom018X | numeric | 80.5% | N/A |
 | `nom019` | Nom019 | numeric | 62.7% | N/A |
-| `nom022` | Nom022 | numeric | 82.0% | N/A |
+| `nom022` | Nom022 | numeric | 82.1% | N/A |
 | `nom022x` | Nom022X | numeric | 80.4% | N/A |
-| `nom024` | Nom024 | numeric | 82.0% | N/A |
+| `nom024` | Nom024 | numeric | 82.1% | N/A |
 | `nom024x` | Nom024X | numeric | 80.4% | N/A |
-| `nom026` | Nom026 | numeric | 96.2% | N/A |
-| `nom026x` | Nom026X | numeric | 96.1% | N/A |
-| `nom028` | Nom028 | numeric | 92.2% | N/A |
+| `nom026` | Nom026 | numeric | 96.1% | N/A |
+| `nom026x` | Nom026X | numeric | 96.0% | N/A |
+| `nom028` | Nom028 | numeric | 92.1% | N/A |
 | `nom029` | Nom029 | numeric | 96.1% | N/A |
 | `nom029x` | Nom029X | numeric | 96.0% | N/A |
 | `nom031` | Nom031 | numeric | 96.7% | N/A |
 | `nom033` | Nom033 | numeric | 95.7% | N/A |
-| `nom033x` | Nom033X | numeric | 95.5% | N/A |
+| `nom033x` | Nom033X | numeric | 95.4% | N/A |
 | `nom034` | Nom034 | numeric | 96.1% | N/A |
-| `nom034x` | Nom034X | numeric | 96.1% | N/A |
+| `nom034x` | Nom034X | numeric | 96.0% | N/A |
 | `nom035` | Nom035 | numeric | 81.7% | N/A |
 | `nom035x` | Nom035X | numeric | 80.2% | N/A |
 | `nom042x` | Nom042X | numeric | 62.7% | N/A |
@@ -499,84 +578,84 @@ for race/ethnicity, education categories, and other demographic variables.
 | `nom047x` | Nom047X | numeric | 98.9% | N/A |
 | `nom048x` | Nom048X | numeric | 63.0% | N/A |
 | `nom049` | Nom049 | numeric | 98.7% | N/A |
-| `nom049x` | Nom049X | numeric | 98.9% | N/A |
+| `nom049x` | Nom049X | numeric | 98.8% | N/A |
 | `nom052y` | Nom052Y | numeric | 63.0% | N/A |
 | `nom053` | Nom053 | numeric | 81.7% | N/A |
 | `nom053x` | Nom053X | numeric | 80.3% | N/A |
 | `nom054x` | Nom054X | numeric | 63.0% | N/A |
 | `nom056x` | Nom056X | numeric | 62.7% | N/A |
-| `nom057` | Nom057 | numeric | 91.2% | N/A |
-| `nom059` | Nom059 | numeric | 82.0% | N/A |
+| `nom057` | Nom057 | numeric | 91.1% | N/A |
+| `nom059` | Nom059 | numeric | 82.1% | N/A |
 | `nom059x` | Nom059X | numeric | 80.5% | N/A |
-| `nom060y` | Nom060Y | numeric | 62.7% | N/A |
+| `nom060y` | Nom060Y | numeric | 62.8% | N/A |
 | `nom061` | Nom061 | numeric | 96.1% | N/A |
 | `nom061x` | Nom061X | numeric | 96.0% | N/A |
-| `nom062y` | Nom062Y | numeric | 62.7% | N/A |
-| `nom102` | Nom102 | numeric | 62.7% | N/A |
-| `nom103` | Nom103 | numeric | 62.8% | N/A |
-| `nom104` | Nom104 | numeric | 62.8% | N/A |
+| `nom062y` | Nom062Y | numeric | 62.8% | N/A |
+| `nom102` | Nom102 | numeric | 62.8% | N/A |
+| `nom103` | Nom103 | numeric | 62.9% | N/A |
+| `nom104` | Nom104 | numeric | 62.9% | N/A |
 | `nom2202` | Nom2202 | numeric | 62.9% | N/A |
-| `nom2205` | Nom2205 | numeric | 62.9% | N/A |
-| `nom2208` | Nom2208 | numeric | 62.9% | N/A |
+| `nom2205` | Nom2205 | numeric | 63.0% | N/A |
+| `nom2208` | Nom2208 | numeric | 63.0% | N/A |
 | `nos` | Nos | numeric | 99.4% | N/A |
 | `nos_count_90_179` | Nos Count 90 179 | numeric | 99.0% | N/A |
 | `nschj012` | Nschj012 | numeric | 36.6% | N/A |
-| `nschj013` | Nschj013 | numeric | 51.0% | N/A |
-| `nschj017` | Nschj017 | numeric | 51.1% | N/A |
-| `ps001` | Ps001 | numeric | 47.2% | N/A |
-| `ps002` | Ps002 | numeric | 47.6% | N/A |
-| `ps003` | Ps003 | numeric | 47.5% | N/A |
-| `ps004` | Ps004 | numeric | 47.6% | N/A |
-| `ps005` | Ps005 | numeric | 47.4% | N/A |
-| `ps006` | Ps006 | numeric | 47.5% | N/A |
-| `ps007` | Ps007 | numeric | 47.6% | N/A |
-| `ps008` | Ps008 | numeric | 47.5% | N/A |
-| `ps009` | Ps009 | numeric | 47.5% | N/A |
-| `ps010` | Ps010 | numeric | 47.6% | N/A |
-| `ps011` | Ps011 | numeric | 47.6% | N/A |
-| `ps013` | Ps013 | numeric | 47.6% | N/A |
-| `ps014` | Ps014 | numeric | 47.6% | N/A |
-| `ps015` | Ps015 | numeric | 47.6% | N/A |
-| `ps016` | Ps016 | numeric | 47.8% | N/A |
-| `ps017` | Ps017 | numeric | 47.7% | N/A |
-| `ps018` | Ps018 | numeric | 47.6% | N/A |
-| `ps019` | Ps019 | numeric | 47.6% | N/A |
-| `ps020` | Ps020 | numeric | 47.8% | N/A |
-| `ps022` | Ps022 | numeric | 47.8% | N/A |
-| `ps023` | Ps023 | numeric | 47.9% | N/A |
-| `ps024` | Ps024 | numeric | 47.7% | N/A |
-| `ps025` | Ps025 | numeric | 47.8% | N/A |
-| `ps026` | Ps026 | numeric | 47.8% | N/A |
-| `ps027` | Ps027 | numeric | 47.6% | N/A |
-| `ps028` | Ps028 | numeric | 47.6% | N/A |
-| `ps029` | Ps029 | numeric | 47.7% | N/A |
-| `ps030` | Ps030 | numeric | 47.6% | N/A |
-| `ps031` | Ps031 | numeric | 47.8% | N/A |
-| `ps032` | Ps032 | numeric | 47.7% | N/A |
-| `ps034` | Ps034 | numeric | 47.7% | N/A |
-| `ps035` | Ps035 | numeric | 47.8% | N/A |
-| `ps036` | Ps036 | numeric | 47.7% | N/A |
-| `ps037` | Ps037 | numeric | 48.0% | N/A |
-| `ps038` | Ps038 | numeric | 47.9% | N/A |
-| `ps039` | Ps039 | numeric | 47.9% | N/A |
-| `ps040` | Ps040 | numeric | 48.0% | N/A |
+| `nschj013` | Nschj013 | numeric | 51.1% | N/A |
+| `nschj017` | Nschj017 | numeric | 51.2% | N/A |
+| `ps001` | Ps001 | numeric | 47.3% | N/A |
+| `ps002` | Ps002 | numeric | 47.7% | N/A |
+| `ps003` | Ps003 | numeric | 47.7% | N/A |
+| `ps004` | Ps004 | numeric | 47.7% | N/A |
+| `ps005` | Ps005 | numeric | 47.5% | N/A |
+| `ps006` | Ps006 | numeric | 47.6% | N/A |
+| `ps007` | Ps007 | numeric | 47.7% | N/A |
+| `ps008` | Ps008 | numeric | 47.7% | N/A |
+| `ps009` | Ps009 | numeric | 47.6% | N/A |
+| `ps010` | Ps010 | numeric | 47.8% | N/A |
+| `ps011` | Ps011 | numeric | 47.7% | N/A |
+| `ps013` | Ps013 | numeric | 47.7% | N/A |
+| `ps014` | Ps014 | numeric | 47.7% | N/A |
+| `ps015` | Ps015 | numeric | 47.7% | N/A |
+| `ps016` | Ps016 | numeric | 47.9% | N/A |
+| `ps017` | Ps017 | numeric | 47.8% | N/A |
+| `ps018` | Ps018 | numeric | 47.8% | N/A |
+| `ps019` | Ps019 | numeric | 47.8% | N/A |
+| `ps020` | Ps020 | numeric | 47.9% | N/A |
+| `ps022` | Ps022 | numeric | 48.0% | N/A |
+| `ps023` | Ps023 | numeric | 48.0% | N/A |
+| `ps024` | Ps024 | numeric | 47.8% | N/A |
+| `ps025` | Ps025 | numeric | 47.9% | N/A |
+| `ps026` | Ps026 | numeric | 47.9% | N/A |
+| `ps027` | Ps027 | numeric | 47.7% | N/A |
+| `ps028` | Ps028 | numeric | 47.8% | N/A |
+| `ps029` | Ps029 | numeric | 47.9% | N/A |
+| `ps030` | Ps030 | numeric | 47.8% | N/A |
+| `ps031` | Ps031 | numeric | 47.9% | N/A |
+| `ps032` | Ps032 | numeric | 47.8% | N/A |
+| `ps034` | Ps034 | numeric | 47.8% | N/A |
+| `ps035` | Ps035 | numeric | 47.9% | N/A |
+| `ps036` | Ps036 | numeric | 47.9% | N/A |
+| `ps037` | Ps037 | numeric | 48.1% | N/A |
+| `ps038` | Ps038 | numeric | 48.0% | N/A |
+| `ps039` | Ps039 | numeric | 48.0% | N/A |
+| `ps040` | Ps040 | numeric | 48.1% | N/A |
 | `ps041` | Ps041 | numeric | 48.0% | N/A |
-| `ps042` | Ps042 | numeric | 47.9% | N/A |
+| `ps042` | Ps042 | numeric | 48.0% | N/A |
 | `ps043` | Ps043 | numeric | 48.0% | N/A |
-| `ps044` | Ps044 | numeric | 48.0% | N/A |
-| `ps045` | Ps045 | numeric | 48.0% | N/A |
-| `ps046` | Ps046 | numeric | 47.9% | N/A |
-| `ps047` | Ps047 | numeric | 48.0% | N/A |
-| `ps048` | Ps048 | numeric | 47.8% | N/A |
-| `ps049` | Ps049 | numeric | 47.7% | N/A |
-| `q1347` | Q1347 | numeric | 50.5% | N/A |
+| `ps044` | Ps044 | numeric | 48.1% | N/A |
+| `ps045` | Ps045 | numeric | 48.1% | N/A |
+| `ps046` | Ps046 | numeric | 48.0% | N/A |
+| `ps047` | Ps047 | numeric | 48.1% | N/A |
+| `ps048` | Ps048 | numeric | 47.9% | N/A |
+| `ps049` | Ps049 | numeric | 47.8% | N/A |
+| `q1347` | Q1347 | numeric | 50.6% | N/A |
 | `q1348` | Q1348 | character | 85.4% | N/A |
-| `q1394` | Q1394 | character | 51.6% | N/A |
-| `q1394a` | Q1394A | character | 51.6% | N/A |
-| `q1395` | Q1395 | character | 52.2% | N/A |
-| `q1396` | Q1396 | character | 52.2% | N/A |
-| `q1397` | Q1397 | character | 52.1% | N/A |
-| `q1398` | Q1398 | character | 52.1% | N/A |
+| `q1394` | Q1394 | character | 51.8% | N/A |
+| `q1394a` | Q1394A | character | 51.8% | N/A |
+| `q1395` | Q1395 | character | 52.4% | N/A |
+| `q1396` | Q1396 | character | 52.4% | N/A |
+| `q1397` | Q1397 | character | 52.3% | N/A |
+| `q1398` | Q1398 | character | 52.2% | N/A |
 | `q1502` | Q1502 | numeric | 36.2% | N/A |
 | `q1503` | Q1503 | numeric | 36.3% | N/A |
 | `q1504` | Q1504 | numeric | 36.6% | N/A |
@@ -604,7 +683,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `sf018` | Sf018 | numeric | 99.5% | N/A |
 | `sf019` | Sf019 | numeric | 99.5% | N/A |
 | `sf021` | Sf021 | numeric | 99.5% | N/A |
-| `sf054` | Sf054 | numeric | 95.0% | N/A |
+| `sf054` | Sf054 | numeric | 95.1% | N/A |
 | `sf093` | Sf093 | numeric | 96.7% | N/A |
 | `sf122` | Sf122 | numeric | 91.0% | N/A |
 | `sf127` | Sf127 | numeric | 93.6% | N/A |
@@ -628,6 +707,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `sq002___9` | Sq002   9 | numeric | 0.0% | N/A |
 | `sq003` | Sq003 | numeric | 36.3% | N/A |
 | `survey_stop` | Survey Stop | numeric | 99.4% | N/A |
+| `urban_pct` | Percentage of ZIP population in urban areas (0-100) | numeric | 27.9% | N/A |
 
 ---
 
@@ -638,4 +718,4 @@ for race/ethnicity, education categories, and other demographic variables.
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-09-29 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-09-30 by the Kidsights Data Platform*

@@ -1,0 +1,455 @@
+# Naming Conventions and Standards {#sec-standards}
+
+## Naming Conventions
+
+### Variable Names
+
+**Format:** `snake_case` (lowercase with underscores)
+
+**Structure:** `[prefix_]root_name[_suffix][_category]`
+
+**Examples:**
+- `eligible` - Simple root name
+- `a1_race` - Prefix indicates primary caregiver
+- `educ4_max` - Suffix indicates 4-category version
+- `educ6_mom` - Combined suffix and type indicator
+
+### Prefixes
+
+| Prefix | Meaning | Example | Context |
+|--------|---------|---------|---------|
+| `a1_` | Primary caregiver | `a1_race`, `a1_hisp` | Demographic variables |
+| `a2_` | Secondary caregiver | `a2_educ`, `a2_race` | When two caregivers assessed |
+| `cid_` | Criterion for inclusion/exclusion | `cid1_age`, `cid2_consent` | Eligibility determination |
+| `ps_` | Psychosocial measure | `ps001`, `ps_eat` | Domain-specific items |
+
+### Suffixes
+
+| Suffix | Meaning | Example | Purpose |
+|--------|---------|---------|---------|
+| `_max` | Maximum across group | `educ_max` | Highest education between caregivers |
+| `_mom` | Maternal variable | `educ_mom` | Specifically mother's value |
+| `_cat` | Categorical version | `age_cat` | Categorized from continuous |
+| `_z` | Z-score standardized | `height_z` | Standardized scores |
+| `_pct` | Percentile | `bmi_pct` | Percentile ranks |
+
+### Category Indicators
+
+For variables with multiple category structures:
+
+| Indicator | Categories | Example | Use Case |
+|-----------|------------|---------|----------|
+| `4` | 4 categories | `educ4_max` | Coarse grouping |
+| `6` | 6 categories | `educ6_a1` | Medium detail |
+| `8` | 8 categories (original) | `educ_max` | Full detail |
+
+**Pattern:** Lower number = more collapsed categories
+
+### Composite Names
+
+When combining indicators:
+
+```
+[prefix]_[root][number]_[suffix]
+
+Examples:
+- a1_educ4_max  ❌ (too complex, choose either a1 or max)
+- educ4_max     ✅ (clear: 4-category maximum education)
+- educ4_mom     ✅ (clear: 4-category maternal education)
+```
+
+**Rule:** Maximum of 2 qualifiers (prefix + suffix OR number + suffix)
+
+## Variable Labels
+
+### Format Standards
+
+**Capitalization:** Sentence case (first word capitalized)
+
+**Structure:** `[Qualifier] [Concept] [Details]`
+
+**Examples:**
+```r
+var_label(eligible) <- "Meets study inclusion criteria"
+var_label(a1_race) <- "Primary caregiver race (collapsed categories)"
+var_label(educ4_max) <- "Maximum education level among caregivers (4 categories)"
+```
+
+### Label Guidelines
+
+**Be Specific:**
+- ✅ "Child Hispanic/Latino ethnicity"
+- ❌ "Hispanic status"
+
+**Include Category Count:**
+- ✅ "Education level (6 categories)"
+- ❌ "Education level"
+
+**Indicate Population:**
+- ✅ "Primary caregiver age (years)"
+- ❌ "Age (years)"
+
+**Specify Measurement:**
+- ✅ "Household income as percentage of federal poverty level"
+- ❌ "Income category"
+
+## Factor Variable Standards
+
+### Level Naming
+
+**Format:** Descriptive, consistent capitalization
+
+**Examples:**
+```r
+# Race/Ethnicity
+levels: "White, non-Hisp.", "Black, non-Hisp.", "Hispanic", "Two or More"
+
+# Education (4 categories)
+levels: "Less than High School Graduate",
+        "High School Graduate (including Equivalency)",
+        "Some College or Associate's Degree",
+        "College Degree"
+
+# Binary Variables
+levels: "No", "Yes"  # Or FALSE, TRUE for logical
+```
+
+### Ordering Rules
+
+**Ordered Factors:**
+- Education: Low to high educational attainment
+- Income/FPL: Low to high income
+- Age categories: Young to old
+- Severity scales: Mild to severe
+
+**Unordered Factors:**
+- Race/ethnicity: No inherent ordering
+- Sex: No inherent ordering
+- Geographic: No inherent ordering
+
+**Missing Values:**
+- Always last in factor ordering
+- Explicit NA vs "Don't Know" vs "Refuse to Answer"
+
+### Reference Levels
+
+**Default Rule:** Most common non-missing category
+
+**Exceptions:**
+
+| Variable Type | Reference Level | Rationale |
+|---------------|----------------|-----------|
+| Binary | FALSE or "No" | Standard R convention |
+| Race | "White, non-Hisp." | Majority group for comparisons |
+| Education | "College Degree" | High education as reference |
+| Income/FPL | "400+% FPL" | High income as reference |
+
+**Set Reference Levels:**
+```r
+# After creating factor
+race <- relevel(race, ref = "White, non-Hisp.")
+educ4_max <- relevel(educ4_max, ref = "College Degree")
+```
+
+## Missing Data Conventions
+
+### Missing Value Codes
+
+**Study-Specific Conventions:**
+
+| Study | Missing Code | Example |
+|-------|-------------|---------|
+| NE25 | `9` | Single digit for brevity |
+| NE22, NE20 | `-9` | Legacy convention |
+| CREDI, GSED | `-9` | International standards |
+
+**Semantic Distinctions:**
+
+| Code | Meaning | Usage |
+|------|---------|-------|
+| `NA` | True missing | Data never collected |
+| `9` or `-9` | "Don't Know" | Respondent uncertainty |
+| `99` or `-99` | "Refuse to Answer" | Respondent declined |
+| `999` | "Not Applicable" | Question doesn't apply |
+
+### Handling in Transformations
+
+**Preserve Missing Semantics:**
+```r
+# ✅ Correct: Maintain distinction
+transformed <- ifelse(is.na(raw_var), NA,
+                     ifelse(raw_var == 9, NA,  # Convert 9 to NA
+                           recode_logic(raw_var)))
+
+# ❌ Incorrect: Lose information
+transformed <- recode_logic(raw_var)  # 9 treated as valid
+```
+
+**Document Missing Patterns:**
+```r
+var_label(income) <- "Household annual income (nominal dollars)"
+attr(income, "missing_code") <- 9
+attr(income, "missing_meaning") <- "Don't Know / Prefer not to say"
+```
+
+## R Coding Standards
+
+### Explicit Namespacing
+
+**Rule:** Always use `package::function()` format
+
+**Rationale:** Prevents namespace conflicts, especially with plyr/dplyr
+
+```r
+# ✅ Correct
+data %>%
+  dplyr::select(pid, record_id) %>%
+  dplyr::filter(age > 0) %>%
+  dplyr::mutate(age_years = age / 365.25)
+
+# ❌ Incorrect
+data %>%
+  select(pid, record_id) %>%  # Which select?
+  filter(age > 0) %>%
+  mutate(age_years = age / 365.25)
+```
+
+**Required Prefixes:**
+
+| Package | Common Functions |
+|---------|------------------|
+| `dplyr::` | select, filter, mutate, summarise, group_by, left_join, right_join |
+| `tidyr::` | pivot_longer, pivot_wider, separate, unite |
+| `stringr::` | str_detect, str_extract, str_replace, str_split |
+| `arrow::` | read_feather, write_feather |
+| `plyr::` | mapvalues (use before loading dplyr!) |
+
+### Package Loading Order
+
+**Critical:** Load plyr BEFORE dplyr to avoid masking
+
+```r
+# ✅ Correct order
+library(plyr)    # Load first
+library(dplyr)   # Load second
+library(tidyr)
+library(stringr)
+
+# ❌ Incorrect order
+library(dplyr)   # Functions masked
+library(plyr)    # Masks summarise, mutate, etc.
+```
+
+**Alternative:** Use explicit namespacing and don't attach packages:
+```r
+# Load but don't attach
+requireNamespace("dplyr", quietly = TRUE)
+requireNamespace("plyr", quietly = TRUE)
+
+# Always use explicit calls
+plyr::mapvalues(...)
+dplyr::mutate(...)
+```
+
+### Error Handling
+
+**Use tryCatch for Robust Code:**
+```r
+transformed_var <- tryCatch({
+  # Transformation logic that might fail
+  recode_logic(input_var)
+}, error = function(e) {
+  # Log error with context
+  warning(paste("Failed to transform variable:", var_name, "-", e$message))
+  # Return NA or default value
+  return(rep(NA, length(input_var)))
+})
+```
+
+**Validate Inputs:**
+```r
+# Check required columns exist
+required_cols <- c("cqr009", "cqr010", "cqr011")
+missing_cols <- setdiff(required_cols, names(data))
+
+if (length(missing_cols) > 0) {
+  stop(paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+}
+```
+
+### Documentation Standards
+
+**Function Documentation:**
+```r
+#' Transform Race Variables
+#'
+#' Collapses detailed race categories and combines with ethnicity.
+#'
+#' @param dat Data frame containing raw race variables
+#' @param dict REDCap data dictionary for value labels
+#' @return Data frame with race, hisp, raceG variables
+#'
+#' @details
+#' Transformation logic:
+#' 1. Pivot checkbox variables to long format
+#' 2. Collapse Asian subcategories to "Asian or Pacific Islander"
+#' 3. Create "Two or More" category for multiracial
+#' 4. Combine race and Hispanic ethnicity into raceG
+#'
+#' @examples
+#' race_vars <- transform_race(raw_data, data_dictionary)
+```
+
+**Inline Comments:**
+```r
+# ✅ Good: Explain WHY, not WHAT
+# Set White as reference for regression comparisons
+race <- relevel(race, ref = "White, non-Hisp.")
+
+# ❌ Bad: Obvious WHAT
+# Relevel race
+race <- relevel(race, ref = "White, non-Hisp.")
+```
+
+## Python Coding Standards
+
+### Type Hints
+
+**Always Use Type Annotations:**
+```python
+def analyze_variable(series: pd.Series, var_name: str) -> Dict[str, Any]:
+    """Generate metadata for a variable."""
+    metadata: Dict[str, Any] = {
+        "variable_name": var_name,
+        "n_total": len(series)
+    }
+    return metadata
+```
+
+### Error Context
+
+**Provide Rich Error Information:**
+```python
+try:
+    result = process_data(df)
+except Exception as e:
+    logger.error(
+        f"Failed to process data: {e}",
+        extra={
+            "error_type": type(e).__name__,
+            "dataframe_shape": df.shape,
+            "columns": list(df.columns),
+            "traceback": traceback.format_exc()
+        }
+    )
+    raise
+```
+
+### Dataframe Operations
+
+**Explicit Column Selection:**
+```python
+# ✅ Correct: Explicit columns
+df_subset = df[["pid", "record_id", "age"]]
+
+# ❌ Incorrect: Implicit selection
+df_subset = df.drop(columns=["extra_col"])  # Fragile if columns change
+```
+
+## File Naming Conventions
+
+### R Files
+
+**Format:** `snake_case.R`
+
+**Examples:**
+- `ne25_transforms.R` - Main transformation file
+- `extract_redcap.R` - REDCap extraction
+- `load_codebook.R` - Codebook utilities
+
+### Python Files
+
+**Format:** `snake_case.py`
+
+**Examples:**
+- `generate_metadata.py` - Metadata generation
+- `init_database.py` - Database initialization
+- `insert_raw_data.py` - Data insertion
+
+### Configuration Files
+
+**Format:** `kebab-case.yaml` or `snake_case.yaml`
+
+**Examples:**
+- `ne25.yaml` - Study configuration
+- `duckdb.yaml` - Database configuration
+- `derived_variables.yaml` - Variable definitions
+
+### Documentation Files
+
+**Format:** `UPPER_CASE.md` for important docs, `snake_case.md` for others
+
+**Examples:**
+- `README.md` - Project overview
+- `CLAUDE.md` - Claude Code instructions
+- `codebook_utilities.md` - Utility documentation
+
+## Version Control Standards
+
+### Commit Messages
+
+**Format:** `<type>: <subject>`
+
+**Types:**
+- `feat:` New feature or transformation
+- `fix:` Bug fix
+- `docs:` Documentation changes
+- `refactor:` Code restructuring
+- `test:` Test additions/changes
+- `chore:` Maintenance tasks
+
+**Examples:**
+```
+feat: Add 6-category education variables
+fix: Correct race collapsing logic for Pacific Islander
+docs: Update education transformation specifications
+refactor: Extract helper function for value labels
+```
+
+### Branch Naming
+
+**Format:** `type/short-description`
+
+**Examples:**
+- `feat/add-income-categories`
+- `fix/missing-data-handling`
+- `docs/update-manual`
+
+## Code Review Checklist
+
+Before submitting code for review, verify:
+
+**Functionality:**
+- [ ] Code matches specification in manual
+- [ ] All test cases pass
+- [ ] Edge cases handled (missing data, outliers)
+
+**Standards:**
+- [ ] Variable names follow conventions
+- [ ] Explicit namespacing used (R)
+- [ ] Type hints provided (Python)
+- [ ] Error handling implemented
+
+**Documentation:**
+- [ ] Function documentation complete
+- [ ] Inline comments explain WHY
+- [ ] Manual updated if needed
+
+**Quality:**
+- [ ] No hardcoded values
+- [ ] DRY principle followed (no duplication)
+- [ ] Performance acceptable for expected data size
+
+---
+
+**Next:** Part II covers variable domains with detailed transformation specifications. Start with @sec-education for a comprehensive example.
