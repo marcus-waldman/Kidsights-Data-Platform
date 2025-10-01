@@ -13,8 +13,8 @@ This directory contains documentation for the JSON-based codebook system.
 ## Codebook System
 
 The primary codebook is stored at `codebook/data/codebook.json` and contains:
-- **305 items** across 8 studies (NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED)
-- **Version**: 3.0 (updated September 2025)
+- **309 items** across 8 studies (NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED)
+- **Version**: 3.1 (updated October 2025)
 - Item stems, response options, domains, age ranges
 - IRT parameters: NE22, CREDI (SF/LF), GSED (multi-calibration), NE25
 - Study-specific lexicon mappings

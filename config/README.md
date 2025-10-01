@@ -66,12 +66,14 @@ domain_validation:
     - "motor"                       # Motor skills and physical development
     - "coglan"                      # Cognitive and language development
     - "psychosocial_problems_general"  # GSED_PF psychosocial items
+    - "health"                      # HRTL health items from NSCH
 
   valid_hrtl_domains:
     - "social_emotional"
     - "motor"
     - "early_learning"
     - "self_regulation"
+    - "health"
 ```
 
 **Kidsights Domains:**

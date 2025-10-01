@@ -19,6 +19,12 @@ detect_response_set_or_parse <- function(resp_string) {
     return(NULL)
   }
 
+  # Check if it's a response set name (no "=" character, just alphanumeric + underscore)
+  if (!stringr::str_detect(resp_string, "=")) {
+    # It's a response set reference name - return as-is
+    return(resp_string)
+  }
+
   # Normalize the string for comparison - remove spaces and punctuation but keep letters
   normalized <- str_to_lower(str_replace_all(resp_string, "[[:space:]'\"]+", ""))
 
@@ -337,7 +343,7 @@ parse_ps_items <- function(ps_csv_path = "temp/archive_2025/ne25_ps_items.csv") 
 #' @param csv_path Path to CSV file
 #' @param json_path Path for output JSON file
 convert_csv_to_json <- function(
-  csv_path = "C:/Users/waldmanm/git-repositories/Update-KidsightsPublic/codebook/codebook.csv",
+  csv_path = "codebook/data/codebook.csv",
   json_path = "codebook/data/codebook.json"
 ) {
 

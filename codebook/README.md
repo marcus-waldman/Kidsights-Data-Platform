@@ -2,7 +2,7 @@
 
 ## Overview
 
-This directory contains the JSON-based codebook system for the Kidsights Data Platform. The codebook provides comprehensive metadata about 306 items from multiple studies, including their properties, scoring rules, psychometric parameters, and study-specific response options.
+This directory contains the JSON-based codebook system for the Kidsights Data Platform. The codebook provides comprehensive metadata about 309 items from multiple studies, including their properties, scoring rules, psychometric parameters, and study-specific response options.
 
 **Current Studies Supported:**
 - **NE25, NE22, NE20**: Nebraska longitudinal studies
@@ -11,7 +11,7 @@ This directory contains the JSON-based codebook system for the Kidsights Data Pl
 - **GSED_PF**: GSED Psychosocial Frequency items (46 PS items)
 
 **Key Features:**
-- 306 total items with comprehensive metadata
+- 309 total items with comprehensive metadata
 - Hierarchical domain classification system
 - Study-specific response set definitions with proper missing value coding
 - Interactive Quarto dashboard for exploration
@@ -104,7 +104,7 @@ Rscript scripts/audit/ne25_codebook/generate_audit_report.R
 
 The JSON codebook contains:
 
-### Items (305 total)
+### Items (309 total)
 Core item definitions with:
 - **Identifiers**: Primary equate ID plus study-specific lexicons
 - **Domains**: Hierarchical classification (kidsights/cahmi with study groups)
@@ -136,6 +136,7 @@ Study-specific response option definitions ensure proper missing value coding:
 - `motor`: Motor skills and physical development
 - `coglan`: Cognitive and language development
 - `psychosocial_problems_general`: GSED_PF psychosocial items
+- `health`: HRTL health-related items from NSCH
 
 ### Studies Integration
 - **GSED_PF**: 46 PS items (PS001-PS049) with psychosocial_problems_general domain

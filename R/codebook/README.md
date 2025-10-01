@@ -63,7 +63,7 @@ Get summary statistics for the codebook.
 **Example:**
 ```r
 summary <- get_codebook_summary(codebook)
-print(summary$total_items)  # 305
+print(summary$total_items)  # 309
 print(summary$studies)      # c("NE25", "NE22", "GSED_PF", ...)
 ```
 

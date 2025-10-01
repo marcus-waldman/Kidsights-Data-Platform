@@ -5,6 +5,33 @@ All notable changes to the Kidsights Codebook System will be documented in this 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-10-01
+
+### Added
+- **HRTL Health Items**: Added 4 health-related items from National Survey of Children's Health (NSCH)
+  - `CQR014X` (ID 260): Health conditions impact frequency
+  - `NOM044` (ID 261): Extent of health impact (conditional item)
+  - `CQFA002` (ID 262): General health rating
+  - `NOM046X` (ID 263): Dental health condition
+- **New Domain**: `health` added to valid domains for HRTL/NSCH health items
+- **New Response Sets**: Four HRTL-specific response sets for health items:
+  - `hrtl_health_impact_ne25`: 5-point scale for health condition impact
+  - `hrtl_extent_ne25`: 3-point extent scale
+  - `hrtl_health_rating_ne25`: 5-point quality scale for general health
+  - `hrtl_dental_ne25`: 6-point scale for dental condition
+- **Enhanced Conversion**: Updated `detect_response_set_or_parse()` to recognize response set names without "=" characters
+
+### Changed
+- **Total Items**: Increased from 305 to 309 items (added 4 HRTL health items)
+- **Domain Structure**: "health" domain now available in both `valid_domains` and `valid_hrtl_domains`
+- **Configuration**: Updated `codebook_config.yaml` with health domain and response sets
+
+### Technical Details
+- Health items use NE25 study with explicit response set references
+- All health items classified under both `kidsights.health` and `cahmi.health` domains
+- Response sets follow NE25 convention (missing value = 9, not -9)
+- Items added to CSV at IDs 260-263, maintaining sequential numbering
+
 ## [2.1.0] - 2025-09-16
 
 ### Added

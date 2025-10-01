@@ -28,12 +28,14 @@ validation:
       - "psychosocial_problems_socialemotional"
       - "psychosocial_problems_internalizing"
       - "psychosocial_problems_externalizing"
+      - "health"
 
     valid_hrtl_domains:
       - "social_emotional"
       - "motor"
       - "early_learning"
       - "self_regulation"
+      - "health"
 
   study_validation:
     valid_studies:
@@ -82,6 +84,52 @@ response_sets:
     - value: -9
       label: "Don't Know"
       missing: true
+
+  hrtl_health_impact_ne25:
+    - value: 0
+      label: "This child does not have any health conditions"
+    - value: 1
+      label: "Never"
+    - value: 2
+      label: "Sometimes"
+    - value: 3
+      label: "Usually"
+    - value: 4
+      label: "Always"
+
+  hrtl_extent_ne25:
+    - value: 0
+      label: "Very little"
+    - value: 1
+      label: "Somewhat"
+    - value: 2
+      label: "A great deal"
+
+  hrtl_dental_ne25:
+    - value: 0
+      label: "This child does not have any teeth"
+    - value: 1
+      label: "Poor"
+    - value: 2
+      label: "Fair"
+    - value: 3
+      label: "Good"
+    - value: 4
+      label: "Very good"
+    - value: 5
+      label: "Excellent"
+
+  hrtl_health_rating_ne25:
+    - value: 0
+      label: "Excellent"
+    - value: 1
+      label: "Very Good"
+    - value: 2
+      label: "Good"
+    - value: 3
+      label: "Fair"
+    - value: 4
+      label: "Poor"
 
 # Dashboard settings
 dashboard:
