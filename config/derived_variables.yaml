@@ -146,6 +146,73 @@ all_derived_variables:
   - aiannh_name
   - aiannh_afact
 
+  # Mental Health Screening - PHQ-2
+  - phq2_interest
+  - phq2_depressed
+  - phq2_total
+  - phq2_positive
+  - phq2_risk_cat
+
+  # Mental Health Screening - GAD-2
+  - gad2_nervous
+  - gad2_worry
+  - gad2_total
+  - gad2_positive
+  - gad2_risk_cat
+
+  # Adverse Childhood Experiences (ACE)
+  - ace_neglect
+  - ace_parent_loss
+  - ace_mental_illness
+  - ace_substance_use
+  - ace_domestic_violence
+  - ace_incarceration
+  - ace_verbal_abuse
+  - ace_physical_abuse
+  - ace_emotional_neglect
+  - ace_sexual_abuse
+  - ace_total
+  - ace_risk_cat
+
+  # Childcare Access and Difficulty
+  - cc_access_difficulty
+  - cc_difficulty_reason
+
+  # Childcare Receipt and Type
+  - cc_receives_care
+  - cc_primary_type
+
+  # Childcare Costs
+  - cc_weekly_cost_all
+  - cc_weekly_cost_primary
+  - cc_weekly_cost_total
+
+  # Childcare Financial Support
+  - cc_family_support_all
+  - cc_family_support_child
+  - cc_receives_subsidy
+
+  # Childcare Impact and Quality
+  - cc_financial_hardship
+  - cc_quality_satisfaction
+
+  # Childcare Hours and Schedule
+  - cc_hours_per_week
+  - cc_nonstandard_hours
+
+  # Childcare Subsidy Satisfaction
+  - cc_subsidy_sat_process
+  - cc_subsidy_sat_amount
+  - cc_subsidy_sat_options
+
+  # Childcare Multiple Children
+  - cc_pays_multiple_children
+
+  # Childcare Derived Variables
+  - cc_formal_care
+  - cc_intensity
+  - cc_any_support
+
 # Variable labels for documentation
 variable_labels:
   eligible: "Meets study inclusion criteria"
@@ -194,6 +261,73 @@ variable_labels:
   aiannh_code: "Native lands (AIANNH) code(s) - semicolon-separated if ZIP spans multiple areas (2021)"
   aiannh_name: "Native lands (AIANNH) name(s) - semicolon-separated if ZIP spans multiple areas"
   aiannh_afact: "ZIP to AIANNH allocation factor(s) - semicolon-separated, ordered by likelihood"
+
+  # Mental Health Screening - PHQ-2 (Depression)
+  phq2_interest: "PHQ-2 Item 1 - Little interest or pleasure in doing things (past 2 weeks)"
+  phq2_depressed: "PHQ-2 Item 2 - Feeling down, depressed, or hopeless (past 2 weeks)"
+  phq2_total: "PHQ-2 Total Score (0-6) - Depression screening score"
+  phq2_positive: "PHQ-2 Positive Screen (≥3) - Indicates likely depression, further evaluation needed"
+  phq2_risk_cat: "PHQ-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate/Severe (3-6)"
+
+  # Mental Health Screening - GAD-2 (Anxiety)
+  gad2_nervous: "GAD-2 Item 1 - Feeling nervous, anxious, or on edge (past 2 weeks)"
+  gad2_worry: "GAD-2 Item 2 - Not being able to stop or control worrying (past 2 weeks)"
+  gad2_total: "GAD-2 Total Score (0-6) - Anxiety screening score"
+  gad2_positive: "GAD-2 Positive Screen (≥3) - Indicates likely anxiety, further evaluation needed"
+  gad2_risk_cat: "GAD-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate (3-4), Severe (5-6)"
+
+  # Adverse Childhood Experiences (ACE) - Caregiver
+  ace_neglect: "ACE - Physical/emotional neglect during childhood"
+  ace_parent_loss: "ACE - Lost parent through divorce, abandonment, death"
+  ace_mental_illness: "ACE - Lived with someone with mental illness/depression/suicide"
+  ace_substance_use: "ACE - Lived with someone with alcohol/drug problems"
+  ace_domestic_violence: "ACE - Witnessed domestic violence between parents/adults"
+  ace_incarceration: "ACE - Lived with someone who went to jail/prison"
+  ace_verbal_abuse: "ACE - Experienced verbal/emotional abuse from parent/adult"
+  ace_physical_abuse: "ACE - Experienced physical abuse from parent/adult"
+  ace_emotional_neglect: "ACE - Felt unloved or not special in family"
+  ace_sexual_abuse: "ACE - Experienced unwanted sexual contact"
+  ace_total: "ACE Total Score (0-10) - Total count of adverse childhood experiences"
+  ace_risk_cat: "ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)"
+
+  # Childcare - Access and Difficulty
+  cc_access_difficulty: "Difficulty finding child care (past 12 months)"
+  cc_difficulty_reason: "Main reason child care was difficult to find"
+
+  # Childcare - Receipt and Type
+  cc_receives_care: "Child receives non-parental care (10+ hours/week)"
+  cc_primary_type: "Primary child care arrangement type"
+
+  # Childcare - Costs
+  cc_weekly_cost_all: "Weekly household child care costs - all children ($)"
+  cc_weekly_cost_primary: "Weekly cost - primary child care arrangement ($)"
+  cc_weekly_cost_total: "Weekly cost - all arrangements this child ($)"
+
+  # Childcare - Financial Support
+  cc_family_support_all: "Weekly family financial support - all children ($)"
+  cc_family_support_child: "Weekly family financial support - this child ($)"
+  cc_receives_subsidy: "Receives child care subsidy assistance"
+
+  # Childcare - Impact and Quality
+  cc_financial_hardship: "Child care costs create financial hardship"
+  cc_quality_satisfaction: "Satisfaction with primary child care quality"
+
+  # Childcare - Hours and Schedule
+  cc_hours_per_week: "Total hours in child care per week"
+  cc_nonstandard_hours: "Requires evening/weekend/overnight care"
+
+  # Childcare - Subsidy Satisfaction
+  cc_subsidy_sat_process: "Satisfaction with subsidy application process"
+  cc_subsidy_sat_amount: "Satisfaction with subsidy amount"
+  cc_subsidy_sat_options: "Satisfaction with subsidy care options"
+
+  # Childcare - Multiple Children
+  cc_pays_multiple_children: "Pays for childcare for multiple children (10+ hrs/week)"
+
+  # Childcare - Derived Variables
+  cc_formal_care: "Uses formal child care (center/preschool/Head Start)"
+  cc_intensity: "Child care intensity level (part-time/full-time/extended)"
+  cc_any_support: "Receives any child care financial support (family or subsidy)"
 
 # Transformation categories for grouping
 transformation_categories:

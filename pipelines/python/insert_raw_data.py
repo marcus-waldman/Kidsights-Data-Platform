@@ -127,7 +127,15 @@ def insert_dictionary_data(
             return False
 
         logger.info(f"Reading dictionary from: {dictionary_file}")
-        df = pd.read_csv(dictionary_file)
+
+        # Support both CSV and Feather formats for dictionaries
+        if dict_path.suffix.lower() == '.feather':
+            df = pd.read_feather(dictionary_file)
+        elif dict_path.suffix.lower() == '.csv':
+            df = pd.read_csv(dictionary_file)
+        else:
+            logger.error(f"Unsupported dictionary file format: {dict_path.suffix}")
+            return False
 
         if df.empty:
             logger.warning(f"No dictionary data found in {dictionary_file}")

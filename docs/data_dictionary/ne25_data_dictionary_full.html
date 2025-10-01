@@ -35,10 +35,10 @@
 <body>
     <h1>NE25 Data Dictionary</h1>
 
-<p><strong>Generated:</strong> 2025-09-30 17:42:46<br />
-<strong>Total Records:</strong> 4882<br />
-<strong>Total Variables:</strong> 610<br />
-<strong>Categories:</strong> 7  </p>
+<p><strong>Generated:</strong> 2025-09-30 22:44:49<br />
+<strong>Total Records:</strong> 4883<br />
+<strong>Total Variables:</strong> 653<br />
+<strong>Categories:</strong> 14  </p>
 
 <h2>Overview</h2>
 
@@ -55,8 +55,15 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 <li><a href="#education">Education</a> (13 variables)</li>
 <li><a href="#sex">Sex</a> (3 variables)</li>
 <li><a href="#age">Age</a> (7 variables)</li>
+<li><a href="#adverse_experiences">Adverse_Experiences</a> (22 variables)</li>
+<li><a href="#childcare">Childcare</a> (21 variables)</li>
+<li><a href="#coglan">Coglan</a> (80 variables)</li>
 <li><a href="#geography">Geography</a> (28 variables)</li>
-<li><a href="#other">Other</a> (549 variables)</li>
+<li><a href="#mental_health">Mental_Health</a> (10 variables)</li>
+<li><a href="#motor">Motor</a> (76 variables)</li>
+<li><a href="#other">Other</a> (267 variables)</li>
+<li><a href="#psychosocial_problems_general">Psychosocial<em>Problems</em>General</a> (46 variables)</li>
+<li><a href="#socemo">Socemo</a> (70 variables)</li>
 </ul>
 
 <h2>Race</h2>
@@ -64,7 +71,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 <p><strong>Description:</strong> Race and ethnicity variables for children and primary caregivers, including harmonized categories</p>
 
 <p><strong>Variables:</strong> 6<br />
-<strong>Average Missing:</strong> 40.1%<br />
+<strong>Average Missing:</strong> 40.2%<br />
 <strong>Data Types:</strong> 6 factors, 0 numeric, 0 logical, 0 character</p>
 
 <table>
@@ -161,7 +168,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>Relation1</td>
   <td>factor</td>
   <td>36.1%</td>
-  <td>2 (1), 3 (2), 4 (3), 5 (4), 6 (5)</td>
+  <td>1 (Biological or Adoptive Parent), 2 (Foster Parent), 3 (Grandparent), 4 (Other: Non-Relative), 5 (Other: Relative)...</td>
 </tr>
 <tr>
   <td><code>relation2</code></td>
@@ -196,7 +203,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ4_a1</code></td>
   <td>Primary caregiver education level (4 categories)</td>
   <td>factor</td>
-  <td>35.7%</td>
+  <td>35.8%</td>
   <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
 </tr>
 <tr>
@@ -210,7 +217,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ4_max</code></td>
   <td>Maximum education level among caregivers (4 categories)</td>
   <td>factor</td>
-  <td>35.4%</td>
+  <td>35.5%</td>
   <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (College Degree)</td>
 </tr>
 <tr>
@@ -224,7 +231,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ6_a1</code></td>
   <td>Primary caregiver education level (6 categories)</td>
   <td>factor</td>
-  <td>35.7%</td>
+  <td>35.8%</td>
   <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)...</td>
 </tr>
 <tr>
@@ -238,7 +245,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ6_max</code></td>
   <td>Maximum education level among caregivers (6 categories)</td>
   <td>factor</td>
-  <td>35.4%</td>
+  <td>35.5%</td>
   <td>1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)...</td>
 </tr>
 <tr>
@@ -252,7 +259,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ_a1</code></td>
   <td>Primary caregiver education level (8 categories)</td>
   <td>factor</td>
-  <td>35.7%</td>
+  <td>35.8%</td>
   <td>1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (Some College Credit, but No Degree), 4 (High School Graduate or GED Completed), 5 (Associate Degree (AA, AS))...</td>
 </tr>
 <tr>
@@ -266,7 +273,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>educ_max</code></td>
   <td>Maximum education level among caregivers (8 categories)</td>
   <td>factor</td>
-  <td>35.4%</td>
+  <td>35.5%</td>
   <td>1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (High School Graduate or GED Completed), 4 (Some College Credit, but No Degree), 5 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD))...</td>
 </tr>
 <tr>
@@ -280,7 +287,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td><code>mom_a1</code></td>
   <td>Mom A1</td>
   <td>logical</td>
-  <td>36.0%</td>
+  <td>36.3%</td>
   <td>N/A</td>
 </tr>
 </tbody>
@@ -357,7 +364,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tr>
 <tr>
   <td><code>age_in_days</code></td>
-  <td>Age In Days</td>
+  <td>Age Calculator</td>
   <td>numeric</td>
   <td>25.2%</td>
   <td>N/A</td>
@@ -371,7 +378,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tr>
 <tr>
   <td><code>language</code></td>
-  <td>Language</td>
+  <td>Language preference</td>
   <td>factor</td>
   <td>3.4%</td>
   <td>1 (en), 2 (es)</td>
@@ -399,6 +406,618 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tr>
 </tbody>
 </table>
+
+<h2>Adverse_Experiences</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 22<br />
+<strong>Average Missing:</strong> 36.8%<br />
+<strong>Data Types:</strong> 1 factors, 21 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>ace_domestic_violence</code></td>
+  <td>ACE - Witnessed domestic violence between parents/adults</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_emotional_neglect</code></td>
+  <td>ACE - Felt unloved or not special in family</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_incarceration</code></td>
+  <td>ACE - Lived with someone who went to jail/prison</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_mental_illness</code></td>
+  <td>ACE - Lived with someone with mental illness/depression/suicide</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_neglect</code></td>
+  <td>ACE - Physical/emotional neglect during childhood</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_parent_loss</code></td>
+  <td>ACE - Lost parent through divorce, abandonment, death</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_physical_abuse</code></td>
+  <td>ACE - Experienced physical abuse from parent/adult</td>
+  <td>numeric</td>
+  <td>36.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_risk_cat</code></td>
+  <td>ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)</td>
+  <td>factor</td>
+  <td>38.8%</td>
+  <td>1 (1 ACE), 2 (2-3 ACEs), 3 (4+ ACEs), 4 (No ACEs)</td>
+</tr>
+<tr>
+  <td><code>ace_sexual_abuse</code></td>
+  <td>ACE - Experienced unwanted sexual contact</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_substance_use</code></td>
+  <td>ACE - Lived with someone with alcohol/drug problems</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_total</code></td>
+  <td>ACE Total Score (0-10) - Total count of adverse childhood experiences</td>
+  <td>numeric</td>
+  <td>38.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ace_verbal_abuse</code></td>
+  <td>ACE - Experienced verbal/emotional abuse from parent/adult</td>
+  <td>numeric</td>
+  <td>36.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace1</code></td>
+  <td>Did you feel that you didn't have enough to eat, had to wear dirty clothes, or had no one to protect or take care of you?</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace10</code></td>
+  <td>Did you experience unwanted sexual contact, such as fondling or oral/anal/vaginal intercourse or penetration?</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace2</code></td>
+  <td>Did you lose a parent through divorce, abandonment, death, or other reason?</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace3</code></td>
+  <td>Did you live with anyone who was depressed, mentally ill, or attempted suicide?</td>
+  <td>numeric</td>
+  <td>36.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace4</code></td>
+  <td>Did you live with anyone who had a problem with drinking or using drugs, including prescription drugs?</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace5</code></td>
+  <td>Did your parents or adults in your home ever hit, punch, beat, or threaten to harm each other?</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace6</code></td>
+  <td>Did you live with anyone who went to jail or prison?</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace7</code></td>
+  <td>Did a parent or adult in your home ever swear at you, insult you, or put you down?</td>
+  <td>numeric</td>
+  <td>36.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace8</code></td>
+  <td>Did a parent or adult in your home ever hit, beat, kick, or physically hurt you in any way?</td>
+  <td>numeric</td>
+  <td>36.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cace9</code></td>
+  <td>Did you feel that no one in your family loved you or thought you were special?</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Childcare</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 21<br />
+<strong>Average Missing:</strong> 64.2%<br />
+<strong>Data Types:</strong> 15 factors, 6 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>cc_access_difficulty</code></td>
+  <td>Difficulty finding child care (past 12 months)</td>
+  <td>factor</td>
+  <td>39.2%</td>
+  <td>1 (Did not need childcare), 2 (Missing), 3 (Not difficult), 4 (Somewhat difficult), 5 (Very difficult)</td>
+</tr>
+<tr>
+  <td><code>cc_any_support</code></td>
+  <td>Receives any child care financial support (family or subsidy)</td>
+  <td>factor</td>
+  <td>0.0%</td>
+  <td>1 (No), 2 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_difficulty_reason</code></td>
+  <td>Main reason child care was difficult to find</td>
+  <td>factor</td>
+  <td>89.0%</td>
+  <td>1 (Cost too high), 2 (Hours not suitable), 3 (Location not convenient), 4 (Missing), 5 (No openings)...</td>
+</tr>
+<tr>
+  <td><code>cc_family_support_all</code></td>
+  <td>Weekly family financial support - all children ($)</td>
+  <td>numeric</td>
+  <td>74.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cc_family_support_child</code></td>
+  <td>Weekly family financial support - this child ($)</td>
+  <td>numeric</td>
+  <td>66.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cc_financial_hardship</code></td>
+  <td>Child care costs create financial hardship</td>
+  <td>factor</td>
+  <td>73.5%</td>
+  <td>1 (Missing), 2 (No), 3 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_formal_care</code></td>
+  <td>Uses formal child care (center/preschool/Head Start)</td>
+  <td>factor</td>
+  <td>71.6%</td>
+  <td>1 (No), 2 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_hours_per_week</code></td>
+  <td>Total hours in child care per week</td>
+  <td>numeric</td>
+  <td>64.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cc_intensity</code></td>
+  <td>Child care intensity level (part-time/full-time/extended)</td>
+  <td>factor</td>
+  <td>64.8%</td>
+  <td>1 (Extended (&gt;50 hrs)), 2 (Full-time (30-50 hrs)), 3 (Part-time (&lt;30 hrs))</td>
+</tr>
+<tr>
+  <td><code>cc_nonstandard_hours</code></td>
+  <td>Requires evening/weekend/overnight care</td>
+  <td>factor</td>
+  <td>39.5%</td>
+  <td>1 (Missing), 2 (No), 3 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_pays_multiple_children</code></td>
+  <td>Pays for childcare for multiple children (10+ hrs/week)</td>
+  <td>factor</td>
+  <td>39.0%</td>
+  <td>1 (Missing), 2 (No), 3 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_primary_type</code></td>
+  <td>Primary child care arrangement type</td>
+  <td>factor</td>
+  <td>71.6%</td>
+  <td>1 (Childcare center), 2 (Head Start/Early Head Start), 3 (Missing), 4 (Non-relative care), 5 (Other)...</td>
+</tr>
+<tr>
+  <td><code>cc_quality_satisfaction</code></td>
+  <td>Satisfaction with primary child care quality</td>
+  <td>factor</td>
+  <td>65.2%</td>
+  <td>1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)...</td>
+</tr>
+<tr>
+  <td><code>cc_receives_care</code></td>
+  <td>Child receives non-parental care (10+ hours/week)</td>
+  <td>factor</td>
+  <td>39.1%</td>
+  <td>1 (Missing), 2 (No), 3 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_receives_subsidy</code></td>
+  <td>Receives child care subsidy assistance</td>
+  <td>factor</td>
+  <td>64.7%</td>
+  <td>1 (Missing), 2 (No), 3 (Yes)</td>
+</tr>
+<tr>
+  <td><code>cc_subsidy_sat_amount</code></td>
+  <td>Satisfaction with subsidy amount</td>
+  <td>factor</td>
+  <td>93.6%</td>
+  <td>1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)...</td>
+</tr>
+<tr>
+  <td><code>cc_subsidy_sat_options</code></td>
+  <td>Satisfaction with subsidy care options</td>
+  <td>factor</td>
+  <td>93.6%</td>
+  <td>1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)...</td>
+</tr>
+<tr>
+  <td><code>cc_subsidy_sat_process</code></td>
+  <td>Satisfaction with subsidy application process</td>
+  <td>factor</td>
+  <td>93.6%</td>
+  <td>1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)...</td>
+</tr>
+<tr>
+  <td><code>cc_weekly_cost_all</code></td>
+  <td>Weekly household child care costs - all children ($)</td>
+  <td>numeric</td>
+  <td>74.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cc_weekly_cost_primary</code></td>
+  <td>Weekly cost - primary child care arrangement ($)</td>
+  <td>numeric</td>
+  <td>65.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>cc_weekly_cost_total</code></td>
+  <td>Weekly cost - all arrangements this child ($)</td>
+  <td>numeric</td>
+  <td>66.1%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Coglan</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 80<br />
+<strong>Average Missing:</strong> 91.6%<br />
+<strong>Data Types:</strong> 0 factors, 80 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>c007</code></td>
+  <td>Does your child look at a person when that person starts talking or making noise?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c012</code></td>
+  <td>When you talk to your child, does he/she smile, make noise, or more arms, legs or trunk in response?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c019</code></td>
+  <td>Does your child make noise or gesture to get your attention?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c021</code></td>
+  <td>Does your child turn his/her head towards your voice or some noise?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c022</code></td>
+  <td>Does your child make sounds when LOOKING at toys or people (not crying)?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c023</code></td>
+  <td>Does your child laugh?</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c027</code></td>
+  <td>Does your child make single sounds like "buh" or "duh" or "muh"?</td>
+  <td>numeric</td>
+  <td>99.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c033</code></td>
+  <td>Does your child recognize you or other family members? For example, smile when they enter a room or move toward them?</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c034</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child show interest in new objects that are put in front of him/her by reaching out for them?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155609&amp;doc_id_hash=048050645c24a3fb52bc232350a54c6f04891894" width="400" height="234"></p></div></td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c046</code></td>
+  <td>Does your child look for an object of interest when it is removed from sight or hidden from him/her, such as putting it under a cover or behind another object?</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c047</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child play by tapping an object on the ground or a table?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155619&amp;doc_id_hash=f5c348369bf02899c3c80634f6ea87a0aba0749c" alt="" width="400" height="198"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c048</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child intentionally move or change his/her position to get objects that are out of reach?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155618&amp;doc_id_hash=bd82cef1148f769f434f79472e193fa0fa4235c1" alt="" width="400" height="177"></p></div></td>
+  <td>numeric</td>
+  <td>99.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c051</code></td>
+  <td>Does your child make two similar sounds together like baba, mumu, pepe, didi (single consonant vowel combinations)?</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c059</code></td>
+  <td>Does your child stop what he/she is doing when you say "Stop!" even if just for a second?</td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c068</code></td>
+  <td>Does your child make a gesture to indicate "No", such as shaking his/her head?</td>
+  <td>numeric</td>
+  <td>96.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c072</code></td>
+  <td>Can your child follow a simple spoken command or direction without you making a gesture or motion?</td>
+  <td>numeric</td>
+  <td>92.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c073</code></td>
+  <td>Can your child fetch something when asked?</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c081</code></td>
+  <td>Can your child follow directions with more than one step? For example, "Go to the kitchen and bring me a spoon."</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c089</code></td>
+  <td>Can your child say five or more separate words, such as names like "Mama" or objects like "ball"?</td>
+  <td>numeric</td>
+  <td>94.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c090</code></td>
+  <td>Can your child say ten or more words in addition to "Mama" and "Dada"?</td>
+  <td>numeric</td>
+  <td>97.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c091</code></td>
+  <td>Can your child speak using short sentences of two words that go together? For example, "Mama go" or "Dada eat."</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c093</code></td>
+  <td>Can your child ask for something, such as food or water, by name when he/she wants it?</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c096</code></td>
+  <td>Can your child correctly name at least one family member other than mom and dad? For example, name of brother, sister, aunt, or uncle.</td>
+  <td>numeric</td>
+  <td>96.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c098</code></td>
+  <td>When looking at pictures, if you say to your child "what is this?", can they say the name of the object that you point to?</td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c099</code></td>
+  <td>Can your child recognize at least seven objects?</td>
+</tr>
+</tbody>
+</table>
+
+<p>For example, if you ask, "Where is the ball, spoon, cup, cloth, door, plate, or bucket?" does your child look at, point to, or even name the objects? | numeric | 96.3% | N/A |
+| <code>c100</code> | Can your child name at least two body parts, such as arm, eye, or nose? | numeric | 96.8% | N/A |
+| <code>c101</code> | If you show your child an object he/she knows well, such as a cup or an animal, can he/she consistently name it? | numeric | 97.1% | N/A |
+| <code>c102</code> | Does your child usually communicate with words what he/she wants in a way that is understandable to others? | numeric | 93.2% | N/A |
+| <code>c105</code> | Can your child say 15 or more separate words, such as names like "Mama" or objects like "ball"? | numeric | 92.6% | N/A |
+| <code>c107</code> | Can your child sing a short song or repeat parts of a rhyme from memory by him/herself? | numeric | 94.0% | N/A |
+| <code>c108</code> | Can your child tell you or someone familiar his/her own name/nickname when asked to? | numeric | 94.0% | N/A |
+| <code>c111</code> | Does your child know the difference between the words "big" and "small"? </p>
+
+<p>For example, if you ask, "Give me the big spoon" can your child understand which one to give if there are two different sizes? | numeric | 88.2% | N/A |
+| <code>c112</code> | Can your child speak using sentences of three or more words that go together? For example, "I want water." or "The house is big." | numeric | 88.8% | N/A |
+| <code>c113</code> | Can your child correctly use any of the words "I," "you," "she," or "he"? </p>
+
+<p>For example, "I go to store." or "He eats rice." | numeric | 91.9% | N/A |
+| <code>c115</code> | Can your child correctly ask questions using any of the words "what," "which," "where," or "who"? | numeric | 91.6% | N/A |
+| <code>c116</code> | Does your child pronounce most of his/her words correctly? | numeric | 89.8% | N/A |
+| <code>c117</code> | If you show your child two objects or people of a different size, can he/she tell you which one is the big one and which is the small one? | numeric | 88.2% | N/A |
+| <code>c118</code> | Can your child count objects, such as fingers or people, up to five?  | numeric | 91.1% | N/A |
+| <code>c119</code> | Can your child explain in words what common objects like a cup or chair are used for? | numeric | 92.1% | N/A |
+| <code>c120</code> | If you point to an object, can your child correctly use the words "on," "in," or "under" to describe where it is?</p>
+
+<p>For example, "The cup is on the table" instead of "The cup is in the table." | numeric | 93.0% | N/A |
+| <code>c121</code> | Does your child regularly use describing words such as "fast," "short," "hot," "fat," or "beautiful" correctly? | numeric | 92.5% | N/A |
+| <code>c122</code> | Can the child name at least one color, such as red, blue, or yellow? | numeric | 93.6% | N/A |
+| <code>c124</code> | Does your child ask "why" questions? </p>
+
+<p>For example, "Why are you tall?" | numeric | 93.9% | N/A |
+| <code>c126</code> | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct amount? | numeric | 92.7% | N/A |
+| <code>c127</code> | Can your child tell a story? | numeric | 94.7% | N/A |
+| <code>c131</code> | <div class="rich-text-field-label"><p>Does your child understand the term 'longest'?</p> <p> </p> <p>For example, if you ask them to choose "Which is the longest of three objects, such as three spoons or sticks?" would they be able to choose the longest?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155657&amp;doc_id_hash=1e4524b040b74f6000cdc7a35d12280ce59d90dd" alt="" width="400" height="200"></p></div> | numeric | 94.4% | N/A |
+| <code>c136</code> | Can your child say what others like or dislike? For example, "Mama doesn't like fruit," or "Papa likes football." | numeric | 93.5% | N/A |
+| <code>c138</code> | Can your child talk about things that have happened in the past using correct language? </p>
+
+<p>For example, "Yesterday I played with my friend" or "Last week she went to the market." | numeric | 91.2% | N/A |
+| <code>c139</code> | Can your child talk about things that will happen in the future using correct language?</p>
+
+<p>For example, "Tomorrow he will attend school," or "Next week we will go to the market." | numeric | 91.0% | N/A |
+| <code>ecdi009x</code> | If you show your child an object he/she knows well, such as a cup or animal, can he/she consistently name it? </p>
+
+<p>By consistently, we mean that he/she uses the same word to refer to the same object, even if the word used is not fully correct. | numeric | 94.5% | N/A |
+| <code>ecdi010</code> | Can your child recognize at least 5 letters of the alphabet? | numeric | 94.6% | N/A |
+| <code>ecdi011</code> | Can your child write his/her own name? | numeric | 61.9% | N/A |
+| <code>ecdi014</code> | Can your child count 10 objects, such as fingers or blocks, without mistakes? | numeric | 89.7% | N/A |
+| <code>nom001</code> | Is this child able to understand in, on, and under? | numeric | 94.3% | N/A |
+| <code>nom002</code> | How often can your child recognize the beginning sound of a word? For example, the word ball starts with the 'buh' sound? | numeric | 82.1% | N/A |
+| <code>nom002x</code> | How often can your child recognize the beginning sound of a word? For example, can this child tell you that the word "ball" starts with the "buh" sound? | numeric | 80.4% | N/A |
+| <code>nom003</code> | When you say a word, how often can your child come up with another word that starts with the same sound? | numeric | 82.1% | N/A |
+| <code>nom003x</code> | How often can your child come up with words that start with the same sound? </p>
+
+<p>For example, can this child come up with the words "sock" and "sun"? | numeric | 80.5% | N/A |
+| <code>nom005</code> | If you say the word cat, how often can this child tell you a word that rhymes with cat? | numeric | 82.2% | N/A |
+| <code>nom005x</code> | How well can this child come up with words that rhyme? For example, can this child come up with "cat" and "mat?" | numeric | 80.5% | N/A |
+| <code>nom006x</code> | How often can your child explain things they have seen or done so that you know what happened? | numeric | 95.4% | N/A |
+| <code>nom009</code> | Can this child sort objects by color? | numeric | 94.5% | N/A |
+| <code>nom012</code> | Can your child sort objects by length? | numeric | 89.8% | N/A |
+| <code>nom014</code> | If asked to count objects, how high could your child count correctly?  | numeric | 96.0% | N/A |
+| <code>nom014x</code> | If asked to count objects, how high can your child count correctly? | numeric | 96.0% | N/A |
+| <code>nom015</code> | If you had four objects, could your child divide them in half so you have two and they have two? | numeric | 91.2% | N/A |
+| <code>nom017</code> | Can your child read one-digit numbers, such as 4 or 7? | numeric | 94.9% | N/A |
+| <code>nom017x</code> | How often can your child read one-digit numbers? For example, can your child read the numbers 2 or 8? | numeric | 94.9% | N/A |
+| <code>nom018</code> | How often can this child correctly add two numbers, like 2 plus 3? | numeric | 82.2% | N/A |
+| <code>nom018x</code> | How often can this child correctly do simple addition? For example, can this child tell you that two blocks and three blocks add to a total of five blocks? | numeric | 80.5% | N/A |
+| <code>nom019</code> | How often can this child correctly subtract two numbers, like 5 take away 2? | numeric | 62.7% | N/A |
+| <code>nom022</code> | Can your child identify a triangle? | numeric | 82.1% | N/A |
+| <code>nom022x</code> | How often can your child identify basic shapes such as a triangle, circle, or square? | numeric | 80.4% | N/A |
+| <code>nom024</code> | Can your child consistently write his/her first name, even if some of the letters aren't quite right or are backwards? | numeric | 82.1% | N/A |
+| <code>nom026</code> | How many letters of the alphabet can your child recognize? | numeric | 96.1% | N/A |
+| <code>nom026x</code> | About how many letters of the alphabet can your child recognize?  | numeric | 96.0% | N/A |
+| <code>nom061x</code> | Does your child bounce back quickly when things do not go their way? | numeric | 96.0% | N/A |
+| <code>nom2205</code> | How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks? | numeric | 63.0% | N/A |
+| <code>sf122</code> | If you show your child two objects or people of different sizes, can he/she tell you which one is the big one and which is the small one? | numeric | 91.0% | N/A |
+| <code>sf127</code> | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct number? | numeric | 93.6% | N/A |</p>
 
 <h2>Geography</h2>
 
@@ -498,7 +1117,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tr>
 <tr>
   <td><code>eqstate</code></td>
-  <td>Eqstate</td>
+  <td>Do you and your child currently live in the state of Nebraska?</td>
   <td>numeric</td>
   <td>25.5%</td>
   <td>N/A</td>
@@ -508,7 +1127,7 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>Extraction Id</td>
   <td>factor</td>
   <td>0.0%</td>
-  <td>1 (ne25<em>20250930</em>172013)</td>
+  <td>1 (ne25<em>20250930</em>224148)</td>
 </tr>
 <tr>
   <td><code>puma</code></td>
@@ -618,13 +1237,659 @@ for race/ethnicity, education categories, and other demographic variables.</p>
 </tbody>
 </table>
 
+<h2>Mental_Health</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 10<br />
+<strong>Average Missing:</strong> 36.6%<br />
+<strong>Data Types:</strong> 2 factors, 8 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>gad2_nervous</code></td>
+  <td>GAD-2 Item 1 - Feeling nervous, anxious, or on edge (past 2 weeks)</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>gad2_positive</code></td>
+  <td>GAD-2 Positive Screen (â‰¥3) - Indicates likely anxiety, further evaluation needed</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>gad2_risk_cat</code></td>
+  <td>GAD-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate (3-4), Severe (5-6)</td>
+  <td>factor</td>
+  <td>36.7%</td>
+  <td>1 (Mild), 2 (Minimal/None), 3 (Moderate), 4 (Severe)</td>
+</tr>
+<tr>
+  <td><code>gad2_total</code></td>
+  <td>GAD-2 Total Score (0-6) - Anxiety screening score</td>
+  <td>numeric</td>
+  <td>36.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>gad2_worry</code></td>
+  <td>GAD-2 Item 2 - Not being able to stop or control worrying (past 2 weeks)</td>
+  <td>numeric</td>
+  <td>36.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>phq2_depressed</code></td>
+  <td>PHQ-2 Item 2 - Feeling down, depressed, or hopeless (past 2 weeks)</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>phq2_interest</code></td>
+  <td>PHQ-2 Item 1 - Little interest or pleasure in doing things (past 2 weeks)</td>
+  <td>numeric</td>
+  <td>36.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>phq2_positive</code></td>
+  <td>PHQ-2 Positive Screen (â‰¥3) - Indicates likely depression, further evaluation needed</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>phq2_risk_cat</code></td>
+  <td>PHQ-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate/Severe (3-6)</td>
+  <td>factor</td>
+  <td>36.6%</td>
+  <td>1 (Mild), 2 (Minimal/None), 3 (Moderate/Severe)</td>
+</tr>
+<tr>
+  <td><code>phq2_total</code></td>
+  <td>PHQ-2 Total Score (0-6) - Depression screening score</td>
+  <td>numeric</td>
+  <td>36.6%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
+<h2>Motor</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 76<br />
+<strong>Average Missing:</strong> 94.2%<br />
+<strong>Data Types:</strong> 0 factors, 76 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>c005</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child try to move his/her head (or eyes) to follow an object or person?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155596&amp;doc_id_hash=0fdc518e75637d9a3863ecc748429982df54c690" alt="" width="400" height="183"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c013</code></td>
+  <td><div class="rich-text-field-label"><p>When your child is on his/her stomach, can he/she turn his/her head to the side?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155592&amp;doc_id_hash=541b16d6b9f12c82cec60461ee8d13e9b35ee857" alt="" width="400" height="193"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c017</code></td>
+  <td>While your child is on his/her back, can he/she bring his/her hands together?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c018</code></td>
+  <td><div class="rich-text-field-label"><p>When your child is on his/her stomach, can he/she hold his/her head up off the ground?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155599&amp;doc_id_hash=f4d409e5808c742bdc4034c200ab19d9325391e1" alt="" width="400" height="184"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c024</code></td>
+  <td>Can your child hold his/her head steady for at least a few seconds, without it flopping to the side?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c026</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child grasp onto a small object, such as your finger or a spoon, when it is in his/her hand?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155605&amp;doc_id_hash=2e5c5312e4e69a8627168044d40520a27513e1c8" alt="" width="400" height="269"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c028</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child try to reach for objects that are in front of him/her by extending one or both arms?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155615&amp;doc_id_hash=d2cf51595a77c9c27eafe4a3a966f324580ad691" alt="" width="400" height="270"></p></div></td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c029</code></td>
+  <td>When he/she is on his/her tummy, can your child hold his/her head straight up, looking around for more than a few seconds? He/she can rest on his/her arms while doing this.</td>
+  <td>numeric</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c029x</code></td>
+  <td><div class="rich-text-field-label"><p><span style="background-color: #f1c40f |;">When he/she is on his/her tummy, can your child hold his/her head straight up, looking around for more than a few seconds? Your child can rest on his/her arms while doing this.</span></p> <p><span style="background-color: #f1c40f |;"><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155607&amp;doc_id_hash=d04392e586bdaa341b78f08586285a1c1bebabed" alt="" width="400" height="222"></span></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c030</code></td>
+  <td>Can your child roll from his/her back to stomach or stomach to his/her side?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c030x</code></td>
+  <td><div class="rich-text-field-label"><p><span style="color: #000000 | background-color: #f1c40f |;">Can your child roll from his/her back to stomach or stomach to side?</span></p> <p><span style="color: #000000 | background-color: #f1c40f |;"><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155612&amp;doc_id_hash=bb79bf50a2a1e188bcd9a945163167bb8ebe548c" alt="" width="400" height="187"></span></p></div></td>
+  <td>numeric</td>
+  <td>99.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c035</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child reach for AND HOLD an object, at least for a few seconds?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155610&amp;doc_id_hash=d2c241da092c33edebcb6d47f9c4a55461588079" alt="" width="400" height="195"></p></div></td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c036</code></td>
+  <td>When you put your child on the floor, can she lean on her hands while sitting? If your child already sits up straight without leaning on her hands, mark 'yes' for this item.</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c037</code></td>
+  <td><div class="rich-text-field-label"><p>When held in a sitting position, can your child hold his/her head steady and straight?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155606&amp;doc_id_hash=ebbae14d7a72ec80f9dcf8a37f30c3919ba88640" alt="" width="400" height="253"></p></div></td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c038</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child roll from his/her back to stomach, or stomach to back, on his/her own?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155613&amp;doc_id_hash=6956b0cd2db64a66cabf8f072c38c82058eb2f9e" alt="" width="400" height="208"></p></div></td>
+  <td>numeric</td>
+  <td>99.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c039</code></td>
+  <td>Can your child eat food from your fingers or off a spoon you hold?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c040</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pick up a small object, such as a small toy or small stone, using just one hand?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155617&amp;doc_id_hash=e94b277c8c5e9556c00b6a78c55c4288cbc5cabe" alt="" width="400" height="186"></p></div></td>
+  <td>numeric</td>
+  <td>99.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c041</code></td>
+  <td><div class="rich-text-field-label"><p>If an object falls to the ground out of view, does your child look for it?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155621&amp;doc_id_hash=f9cb8e88c9de796e3e2485f730c30dce3810fd33" alt="" width="400" height="180"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c042</code></td>
+  <td><div class="rich-text-field-label"><p>When lying on his/her stomach, can your child hold his/her head and chest off the ground using only his/her hands and arms for support?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155611&amp;doc_id_hash=b5d9280191e10f2941ed71dc4e33fd8270daf672" alt="" width="400" height="218"></p></div></td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c043</code></td>
+  <td><div class="rich-text-field-label"><p>When lying on his/her back, does the child grab his/her feet?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155616&amp;doc_id_hash=f91216143ae25a267ca39d8fe578c3f6b0133ed1" alt="" width="400" height="232"></p></div></td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c044</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child sit with support, either leaning against something (furniture or person) or by leaning forward on his/ her hands?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155614&amp;doc_id_hash=b3c9f14d24488b713e702016b4d00445b9f4aeb1" alt="" width="400" height="273"></p></div></td>
+  <td>numeric</td>
+  <td>99.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c049</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child hold him/herself in a sitting position without help or support for longer than a few seconds?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155622&amp;doc_id_hash=fc9b79a8c3ec90bfadc1b2205f55a3b4634ceadc" alt="" width="400" height="270"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c050</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child bang objects together, or bang an object on the table or on the ground?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155624&amp;doc_id_hash=db237af495999fbb2a749ea8d589d43a1d20402f" alt="" width="400" height="247"></p></div></td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c052</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pass a small object from one hand to the other?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155625&amp;doc_id_hash=edcdbe2c4de1c0a413e7841a450df29c6b206753" alt="" width="400" height="195"></p></div></td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c053</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pick up a small object, such as a piece of food, small toy, or small stone, with just his/her thumb and one finger?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155628&amp;doc_id_hash=8c10b4994c266218f4d03ba5b8d5bd0267f8fca6" alt="" width="400" height="200"></p></div></td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c054</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child maintain a standing position while holding onto a person or object, such as a wall or piece of furniture?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155626&amp;doc_id_hash=ba81e6dac56feb60c6fd3efe66a55d31a2b1a1ea" alt="" width="400" height="342"></p></div></td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c055</code></td>
+  <td><div class="rich-text-field-label"><p>While holding onto furniture, does your child bend down and pick up a small object from the floor and then return to a standing position?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155632&amp;doc_id_hash=f6bc566f62f228d8c7d9435bb2b3d04b42e72106" alt="" width="400" height="270"></p></div></td>
+  <td>numeric</td>
+  <td>95.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c056</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pull themselves up from the floor while holding onto something? For example, can they pull themselves up using a chair, a person, or some other object?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155630&amp;doc_id_hash=057636e6d5bd0325b6189b7f16021d165523befd" alt="" width="400" height="186"></p></div></td>
+  <td>numeric</td>
+  <td>95.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c057</code></td>
+  <td><div class="rich-text-field-label"><p>While holding onto furniture, does your child squat with control without falling or flopping down?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155631&amp;doc_id_hash=3ab814e6ceaa7262758f27680cf0314fefc7ee76" alt="" width="400" height="222"></p></div></td>
+  <td>numeric</td>
+  <td>95.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c058</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pick up and drop a small object (e.g., a small toy or small stone) into a bucket or bowl while sitting?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=158398&amp;doc_id_hash=ece6fd33a012796962c438ec9125840799cdcd49" alt="" width="400" height="298"></p></div></td>
+  <td>numeric</td>
+  <td>95.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c060</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child walk several steps while holding on to a person or object, such as a wall or piece of furniture?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155633&amp;doc_id_hash=226b6068a9bcd07ae2c6221d42ad8b6320acb773" alt="" width="400" height="275"></p></div></td>
+  <td>numeric</td>
+  <td>95.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c061</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child stand up without holding onto anything, even if just for a few seconds?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155634&amp;doc_id_hash=951b1f667c798c2a173c8bc79bb0645711a09da6" alt="" width="400" height="288"></p></div></td>
+  <td>numeric</td>
+  <td>95.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c062</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child maintain a standing position on his/her own, without holding on or receiving support?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155642&amp;doc_id_hash=05e933e8fd1751141459bb3a6ef0494c88ec2cb3" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>92.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c063</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child make any light marks on paper or in dirt with a crayon or a stick?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155639&amp;doc_id_hash=11b9ddb859a2f7e801a0ba98097187f087070fa4" alt="" width="400" height="379"></p></div></td>
+  <td>numeric</td>
+  <td>92.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c064</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pick up small bits of food and feed him/her-self using his/her hand?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155627&amp;doc_id_hash=f73463ea467ec77ef0856dca1a294ac826916425" alt="" width="400" height="277"></p></div></td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c065</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child climb onto an object? For example, a rock, porch, step, chair, bed, or low table.</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155638&amp;doc_id_hash=1ea8b726c21f6aa946dc494dc93f52553fdf04db" alt="" width="400" height="369"></p> <p> </p></div></td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c066</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child take several steps (3-5) forward without holding onto any person or object, even if they fall down immediately afterward?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155644&amp;doc_id_hash=228c9a68e57f1fcb333ac5d72f9d549927617ea7" alt="" width="400" height="178"></p></div></td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c067</code></td>
+  <td>Can your child move around by walking, rather than by crawling on his hands and knees?</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c069</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child stand up from sitting by himself and take several steps forward?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155645&amp;doc_id_hash=6c2f9d47bbb0d5ba3dd5aaeedb50dd449505875a" alt="" width="400" height="208"></p></div></td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c070</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child bend down or squat to pick up an object from the floor and then stand up again, without help from a person or object?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155643&amp;doc_id_hash=fb4176428ea45b9283017426d36be3a826746ad7" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>93.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c071</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child make a scribble on paper, or in dirt, in a back and forth manner? For example, can he or she move the pen or pencil or stick back and forth?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155641&amp;doc_id_hash=fea870520b80fabc30cde3bee7d71cb083cdaafd" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>92.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c074</code></td>
+  <td>Can your child drink from an open cup without help?</td>
+  <td>numeric</td>
+  <td>94.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c076</code></td>
+  <td><div class="rich-text-field-label"><p>While standing, can your child purposefully throw the ball and not just drop it?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155647&amp;doc_id_hash=d7944db99fca3f1bae3b69d963a15b7a7f10e0bf" alt="" width="400" height="282"></p></div></td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c077</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child walk well, with coordination, without falling down often? With one foot in front of the other rather than shifting weight side to side, stiff-legged?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155648&amp;doc_id_hash=4b00e78e86322d049e3f673fbd5a4422c586ac4d" alt="" width="400" height="290"></p></div></td>
+  <td>numeric</td>
+  <td>94.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c078</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child stack at least two objects on top of each other, such as bottle tops, blocks, or stones?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155640&amp;doc_id_hash=cf646becea765d39614cb86740af28571d2f6080" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>92.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c079</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child kick a ball or other round object forward using his/her foot?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155649&amp;doc_id_hash=7e852efe19d0fb57d1e9c9e848f9c842768d33bc" alt="" width="400" height="294"></p></div></td>
+  <td>numeric</td>
+  <td>94.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c080</code></td>
+  <td><div class="rich-text-field-label"><p>While standing, can your child kick a ball by swinging his/her leg forward?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155652&amp;doc_id_hash=218f60ff44ce3c8e91d72843afa1ef94c3281d8a" alt="" width="400" height="274"></p></div></td>
+  <td>numeric</td>
+  <td>95.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c083</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child stack three or more small objects, such as blocks, cups, or bottle caps, on top of each other?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155651&amp;doc_id_hash=89753eb8437d1c017cc1c7f613b5027862878875" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>94.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c084</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child run well, without falling or bumping into objects?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155653&amp;doc_id_hash=600194da4958436f186964408a7b2a0db991c877" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>95.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c087</code></td>
+  <td>Does your child dry hands by herself/himself after you have washed them?</td>
+  <td>numeric</td>
+  <td>92.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c092</code></td>
+  <td>Can your child wash hands by him/herself?</td>
+  <td>numeric</td>
+  <td>90.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c097</code></td>
+  <td>Can your child walk on an uneven surface, like a bumpy or steep road, without falling?</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c103</code></td>
+  <td>Can your child draw a straight line?</td>
+  <td>numeric</td>
+  <td>91.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c104</code></td>
+  <td>Can your child remove an item of clothing, such as take off his/her shirt?</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c106</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child jump with both feet leaving the ground?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155654&amp;doc_id_hash=94b42d6bcc0486ba83e0ce821a48ea46786abcd1" alt="" width="400" height="221"></p></div></td>
+  <td>numeric</td>
+  <td>93.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c109</code></td>
+  <td>Can your child put on at least one piece of clothing by himself?</td>
+  <td>numeric</td>
+  <td>89.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c110</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child unscrew the lid from a bottle or jar?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155656&amp;doc_id_hash=19e23f88ac5ef5b1a73408f76c537d3946ed0e2d" alt="" width="400" height="200"></p></div></td>
+  <td>numeric</td>
+  <td>90.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c129</code></td>
+  <td>Can your child dress him/herself completely, except for shoelaces, buttons, and zippers?</td>
+  <td>numeric</td>
+  <td>91.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c132</code></td>
+  <td>Can your child fasten and unfasten buttons without help?</td>
+  <td>numeric</td>
+  <td>62.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c133</code></td>
+  <td>If you draw a circle, can your child do it, just as you did?</td>
+  <td>numeric</td>
+  <td>89.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c135</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child stand on one foot WITHOUT any support for at least a few seconds?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155655&amp;doc_id_hash=431105b1ac949a03f4db3d10146acaf83701da12" alt="" width="400" height="300"></p></div></td>
+  <td>numeric</td>
+  <td>89.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom024x</code></td>
+  <td>How often can your child write his/her first name, even if some of the letters aren't quite right or are backwards?</td>
+  <td>numeric</td>
+  <td>80.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom028</code></td>
+  <td>Can your child draw a triangle?</td>
+  <td>numeric</td>
+  <td>92.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom029</code></td>
+  <td>Can your child draw a square?</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom029x</code></td>
+  <td>How well can your child draw a circle?</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom031</code></td>
+  <td>Can your child make a tower of three or more blocks?</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom033</code></td>
+  <td>Can your child draw a face with eyes and mouth?</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom033x</code></td>
+  <td>How well can your child draw a face with eyes and mouth?</td>
+  <td>numeric</td>
+  <td>95.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom034</code></td>
+  <td>Can your child draw a person with arms and legs?</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom034x</code></td>
+  <td>How well can your child draw a person with a head, body, arms, and legs?</td>
+  <td>numeric</td>
+  <td>96.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom035</code></td>
+  <td>When using a pencil, can your child use fingers to hold it?</td>
+  <td>numeric</td>
+  <td>81.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom035x</code></td>
+  <td>How does your child usually hold a pencil?</td>
+  <td>numeric</td>
+  <td>80.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom042x</code></td>
+  <td>How well can this child bounce a ball for several seconds?</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf018</code></td>
+  <td>While your child is on his/her back, can he/she bring his/her hands together such that the hands touch each other?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf019</code></td>
+  <td>Does your child move excitedly, kick legs, move arms or trunk, or make coo noises when a known person enters the room or speaks to him/her?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf054</code></td>
+  <td><div class="rich-text-field-label"><p>Can your child pick up and drop a small object, such as a piece of food, small toy, or small stone, into a bucket or bowl while sitting?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155629&amp;doc_id_hash=392e90813ab18c7873cd0625944a40dce552fa22" alt="" width="400" height="298"></p></div></td>
+  <td>numeric</td>
+  <td>95.1%</td>
+  <td>N/A</td>
+</tr>
+</tbody>
+</table>
+
 <h2>Other</h2>
 
 <p><strong>Description:</strong> No description available</p>
 
-<p><strong>Variables:</strong> 549<br />
-<strong>Average Missing:</strong> 60.0%<br />
-<strong>Data Types:</strong> 4 factors, 507 numeric, 6 logical, 32 character</p>
+<p><strong>Variables:</strong> 267<br />
+<strong>Average Missing:</strong> 36.1%<br />
+<strong>Data Types:</strong> 4 factors, 225 numeric, 6 logical, 32 character</p>
 
 <table>
 <thead>
@@ -659,3825 +1924,1174 @@ for race/ethnicity, education categories, and other demographic variables.</p>
   <td>1 (Fail), 2 (Pass)</td>
 </tr>
 <tr>
-  <td><code>c004</code></td>
-  <td>C004</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c005</code></td>
-  <td>C005</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c007</code></td>
-  <td>C007</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c010</code></td>
-  <td>C010</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c012</code></td>
-  <td>C012</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c013</code></td>
-  <td>C013</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c014</code></td>
-  <td>C014</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c015</code></td>
-  <td>C015</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c016</code></td>
-  <td>C016</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c017</code></td>
-  <td>C017</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c018</code></td>
-  <td>C018</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c019</code></td>
-  <td>C019</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c020</code></td>
-  <td>C020</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c021</code></td>
-  <td>C021</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c022</code></td>
-  <td>C022</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c023</code></td>
-  <td>C023</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c024</code></td>
-  <td>C024</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c025</code></td>
-  <td>C025</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c026</code></td>
-  <td>C026</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c027</code></td>
-  <td>C027</td>
-  <td>numeric</td>
-  <td>99.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c028</code></td>
-  <td>C028</td>
-  <td>numeric</td>
-  <td>99.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c029</code></td>
-  <td>C029</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c029x</code></td>
-  <td>C029X</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c030</code></td>
-  <td>C030</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c030x</code></td>
-  <td>C030X</td>
-  <td>numeric</td>
-  <td>99.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c031</code></td>
-  <td>C031</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c032</code></td>
-  <td>C032</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c033</code></td>
-  <td>C033</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c034</code></td>
-  <td>C034</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c035</code></td>
-  <td>C035</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c036</code></td>
-  <td>C036</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c037</code></td>
-  <td>C037</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c038</code></td>
-  <td>C038</td>
-  <td>numeric</td>
-  <td>99.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c039</code></td>
-  <td>C039</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c040</code></td>
-  <td>C040</td>
-  <td>numeric</td>
-  <td>99.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c041</code></td>
-  <td>C041</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c042</code></td>
-  <td>C042</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c043</code></td>
-  <td>C043</td>
-  <td>numeric</td>
-  <td>99.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c044</code></td>
-  <td>C044</td>
-  <td>numeric</td>
-  <td>99.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c045</code></td>
-  <td>C045</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c046</code></td>
-  <td>C046</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c047</code></td>
-  <td>C047</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c048</code></td>
-  <td>C048</td>
-  <td>numeric</td>
-  <td>99.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c049</code></td>
-  <td>C049</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c050</code></td>
-  <td>C050</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c051</code></td>
-  <td>C051</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c052</code></td>
-  <td>C052</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c053</code></td>
-  <td>C053</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c054</code></td>
-  <td>C054</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c055</code></td>
-  <td>C055</td>
-  <td>numeric</td>
-  <td>95.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c056</code></td>
-  <td>C056</td>
-  <td>numeric</td>
-  <td>95.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c057</code></td>
-  <td>C057</td>
-  <td>numeric</td>
-  <td>95.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c058</code></td>
-  <td>C058</td>
-  <td>numeric</td>
-  <td>95.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c059</code></td>
-  <td>C059</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c060</code></td>
-  <td>C060</td>
-  <td>numeric</td>
-  <td>95.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c061</code></td>
-  <td>C061</td>
-  <td>numeric</td>
-  <td>95.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c062</code></td>
-  <td>C062</td>
-  <td>numeric</td>
-  <td>92.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c063</code></td>
-  <td>C063</td>
-  <td>numeric</td>
-  <td>92.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c064</code></td>
-  <td>C064</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c065</code></td>
-  <td>C065</td>
-  <td>numeric</td>
-  <td>92.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c066</code></td>
-  <td>C066</td>
-  <td>numeric</td>
-  <td>93.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c067</code></td>
-  <td>C067</td>
-  <td>numeric</td>
-  <td>93.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c068</code></td>
-  <td>C068</td>
-  <td>numeric</td>
-  <td>96.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c069</code></td>
-  <td>C069</td>
-  <td>numeric</td>
-  <td>93.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c070</code></td>
-  <td>C070</td>
-  <td>numeric</td>
-  <td>93.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c071</code></td>
-  <td>C071</td>
-  <td>numeric</td>
-  <td>92.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c072</code></td>
-  <td>C072</td>
-  <td>numeric</td>
-  <td>92.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c073</code></td>
-  <td>C073</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c074</code></td>
-  <td>C074</td>
-  <td>numeric</td>
-  <td>94.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c075</code></td>
-  <td>C075</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c076</code></td>
-  <td>C076</td>
-  <td>numeric</td>
-  <td>93.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c077</code></td>
-  <td>C077</td>
-  <td>numeric</td>
-  <td>94.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c078</code></td>
-  <td>C078</td>
-  <td>numeric</td>
-  <td>92.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c079</code></td>
-  <td>C079</td>
-  <td>numeric</td>
-  <td>94.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c080</code></td>
-  <td>C080</td>
-  <td>numeric</td>
-  <td>95.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c081</code></td>
-  <td>C081</td>
-  <td>numeric</td>
-  <td>96.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c082</code></td>
-  <td>C082</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c083</code></td>
-  <td>C083</td>
-  <td>numeric</td>
-  <td>94.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c084</code></td>
-  <td>C084</td>
-  <td>numeric</td>
-  <td>95.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c085</code></td>
-  <td>C085</td>
-  <td>numeric</td>
-  <td>93.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c086</code></td>
-  <td>C086</td>
-  <td>numeric</td>
-  <td>92.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c087</code></td>
-  <td>C087</td>
-  <td>numeric</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c088</code></td>
-  <td>C088</td>
-  <td>numeric</td>
-  <td>61.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c089</code></td>
-  <td>C089</td>
-  <td>numeric</td>
-  <td>94.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c090</code></td>
-  <td>C090</td>
-  <td>numeric</td>
-  <td>97.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c091</code></td>
-  <td>C091</td>
-  <td>numeric</td>
-  <td>92.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c092</code></td>
-  <td>C092</td>
-  <td>numeric</td>
-  <td>90.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c093</code></td>
-  <td>C093</td>
-  <td>numeric</td>
-  <td>97.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c094</code></td>
-  <td>C094</td>
-  <td>numeric</td>
-  <td>93.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c095</code></td>
-  <td>C095</td>
-  <td>numeric</td>
-  <td>95.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c096</code></td>
-  <td>C096</td>
-  <td>numeric</td>
-  <td>96.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c097</code></td>
-  <td>C097</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c098</code></td>
-  <td>C098</td>
-  <td>numeric</td>
-  <td>92.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c099</code></td>
-  <td>C099</td>
-  <td>numeric</td>
-  <td>96.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c100</code></td>
-  <td>C100</td>
-  <td>numeric</td>
-  <td>96.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c101</code></td>
-  <td>C101</td>
-  <td>numeric</td>
-  <td>97.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c102</code></td>
-  <td>C102</td>
-  <td>numeric</td>
-  <td>93.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c103</code></td>
-  <td>C103</td>
-  <td>numeric</td>
-  <td>91.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c104</code></td>
-  <td>C104</td>
-  <td>numeric</td>
-  <td>97.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c105</code></td>
-  <td>C105</td>
-  <td>numeric</td>
-  <td>92.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c106</code></td>
-  <td>C106</td>
-  <td>numeric</td>
-  <td>93.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c107</code></td>
-  <td>C107</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c108</code></td>
-  <td>C108</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c109</code></td>
-  <td>C109</td>
-  <td>numeric</td>
-  <td>89.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c110</code></td>
-  <td>C110</td>
-  <td>numeric</td>
-  <td>90.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c111</code></td>
-  <td>C111</td>
-  <td>numeric</td>
-  <td>88.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c112</code></td>
-  <td>C112</td>
-  <td>numeric</td>
-  <td>88.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c113</code></td>
-  <td>C113</td>
-  <td>numeric</td>
-  <td>91.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c114</code></td>
-  <td>C114</td>
-  <td>numeric</td>
-  <td>90.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c115</code></td>
-  <td>C115</td>
-  <td>numeric</td>
-  <td>91.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c116</code></td>
-  <td>C116</td>
-  <td>numeric</td>
-  <td>89.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c117</code></td>
-  <td>C117</td>
-  <td>numeric</td>
-  <td>88.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c118</code></td>
-  <td>C118</td>
-  <td>numeric</td>
-  <td>91.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c119</code></td>
-  <td>C119</td>
-  <td>numeric</td>
-  <td>92.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c120</code></td>
-  <td>C120</td>
-  <td>numeric</td>
-  <td>93.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c121</code></td>
-  <td>C121</td>
-  <td>numeric</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c122</code></td>
-  <td>C122</td>
-  <td>numeric</td>
-  <td>93.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c123</code></td>
-  <td>C123</td>
-  <td>numeric</td>
-  <td>90.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c124</code></td>
-  <td>C124</td>
-  <td>numeric</td>
-  <td>93.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c125</code></td>
-  <td>C125</td>
-  <td>numeric</td>
-  <td>88.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c126</code></td>
-  <td>C126</td>
-  <td>numeric</td>
-  <td>92.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c127</code></td>
-  <td>C127</td>
-  <td>numeric</td>
-  <td>94.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c128</code></td>
-  <td>C128</td>
-  <td>numeric</td>
-  <td>94.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c129</code></td>
-  <td>C129</td>
-  <td>numeric</td>
-  <td>91.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c130</code></td>
-  <td>C130</td>
-  <td>numeric</td>
-  <td>97.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c131</code></td>
-  <td>C131</td>
-  <td>numeric</td>
-  <td>94.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c132</code></td>
-  <td>C132</td>
-  <td>numeric</td>
-  <td>61.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c133</code></td>
-  <td>C133</td>
-  <td>numeric</td>
-  <td>89.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c134</code></td>
-  <td>C134</td>
-  <td>numeric</td>
-  <td>89.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c135</code></td>
-  <td>C135</td>
-  <td>numeric</td>
-  <td>89.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c136</code></td>
-  <td>C136</td>
-  <td>numeric</td>
-  <td>93.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c137</code></td>
-  <td>C137</td>
-  <td>numeric</td>
-  <td>93.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c138</code></td>
-  <td>C138</td>
-  <td>numeric</td>
-  <td>91.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>c139</code></td>
-  <td>C139</td>
-  <td>numeric</td>
-  <td>91.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace1</code></td>
-  <td>Cace1</td>
-  <td>numeric</td>
-  <td>36.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace10</code></td>
-  <td>Cace10</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace2</code></td>
-  <td>Cace2</td>
-  <td>numeric</td>
-  <td>36.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace3</code></td>
-  <td>Cace3</td>
-  <td>numeric</td>
-  <td>36.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace4</code></td>
-  <td>Cace4</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace5</code></td>
-  <td>Cace5</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace6</code></td>
-  <td>Cace6</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace7</code></td>
-  <td>Cace7</td>
-  <td>numeric</td>
-  <td>36.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace8</code></td>
-  <td>Cace8</td>
-  <td>numeric</td>
-  <td>36.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cace9</code></td>
-  <td>Cace9</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
   <td><code>cfqb001</code></td>
-  <td>Cfqb001</td>
+  <td>In general, how is your physical health?</td>
   <td>numeric</td>
   <td>36.3%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>cname1</code></td>
-  <td>Cname1</td>
-  <td>character</td>
-  <td>72.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>compensation</code></td>
-  <td>Compensation</td>
-  <td>factor</td>
-  <td>0.0%</td>
-  <td>1 (Fail), 2 (Pass)</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_180_364</code></td>
-  <td>Consecutive Nos 180 364</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_365_548</code></td>
-  <td>Consecutive Nos 365 548</td>
-  <td>numeric</td>
-  <td>92.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_549_731</code></td>
-  <td>Consecutive Nos 549 731</td>
-  <td>numeric</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_732_914</code></td>
-  <td>Consecutive Nos 732 914</td>
-  <td>numeric</td>
-  <td>88.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_90_179</code></td>
-  <td>Consecutive Nos 90 179</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_915_1096</code></td>
-  <td>Consecutive Nos 915 1096</td>
-  <td>numeric</td>
-  <td>89.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consecutive_nos_count</code></td>
-  <td>Consecutive Nos Count</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consent_date</code></td>
-  <td>Consent Date</td>
-  <td>character</td>
-  <td>24.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consent_doc_complete</code></td>
-  <td>Consent Doc Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>consent_doc_timestamp</code></td>
-  <td>Consent Doc Timestamp</td>
-  <td>character</td>
-  <td>6.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa001</code></td>
-  <td>Cqfa001</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa002</code></td>
-  <td>Cqfa002</td>
-  <td>numeric</td>
-  <td>39.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa005</code></td>
-  <td>Cqfa005</td>
-  <td>numeric</td>
-  <td>36.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa006</code></td>
-  <td>Cqfa006</td>
-  <td>numeric</td>
-  <td>36.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa009</code></td>
-  <td>Cqfa009</td>
-  <td>numeric</td>
-  <td>36.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010</code></td>
-  <td>Cqfa010</td>
-  <td>numeric</td>
-  <td>36.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___1</code></td>
-  <td>Cqfa010A   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___2</code></td>
-  <td>Cqfa010A   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___3</code></td>
-  <td>Cqfa010A   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___4</code></td>
-  <td>Cqfa010A   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___5</code></td>
-  <td>Cqfa010A   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa010a___6</code></td>
-  <td>Cqfa010A   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfa013</code></td>
-  <td>Cqfa013</td>
-  <td>numeric</td>
-  <td>39.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb002</code></td>
-  <td>Cqfb002</td>
-  <td>numeric</td>
-  <td>36.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb007x</code></td>
-  <td>Cqfb007X</td>
-  <td>numeric</td>
-  <td>39.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb008</code></td>
-  <td>Cqfb008</td>
-  <td>numeric</td>
-  <td>37.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb009</code></td>
-  <td>Cqfb009</td>
-  <td>numeric</td>
-  <td>36.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb010</code></td>
-  <td>Cqfb010</td>
-  <td>numeric</td>
-  <td>36.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb011</code></td>
-  <td>Cqfb011</td>
-  <td>numeric</td>
-  <td>36.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb012</code></td>
-  <td>Cqfb012</td>
-  <td>numeric</td>
-  <td>36.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb013</code></td>
-  <td>Cqfb013</td>
-  <td>numeric</td>
-  <td>36.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb014</code></td>
-  <td>Cqfb014</td>
-  <td>numeric</td>
-  <td>36.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb015</code></td>
-  <td>Cqfb015</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqfb016</code></td>
-  <td>Cqfb016</td>
-  <td>numeric</td>
-  <td>36.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr0011</code></td>
-  <td>Cqr0011</td>
-  <td>numeric</td>
-  <td>39.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr002</code></td>
-  <td>Cqr002</td>
-  <td>numeric</td>
-  <td>35.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr003</code></td>
-  <td>Cqr003</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr004</code></td>
-  <td>Cqr004</td>
-  <td>numeric</td>
-  <td>35.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr006</code></td>
-  <td>Cqr006</td>
-  <td>numeric</td>
-  <td>35.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___1</code></td>
-  <td>Cqr007   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___2</code></td>
-  <td>Cqr007   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___3</code></td>
-  <td>Cqr007   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___4</code></td>
-  <td>Cqr007   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___5</code></td>
-  <td>Cqr007   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___6</code></td>
-  <td>Cqr007   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr007___7</code></td>
-  <td>Cqr007   7</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr008</code></td>
-  <td>Cqr008</td>
-  <td>numeric</td>
-  <td>36.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr009</code></td>
-  <td>Cqr009</td>
-  <td>numeric</td>
-  <td>39.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___1</code></td>
-  <td>Cqr010   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___10</code></td>
-  <td>Cqr010   10</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___11</code></td>
-  <td>Cqr010   11</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___12</code></td>
-  <td>Cqr010   12</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___13</code></td>
-  <td>Cqr010   13</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___14</code></td>
-  <td>Cqr010   14</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___15</code></td>
-  <td>Cqr010   15</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___16</code></td>
-  <td>Cqr010   16</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___2</code></td>
-  <td>Cqr010   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___3</code></td>
-  <td>Cqr010   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___4</code></td>
-  <td>Cqr010   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___5</code></td>
-  <td>Cqr010   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___6</code></td>
-  <td>Cqr010   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___7</code></td>
-  <td>Cqr010   7</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___8</code></td>
-  <td>Cqr010   8</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr010___9</code></td>
-  <td>Cqr010   9</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr011</code></td>
-  <td>Cqr011</td>
-  <td>numeric</td>
-  <td>39.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr013</code></td>
-  <td>Cqr013</td>
-  <td>numeric</td>
-  <td>40.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr014x</code></td>
-  <td>Cqr014X</td>
-  <td>numeric</td>
-  <td>39.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr015</code></td>
-  <td>Cqr015</td>
-  <td>numeric</td>
-  <td>39.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr016</code></td>
-  <td>Cqr016</td>
-  <td>numeric</td>
-  <td>39.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr017</code></td>
-  <td>Cqr017</td>
-  <td>numeric</td>
-  <td>40.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr018</code></td>
-  <td>Cqr018</td>
-  <td>numeric</td>
-  <td>39.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr019</code></td>
-  <td>Cqr019</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr020</code></td>
-  <td>Cqr020</td>
-  <td>numeric</td>
-  <td>40.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr021</code></td>
-  <td>Cqr021</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr022</code></td>
-  <td>Cqr022</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr023</code></td>
-  <td>Cqr023</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqr024</code></td>
-  <td>Cqr024</td>
-  <td>numeric</td>
-  <td>40.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>cqrn012</code></td>
-  <td>Cqrn012</td>
-  <td>numeric</td>
-  <td>39.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi001</code></td>
-  <td>Credi001</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi005</code></td>
-  <td>Credi005</td>
-  <td>numeric</td>
-  <td>99.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi017</code></td>
-  <td>Credi017</td>
-  <td>numeric</td>
-  <td>99.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi019</code></td>
-  <td>Credi019</td>
-  <td>numeric</td>
-  <td>93.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi020</code></td>
-  <td>Credi020</td>
-  <td>numeric</td>
-  <td>94.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi021</code></td>
-  <td>Credi021</td>
-  <td>numeric</td>
-  <td>97.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi025</code></td>
-  <td>Credi025</td>
-  <td>numeric</td>
-  <td>95.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi028</code></td>
-  <td>Credi028</td>
-  <td>numeric</td>
-  <td>94.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi029</code></td>
-  <td>Credi029</td>
-  <td>numeric</td>
-  <td>93.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi030</code></td>
-  <td>Credi030</td>
-  <td>numeric</td>
-  <td>96.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi031</code></td>
-  <td>Credi031</td>
-  <td>numeric</td>
-  <td>95.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi036</code></td>
-  <td>Credi036</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi038</code></td>
-  <td>Credi038</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi041</code></td>
-  <td>Credi041</td>
-  <td>numeric</td>
-  <td>96.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi045</code></td>
-  <td>Credi045</td>
-  <td>numeric</td>
-  <td>94.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi046</code></td>
-  <td>Credi046</td>
-  <td>numeric</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi052</code></td>
-  <td>Credi052</td>
-  <td>numeric</td>
-  <td>91.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>credi058</code></td>
-  <td>Credi058</td>
-  <td>numeric</td>
-  <td>88.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>date_complete_check</code></td>
-  <td>Date Complete Check</td>
-  <td>numeric</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>dob</code></td>
-  <td>Dob</td>
-  <td>character</td>
-  <td>25.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>dob_match</code></td>
-  <td>Dob Match</td>
-  <td>numeric</td>
-  <td>24.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi007</code></td>
-  <td>Ecdi007</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi009x</code></td>
-  <td>Ecdi009X</td>
-  <td>numeric</td>
-  <td>94.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi010</code></td>
-  <td>Ecdi010</td>
-  <td>numeric</td>
-  <td>94.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi011</code></td>
-  <td>Ecdi011</td>
-  <td>numeric</td>
-  <td>61.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi014</code></td>
-  <td>Ecdi014</td>
-  <td>numeric</td>
-  <td>89.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi015</code></td>
-  <td>Ecdi015</td>
-  <td>numeric</td>
-  <td>93.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi015x</code></td>
-  <td>Ecdi015X</td>
-  <td>numeric</td>
-  <td>88.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi016</code></td>
-  <td>Ecdi016</td>
-  <td>numeric</td>
-  <td>94.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi017</code></td>
-  <td>Ecdi017</td>
-  <td>numeric</td>
-  <td>90.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ecdi018</code></td>
-  <td>Ecdi018</td>
-  <td>numeric</td>
-  <td>93.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eligibility</code></td>
-  <td>Eligibility</td>
-  <td>factor</td>
-  <td>0.0%</td>
-  <td>1 (Fail), 2 (Pass)</td>
-</tr>
-<tr>
-  <td><code>eligibility_form_complete</code></td>
-  <td>Eligibility Form Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eligibility_form_timestamp</code></td>
-  <td>Eligibility Form Timestamp</td>
-  <td>character</td>
-  <td>24.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eligible.x</code></td>
-  <td>Eligible.X</td>
-  <td>logical</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eligible.y</code></td>
-  <td>Eligible.Y</td>
-  <td>logical</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>email</code></td>
-  <td>Email</td>
-  <td>character</td>
-  <td>84.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>email_followup</code></td>
-  <td>Email Followup</td>
-  <td>character</td>
-  <td>66.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>email_registration_complete</code></td>
-  <td>Email Registration Complete</td>
-  <td>numeric</td>
-  <td>84.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>email_registration_timestamp</code></td>
-  <td>Email Registration Timestamp</td>
-  <td>character</td>
-  <td>84.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eq001</code></td>
-  <td>Eq001</td>
-  <td>numeric</td>
-  <td>25.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eq002</code></td>
-  <td>Eq002</td>
-  <td>numeric</td>
-  <td>25.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eq003</code></td>
-  <td>Eq003</td>
-  <td>numeric</td>
-  <td>24.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>eq004a</code></td>
-  <td>Eq004A</td>
-  <td>character</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_a_1</code></td>
-  <td>Fci A 1</td>
-  <td>numeric</td>
-  <td>39.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_a_2</code></td>
-  <td>Fci A 2</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_a_3</code></td>
-  <td>Fci A 3</td>
-  <td>numeric</td>
-  <td>40.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_b_1</code></td>
-  <td>Fci B 1</td>
-  <td>numeric</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_b_2</code></td>
-  <td>Fci B 2</td>
-  <td>numeric</td>
-  <td>42.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_1</code></td>
-  <td>Fci C 1</td>
-  <td>numeric</td>
-  <td>40.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_10</code></td>
-  <td>Fci C 10</td>
-  <td>numeric</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_11</code></td>
-  <td>Fci C 11</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_2</code></td>
-  <td>Fci C 2</td>
-  <td>numeric</td>
-  <td>40.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_3</code></td>
-  <td>Fci C 3</td>
-  <td>numeric</td>
-  <td>40.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_4</code></td>
-  <td>Fci C 4</td>
-  <td>numeric</td>
-  <td>40.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_5</code></td>
-  <td>Fci C 5</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_6</code></td>
-  <td>Fci C 6</td>
-  <td>numeric</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_7</code></td>
-  <td>Fci C 7</td>
-  <td>numeric</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_8</code></td>
-  <td>Fci C 8</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_c_9</code></td>
-  <td>Fci C 9</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_1</code></td>
-  <td>Fci D 1</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_10</code></td>
-  <td>Fci D 10</td>
-  <td>numeric</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_11</code></td>
-  <td>Fci D 11</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_2</code></td>
-  <td>Fci D 2</td>
-  <td>numeric</td>
-  <td>40.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_3</code></td>
-  <td>Fci D 3</td>
-  <td>numeric</td>
-  <td>40.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_4</code></td>
-  <td>Fci D 4</td>
-  <td>numeric</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_5</code></td>
-  <td>Fci D 5</td>
-  <td>numeric</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_6</code></td>
-  <td>Fci D 6</td>
-  <td>numeric</td>
-  <td>40.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_7</code></td>
-  <td>Fci D 7</td>
-  <td>numeric</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_8</code></td>
-  <td>Fci D 8</td>
-  <td>numeric</td>
-  <td>40.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fci_d_9</code></td>
-  <td>Fci D 9</td>
-  <td>numeric</td>
-  <td>40.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>financial_compensation_be_sent_to_a_nebraska_residential_address___1</code></td>
-  <td>Financial Compensation Be Sent To A Nebraska Residential Address   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_1097_2191</code></td>
-  <td>First 5 Nos 1097 2191</td>
-  <td>numeric</td>
-  <td>61.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_180_364</code></td>
-  <td>First 5 Nos 180 364</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_365_548</code></td>
-  <td>First 5 Nos 365 548</td>
-  <td>numeric</td>
-  <td>92.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_549_731</code></td>
-  <td>First 5 Nos 549 731</td>
-  <td>numeric</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_732_914</code></td>
-  <td>First 5 Nos 732 914</td>
-  <td>numeric</td>
-  <td>88.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_90_179</code></td>
-  <td>First 5 Nos 90 179</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>first_5_nos_915_1096</code></td>
-  <td>First 5 Nos 915 1096</td>
-  <td>numeric</td>
-  <td>89.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fq001</code></td>
-  <td>Fq001</td>
-  <td>numeric</td>
-  <td>25.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fq005</code></td>
-  <td>Fq005</td>
-  <td>numeric</td>
-  <td>39.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fqlive1_1</code></td>
-  <td>Fqlive1 1</td>
-  <td>numeric</td>
-  <td>36.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fqlive1_2</code></td>
-  <td>Fqlive1 2</td>
-  <td>numeric</td>
-  <td>37.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>fqlive1_3</code></td>
-  <td>Fqlive1 3</td>
-  <td>numeric</td>
-  <td>53.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>include.x</code></td>
-  <td>Include.X</td>
-  <td>logical</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>include.y</code></td>
-  <td>Include.Y</td>
-  <td>logical</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>ineligible_flag</code></td>
-  <td>Ineligible Flag</td>
-  <td>numeric</td>
-  <td>99.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>kidsights_data_reviews_all_responses_for_quality___1</code></td>
-  <td>Kidsights Data Reviews All Responses For Quality   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi000</code></td>
-  <td>Mmi000</td>
-  <td>numeric</td>
-  <td>64.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi003</code></td>
-  <td>Mmi003</td>
-  <td>numeric</td>
-  <td>65.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi003b</code></td>
-  <td>Mmi003B</td>
-  <td>numeric</td>
-  <td>66.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi009</code></td>
-  <td>Mmi009</td>
-  <td>numeric</td>
-  <td>73.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi013</code></td>
-  <td>Mmi013</td>
-  <td>numeric</td>
-  <td>39.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi014</code></td>
-  <td>Mmi014</td>
-  <td>numeric</td>
-  <td>81.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi018</code></td>
-  <td>Mmi018</td>
-  <td>numeric</td>
-  <td>64.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi019_1</code></td>
-  <td>Mmi019 1</td>
-  <td>numeric</td>
-  <td>93.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi019_2</code></td>
-  <td>Mmi019 2</td>
-  <td>numeric</td>
-  <td>93.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi019_3</code></td>
-  <td>Mmi019 3</td>
-  <td>numeric</td>
-  <td>93.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi100</code></td>
-  <td>Mmi100</td>
-  <td>numeric</td>
-  <td>39.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi101</code></td>
-  <td>Mmi101</td>
-  <td>numeric</td>
-  <td>36.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi110</code></td>
-  <td>Mmi110</td>
-  <td>numeric</td>
-  <td>40.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi111</code></td>
-  <td>Mmi111</td>
-  <td>numeric</td>
-  <td>40.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi112</code></td>
-  <td>Mmi112</td>
-  <td>numeric</td>
-  <td>40.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi113</code></td>
-  <td>Mmi113</td>
-  <td>numeric</td>
-  <td>40.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi120</code></td>
-  <td>Mmi120</td>
-  <td>numeric</td>
-  <td>35.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi121</code></td>
-  <td>Mmi121</td>
-  <td>numeric</td>
-  <td>36.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi122</code></td>
-  <td>Mmi122</td>
-  <td>numeric</td>
-  <td>36.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmi123</code></td>
-  <td>Mmi123</td>
-  <td>numeric</td>
-  <td>36.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs009</code></td>
-  <td>Mmifs009</td>
-  <td>numeric</td>
-  <td>76.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs010</code></td>
-  <td>Mmifs010</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs011</code></td>
-  <td>Mmifs011</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs012</code></td>
-  <td>Mmifs012</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs013</code></td>
-  <td>Mmifs013</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs014</code></td>
-  <td>Mmifs014</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs015</code></td>
-  <td>Mmifs015</td>
-  <td>numeric</td>
-  <td>76.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmifs016</code></td>
-  <td>Mmifs016</td>
-  <td>numeric</td>
-  <td>76.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mmihl002</code></td>
-  <td>Mmihl002</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_2_family_information_complete</code></td>
-  <td>Module 2 Family Information Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_2_family_information_timestamp</code></td>
-  <td>Module 2 Family Information Timestamp</td>
-  <td>character</td>
-  <td>35.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_3_child_information_complete</code></td>
-  <td>Module 3 Child Information Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_3_child_information_timestamp</code></td>
-  <td>Module 3 Child Information Timestamp</td>
-  <td>character</td>
-  <td>38.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_4_home_learning_environment_complete</code></td>
-  <td>Module 4 Home Learning Environment Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_4_home_learning_environment_timestamp</code></td>
-  <td>Module 4 Home Learning Environment Timestamp</td>
-  <td>character</td>
-  <td>39.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_5_birthdate_confirmation_complete</code></td>
-  <td>Module 5 Birthdate Confirmation Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_5_birthdate_confirmation_timestamp</code></td>
-  <td>Module 5 Birthdate Confirmation Timestamp</td>
-  <td>character</td>
-  <td>40.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_0_89_complete</code></td>
-  <td>Module 6 0 89 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_0_89_timestamp</code></td>
-  <td>Module 6 0 89 Timestamp</td>
-  <td>character</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_1097_2191_complete</code></td>
-  <td>Module 6 1097 2191 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_1097_2191_timestamp</code></td>
-  <td>Module 6 1097 2191 Timestamp</td>
-  <td>character</td>
-  <td>61.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_180_364_complete</code></td>
-  <td>Module 6 180 364 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_180_364_timestamp</code></td>
-  <td>Module 6 180 364 Timestamp</td>
-  <td>character</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_365_548_complete</code></td>
-  <td>Module 6 365 548 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_365_548_timestamp</code></td>
-  <td>Module 6 365 548 Timestamp</td>
-  <td>character</td>
-  <td>92.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_549_731_complete</code></td>
-  <td>Module 6 549 731 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_549_731_timestamp</code></td>
-  <td>Module 6 549 731 Timestamp</td>
-  <td>character</td>
-  <td>92.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_732_914_complete</code></td>
-  <td>Module 6 732 914 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_732_914_timestamp</code></td>
-  <td>Module 6 732 914 Timestamp</td>
-  <td>character</td>
-  <td>88.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_90_179_complete</code></td>
-  <td>Module 6 90 179 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_90_179_timestamp</code></td>
-  <td>Module 6 90 179 Timestamp</td>
-  <td>character</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_915_1096_complete</code></td>
-  <td>Module 6 915 1096 Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_6_915_1096_timestamp</code></td>
-  <td>Module 6 915 1096 Timestamp</td>
-  <td>character</td>
-  <td>89.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_8_followup_information_complete</code></td>
-  <td>Module 8 Followup Information Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_8_followup_information_timestamp</code></td>
-  <td>Module 8 Followup Information Timestamp</td>
-  <td>character</td>
-  <td>50.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_9_compensation_information_complete</code></td>
-  <td>Module 9 Compensation Information Complete</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>module_9_compensation_information_timestamp</code></td>
-  <td>Module 9 Compensation Information Timestamp</td>
-  <td>character</td>
-  <td>49.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mrw001</code></td>
-  <td>Mrw001</td>
-  <td>numeric</td>
-  <td>39.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mrw002</code></td>
-  <td>Mrw002</td>
-  <td>numeric</td>
-  <td>74.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mrw003_1</code></td>
-  <td>Mrw003 1</td>
-  <td>numeric</td>
-  <td>74.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>mrw003_2</code></td>
-  <td>Mrw003 2</td>
-  <td>numeric</td>
-  <td>66.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom001</code></td>
-  <td>Nom001</td>
-  <td>numeric</td>
-  <td>94.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom002</code></td>
-  <td>Nom002</td>
-  <td>numeric</td>
-  <td>82.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom002x</code></td>
-  <td>Nom002X</td>
-  <td>numeric</td>
-  <td>80.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom003</code></td>
-  <td>Nom003</td>
-  <td>numeric</td>
-  <td>82.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom003x</code></td>
-  <td>Nom003X</td>
-  <td>numeric</td>
-  <td>80.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom005</code></td>
-  <td>Nom005</td>
-  <td>numeric</td>
-  <td>82.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom005x</code></td>
-  <td>Nom005X</td>
-  <td>numeric</td>
-  <td>80.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom006</code></td>
-  <td>Nom006</td>
-  <td>numeric</td>
-  <td>95.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom006x</code></td>
-  <td>Nom006X</td>
-  <td>numeric</td>
-  <td>95.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom009</code></td>
-  <td>Nom009</td>
-  <td>numeric</td>
-  <td>94.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom012</code></td>
-  <td>Nom012</td>
-  <td>numeric</td>
-  <td>89.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom014</code></td>
-  <td>Nom014</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom014x</code></td>
-  <td>Nom014X</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom015</code></td>
-  <td>Nom015</td>
-  <td>numeric</td>
-  <td>91.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom017</code></td>
-  <td>Nom017</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom017x</code></td>
-  <td>Nom017X</td>
-  <td>numeric</td>
-  <td>94.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom018</code></td>
-  <td>Nom018</td>
-  <td>numeric</td>
-  <td>82.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom018x</code></td>
-  <td>Nom018X</td>
-  <td>numeric</td>
-  <td>80.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom019</code></td>
-  <td>Nom019</td>
-  <td>numeric</td>
-  <td>62.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom022</code></td>
-  <td>Nom022</td>
-  <td>numeric</td>
-  <td>82.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom022x</code></td>
-  <td>Nom022X</td>
-  <td>numeric</td>
-  <td>80.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom024</code></td>
-  <td>Nom024</td>
-  <td>numeric</td>
-  <td>82.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom024x</code></td>
-  <td>Nom024X</td>
-  <td>numeric</td>
-  <td>80.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom026</code></td>
-  <td>Nom026</td>
-  <td>numeric</td>
-  <td>96.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom026x</code></td>
-  <td>Nom026X</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom028</code></td>
-  <td>Nom028</td>
-  <td>numeric</td>
-  <td>92.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom029</code></td>
-  <td>Nom029</td>
-  <td>numeric</td>
-  <td>96.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom029x</code></td>
-  <td>Nom029X</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom031</code></td>
-  <td>Nom031</td>
-  <td>numeric</td>
-  <td>96.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom033</code></td>
-  <td>Nom033</td>
-  <td>numeric</td>
-  <td>95.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom033x</code></td>
-  <td>Nom033X</td>
-  <td>numeric</td>
-  <td>95.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom034</code></td>
-  <td>Nom034</td>
-  <td>numeric</td>
-  <td>96.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom034x</code></td>
-  <td>Nom034X</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom035</code></td>
-  <td>Nom035</td>
-  <td>numeric</td>
-  <td>81.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom035x</code></td>
-  <td>Nom035X</td>
-  <td>numeric</td>
-  <td>80.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom042x</code></td>
-  <td>Nom042X</td>
-  <td>numeric</td>
-  <td>62.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom044</code></td>
-  <td>Nom044</td>
-  <td>numeric</td>
-  <td>100.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom046x</code></td>
-  <td>Nom046X</td>
-  <td>numeric</td>
-  <td>39.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom047</code></td>
-  <td>Nom047</td>
-  <td>numeric</td>
-  <td>98.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom047x</code></td>
-  <td>Nom047X</td>
-  <td>numeric</td>
-  <td>98.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom048x</code></td>
-  <td>Nom048X</td>
-  <td>numeric</td>
-  <td>63.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom049</code></td>
-  <td>Nom049</td>
-  <td>numeric</td>
-  <td>98.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom049x</code></td>
-  <td>Nom049X</td>
-  <td>numeric</td>
-  <td>98.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom052y</code></td>
-  <td>Nom052Y</td>
-  <td>numeric</td>
-  <td>63.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom053</code></td>
-  <td>Nom053</td>
-  <td>numeric</td>
-  <td>81.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom053x</code></td>
-  <td>Nom053X</td>
-  <td>numeric</td>
-  <td>80.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom054x</code></td>
-  <td>Nom054X</td>
-  <td>numeric</td>
-  <td>63.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom056x</code></td>
-  <td>Nom056X</td>
-  <td>numeric</td>
-  <td>62.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom057</code></td>
-  <td>Nom057</td>
-  <td>numeric</td>
-  <td>91.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom059</code></td>
-  <td>Nom059</td>
-  <td>numeric</td>
-  <td>82.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom059x</code></td>
-  <td>Nom059X</td>
-  <td>numeric</td>
-  <td>80.5%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom060y</code></td>
-  <td>Nom060Y</td>
-  <td>numeric</td>
-  <td>62.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom061</code></td>
-  <td>Nom061</td>
-  <td>numeric</td>
-  <td>96.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom061x</code></td>
-  <td>Nom061X</td>
-  <td>numeric</td>
-  <td>96.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom062y</code></td>
-  <td>Nom062Y</td>
-  <td>numeric</td>
-  <td>62.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom102</code></td>
-  <td>Nom102</td>
-  <td>numeric</td>
-  <td>62.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom103</code></td>
-  <td>Nom103</td>
-  <td>numeric</td>
-  <td>62.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom104</code></td>
-  <td>Nom104</td>
-  <td>numeric</td>
-  <td>62.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom2202</code></td>
-  <td>Nom2202</td>
-  <td>numeric</td>
-  <td>62.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom2205</code></td>
-  <td>Nom2205</td>
-  <td>numeric</td>
-  <td>63.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nom2208</code></td>
-  <td>Nom2208</td>
-  <td>numeric</td>
-  <td>63.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nos</code></td>
-  <td>Nos</td>
-  <td>numeric</td>
-  <td>99.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nos_count_90_179</code></td>
-  <td>Nos Count 90 179</td>
-  <td>numeric</td>
-  <td>99.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nschj012</code></td>
-  <td>Nschj012</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nschj013</code></td>
-  <td>Nschj013</td>
-  <td>numeric</td>
-  <td>51.1%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>nschj017</code></td>
-  <td>Nschj017</td>
-  <td>numeric</td>
-  <td>51.2%</td>
-  <td>N/A</td>
-</tr>
+  <td>What is this child's name? (First name or nickname ONLY)</td>
+</tr>
+</tbody>
+</table>
+
+<p>Providing your child's name is optional. We will only use if we follow-up in the future and would like to ask questions about this child | character | 72.5% | N/A |
+| <code>compensation</code> | Compensation | factor | 0.0% | 1 (Fail), 2 (Pass) |
+| <code>consecutive_nos_180_364</code> | Consecutive Nos | numeric | 94.9% | N/A |
+| <code>consecutive_nos_365_548</code> | 5 Consecutive Nos | numeric | 92.2% | N/A |
+| <code>consecutive_nos_549_731</code> | 5 Consecutive Nos | numeric | 92.5% | N/A |
+| <code>consecutive_nos_732_914</code> | 5 Consecutive Nos | numeric | 88.1% | N/A |
+| <code>consecutive_nos_90_179</code> | 5 Consecutive Nos | numeric | 99.0% | N/A |
+| <code>consecutive_nos_915_1096</code> | 5 Consecutive Nos | numeric | 89.7% | N/A |
+| <code>consecutive_nos_count</code> | 5 Consecutive Nos Count | numeric | 99.4% | N/A |
+| <code>consent_date</code> | Today's Date | character | 24.9% | N/A |
+| <code>consent_doc_complete</code> | Consent Doc Complete | numeric | 0.0% | N/A |
+| <code>consent_doc_timestamp</code> | Consent Doc Timestamp | character | 6.5% | N/A |
+| <code>cqfa001</code> | What is your marital status? | numeric | 36.7% | N/A |
+| <code>cqfa002</code> | In general, how would you describe your child's health? | numeric | 39.4% | N/A |
+| <code>cqfa005</code> | Since your child was born, how often has it been very hard to cover the basics, like food and housing, on your family's income? | numeric | 36.0% | N/A |
+| <code>cqfa006</code> | DURING THE PAST 12 MONTHS, which of these statements best describes your household's ability to afford the food you need? | numeric | 36.1% | N/A |
+| <code>cqfa009</code> | How many times has your child moved to a new address since he or she was born? | numeric | 36.2% | N/A |
+| <code>cqfa010</code> | DURING THE PAST 12 MONTHS, was there someone that you could turn to for day-to-day emotional support with parenting or raising children? | numeric | 36.0% | N/A |
+| <code>cqfa010a___1</code> | Cqfa010A   1 | numeric | 0.0% | N/A |
+| <code>cqfa010a___2</code> | Cqfa010A   2 | numeric | 0.0% | N/A |
+| <code>cqfa010a___3</code> | Cqfa010A   3 | numeric | 0.0% | N/A |
+| <code>cqfa010a___4</code> | Cqfa010A   4 | numeric | 0.0% | N/A |
+| <code>cqfa010a___5</code> | Cqfa010A   5 | numeric | 0.0% | N/A |
+| <code>cqfa010a___6</code> | Cqfa010A   6 | numeric | 0.0% | N/A |
+| <code>cqfa013</code> | DURING THE PAST WEEK, how many hours of sleep did your child get on an average weeknight? | numeric | 39.5% | N/A |
+| <code>cqfb002</code> | In general, how is your mental or emotional health? | numeric | 36.1% | N/A |
+| <code>cqfb007x</code> | <div class="rich-text-field-label"><p><span style="text-decoration: underline;">The rest of the questions ask only about the child whose birthdate you entered at the beginning of the survey.</span><br><br>Does your child receive care for at least 10 hours per week from someone other than a parent or guardian?</p> <p>This could be a daycare center, preschool, Head Start program, family childcare home, nanny, au pair, babysitter, or relative.</p></div> | numeric | 39.1% | N/A |
+| <code>cqfb008</code> | DURING THE PAST 12 MONTHS, did you or anyone in the family have to quit a job, not take a job, or greatly change your job because of problems with childcare for your child? | numeric | 37.3% | N/A |
+| <code>cqfb009</code> | People in this neighborhood help each other out. | numeric | 36.2% | N/A |
+| <code>cqfb010</code> | We watch out for each other's children in this neighborhood. | numeric | 36.5% | N/A |
+| <code>cqfb011</code> | This child is safe in our neighborhood. | numeric | 36.2% | N/A |
+| <code>cqfb012</code> | When we encounter difficulties, we know where to go for help in our community. | numeric | 36.5% | N/A |
+| <code>cqfb013</code> | Little interest or pleasure in doing things? | numeric | 36.3% | N/A |
+| <code>cqfb014</code> | Feeling down, depressed or hopeless? | numeric | 36.6% | N/A |
+| <code>cqfb015</code> | Feeling nervous, anxious or on edge? | numeric | 36.6% | N/A |
+| <code>cqfb016</code> | Not being able to stop or control worrying? | numeric | 36.4% | N/A |
+| <code>cqr0011</code> | DURING THE PAST WEEK, has your child been sick or unwell?</p>
+
+<p>For example, fever, earache, vomiting, and diarrhea. | numeric | 39.7% | N/A |
+| <code>cqr002</code> | What is your sex? | numeric | 35.7% | N/A |
+| <code>cqr003</code> | <div class="rich-text-field-label"><p>What is your age?</p></div> | numeric | 36.7% | N/A |
+| <code>cqr004</code> | What is the highest grade or level of school you have completed? | numeric | 35.8% | N/A |
+| <code>cqr006</code> | What was your total family income, before taxes, for the year 2024?</p>
+
+<p>Include money from jobs, child support, Social Security, retirement income, unemployment payments, public assistance, and other sources. Also, include income from interest, dividends, net income from business, farm, or rent, and any other money income received.</p>
+
+<p>Use the slider to select a value that best represents this value. | numeric | 35.4% | N/A |
+| <code>cqr007___1</code> | Cqr007   1 | numeric | 0.0% | N/A |
+| <code>cqr007___2</code> | Cqr007   2 | numeric | 0.0% | N/A |
+| <code>cqr007___3</code> | Cqr007   3 | numeric | 0.0% | N/A |
+| <code>cqr007___4</code> | Cqr007   4 | numeric | 0.0% | N/A |
+| <code>cqr007___5</code> | Cqr007   5 | numeric | 0.0% | N/A |
+| <code>cqr007___6</code> | Cqr007   6 | numeric | 0.0% | N/A |
+| <code>cqr007___7</code> | Cqr007   7 | numeric | 0.0% | N/A |
+| <code>cqr008</code> | How are you related to your child? | numeric | 36.1% | N/A |
+| <code>cqr009</code> | What is your child's sex? | numeric | 39.3% | N/A |
+| <code>cqr010___1</code> | Cqr010   1 | numeric | 0.0% | N/A |
+| <code>cqr010___10</code> | Cqr010   10 | numeric | 0.0% | N/A |
+| <code>cqr010___11</code> | Cqr010   11 | numeric | 0.0% | N/A |
+| <code>cqr010___12</code> | Cqr010   12 | numeric | 0.0% | N/A |
+| <code>cqr010___13</code> | Cqr010   13 | numeric | 0.0% | N/A |
+| <code>cqr010___14</code> | Cqr010   14 | numeric | 0.0% | N/A |
+| <code>cqr010___15</code> | Cqr010   15 | numeric | 0.0% | N/A |
+| <code>cqr010___16</code> | Cqr010   16 | numeric | 0.0% | N/A |
+| <code>cqr010___2</code> | Cqr010   2 | numeric | 0.0% | N/A |
+| <code>cqr010___3</code> | Cqr010   3 | numeric | 0.0% | N/A |
+| <code>cqr010___4</code> | Cqr010   4 | numeric | 0.0% | N/A |
+| <code>cqr010___5</code> | Cqr010   5 | numeric | 0.0% | N/A |
+| <code>cqr010___6</code> | Cqr010   6 | numeric | 0.0% | N/A |
+| <code>cqr010___7</code> | Cqr010   7 | numeric | 0.0% | N/A |
+| <code>cqr010___8</code> | Cqr010   8 | numeric | 0.0% | N/A |
+| <code>cqr010___9</code> | Cqr010   9 | numeric | 0.0% | N/A |
+| <code>cqr011</code> | Is your child of Hispanic, Latino, or Spanish origin? | numeric | 39.1% | N/A |
+| <code>cqr013</code> | Does your child need or use more medical care, mental health, or educational services than is usual for most children of the same age? | numeric | 40.0% | N/A |
+| <code>cqr014x</code> | DURING THE PAST 12 MONTHS, how often have your child's health conditions or problems affected their ability to do things other children their age do? | numeric | 39.4% | N/A |
+| <code>cqr015</code> | Does your child need or get special therapy, such as physical, occupational, or speech therapy? | numeric | 40.0% | N/A |
+| <code>cqr016</code> | Does your child have any emotional, developmental, or behavioral problems for which he/she needs treatment or counseling? | numeric | 39.7% | N/A |
+| <code>cqr017</code> | Parent or guardian divorced or separated? | numeric | 40.0% | N/A |
+| <code>cqr018</code> | Parent or guardian died? | numeric | 39.9% | N/A |
+| <code>cqr019</code> | Parent or guardian served time in jail? | numeric | 40.3% | N/A |
+| <code>cqr020</code> | Saw or heard parents or adults slap, hit, kick, punch one another in the home? | numeric | 40.1% | N/A |
+| <code>cqr021</code> | Was a victim of violence or witnessed violence in his or her neighborhood? | numeric | 40.3% | N/A |
+| <code>cqr022</code> | Lived with anyone who was mentally ill, suicidal, or severely depressed? | numeric | 40.3% | N/A |
+| <code>cqr023</code> | Lived with anyone who had a problem with alcohol or drugs? | numeric | 40.3% | N/A |
+| <code>cqr024</code> | Treated or judged unfairly because of his or her race or ethnic group? | numeric | 40.1% | N/A |
+| <code>cqrn012</code> | To your knowledge, has your child ever been screened for developmental delays OR has a health professional suggested that your child be screened for developmental delays? | numeric | 39.9% | N/A |
+| <code>date_complete_check</code> | Date Complete Check (It make sure the branching logic doesnot appear until the user finishes typing the date)  | numeric | 40.5% | N/A |
+| <code>dob</code> | <div class="rich-text-field-label"><p><span style="text-decoration: underline;">This survey is about the one child whose birthday you will enter here.</span></p> <p><br>What is your child's date of birth?</p> <p><span style="color: #e03e2d;">Please enter your child's birthdate in the following format: MM/DD/YYYY (Month/Day/Year).</span></p></div> | character | 25.2% | N/A |
+| <code>dob_match</code> | Dob Match | numeric | 24.8% | N/A |
+| <code>ecdi007</code> | Can your child speak using sentences of 5 or more words that go together? | numeric | 94.0% | N/A |
+| <code>eligibility</code> | Eligibility | factor | 0.0% | 1 (Fail), 2 (Pass) |
+| <code>eligibility_form_complete</code> | Eligibility Form Complete | numeric | 0.0% | N/A |
+| <code>eligibility_form_timestamp</code> | Eligibility Form Timestamp | character | 24.7% | N/A |
+| <code>eligible.x</code> | Eligible.X | logical | 0.0% | N/A |
+| <code>eligible.y</code> | Eligible.Y | logical | 0.0% | N/A |
+| <code>email</code> | Email | character | 84.7% | N/A |
+| <code>email_followup</code> | Please provide email for contact | character | 66.2% | N/A |
+| <code>email_registration_complete</code> | Email Registration Complete | numeric | 84.7% | N/A |
+| <code>email_registration_timestamp</code> | Email Registration Timestamp | character | 84.7% | N/A |
+| <code>eq001</code> | Do you consent to participate in this survey? | numeric | 25.1% | N/A |
+| <code>eq002</code> | Are you a primary caregiver for your child?</p>
+
+<p>A primary caregiver, most often a parent or guardian, is a person who is often responsible for the care of the child, spends a significant amount of time with the child (at least 40 hours per week), and can speak to what the child can do and how the child behaves.  | numeric | 25.1% | N/A |
+| <code>eq003</code> | Are you 19 years of age or older? | numeric | 24.9% | N/A |
+| <code>eq004a</code> | <div class="rich-text-field-label"><p>Please confirm your child's date of birth<br><span style="color: #e03e2d;">Please enter the birthdate in MM/DD/YYYY format (e.g., 12/31/2000)</span></p></div> | character | 40.5% | N/A |
+| <code>fci_a_1</code> | About how many books are there in the home, including schoolbooks, novels, and religious books?</p>
+
+<p>Do not include books meant for very young children, such as picture books. | numeric | 39.8% | N/A |
+| <code>fci_a_2</code> | How many magazines and newspapers are there in the household? | numeric | 40.3% | N/A |
+| <code>fci_a_3</code> | How many times in a week does your child see you or other members of the household reading books, magazines or newspapers? | numeric | 40.2% | N/A |
+| <code>fci_b_1</code> | Do you have children's books or picture books at home for your child? | numeric | 40.5% | N/A |
+| <code>fci_b_2</code> | How many books do you have in your home for your child? | numeric | 42.9% | N/A |
+| <code>fci_c_1</code> | Home-made toys? For example, home-made play-dough, puppets, balls made of plastic papers, clay dolls, wire cars, or other toys made at home. | numeric | 40.1% | N/A |
+| <code>fci_c_10</code> | Things for pretending? | numeric | 40.5% | N/A |
+| <code>fci_c_11</code> | Does your child play with electronic devices other than radio or TV? | numeric | 40.2% | N/A |
+| <code>fci_c_2</code> | Toys from a shop or manufactured toys? For example, balls, dolls, cars, or other toys from a shop/store. | numeric | 40.1% | N/A |
+| <code>fci_c_3</code> | Household objects? For example, bowls, spoons, empty matchboxes, empty bottles or pots, large cardboard boxes. OR objects found outside? For example, sticks, rocks, animal shells or leaves. | numeric | 40.1% | N/A |
+| <code>fci_c_4</code> | Things which make or play music? | numeric | 40.0% | N/A |
+| <code>fci_c_5</code> | Things for drawing or writing? | numeric | 40.2% | N/A |
+| <code>fci_c_6</code> | Picture books for children that are not schoolbooks? | numeric | 40.5% | N/A |
+| <code>fci_c_7</code> | Things meant for stacking, constructing, or building? For example, blocks, logs, maize cobs to build a pretend house, small pieces of timber, stones, small pieces of brick. | numeric | 40.5% | N/A |
+| <code>fci_c_8</code> | Things that encourage movement, like rolling, crawling, walking, or running? | numeric | 40.2% | N/A |
+| <code>fci_c_9</code> | Toys for learning colors or shapes, like circle, square, triangle? | numeric | 40.3% | N/A |
+| <code>fci_d_1</code> | Read books to or look at picture books, photos or posters with your child? | numeric | 40.2% | N/A |
+| <code>fci_d_10</code> | Do physical activities with your child? For example, walk, play on swings or slides, ride in toy tricycle, play in pool. | numeric | 40.4% | N/A |
+| <code>fci_d_11</code> | Does your child have a place of their own to keep toys or treasures? | numeric | 40.3% | N/A |
+| <code>fci_d_2</code> | Tell stories to your child? | numeric | 40.2% | N/A |
+| <code>fci_d_3</code> | Sing songs or say rhymes with your child including lullabies? | numeric | 40.8% | N/A |
+| <code>fci_d_4</code> | Take your child outside the home or yard or enclosure? For example, play dates with other children, visiting other family, going to beach or park. | numeric | 40.4% | N/A |
+| <code>fci_d_5</code> | Play with your child? For example, peek-a-boo, hand games (pat-a-cake), pretend play with dolls or other toys. | numeric | 40.5% | N/A |
+| <code>fci_d_6</code> | Count things with your child? | numeric | 40.3% | N/A |
+| <code>fci_d_7</code> | Draw or paint things with your child? | numeric | 40.4% | N/A |
+| <code>fci_d_8</code> | Construct things with your child? | numeric | 40.5% | N/A |
+| <code>fci_d_9</code> | Do any household chores with your child and talk while doing the work? For example, child put things away, sweep, set the table, do dishes, cook. | numeric | 40.6% | N/A |
+| <code>financial_compensation_be_sent_to_a_nebraska_residential_address___1</code> | Financial Compensation Be Sent To A Nebraska Residential Address   1 | numeric | 0.0% | N/A |
+| <code>first_5_nos_1097_2191</code> | First 5 Consecutive Nos | numeric | 61.9% | N/A |
+| <code>first_5_nos_180_364</code> | First 5 Nos count | numeric | 94.9% | N/A |
+| <code>first_5_nos_365_548</code> | First 5 Nos count | numeric | 92.2% | N/A |
+| <code>first_5_nos_549_731</code> | First 5 Nos count | numeric | 92.5% | N/A |
+| <code>first_5_nos_732_914</code> | First 5 Nos | numeric | 88.1% | N/A |
+| <code>first_5_nos_90_179</code> | First 5 Nos Count | numeric | 99.0% | N/A |
+| <code>first_5_nos_915_1096</code> | First 5 Nos | numeric | 89.7% | N/A |
+| <code>fq001</code> | Which county do you live in? | numeric | 25.4% | N/A |
+| <code>fq005</code> | Is your child enrolled in Early Head Start or Head Start? | numeric | 39.6% | N/A |
+| <code>fqlive1_1</code> | Children, birth through 18 years | numeric | 36.7% | N/A |
+| <code>fqlive1_2</code> | Adults, 19- 65 years of age | numeric | 37.0% | N/A |
+| <code>fqlive1_3</code> | Adults, 66 years or older | numeric | 53.9% | N/A |
+| <code>include.x</code> | Include.X | logical | 0.0% | N/A |
+| <code>include.y</code> | Include.Y | logical | 0.0% | N/A |
+| <code>ineligible_flag</code> | Ineligible Flag:</p>
+
+<p>Do not proceed to the next session if:
+CHILD is identified as white
+AND CHILD identified as non-Hispanic
+AND CHILD is 1096 days OR older
+AND the responding caregiver has a Bachelors  degree OR a masters degree OR a doctorate
+Otherwise, proceed with the survey | numeric | 99.3% | N/A |
+| <code>kidsights_data_reviews_all_responses_for_quality___1</code> | Kidsights Data Reviews All Responses For Quality   1 | numeric | 0.0% | N/A |
+| <code>mmi000</code> | This question asks about your child's primary childcare arrangement. </p>
+
+<p>In a typical week, what type of childcare does your child receive the most? | numeric | 64.3% | N/A |
+| <code>mmi003</code> | In a typical week, about how much does your household pay for your child's primary childcare arrangement?</p>
+
+<p>Use the slider to select a value that best represents this value $[mmi003]
+ | numeric | 65.8% | N/A |
+| <code>mmi003b</code> | In a typical week, about how much does your household pay for all childcare arrangements for your child?</p>
+
+<p>Use the slider to select a value that best represents this value $[mmi003b] | numeric | 66.1% | N/A |
+| <code>mmi009</code> | Do childcare costs affect your family's ability to pay for basic necessities such as food, housing, medicine, health care, and clothing? | numeric | 73.5% | N/A |
+| <code>mmi013</code> | DURING THE PAST 12 MONTHS, how difficult was it to find childcare when you needed it? | numeric | 39.2% | N/A |
+| <code>mmi014</code> | What was the main reason that it was difficult to find childcare? | numeric | 81.1% | N/A |
+| <code>mmi018</code> | Is your primary childcare arrangement paid for, at least in part, by a childcare subsidy program? | numeric | 64.7% | N/A |
+| <code>mmi019_1</code> | Application process? | numeric | 93.5% | N/A |
+| <code>mmi019_2</code> | Amount of assistance? | numeric | 93.5% | N/A |
+| <code>mmi019_3</code> | Childcare options you can access with the subsidy? | numeric | 93.5% | N/A |
+| <code>mmi100</code> | Does your child require childcare on evenings, weekends, or overnight?  | numeric | 39.5% | N/A |
+| <code>mmi101</code> | DURING THE PAST 12 MONTHS, has a lack of reliable transportation kept you from getting to work, school, medical appointments, or other daily needs? | numeric | 36.5% | N/A |
+| <code>mmi110</code> | how often is this child affectionate and tender? | numeric | 40.6% | N/A |
+| <code>mmi111</code> | how often does this child bounce back quickly when things do not go their way? | numeric | 40.6% | N/A |
+| <code>mmi112</code> | how often does this child show interest and curiosity in learning new things? | numeric | 40.8% | N/A |
+| <code>mmi113</code> | how often does this child smile and laugh? | numeric | 40.7% | N/A |
+| <code>mmi120</code> | Talk together about what to do? | numeric | 35.9% | N/A |
+| <code>mmi121</code> | Work together to solve our problems? | numeric | 36.2% | N/A |
+| <code>mmi122</code> | Know we have strengths to draw on? | numeric | 36.4% | N/A |
+| <code>mmi123</code> | Stay hopeful even in difficult times? | numeric | 36.5% | N/A |
+| <code>mmifs009</code> | You were worried you would not have enough food to eat? | numeric | 76.2% | N/A |
+| <code>mmifs010</code> | You were unable to eat healthy and nutritious food? | numeric | 76.3% | N/A |
+| <code>mmifs011</code> | You ate only a few kinds of food? | numeric | 76.3% | N/A |
+| <code>mmifs012</code> | You had to skip a meal? | numeric | 76.3% | N/A |
+| <code>mmifs013</code> | You ate less than you thought you should? | numeric | 76.3% | N/A |
+| <code>mmifs014</code> | Your household ran out of food? | numeric | 76.3% | N/A |
+| <code>mmifs015</code> | You were hungry but did not eat? | numeric | 76.3% | N/A |
+| <code>mmifs016</code> | You went without eating for a whole day? | numeric | 76.4% | N/A |
+| <code>mmihl002</code> | Is English the primary language spoken at home? | numeric | 36.6% | N/A |
+| <code>module_2_family_information_complete</code> | Module 2 Family Information Complete | numeric | 0.0% | N/A |
+| <code>module_2_family_information_timestamp</code> | Module 2 Family Information Timestamp | character | 35.1% | N/A |
+| <code>module_3_child_information_complete</code> | Module 3 Child Information Complete | numeric | 0.0% | N/A |
+| <code>module_3_child_information_timestamp</code> | Module 3 Child Information Timestamp | character | 38.1% | N/A |
+| <code>module_4_home_learning_environment_complete</code> | Module 4 Home Learning Environment Complete | numeric | 0.0% | N/A |
+| <code>module_4_home_learning_environment_timestamp</code> | Module 4 Home Learning Environment Timestamp | character | 39.3% | N/A |
+| <code>module_5_birthdate_confirmation_complete</code> | Module 5 Birthdate Confirmation Complete | numeric | 0.0% | N/A |
+| <code>module_5_birthdate_confirmation_timestamp</code> | Module 5 Birthdate Confirmation Timestamp | character | 40.4% | N/A |
+| <code>module_6_0_89_complete</code> | Module 6 0 89 Complete | numeric | 0.0% | N/A |
+| <code>module_6_0_89_timestamp</code> | Module 6 0 89 Timestamp | character | 99.4% | N/A |
+| <code>module_6_1097_2191_complete</code> | Module 6 1097 2191 Complete | numeric | 0.0% | N/A |
+| <code>module_6_1097_2191_timestamp</code> | Module 6 1097 2191 Timestamp | character | 61.9% | N/A |
+| <code>module_6_180_364_complete</code> | Module 6 180 364 Complete | numeric | 0.0% | N/A |
+| <code>module_6_180_364_timestamp</code> | Module 6 180 364 Timestamp | character | 94.9% | N/A |
+| <code>module_6_365_548_complete</code> | Module 6 365 548 Complete | numeric | 0.0% | N/A |
+| <code>module_6_365_548_timestamp</code> | Module 6 365 548 Timestamp | character | 92.2% | N/A |
+| <code>module_6_549_731_complete</code> | Module 6 549 731 Complete | numeric | 0.0% | N/A |
+| <code>module_6_549_731_timestamp</code> | Module 6 549 731 Timestamp | character | 92.5% | N/A |
+| <code>module_6_732_914_complete</code> | Module 6 732 914 Complete | numeric | 0.0% | N/A |
+| <code>module_6_732_914_timestamp</code> | Module 6 732 914 Timestamp | character | 88.1% | N/A |
+| <code>module_6_90_179_complete</code> | Module 6 90 179 Complete | numeric | 0.0% | N/A |
+| <code>module_6_90_179_timestamp</code> | Module 6 90 179 Timestamp | character | 99.0% | N/A |
+| <code>module_6_915_1096_complete</code> | Module 6 915 1096 Complete | numeric | 0.0% | N/A |
+| <code>module_6_915_1096_timestamp</code> | Module 6 915 1096 Timestamp | character | 89.7% | N/A |
+| <code>module_8_followup_information_complete</code> | Module 8 Followup Information Complete | numeric | 0.0% | N/A |
+| <code>module_8_followup_information_timestamp</code> | Module 8 Followup Information Timestamp | character | 50.5% | N/A |
+| <code>module_9_compensation_information_complete</code> | Module 9 Compensation Information Complete | numeric | 0.0% | N/A |
+| <code>module_9_compensation_information_timestamp</code> | Module 9 Compensation Information Timestamp | character | 49.9% | N/A |
+| <code>mrw001</code> | This question is about all of your children. </p>
+
+<p>Does your household pay for at least 10 hours of childcare per week for more than one child? </p>
+
+<p>This could be a childcare center, preschool, family childcare home, nanny, au pair, babysitter, before/after school program, or relative. | numeric | 39.0% | N/A |
+| <code>mrw002</code> | This question is about all of your children. </p>
+
+<p>In a typical week, about how much does your household pay for childcare total across all childcare arrangements? | numeric | 74.3% | N/A |
+| <code>mrw003_1</code> | This question is about all of your children. </p>
+
+<p>In a typical week, about how much financial support do you receive from other individuals, including family, to help cover the cost of childcare?  </p>
+
+<p>Enter 0 if you receive no such financial support. | numeric | 74.2% | N/A |
+| <code>mrw003_2</code> | In a typical week, about how much financial support do you receive from other individuals, including family, to help cover the cost of childcare for your child?  </p>
+
+<p>Enter 0 if you receive no such financial support.</p>
+
+<p>Use the slider to select a value that best represents this value $[mrw003_2] | numeric | 66.0% | N/A |
+| <code>nom044</code> | To what extent do your child's health conditions or problems affect their ability to do things? | numeric | 100.0% | N/A |
+| <code>nom046x</code> | How would you describe the condition of your child's teeth? | numeric | 39.3% | N/A |
+| <code>nom047</code> | How often does this child show concern when they see others are hurt or unhappy? | numeric | 98.7% | N/A |
+| <code>nos</code> | 5 Nos | numeric | 99.4% | N/A |
+| <code>nos_count_90_179</code> | 3 consecutive No's count  | numeric | 99.0% | N/A |
+| <code>nschj012</code> | Does your child have another parent or adult caregiver who lives in this household? | numeric | 36.6% | N/A |
+| <code>nschj013</code> | How is this other caregiver related to your child? | numeric | 51.1% | N/A |
+| <code>nschj017</code> | What is the highest grade or level of school this caregiver has completed? | numeric | 51.2% | N/A |
+| <code>q1347</code> | Are you interested in participating in future research? | numeric | 50.6% | N/A |
+| <code>q1348</code> | Please provide your mobile phone number if you prefer phone contact. | character | 85.4% | N/A |
+| <code>q1394</code> | First Name: | character | 51.8% | N/A |
+| <code>q1394a</code> | Last Name: | character | 51.8% | N/A |
+| <code>q1395</code> | Street Address: | character | 52.4% | N/A |
+| <code>q1396</code> | Town/City: | character | 52.4% | N/A |
+| <code>q1397</code> | State: | character | 52.3% | N/A |
+| <code>q1398</code> | Zip code: | character | 52.3% | N/A |
+| <code>q1502</code> | How well do you think you are handling the day-to-day demands of raising children? | numeric | 36.2% | N/A |
+| <code>q1503</code> | Angry with your child? | numeric | 36.3% | N/A |
+| <code>q1504</code> | That your child does things that really bother you a lot? | numeric | 36.7% | N/A |
+| <code>q1505</code> | That your child is much harder to care for than most children his or her age? | numeric | 36.4% | N/A |
+| <code>q939___1</code> | Q939   1 | numeric | 0.0% | N/A |
+| <code>q939___2</code> | Q939   2 | numeric | 0.0% | N/A |
+| <code>q939___3</code> | Q939   3 | numeric | 0.0% | N/A |
+| <code>q939___4</code> | Q939   4 | numeric | 0.0% | N/A |
+| <code>q939___5</code> | Q939   5 | numeric | 0.0% | N/A |
+| <code>q939___6</code> | Q939   6 | numeric | 0.0% | N/A |
+| <code>q939___7</code> | Q939   7 | numeric | 0.0% | N/A |
+| <code>q939___8</code> | Q939   8 | numeric | 0.0% | N/A |
+| <code>q940</code> | How many times has your care arrangement for your child changed in the past 12 months? | numeric | 64.4% | N/A |
+| <code>q941</code> | Overall, how satisfied are you with the quality of care and education that your primary childcare arrangement provides to your child? | numeric | 64.5% | N/A |
+| <code>q943</code> | How many hours per week do you usually work outside the home? | numeric | 36.1% | N/A |
+| <code>q958</code> | Across all providers, how many total hours does your child spend in childcare during a regular week? </p>
+
+<p>Please enter a number, such as 20. | character | 64.8% | N/A |
+| <code>q959___1</code> | Q959   1 | numeric | 0.0% | N/A |
+| <code>q959___2</code> | Q959   2 | numeric | 0.0% | N/A |
+| <code>q959___3</code> | Q959   3 | numeric | 0.0% | N/A |
+| <code>q959___4</code> | Q959   4 | numeric | 0.0% | N/A |
+| <code>q959___5</code> | Q959   5 | numeric | 0.0% | N/A |
+| <code>q959___6</code> | Q959   6 | numeric | 0.0% | N/A |
+| <code>q960</code> | DURING THE PAST YEAR, is there anything that you think has affected your child's development, positively or negatively? | numeric | 39.9% | N/A |
+| <code>redcap_survey_identifier</code> | Redcap Survey Identifier | numeric | 93.9% | N/A |
+| <code>source_project</code> | Source Project | factor | 0.0% | 1 (kidsights<em>data</em>survey), 2 (kidsights<em>email</em>registration), 3 (kidsights<em>public), 4 (kidsights</em>public_birth) |
+| <code>sq001</code> | Please enter your 5-digit zip code. | character | 25.4% | N/A |
+| <code>sq002___1</code> | Sq002   1 | numeric | 0.0% | N/A |
+| <code>sq002___10</code> | Sq002   10 | numeric | 0.0% | N/A |
+| <code>sq002___11</code> | Sq002   11 | numeric | 0.0% | N/A |
+| <code>sq002___12</code> | Sq002   12 | numeric | 0.0% | N/A |
+| <code>sq002___13</code> | Sq002   13 | numeric | 0.0% | N/A |
+| <code>sq002___14</code> | Sq002   14 | numeric | 0.0% | N/A |
+| <code>sq002___15</code> | Sq002   15 | numeric | 0.0% | N/A |
+| <code>sq002___16</code> | Sq002   16 | numeric | 0.0% | N/A |
+| <code>sq002___2</code> | Sq002   2 | numeric | 0.0% | N/A |
+| <code>sq002___3</code> | Sq002   3 | numeric | 0.0% | N/A |
+| <code>sq002___4</code> | Sq002   4 | numeric | 0.0% | N/A |
+| <code>sq002___5</code> | Sq002   5 | numeric | 0.0% | N/A |
+| <code>sq002___6</code> | Sq002   6 | numeric | 0.0% | N/A |
+| <code>sq002___7</code> | Sq002   7 | numeric | 0.0% | N/A |
+| <code>sq002___8</code> | Sq002   8 | numeric | 0.0% | N/A |
+| <code>sq002___9</code> | Sq002   9 | numeric | 0.0% | N/A |
+| <code>sq003</code> | Are you of Hispanic, Latino or Spanish origin? | numeric | 36.3% | N/A |
+| <code>survey_stop</code> | survey Stop | numeric | 99.4% | N/A |
+| <code>urban_pct</code> | Percentage of ZIP population in urban areas (0-100) | numeric | 27.9% | N/A |</p>
+
+<h2>Psychosocial<em>Problems</em>General</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 46<br />
+<strong>Average Missing:</strong> 47.9%<br />
+<strong>Data Types:</strong> 0 factors, 46 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
+<tr>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
+</tr>
+</thead>
+<tbody>
 <tr>
   <td><code>ps001</code></td>
-  <td>Ps001</td>
+  <td>Do you have any concerns about how your child behaves?</td>
   <td>numeric</td>
-  <td>47.3%</td>
+  <td>47.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps002</code></td>
-  <td>Ps002</td>
+  <td>Does your child eat too little?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps003</code></td>
-  <td>Ps003</td>
+  <td>Does your child seem fussy or cry, and you are not able to console him/her?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps004</code></td>
-  <td>Ps004</td>
+  <td>Does your child show little interest in things around him/her?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps005</code></td>
-  <td>Ps005</td>
+  <td>Does your child sleep less than other children of the same age?</td>
   <td>numeric</td>
   <td>47.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps006</code></td>
-  <td>Ps006</td>
+  <td>Is your child irritable or fussy?</td>
   <td>numeric</td>
   <td>47.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps007</code></td>
-  <td>Ps007</td>
+  <td>Does your child have a hard time calming down even when you soothe him/her?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps008</code></td>
-  <td>Ps008</td>
+  <td>If your child gets upset, do they cry for a long time?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps009</code></td>
-  <td>Ps009</td>
+  <td>Does your child reject or turn away from affection (e.g., refuses or pulls away from hugs from well-known family members)?</td>
   <td>numeric</td>
   <td>47.6%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps010</code></td>
-  <td>Ps010</td>
+  <td>Does your child have difficulty staying asleep?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps011</code></td>
-  <td>Ps011</td>
+  <td>Does your child have difficulty falling asleep at night?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps013</code></td>
-  <td>Ps013</td>
+  <td>Does your child wake up more than two times at night and want your attentions (e.g., cries, asks for you)?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps014</code></td>
-  <td>Ps014</td>
+  <td>When upset, does your child get very still, freeze or does not move?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps015</code></td>
-  <td>Ps015</td>
+  <td>Do you have any concerns about how your child gets along with others?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps016</code></td>
-  <td>Ps016</td>
+  <td>Does your child at times isolate themself or become withdrawn?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps017</code></td>
-  <td>Ps017</td>
+  <td>Does your child have an irregular eating pattern?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps018</code></td>
-  <td>Ps018</td>
+  <td>Does your child become afraid around strangers, even when you are with him/her?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps019</code></td>
-  <td>Ps019</td>
+  <td>Does your child become extremely distressed/upset/disturbed (e.g., cries, screams) in response to loud sounds or bright lights?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps020</code></td>
-  <td>Ps020</td>
+  <td>Does your child cry or whine when he/she is made to wait for something he/she wants (e.g., toy or food)?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps022</code></td>
-  <td>Ps022</td>
+  <td>Does your child intentionally try to hurt you or other familiar adults?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps023</code></td>
-  <td>Ps023</td>
+  <td>Does your child kick, bite, or hit familiar adults?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps024</code></td>
-  <td>Ps024</td>
+  <td>Does your child kick, bite, or hit other children for no apparent reason?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps025</code></td>
-  <td>Ps025</td>
+  <td>Does your child not seem hungry when it is time to eat?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps026</code></td>
-  <td>Ps026</td>
+  <td>Does your child cry for no reason (e.g., when he/she is not hungry or not tired)?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps027</code></td>
-  <td>Ps027</td>
+  <td>Does your child have extreme changes in emotions (e.g., quickly changing from very happy to very angry) for not apparent reason?</td>
   <td>numeric</td>
   <td>47.7%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps028</code></td>
-  <td>Ps028</td>
+  <td>Does your child lose their temper?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps029</code></td>
-  <td>Ps029</td>
+  <td>Does your child show panic or fear for no reason?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps030</code></td>
-  <td>Ps030</td>
+  <td>Does your child refuse to eat foods that you think are healthy?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps031</code></td>
-  <td>Ps031</td>
+  <td>Does your child resist eating?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps032</code></td>
-  <td>Ps032</td>
+  <td>Is your child intentionally mean to other children?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps034</code></td>
-  <td>Ps034</td>
+  <td>Does your child have trouble paying attention?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps035</code></td>
-  <td>Ps035</td>
+  <td>Does your child prefer to play alone, even when other children are present?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps036</code></td>
-  <td>Ps036</td>
+  <td>Does your child act impulsively without thinking (e.g., running into the street without looking or doing other dangerous behaviors)?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps037</code></td>
-  <td>Ps037</td>
+  <td>Does your child get easily frustrated with everyday tasks?</td>
   <td>numeric</td>
   <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps038</code></td>
-  <td>Ps038</td>
+  <td>Does your child have difficulty taking turns when playing with others?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps039</code></td>
-  <td>Ps039</td>
+  <td>Does your child ignore you or seem angry with you when you do not immediately respond to him/her?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps040</code></td>
-  <td>Ps040</td>
+  <td>Does your child get worried or anxious?</td>
   <td>numeric</td>
   <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps041</code></td>
-  <td>Ps041</td>
+  <td>Does your child have difficulty getting along with other children?</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps042</code></td>
-  <td>Ps042</td>
+  <td>Does your child refuse to play with other children?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps043</code></td>
-  <td>Ps043</td>
+  <td>Does your child scream while still asleep and cannot be comforted?</td>
   <td>numeric</td>
-  <td>48.0%</td>
+  <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps044</code></td>
-  <td>Ps044</td>
+  <td>After you have been separated, does your child seem upset (e.g., angry or withdrawn) when you are reunited?</td>
   <td>numeric</td>
   <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps045</code></td>
-  <td>Ps045</td>
+  <td>Is your child intentionally cruel to animals?</td>
   <td>numeric</td>
   <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps046</code></td>
-  <td>Ps046</td>
+  <td>Is your child impatient or unwilling to wait when you ask him/her to?</td>
   <td>numeric</td>
   <td>48.0%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps047</code></td>
-  <td>Ps047</td>
+  <td>Is your child unable to sit still?</td>
   <td>numeric</td>
   <td>48.1%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps048</code></td>
-  <td>Ps048</td>
+  <td>Is your child sad or unhappy?</td>
   <td>numeric</td>
   <td>47.9%</td>
   <td>N/A</td>
 </tr>
 <tr>
   <td><code>ps049</code></td>
-  <td>Ps049</td>
+  <td>Does your child hurt himself/herself intentionally (e.g. pulling his/her hair out or banging his/her head)?</td>
   <td>numeric</td>
   <td>47.8%</td>
   <td>N/A</td>
 </tr>
+</tbody>
+</table>
+
+<h2>Socemo</h2>
+
+<p><strong>Description:</strong> No description available</p>
+
+<p><strong>Variables:</strong> 70<br />
+<strong>Average Missing:</strong> 88.9%<br />
+<strong>Data Types:</strong> 0 factors, 70 numeric, 0 logical, 0 character</p>
+
+<table>
+<thead>
 <tr>
-  <td><code>q1347</code></td>
-  <td>Q1347</td>
-  <td>numeric</td>
-  <td>50.6%</td>
-  <td>N/A</td>
+  <th>Variable</th>
+  <th>Label</th>
+  <th>Type</th>
+  <th>Missing</th>
+  <th>Details</th>
 </tr>
+</thead>
+<tbody>
 <tr>
-  <td><code>q1348</code></td>
-  <td>Q1348</td>
-  <td>character</td>
-  <td>85.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1394</code></td>
-  <td>Q1394</td>
-  <td>character</td>
-  <td>51.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1394a</code></td>
-  <td>Q1394A</td>
-  <td>character</td>
-  <td>51.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1395</code></td>
-  <td>Q1395</td>
-  <td>character</td>
-  <td>52.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1396</code></td>
-  <td>Q1396</td>
-  <td>character</td>
-  <td>52.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1397</code></td>
-  <td>Q1397</td>
-  <td>character</td>
-  <td>52.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1398</code></td>
-  <td>Q1398</td>
-  <td>character</td>
-  <td>52.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1502</code></td>
-  <td>Q1502</td>
-  <td>numeric</td>
-  <td>36.2%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1503</code></td>
-  <td>Q1503</td>
-  <td>numeric</td>
-  <td>36.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1504</code></td>
-  <td>Q1504</td>
-  <td>numeric</td>
-  <td>36.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q1505</code></td>
-  <td>Q1505</td>
-  <td>numeric</td>
-  <td>36.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___1</code></td>
-  <td>Q939   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___2</code></td>
-  <td>Q939   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___3</code></td>
-  <td>Q939   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___4</code></td>
-  <td>Q939   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___5</code></td>
-  <td>Q939   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___6</code></td>
-  <td>Q939   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___7</code></td>
-  <td>Q939   7</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q939___8</code></td>
-  <td>Q939   8</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q940</code></td>
-  <td>Q940</td>
-  <td>numeric</td>
-  <td>64.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q941</code></td>
-  <td>Q941</td>
-  <td>numeric</td>
-  <td>64.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q943</code></td>
-  <td>Q943</td>
-  <td>numeric</td>
-  <td>36.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q958</code></td>
-  <td>Q958</td>
-  <td>character</td>
-  <td>64.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___1</code></td>
-  <td>Q959   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___2</code></td>
-  <td>Q959   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___3</code></td>
-  <td>Q959   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___4</code></td>
-  <td>Q959   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___5</code></td>
-  <td>Q959   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q959___6</code></td>
-  <td>Q959   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>q960</code></td>
-  <td>Q960</td>
-  <td>numeric</td>
-  <td>39.9%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>redcap_survey_identifier</code></td>
-  <td>Redcap Survey Identifier</td>
-  <td>numeric</td>
-  <td>93.8%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sf018</code></td>
-  <td>Sf018</td>
+  <td><code>c004</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child smile?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155602&amp;doc_id_hash=e02d922a37d0c566bc68918464b6f1928dd4054e" alt="" width="400" height="206"></p></div></td>
   <td>numeric</td>
   <td>99.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>sf019</code></td>
-  <td>Sf019</td>
+  <td><code>c010</code></td>
+  <td>Does your child smile when you smile or talk with him/her?</td>
   <td>numeric</td>
   <td>99.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>sf021</code></td>
-  <td>Sf021</td>
+  <td><code>c014</code></td>
+  <td>When you are about to pick up your child, does he/she act happy or excited?</td>
   <td>numeric</td>
   <td>99.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>sf054</code></td>
-  <td>Sf054</td>
+  <td><code>c015</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child look at your face when you speak to him/her?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155595&amp;doc_id_hash=ee82ca918253f66679d4620c67e1b29112c381aa" width="400" height="222"></p></div></td>
   <td>numeric</td>
-  <td>95.1%</td>
+  <td>99.5%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>sf093</code></td>
-  <td>Sf093</td>
-  <td>numeric</td>
-  <td>96.7%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sf122</code></td>
-  <td>Sf122</td>
-  <td>numeric</td>
-  <td>91.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sf127</code></td>
-  <td>Sf127</td>
-  <td>numeric</td>
-  <td>93.6%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>source_project</code></td>
-  <td>Source Project</td>
-  <td>factor</td>
-  <td>0.0%</td>
-  <td>1 (kidsights<em>data</em>survey), 2 (kidsights<em>email</em>registration), 3 (kidsights<em>public), 4 (kidsights</em>public_birth)</td>
-</tr>
-<tr>
-  <td><code>sq001</code></td>
-  <td>Sq001</td>
-  <td>character</td>
-  <td>25.4%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___1</code></td>
-  <td>Sq002   1</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___10</code></td>
-  <td>Sq002   10</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___11</code></td>
-  <td>Sq002   11</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___12</code></td>
-  <td>Sq002   12</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___13</code></td>
-  <td>Sq002   13</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___14</code></td>
-  <td>Sq002   14</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___15</code></td>
-  <td>Sq002   15</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___16</code></td>
-  <td>Sq002   16</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___2</code></td>
-  <td>Sq002   2</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___3</code></td>
-  <td>Sq002   3</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___4</code></td>
-  <td>Sq002   4</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___5</code></td>
-  <td>Sq002   5</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___6</code></td>
-  <td>Sq002   6</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___7</code></td>
-  <td>Sq002   7</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___8</code></td>
-  <td>Sq002   8</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq002___9</code></td>
-  <td>Sq002   9</td>
-  <td>numeric</td>
-  <td>0.0%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>sq003</code></td>
-  <td>Sq003</td>
-  <td>numeric</td>
-  <td>36.3%</td>
-  <td>N/A</td>
-</tr>
-<tr>
-  <td><code>survey_stop</code></td>
-  <td>Survey Stop</td>
+  <td><code>c016</code></td>
+  <td>Does your child stop crying or calm down when you come to the room after being out of sight, or when you pick him or her up?</td>
   <td>numeric</td>
   <td>99.4%</td>
   <td>N/A</td>
 </tr>
 <tr>
-  <td><code>urban_pct</code></td>
-  <td>Percentage of ZIP population in urban areas (0-100)</td>
+  <td><code>c020</code></td>
+  <td><div class="rich-text-field-label"><p>Does your child sometimes suck his/her thumb or fingers?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155590&amp;doc_id_hash=784fa9e7d6a3a650e3e2fb955c46e6a451df1d5f" alt="" width="400" height="300"></p></div></td>
   <td>numeric</td>
-  <td>27.9%</td>
+  <td>99.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c025</code></td>
+  <td>Does your child move excitedly, kick legs, move arms or trunk, or make coo noises when a known person enters the room or speaks to them?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c031</code></td>
+  <td>If you play a game with your child, does he/she respond with interest? For example, if you play peek-a-boo, pat-a-cake, wave bye-bye, etc. does your child smile, widen their eyes, kick or move arms or vocalize?</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c032</code></td>
+  <td>Does your child smile or become excited when seeing someone familiar?</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c045</code></td>
+  <td>Is your child interested when he/she sees other children playing? Does she or he watch, smile, or look excited?</td>
+  <td>numeric</td>
+  <td>99.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c075</code></td>
+  <td>Does your child put his/her hands out to have them washed?</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c082</code></td>
+  <td>Even if your child is unable to do singing games, does he/she enjoy them and want to be a part of them?</td>
+  <td>numeric</td>
+  <td>94.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c085</code></td>
+  <td>Can your child greet people either by giving his/her hand or saying "hello"?</td>
+  <td>numeric</td>
+  <td>93.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c086</code></td>
+  <td>Does your child share with others? For example, food.</td>
+  <td>numeric</td>
+  <td>92.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c088</code></td>
+  <td>Is your child able to go poo or pee without having accidents, like wetting or soiling themselves?</td>
+  <td>numeric</td>
+  <td>61.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c094</code></td>
+  <td>Can your child break off pieces of food and feed them to him/her-self?</td>
+  <td>numeric</td>
+  <td>93.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c095</code></td>
+  <td>Does your child show independence, such as wanting to pick their own clothes, choose their own activities, or try to go outside alone?</td>
+  <td>numeric</td>
+  <td>95.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c114</code></td>
+  <td>Can your child say what he/she likes or dislikes? For example, "I like sweets."</td>
+  <td>numeric</td>
+  <td>90.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c123</code></td>
+  <td>Does your child know to keep quiet when the situation requires it? For example, at ceremonies, or when someone is asleep.</td>
+  <td>numeric</td>
+  <td>90.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c125</code></td>
+  <td>Can your child tell you when he/she is happy, angry, or sad?</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c128</code></td>
+  <td>Can your child tell you when others are happy, angry, or sad?</td>
+  <td>numeric</td>
+  <td>94.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c130</code></td>
+  <td>Does your child help out around the house with simple chores, even if he/she doesn't do them well?</td>
+  <td>numeric</td>
+  <td>97.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c134</code></td>
+  <td>Can your child go to the toilet by him/herself?</td>
+  <td>numeric</td>
+  <td>89.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>c137</code></td>
+  <td>Does your child show respect around elders?</td>
+  <td>numeric</td>
+  <td>93.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi001</code></td>
+  <td>Does the child smile when others smile at him/her?</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi005</code></td>
+  <td>Does your child react differently according to the tone of your voice? For example, smile when you say something in a happy tone.</td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi017</code></td>
+  <td>Does your child often show affection toward others? For example, hugging parents, brothers, or sisters.</td>
+  <td>numeric</td>
+  <td>99.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi019</code></td>
+  <td>Can the child indicate when he/she needs to go to the toilet?</td>
+  <td>numeric</td>
+  <td>93.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi020</code></td>
+  <td>Can your child sit or play on his/her own for at least 20 minutes?</td>
+  <td>numeric</td>
+  <td>94.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi021</code></td>
+  <td>Does the child listen to someone telling a story with interest?</td>
+  <td>numeric</td>
+  <td>97.4%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi025</code></td>
+  <td>Does the child imitate others' behaviors, such as washing hands or dishes?</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi028</code></td>
+  <td>Does your child usually follow rules and obey adults? For example, "Go there" or "Don't do that."</td>
+  <td>numeric</td>
+  <td>94.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi029</code></td>
+  <td>Can the child sit still when asked to by an adult? For example, for two minutes.</td>
+  <td>numeric</td>
+  <td>93.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi030</code></td>
+  <td>Does your child involve others in play? For example, play interactive games with other children.</td>
+  <td>numeric</td>
+  <td>96.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi031</code></td>
+  <td>When the child is upset, does he/she calm down quickly on his/her own?</td>
+  <td>numeric</td>
+  <td>95.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi036</code></td>
+  <td>Can your child concentrate on one task, such as playing with friends or eating a meal, for 20 minutes?</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi038</code></td>
+  <td>Does your child usually finish an activity he/she enjoys, such as a game or book?</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi041</code></td>
+  <td>Can your child tell you when he/she is tired or hungry?</td>
+  <td>numeric</td>
+  <td>96.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi045</code></td>
+  <td>Is your child kind to younger children? For example, speaks to them nicely and touches them gently.</td>
+  <td>numeric</td>
+  <td>94.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi046</code></td>
+  <td>Does the child greet neighbors or other people he/she knows without being told? For example, by saying hello or gesturing hello.</td>
+  <td>numeric</td>
+  <td>92.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi052</code></td>
+  <td>Does your child sometimes save things like candy or new toys for the future?</td>
+  <td>numeric</td>
+  <td>91.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>credi058</code></td>
+  <td>Does your child ask about familiar people other than parents when they are not there? For example, "Where is the neighbor?"</td>
+  <td>numeric</td>
+  <td>88.2%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi015</code></td>
+  <td>Can your child do an activity such as coloring without repeatedly asking for help or giving up too quickly?</td>
+  <td>numeric</td>
+  <td>93.6%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi015x</code></td>
+  <td>Can your child do an activity, such as coloring or playing with building blocks, without repeatedly asking for help or giving up too quickly?</td>
+  <td>numeric</td>
+  <td>88.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi016</code></td>
+  <td>Does your child ask about familiar people other than parents when they are not there? For example, "Where is Grandma?"</td>
+  <td>numeric</td>
+  <td>94.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi017</code></td>
+  <td>Does your child offer to help someone who seems to need help?</td>
+  <td>numeric</td>
+  <td>90.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>ecdi018</code></td>
+  <td>Does your child get along well with other children?</td>
+  <td>numeric</td>
+  <td>93.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom006</code></td>
+  <td>How often can your child explain things they have seen or done so that you understand?</td>
+  <td>numeric</td>
+  <td>95.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom047x</code></td>
+  <td>How often does this child show concern when they see others who are hurt or unhappy?</td>
+  <td>numeric</td>
+  <td>98.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom048x</code></td>
+  <td>Compared to other children his or her age, how much difficulty does this child have making or keeping friends?</td>
+  <td>numeric</td>
+  <td>63.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom049</code></td>
+  <td>How often does this child play well with others?</td>
+  <td>numeric</td>
+  <td>98.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom049x</code></td>
+  <td>How often does this child play well with other children?</td>
+  <td>numeric</td>
+  <td>98.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom052y</code></td>
+  <td>How often does this child lose their temper?</td>
+  <td>numeric</td>
+  <td>63.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom053</code></td>
+  <td>Can your child recognize and name emotions in themselves?</td>
+  <td>numeric</td>
+  <td>81.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom053x</code></td>
+  <td>How often can your child recognize and name their own emotions?</td>
+  <td>numeric</td>
+  <td>80.3%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom054x</code></td>
+  <td>How often does this child get easily distracted?</td>
+  <td>numeric</td>
+  <td>63.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom056x</code></td>
+  <td>How often does this child have difficulty waiting for their turn?</td>
+  <td>numeric</td>
+  <td>62.7%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom057</code></td>
+  <td>How often does your child take turns during games or fun activities?</td>
+  <td>numeric</td>
+  <td>91.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom059</code></td>
+  <td>How often does your child show concern when they see others are hurt or unhappy?</td>
+  <td>numeric</td>
+  <td>82.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom059x</code></td>
+  <td>How often does your child keep working on a task even when it is hard for them?</td>
+  <td>numeric</td>
+  <td>80.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom060y</code></td>
+  <td>How often does this child have trouble calming down?</td>
+  <td>numeric</td>
+  <td>62.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom061</code></td>
+  <td>My child bounces back easily when things do not go his/her way.</td>
+  <td>numeric</td>
+  <td>96.1%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom062y</code></td>
+  <td>How often does this child have difficulty when asked to end one activity and start a new activity?</td>
+  <td>numeric</td>
+  <td>62.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom102</code></td>
+  <td>How often does this child keep working at something until he or she is finished?</td>
+  <td>numeric</td>
+  <td>62.8%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom103</code></td>
+  <td>When this child is paying attention, how often can he or she follow instructions to complete a simple task?</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom104</code></td>
+  <td>Compared to other children their age, how often is this child able to sit still?</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom2202</code></td>
+  <td>How often can this child focus on a task you give them for at least a few minutes? For example, can this child focus on simple chores?</td>
+  <td>numeric</td>
+  <td>62.9%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>nom2208</code></td>
+  <td>How often does this child share toys or games with other children?</td>
+  <td>numeric</td>
+  <td>63.0%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf021</code></td>
+  <td><div class="rich-text-field-label"><p>If you play a game with your child, does he/she respond with interest? For example, if you play peek-a-boo, pat-a-cake, wave bye-bye, etc. does your child smile, widen his/her eyes, kick or move arms or vocalize?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&amp;id=155603&amp;doc_id_hash=99f6ddcda0c611bd8a9a0a1d5d64694c28c5ea8a" alt="" width="400" height="225"></p></div></td>
+  <td>numeric</td>
+  <td>99.5%</td>
+  <td>N/A</td>
+</tr>
+<tr>
+  <td><code>sf093</code></td>
+  <td>Does your child show independence? For example, wants to go to visit a friend's house.</td>
+  <td>numeric</td>
+  <td>96.7%</td>
   <td>N/A</td>
 </tr>
 </tbody>

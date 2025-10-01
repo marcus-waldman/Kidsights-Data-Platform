@@ -105,6 +105,144 @@ def load_variable_labels(config_path: str) -> Dict[str, str]:
         return {}
 
 
+def parse_redcap_choices(choices_string: str) -> Dict[str, str]:
+    """
+    Parse REDCap select_choices_or_calculations string into a dictionary.
+
+    Args:
+        choices_string: String in format "code1, label1 | code2, label2 | ..."
+
+    Returns:
+        Dictionary mapping codes to labels
+    """
+    if not choices_string or pd.isna(choices_string):
+        return {}
+
+    choices_dict = {}
+    try:
+        # Split on pipe character
+        choices = [choice.strip() for choice in choices_string.split('|')]
+
+        for choice in choices:
+            # Split on first comma to separate code from label
+            if ',' in choice:
+                parts = choice.split(',', 1)
+                if len(parts) == 2:
+                    code = parts[0].strip()
+                    label = parts[1].strip()
+                    choices_dict[code] = label
+    except Exception as e:
+        # If parsing fails, return empty dict
+        pass
+
+    return choices_dict
+
+
+def load_codebook_domains(codebook_path: str = "codebook/data/codebook.json") -> Dict[str, str]:
+    """
+    Load domain information from the codebook for child development items.
+
+    Args:
+        codebook_path: Path to the codebook JSON file
+
+    Returns:
+        Dictionary mapping variable names (lowercase) to their domains
+    """
+    try:
+        codebook_file = Path(codebook_path)
+        if not codebook_file.exists():
+            return {}
+
+        with open(codebook_file, 'r') as f:
+            codebook = json.load(f)
+
+        domain_mapping = {}
+
+        # Iterate through codebook items
+        for lex_id, item in codebook.get('items', {}).items():
+            # Check if item is in NE25
+            if 'NE25' in item.get('studies', []):
+                # Get kidsights domain
+                domains = item.get('domains', {})
+                kidsights_domain = domains.get('kidsights', {})
+
+                if kidsights_domain:
+                    domain_value = kidsights_domain.get('value')
+                    if domain_value:
+                        # Handle both string and list
+                        if isinstance(domain_value, list):
+                            domain_str = domain_value[0] if domain_value else None
+                        else:
+                            domain_str = domain_value
+
+                        # Get NE25 variable name (lowercase for matching)
+                        ne25_var = item.get('lexicons', {}).get('ne25')
+                        if ne25_var and domain_str:
+                            domain_mapping[ne25_var.lower()] = domain_str
+
+        return domain_mapping
+
+    except Exception as e:
+        print(f"Warning: Could not load codebook domains: {e}")
+        return {}
+
+
+def load_redcap_metadata(db_ops: DatabaseOperations) -> Dict[str, Dict[str, Any]]:
+    """
+    Load REDCap data dictionary metadata from the database.
+
+    Args:
+        db_ops: Database operations instance
+
+    Returns:
+        Dictionary mapping field names to REDCap metadata dictionaries
+    """
+    try:
+        # Check if the table exists
+        if not db_ops.table_exists("ne25_data_dictionary"):
+            return {}
+
+        # Query the dictionary table
+        query = """
+        SELECT
+            field_name,
+            field_label,
+            field_type,
+            select_choices_or_calculations,
+            field_note,
+            form_name,
+            section_header
+        FROM ne25_data_dictionary
+        """
+
+        df = db_ops.query_to_dataframe(query)
+
+        if df is None or df.empty:
+            return {}
+
+        # Convert to dictionary keyed by field_name
+        redcap_dict = {}
+        for _, row in df.iterrows():
+            field_name = row['field_name']
+            choices_str = row['select_choices_or_calculations'] if pd.notna(row['select_choices_or_calculations']) else ''
+
+            redcap_dict[field_name] = {
+                'field_label': row['field_label'] if pd.notna(row['field_label']) else '',
+                'field_type': row['field_type'] if pd.notna(row['field_type']) else '',
+                'select_choices_or_calculations': choices_str,
+                'response_options': parse_redcap_choices(choices_str),  # Parse choices into dict
+                'field_note': row['field_note'] if pd.notna(row['field_note']) else '',
+                'form_name': row['form_name'] if pd.notna(row['form_name']) else '',
+                'section_header': row['section_header'] if pd.notna(row['section_header']) else ''
+            }
+
+        return redcap_dict
+
+    except Exception as e:
+        print(f"Warning: Could not load REDCap metadata: {e}")
+        return {}
+
+
 @with_logging("analyze_variable")
 def analyze_variable(series: pd.Series, var_name: str) -> Dict[str, Any]:
     """
@@ -364,6 +502,18 @@ def categorize_variable(var_name: str) -> str:
     if var_name in ['eligible', 'authentic', 'include'] or 'cid' in var_lower:
         return 'eligibility'
 
+    # Mental health screening variables (PHQ-2, GAD-2) - Check before sex to avoid misclassification
+    if any(mh_term in var_lower for mh_term in ['phq2_', 'gad2_']):
+        return 'mental_health'
+
+    # Adverse Childhood Experiences (ACE) variables - Check before sex to avoid ace_sexual_abuse misclassification
+    if 'ace_' in var_lower or var_name.startswith('cace'):
+        return 'adverse_experiences'
+
+    # Childcare variables
+    if 'cc_' in var_lower or any(cc_term in var_lower for cc_term in ['childcare', 'child_care']):
+        return 'childcare'
+
     # Age variables
     if any(age_term in var_lower for age_term in ['age', 'years_old', 'months_old', 'days_old']):
         return 'age'
@@ -505,6 +655,22 @@ def generate_metadata_from_table(
                 }
             )
 
+        # Load REDCap metadata for enriching variable descriptions
+        logger.info("Loading REDCap data dictionary metadata...")
+        redcap_metadata = load_redcap_metadata(db_ops)
+        if redcap_metadata:
+            logger.info(f"Loaded REDCap metadata for {len(redcap_metadata)} fields")
+        else:
+            logger.info("No REDCap metadata available")
+
+        # Load codebook domains for child development items
+        logger.info("Loading codebook domain classifications...")
+        codebook_domains = load_codebook_domains()
+        if codebook_domains:
+            logger.info(f"Loaded codebook domains for {len(codebook_domains)} child development items")
+        else:
+            logger.info("No codebook domain information available")
+
         metadata_list = []
         failed_variables = []
 
@@ -531,14 +697,48 @@ def generate_metadata_from_table(
                         # Generate basic metadata
                         var_metadata = analyze_variable(df[col_name], col_name)
 
-                        # Add category and transformation notes
-                        category = categorize_variable(col_name)
-                        var_metadata["category"] = category
+                        # Add category with priority: codebook domain > simple categorization
+                        if col_name in codebook_domains:
+                            # Use codebook domain for child development items
+                            category = codebook_domains[col_name]
+                            var_metadata["category"] = category
+                            var_metadata["domain_source"] = "codebook"
+                        else:
+                            # Use simple categorization for other variables
+                            category = categorize_variable(col_name)
+                            var_metadata["category"] = category
+                            var_metadata["domain_source"] = "auto"
 
-                        # Use custom label if available, otherwise generate from variable name
-                        if col_name in variable_labels:
+                        # Set variable label with priority: REDCap > YAML config > auto-generated
+                        if col_name in redcap_metadata and redcap_metadata[col_name]['field_label']:
+                            # Use REDCap field label (original survey question)
+                            var_metadata["variable_label"] = redcap_metadata[col_name]['field_label']
+
+                            # Add REDCap field note if available
+                            if redcap_metadata[col_name]['field_note']:
+                                var_metadata["field_note"] = redcap_metadata[col_name]['field_note']
+
+                            # Add REDCap field type
+                            if redcap_metadata[col_name]['field_type']:
+                                var_metadata["redcap_field_type"] = redcap_metadata[col_name]['field_type']
+
+                            # Add form name for context
+                            if redcap_metadata[col_name]['form_name']:
+                                var_metadata["redcap_form"] = redcap_metadata[col_name]['form_name']
+
+                            # Add REDCap response options if available
+                            if redcap_metadata[col_name]['response_options']:
+                                # Store as JSON string for database compatibility
+                                var_metadata["redcap_response_options"] = json.dumps(
+                                    redcap_metadata[col_name]['response_options'],
+                                    ensure_ascii=False
+                                )
+
+                        elif col_name in variable_labels:
+                            # Use custom label from YAML config (derived variables)
                             var_metadata["variable_label"] = variable_labels[col_name]
                         else:
+                            # Auto-generate label from variable name
                             var_metadata["variable_label"] = col_name.replace('_', ' ').title()
 
                         var_metadata["transformation_notes"] = generate_transformation_notes(col_name, category)

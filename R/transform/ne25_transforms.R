@@ -137,23 +137,134 @@ value_labels <- function(lex, dict, varname = "lex_ne25") {
   return(outdf)
 }
 
-# CPI adjustment function (simplified version)
-cpi_ratio_1999 <- function(date_vector) {
-  # For simplicity, return 1.0 for now
-  # Full implementation would download CPI data from FRED
-  rep(1.0, length(date_vector))
+# CPI adjustment function - downloads CPI data from FRED and calculates 1999 adjustment ratios
+cpi_ratio_1999 <- function(date_vector, api_key_file = "C:/Users/waldmanm/my-APIs/FRED.txt") {
+  # Read FRED API key and set it for fredr
+  fred_api_key <- readLines(api_key_file, warn = FALSE)[1]
+  fredr::fredr_set_key(fred_api_key)
+
+  # Download CPI data from FRED using fredr package
+  cpi_raw <- fredr::fredr(series_id = "CPIAUCSL")
+
+  # Preprocess CPI data
+  cpi_data <- cpi_raw %>%
+    dplyr::mutate(
+      year = lubridate::year(date),
+      month = lubridate::month(date),
+      cpi = value
+    ) %>%
+    dplyr::select(month, year, cpi)
+
+  # Create lookup for 1999 CPI values by month
+  cpi_1999 <- cpi_data %>%
+    dplyr::filter(year == 1999) %>%
+    dplyr::select(month, cpi_1999 = cpi)
+
+  # Prepare input dates for matching
+  input_df <- dplyr::tibble(
+    original_date = as.Date(date_vector),
+    year = lubridate::year(original_date),
+    month = lubridate::month(original_date)
+  )
+
+  # Join CPI data
+  final_df <- input_df %>%
+    dplyr::left_join(cpi_data, by = c("month", "year")) %>%
+    dplyr::left_join(cpi_1999, by = "month") %>%
+    dplyr::mutate(ratio = cpi_1999/cpi)
+
+  # For dates where the fed has not released a CPI number, simply take the latest value
+  final_df <- final_df %>%
+    dplyr::mutate(rid = 1:dplyr::n()) %>%
+    dplyr::arrange(original_date) %>%
+    tidyr::fill(dplyr::everything(), .direction = "down") %>%
+    dplyr::arrange(rid)
+
+  # Return ratio vector
+  return(final_df$ratio)
 }
 
-# Poverty threshold function (simplified)
+# Poverty threshold function - downloads HHS poverty guidelines and returns year/family-size specific thresholds
 get_poverty_threshold <- function(dates, family_size) {
-  # Simplified poverty thresholds for 2024
-  thresholds <- c(15060, 20440, 25820, 31200, 36580, 41960, 47340, 52720)
+  # Convert to proper format
+  year_vec <- lubridate::year(dates)
+  if (any(is.na(year_vec))) {
+    message("Invalid dates supplied. Assuming median of observed dates.")
+    year_vec[is.na(year_vec)] <- stats::median(year_vec, na.rm = TRUE)
+  }
 
-  # Use family size to get threshold, default to family of 4
-  sapply(family_size, function(fs) {
-    if(is.na(fs) || fs > 8) return(31200)  # Default to family of 4
-    return(thresholds[fs])
-  })
+  # Download the Excel file to a temp location
+  url <- "https://aspe.hhs.gov/sites/default/files/documents/3edbd42a9b8de4f2a87211283e541ca4/historical-poverty-guidelines-through-2024.xlsx"
+  tmp_file <- tempfile(fileext = ".xlsx")
+  utils::download.file(url, tmp_file, mode = "wb", quiet = TRUE)
+
+  # Identify the sheet containing the 48-state nonfarm table
+  all_sheets <- readxl::excel_sheets(tmp_file)
+  target_sheet <- all_sheets[grepl("48 Contiguous States--Nonfarm", all_sheets, ignore.case = TRUE)]
+
+  # Read that sheet into a data frame
+  raw_df <- readxl::read_excel(tmp_file, sheet = target_sheet, skip = 3)
+
+  # Locate column positions for "Year" and "$ For Each Additional Person (9+)"
+  col_start <- which(names(raw_df) == "Year")
+  col_end <- which(names(raw_df) == "$ For Each Additional Person (9+)")
+
+  # Subset to only those columns
+  trimmed_df <- raw_df %>%
+    dplyr::select(col_start:col_end) %>%
+    dplyr::rename_all(tolower)
+
+  names(trimmed_df) <- stringr::str_remove_all(names(trimmed_df), "person") %>%
+    stringr::str_remove_all("s") %>%
+    stringr::str_remove_all("\\$ for") %>%
+    stringr::str_trim("both")
+
+  # Clean up temp file
+  unlink(tmp_file)
+
+  # Grab latest guidelines from HHS
+  guidelines_url <- "https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines"
+  page <- rvest::read_html(guidelines_url)
+
+  # Extract table for 48 contiguous states (latest available)
+  tables <- page %>% rvest::html_table(header = TRUE)
+  poverty_table <- tables[[1]]  # Assumes first table is relevant
+  names(poverty_table) <- tolower(as.character(poverty_table[1, c(1:2)]))
+  poverty_table <- poverty_table[-1, ] %>%
+    tidyr::pivot_wider(names_from = `persons in family/household`, values_from = `poverty guideline`) %>%
+    dplyr::mutate(year = lubridate::year(lubridate::today())) %>%
+    dplyr::relocate(year)
+  names(poverty_table) <- names(trimmed_df)
+
+  poverty_table <- poverty_table %>%
+    tidyr::pivot_longer(`1`:`each additional  (9+)`) %>%
+    dplyr::mutate(value = stringr::str_remove_all(value, "\\$") %>%
+                    stringr::str_remove_all(",") %>%
+                    stringr::str_remove_all("For families/households with more than 8 persons add") %>%
+                    stringr::str_remove_all("for each additional person.") %>%
+                    stringr::str_trim("both") %>%
+                    as.numeric()
+    ) %>%
+    tidyr::pivot_wider(names_from = name, values_from = value)
+
+  poverty_table <- poverty_table %>%
+    dplyr::bind_rows(trimmed_df) %>%
+    dplyr::rename(additional = `each additional  (9+)`) %>%
+    tidyr::pivot_longer(`1`:`8`, names_to = 'family_size', values_to = "threshold") %>%
+    dplyr::mutate(
+      additional = ifelse(family_size < 8, 0, additional),
+      family_size = as.numeric(family_size)
+    )
+
+  final_df <- data.frame(date = dates, year = year_vec, family_size = family_size) %>%
+    dplyr::mutate(
+      above9 = ifelse(family_size > 8, family_size - 8, 0),
+      family_size = ifelse(family_size > 8, 8, family_size)
+    ) %>%
+    dplyr::left_join(poverty_table, by = c("year", "family_size")) %>%
+    dplyr::mutate(threshold = threshold + additional * above9)
+
+  return(final_df$threshold)
 }
 
 # Main transformation function
@@ -798,13 +909,326 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     recodes_df <- geographic_df
   }
 
+  # Mental Health and ACE Variables
+  if(what %in% c("mental health", "ace", "phq", "gad")) {
+
+    mental_health_df <- dat %>% dplyr::select(pid, record_id)
+
+    # PHQ-2 Variables (Depression Screening)
+    if(all(c("cqfb013", "cqfb014") %in% names(dat))) {
+      mental_health_df <- mental_health_df %>%
+        dplyr::mutate(
+          phq2_interest = dat$cqfb013,
+          phq2_depressed = dat$cqfb014
+        )
+
+      # PHQ-2 Total Score (0-6)
+      mental_health_df$phq2_total <- rowSums(
+        mental_health_df[c("phq2_interest", "phq2_depressed")],
+        na.rm = FALSE
+      )
+
+      # PHQ-2 Positive Screen (>=3)
+      mental_health_df$phq2_positive <- ifelse(
+        mental_health_df$phq2_total >= 3, 1, 0
+      )
+
+      # PHQ-2 Risk Category
+      mental_health_df$phq2_risk_cat <- dplyr::case_when(
+        mental_health_df$phq2_total %in% 0:1 ~ "Minimal/None",
+        mental_health_df$phq2_total == 2 ~ "Mild",
+        mental_health_df$phq2_total %in% 3:6 ~ "Moderate/Severe",
+        TRUE ~ NA_character_
+      )
+    }
+
+    # GAD-2 Variables (Anxiety Screening)
+    if(all(c("cqfb015", "cqfb016") %in% names(dat))) {
+      mental_health_df <- mental_health_df %>%
+        dplyr::mutate(
+          gad2_nervous = dat$cqfb015,
+          gad2_worry = dat$cqfb016
+        )
+
+      # GAD-2 Total Score (0-6)
+      mental_health_df$gad2_total <- rowSums(
+        mental_health_df[c("gad2_nervous", "gad2_worry")],
+        na.rm = FALSE
+      )
+
+      # GAD-2 Positive Screen (>=3)
+      mental_health_df$gad2_positive <- ifelse(
+        mental_health_df$gad2_total >= 3, 1, 0
+      )
+
+      # GAD-2 Risk Category
+      mental_health_df$gad2_risk_cat <- dplyr::case_when(
+        mental_health_df$gad2_total %in% 0:1 ~ "Minimal/None",
+        mental_health_df$gad2_total == 2 ~ "Mild",
+        mental_health_df$gad2_total %in% 3:4 ~ "Moderate",
+        mental_health_df$gad2_total %in% 5:6 ~ "Severe",
+        TRUE ~ NA_character_
+      )
+    }
+
+    # Caregiver ACE Variables (10 items)
+    ace_vars <- paste0("cace", 1:10)
+    ace_vars_present <- ace_vars[ace_vars %in% names(dat)]
+
+    if(length(ace_vars_present) > 0) {
+      # Create renamed ACE variables
+      ace_mapping <- c(
+        "cace1" = "ace_neglect",
+        "cace2" = "ace_parent_loss",
+        "cace3" = "ace_mental_illness",
+        "cace4" = "ace_substance_use",
+        "cace5" = "ace_domestic_violence",
+        "cace6" = "ace_incarceration",
+        "cace7" = "ace_verbal_abuse",
+        "cace8" = "ace_physical_abuse",
+        "cace9" = "ace_emotional_neglect",
+        "cace10" = "ace_sexual_abuse"
+      )
+
+      for(old_name in names(ace_mapping)) {
+        if(old_name %in% names(dat)) {
+          new_name <- ace_mapping[[old_name]]
+          mental_health_df[[new_name]] <- dat[[old_name]]
+        }
+      }
+
+      # ACE Total Score (0-10)
+      ace_cols <- ace_mapping[ace_vars_present]
+      if(length(ace_cols) > 0) {
+        mental_health_df$ace_total <- rowSums(
+          mental_health_df[ace_cols],
+          na.rm = FALSE
+        )
+
+        # ACE Risk Category
+        mental_health_df$ace_risk_cat <- dplyr::case_when(
+          mental_health_df$ace_total == 0 ~ "No ACEs",
+          mental_health_df$ace_total == 1 ~ "1 ACE",
+          mental_health_df$ace_total %in% 2:3 ~ "2-3 ACEs",
+          mental_health_df$ace_total >= 4 ~ "4+ ACEs",
+          TRUE ~ NA_character_
+        )
+      }
+    }
+
+    # Convert categorical variables to factors
+    if("phq2_risk_cat" %in% names(mental_health_df)) {
+      mental_health_df$phq2_risk_cat <- factor(
+        mental_health_df$phq2_risk_cat,
+        levels = c("Minimal/None", "Mild", "Moderate/Severe")
+      )
+    }
+
+    if("gad2_risk_cat" %in% names(mental_health_df)) {
+      mental_health_df$gad2_risk_cat <- factor(
+        mental_health_df$gad2_risk_cat,
+        levels = c("Minimal/None", "Mild", "Moderate", "Severe")
+      )
+    }
+
+    if("ace_risk_cat" %in% names(mental_health_df)) {
+      mental_health_df$ace_risk_cat <- factor(
+        mental_health_df$ace_risk_cat,
+        levels = c("No ACEs", "1 ACE", "2-3 ACEs", "4+ ACEs")
+      )
+    }
+
+    recodes_df <- mental_health_df
+  }
+
+  # Childcare Variables
+  if(what %in% c("childcare", "child care", "cc")) {
+
+    childcare_df <- dat %>% dplyr::select(pid, record_id)
+
+    # Access and Difficulty Variables
+    if("mmi013" %in% names(dat)) {
+      childcare_df$cc_access_difficulty <- factor(
+        dat$mmi013,
+        levels = c(0, 1, 2, 3, 9),
+        labels = c("Did not need childcare", "Not difficult", "Somewhat difficult",
+                   "Very difficult", "Missing")
+      )
+    }
+
+    if("mmi014" %in% names(dat)) {
+      childcare_df$cc_difficulty_reason <- factor(
+        dat$mmi014,
+        levels = c(1, 2, 3, 4, 5, 6, 7, 9),
+        labels = c("Cost too high", "No openings", "Location not convenient",
+                   "Hours not suitable", "Quality not satisfactory",
+                   "Transportation difficulties", "Other", "Missing")
+      )
+    }
+
+    # Child Care Receipt and Type Variables
+    if("cqfb007x" %in% names(dat)) {
+      childcare_df$cc_receives_care <- factor(
+        dat$cqfb007x,
+        levels = c(0, 1, 9),
+        labels = c("No", "Yes", "Missing")
+      )
+    }
+
+    if("mmi000" %in% names(dat)) {
+      childcare_df$cc_primary_type <- factor(
+        dat$mmi000,
+        levels = c(1, 2, 3, 4, 5, 6, 9),
+        labels = c("Relative care", "Non-relative care", "Childcare center",
+                   "Preschool program", "Head Start/Early Head Start",
+                   "Other", "Missing")
+      )
+    }
+
+    # Cost Variables (Numeric)
+    if("mrw002" %in% names(dat)) {
+      childcare_df$cc_weekly_cost_all <- as.numeric(dat$mrw002)
+    }
+
+    if("mmi003" %in% names(dat)) {
+      childcare_df$cc_weekly_cost_primary <- as.numeric(dat$mmi003)
+    }
+
+    if("mmi003b" %in% names(dat)) {
+      childcare_df$cc_weekly_cost_total <- as.numeric(dat$mmi003b)
+    }
+
+    # Financial Support Variables
+    if("mrw003_1" %in% names(dat)) {
+      childcare_df$cc_family_support_all <- as.numeric(dat$mrw003_1)
+    }
+
+    if("mrw003_2" %in% names(dat)) {
+      childcare_df$cc_family_support_child <- as.numeric(dat$mrw003_2)
+    }
+
+    if("mmi018" %in% names(dat)) {
+      childcare_df$cc_receives_subsidy <- factor(
+        dat$mmi018,
+        levels = c(0, 1, 9),
+        labels = c("No", "Yes", "Missing")
+      )
+    }
+
+    # Impact and Quality Variables
+    if("mmi009" %in% names(dat)) {
+      childcare_df$cc_financial_hardship <- factor(
+        dat$mmi009,
+        levels = c(0, 1, 9),
+        labels = c("No", "Yes", "Missing")
+      )
+    }
+
+    if("q941" %in% names(dat)) {
+      childcare_df$cc_quality_satisfaction <- factor(
+        dat$q941,
+        levels = c(1, 2, 3, 4, 5, 9),
+        labels = c("Very dissatisfied", "Dissatisfied", "Neither",
+                   "Satisfied", "Very satisfied", "Missing")
+      )
+    }
+
+    # Hours and Schedule Variables
+    if("q958" %in% names(dat)) {
+      childcare_df$cc_hours_per_week <- as.numeric(dat$q958)
+    }
+
+    if("mmi100" %in% names(dat)) {
+      childcare_df$cc_nonstandard_hours <- factor(
+        dat$mmi100,
+        levels = c(0, 1, 9),
+        labels = c("No", "Yes", "Missing")
+      )
+    }
+
+    # Subsidy Satisfaction Variables
+    if("mmi019_1" %in% names(dat)) {
+      childcare_df$cc_subsidy_sat_process <- factor(
+        dat$mmi019_1,
+        levels = c(1, 2, 3, 4, 5, 9),
+        labels = c("Very dissatisfied", "Dissatisfied", "Neither",
+                   "Satisfied", "Very satisfied", "Missing")
+      )
+    }
+
+    if("mmi019_2" %in% names(dat)) {
+      childcare_df$cc_subsidy_sat_amount <- factor(
+        dat$mmi019_2,
+        levels = c(1, 2, 3, 4, 5, 9),
+        labels = c("Very dissatisfied", "Dissatisfied", "Neither",
+                   "Satisfied", "Very satisfied", "Missing")
+      )
+    }
+
+    if("mmi019_3" %in% names(dat)) {
+      childcare_df$cc_subsidy_sat_options <- factor(
+        dat$mmi019_3,
+        levels = c(1, 2, 3, 4, 5, 9),
+        labels = c("Very dissatisfied", "Dissatisfied", "Neither",
+                   "Satisfied", "Very satisfied", "Missing")
+      )
+    }
+
+    # Multiple Child Payment Variable
+    if("mrw001" %in% names(dat)) {
+      childcare_df$cc_pays_multiple_children <- factor(
+        dat$mrw001,
+        levels = c(0, 1, 9),
+        labels = c("No", "Yes", "Missing")
+      )
+    }
+
+    # Derived Variables
+    # Binary indicator for any formal care (center or preschool)
+    if("cc_primary_type" %in% names(childcare_df)) {
+      childcare_df$cc_formal_care <- dplyr::case_when(
+        childcare_df$cc_primary_type %in% c("Childcare center", "Preschool program", "Head Start/Early Head Start") ~
+          factor(1, levels = c(0, 1), labels = c("No", "Yes")),
+        !is.na(childcare_df$cc_primary_type) ~
+          factor(0, levels = c(0, 1), labels = c("No", "Yes")),
+        TRUE ~ NA
+      )
+    }
+
+    # Care intensity categories based on hours per week
+    if("cc_hours_per_week" %in% names(childcare_df)) {
+      childcare_df$cc_intensity <- dplyr::case_when(
+        childcare_df$cc_hours_per_week < 30 ~
+          factor(1, levels = c(1, 2, 3), labels = c("Part-time (<30 hrs)", "Full-time (30-50 hrs)", "Extended (>50 hrs)")),
+        childcare_df$cc_hours_per_week >= 30 & childcare_df$cc_hours_per_week <= 50 ~
+          factor(2, levels = c(1, 2, 3), labels = c("Part-time (<30 hrs)", "Full-time (30-50 hrs)", "Extended (>50 hrs)")),
+        childcare_df$cc_hours_per_week > 50 ~
+          factor(3, levels = c(1, 2, 3), labels = c("Part-time (<30 hrs)", "Full-time (30-50 hrs)", "Extended (>50 hrs)")),
+        TRUE ~ NA
+      )
+    }
+
+    # Binary indicator for receiving any financial support
+    if(any(c("cc_family_support_all", "cc_family_support_child", "cc_receives_subsidy") %in% names(childcare_df))) {
+      childcare_df$cc_any_support <- dplyr::case_when(
+        (!is.na(childcare_df$cc_family_support_all) & childcare_df$cc_family_support_all > 0) |
+          (!is.na(childcare_df$cc_family_support_child) & childcare_df$cc_family_support_child > 0) |
+          (childcare_df$cc_receives_subsidy == "Yes") ~
+          factor(1, levels = c(0, 1), labels = c("No", "Yes")),
+        TRUE ~ factor(0, levels = c(0, 1), labels = c("No", "Yes"))
+      )
+    }
+
+    recodes_df <- childcare_df
+  }
+
   return(recodes_df)
 }
 
 # Master transformation function that applies all transformations
 recode_it <- function(dat, dict, my_API = NULL, what = "all") {
   if(what == "all") {
-    vars <- c("include", "race", "caregiver relationship", "education", "sex", "age", "income", "geographic")
+    vars <- c("include", "race", "caregiver relationship", "education", "sex", "age", "income", "geographic", "mental health", "childcare")
   } else {
     vars <- what
   }

@@ -27,29 +27,36 @@ source("R/documentation/generate_interactive_dictionary.R")
 convert_dictionary_to_df <- function(dict_list) {
   if (length(dict_list) == 0) return(data.frame())
 
+  # Helper function to get value or default
+  get_or_default <- function(x, default = "") {
+    if (is.null(x)) return(default)
+    if (length(x) == 0) return(default)
+    return(x)
+  }
+
   # Convert list to data frame
   dict_rows <- list()
   for (field_name in names(dict_list)) {
     field_info <- dict_list[[field_name]]
     dict_rows[[field_name]] <- data.frame(
-      field_name = field_info$field_name %||% field_name,
-      form_name = field_info$form_name %||% "",
-      section_header = field_info$section_header %||% "",
-      field_type = field_info$field_type %||% "",
-      field_label = field_info$field_label %||% "",
-      select_choices_or_calculations = field_info$select_choices_or_calculations %||% "",
-      field_note = field_info$field_note %||% "",
-      text_validation_type_or_show_slider_number = field_info$text_validation_type_or_show_slider_number %||% "",
-      text_validation_min = field_info$text_validation_min %||% "",
-      text_validation_max = field_info$text_validation_max %||% "",
-      identifier = field_info$identifier %||% "",
-      branching_logic = field_info$branching_logic %||% "",
-      required_field = field_info$required_field %||% "",
-      custom_alignment = field_info$custom_alignment %||% "",
-      question_number = field_info$question_number %||% "",
-      matrix_group_name = field_info$matrix_group_name %||% "",
-      matrix_ranking = field_info$matrix_ranking %||% "",
-      field_annotation = field_info$field_annotation %||% "",
+      field_name = get_or_default(field_info$field_name, field_name),
+      form_name = get_or_default(field_info$form_name),
+      section_header = get_or_default(field_info$section_header),
+      field_type = get_or_default(field_info$field_type),
+      field_label = get_or_default(field_info$field_label),
+      select_choices_or_calculations = get_or_default(field_info$select_choices_or_calculations),
+      field_note = get_or_default(field_info$field_note),
+      text_validation_type_or_show_slider_number = get_or_default(field_info$text_validation_type_or_show_slider_number),
+      text_validation_min = get_or_default(field_info$text_validation_min),
+      text_validation_max = get_or_default(field_info$text_validation_max),
+      identifier = get_or_default(field_info$identifier),
+      branching_logic = get_or_default(field_info$branching_logic),
+      required_field = get_or_default(field_info$required_field),
+      custom_alignment = get_or_default(field_info$custom_alignment),
+      question_number = get_or_default(field_info$question_number),
+      matrix_group_name = get_or_default(field_info$matrix_group_name),
+      matrix_ranking = get_or_default(field_info$matrix_ranking),
+      field_annotation = get_or_default(field_info$field_annotation),
       stringsAsFactors = FALSE
     )
   }
