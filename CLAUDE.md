@@ -147,7 +147,7 @@ echo 'library(dplyr); cat("Success\n")' > scripts/temp/temp_script.R
 1. **Database Init:** `python pipelines/python/init_database.py --config config/sources/ne25.yaml`
 2. **Data Extraction:** R extracts from 4 REDCap projects
 3. **Raw Storage:** Python stores via Feather files
-4. **Transformations:** R applies recode_it() for 21 derived variables
+4. **Transformations:** R applies recode_it() for 99 derived variables
 5. **Final Storage:** Python stores transformed data
 6. **Metadata:** Python generates comprehensive documentation
 
@@ -216,12 +216,18 @@ success = dm.test_connection()
 
 ## Derived Variables System
 
-### 48 Derived Variables Created by recode_it()
+### 99 Derived Variables Created by recode_it()
 
 **Eligibility (3):** `eligible`, `authentic`, `include`
 **Race/Ethnicity (6):** `hisp`, `race`, `raceG`, `a1_hisp`, `a1_race`, `a1_raceG`
 **Education (12):** 8/4/6-category versions of `educ_max`, `educ_a1`, `educ_a2`, `educ_mom`
-**Geographic (27):** PUMA, County, Tract, CBSA, Urban/Rural, School/Legislative/Congressional districts, Native Lands
+**Income (6):** `income`, `inc99`, `family_size`, `federal_poverty_threshold`, `fpl`, `fplcat`, `fpl_derivation_flag`
+**Mental Health - PHQ-2 (5):** `phq2_interest`, `phq2_depressed`, `phq2_total`, `phq2_positive`, `phq2_risk_cat`
+**Mental Health - GAD-2 (5):** `gad2_nervous`, `gad2_worry`, `gad2_total`, `gad2_positive`, `gad2_risk_cat`
+**Caregiver ACEs (12):** `ace_neglect`, `ace_parent_loss`, `ace_mental_illness`, `ace_substance_use`, `ace_domestic_violence`, `ace_incarceration`, `ace_verbal_abuse`, `ace_physical_abuse`, `ace_emotional_neglect`, `ace_sexual_abuse`, `ace_total`, `ace_risk_cat`
+**Child ACEs (10):** `child_ace_parent_divorce`, `child_ace_parent_death`, `child_ace_parent_jail`, `child_ace_domestic_violence`, `child_ace_neighborhood_violence`, `child_ace_mental_illness`, `child_ace_substance_use`, `child_ace_discrimination`, `child_ace_total`, `child_ace_risk_cat`
+**Childcare (21):** Access, costs, quality, subsidies, derived indicators for formal care and intensity
+**Geographic (25):** PUMA, County, Tract, CBSA, Urban/Rural, School/Legislative/Congressional districts, Native Lands
 
 ### Configuration
 - **Variables list:** `config/derived_variables.yaml`

@@ -22,8 +22,8 @@ The Kidsights Data Platform provides automated data extraction, validation, and 
 REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Derived Variables → Python: Database Ops
      ↓                         ↓                     ↓                        ↓                    ↓
 - Project 7679             - REDCapR             - flexible_bind         - recode_it()      - Connection mgmt
-- Project 7943             - Secure tokens       - Type conversion       - 21 variables     - Error handling
-- Project 7999             - Rate limiting       - Field mapping         - 7 categories     - Chunked processing
+- Project 7943             - Secure tokens       - Type conversion       - 99 variables     - Error handling
+- Project 7999             - Rate limiting       - Field mapping         - 10 categories    - Chunked processing
 - Project 8014             - 588 raw vars        - 3,908 records         - Factor levels    - Metadata generation
                                                    ↓                        ↓                    ↓
                                           Raw Data (588 vars)    Transformed Data (609 vars)   DuckDB Storage
@@ -90,7 +90,7 @@ A successful run will:
 
 ## Derived Variables System
 
-The platform includes a sophisticated derived variables system that transforms raw REDCap data into analysis-ready variables. This system creates **21 derived variables** across 7 categories through the `recode_it()` transformation process.
+The platform includes a sophisticated derived variables system that transforms raw REDCap data into analysis-ready variables. This system creates **99 derived variables** across 10 categories through the `recode_it()` transformation process.
 
 ### Key Concepts
 
@@ -105,7 +105,7 @@ The platform includes a sophisticated derived variables system that transforms r
 - **Missing Data Handling**: Systematic treatment of missing/invalid responses
 - **Analysis Flexibility**: Multiple category structures (4, 6, 8 categories) for education
 
-### The 21 Derived Variables
+### The 99 Derived Variables
 
 #### **Inclusion & Eligibility (3 variables)**
 ```r
@@ -139,9 +139,69 @@ educ4_max, educ4_a1, educ4_a2, educ4_mom
 educ6_max, educ6_a1, educ6_a2, educ6_mom
 ```
 
+#### **Income & Poverty (7 variables)**
+```r
+income                     # Household annual income (nominal $)
+inc99                      # Income adjusted to 1999 dollars
+family_size                # Number of people in household
+federal_poverty_threshold  # FPL threshold for family size
+fpl_derivation_flag        # Flag indicating how FPL was derived
+fpl                        # Income as % of FPL
+fplcat                     # FPL categories (<100%, 100-199%, etc.)
+```
+
+#### **Mental Health Screening (10 variables)**
+```r
+# PHQ-2 (Depression Screening)
+phq2_interest, phq2_depressed, phq2_total, phq2_positive, phq2_risk_cat
+
+# GAD-2 (Anxiety Screening)
+gad2_nervous, gad2_worry, gad2_total, gad2_positive, gad2_risk_cat
+```
+
+#### **Caregiver Adverse Childhood Experiences (12 variables)**
+```r
+# Individual ACE items (caregiver's own childhood)
+ace_neglect, ace_parent_loss, ace_mental_illness, ace_substance_use,
+ace_domestic_violence, ace_incarceration, ace_verbal_abuse,
+ace_physical_abuse, ace_emotional_neglect, ace_sexual_abuse
+
+# Composite scores
+ace_total       # Total count (0-10)
+ace_risk_cat    # Risk category (No ACEs, 1 ACE, 2-3 ACEs, 4+ ACEs)
+```
+
+#### **Child Adverse Childhood Experiences (10 variables)**
+```r
+# Individual ACE items (child's experiences as reported by caregiver)
+child_ace_parent_divorce, child_ace_parent_death, child_ace_parent_jail,
+child_ace_domestic_violence, child_ace_neighborhood_violence,
+child_ace_mental_illness, child_ace_substance_use, child_ace_discrimination
+
+# Composite scores
+child_ace_total      # Total count (0-8)
+child_ace_risk_cat   # Risk category (No ACEs, 1 ACE, 2-3 ACEs, 4+ ACEs)
+```
+
+#### **Childcare Access & Support (21 variables)**
+```r
+# Access and difficulty finding childcare
+# Primary arrangement type, hours, costs
+# Quality ratings, subsidy receipt
+# Derived: formal care indicator, intensity level
+```
+
+#### **Geographic Variables (25 variables)**
+```r
+# ZIP-based geographic assignments with allocation factors
+# PUMA, County, Census Tract, CBSA, Urban/Rural
+# School Districts, State Legislative Districts, Congressional Districts
+# Native Lands (AIANNH areas)
+```
+
 ### Transformation Process
 
-The `recode_it()` function orchestrates transformations across 7 categories:
+The `recode_it()` function orchestrates transformations across 10 categories:
 
 ```r
 # Apply all transformations
@@ -150,16 +210,20 @@ transformed_data <- recode_it(raw_data, redcap_dict)
 # Or apply specific categories
 race_vars <- recode_it(raw_data, redcap_dict, what = "race")
 educ_vars <- recode_it(raw_data, redcap_dict, what = "education")
+mental_health_vars <- recode_it(raw_data, redcap_dict, what = "mental health")
 ```
 
 **Transformation Categories**:
-1. **include**: Eligibility determination from 9 CID criteria
+1. **include**: Eligibility determination from 8 CID criteria
 2. **race**: Race/ethnicity harmonization with collapsed categories
 3. **education**: Education with 3 different category structures
 4. **caregiver relationship**: Family structure variables
 5. **sex**: Child sex variables
 6. **age**: Age calculations in multiple units
-7. **income**: Income and Federal Poverty Level categories
+7. **income**: Income, CPI adjustment, and Federal Poverty Level categories with derivation flags
+8. **geographic**: 25 ZIP-based geographic assignments with allocation factors
+9. **mental health**: PHQ-2, GAD-2, caregiver ACEs, child ACEs with clinical cutoffs and risk categories
+10. **childcare**: 21 childcare access, cost, quality, and support variables
 
 ### Configuration & Documentation
 

@@ -1,6 +1,6 @@
 # NE25 Data Transformations
 
-This directory contains R functions for transforming raw REDCap data into analysis-ready variables for the NE25 study. The transformation system creates 21 derived variables across 7 categories through the `recode_it()` function.
+This directory contains R functions for transforming raw REDCap data into analysis-ready variables for the NE25 study. The transformation system creates 99 derived variables across 10 categories through the `recode_it()` function.
 
 ## Architecture Overview
 
@@ -9,7 +9,7 @@ The transformation system follows a modular design pattern:
 ```
 Raw REDCap Data → recode_it() → Category Transformations → Derived Variables
        ↓              ↓                ↓                      ↓
-   588 columns   Master function   7 transformation    21 derived variables
+   588 columns   Master function   10 transformation   99 derived variables
    3,906 records    orchestrates     categories         with labels & levels
 ```
 
@@ -278,8 +278,181 @@ fplcat                   # Factor: FPL categories ("<100% FPL", "100-199% FPL", 
 - `inc99`: "Household annual income (1999 dollars)"
 - `family_size`: "Family size (number of people in household)"
 - `federal_poverty_threshold`: "Federal poverty threshold for family size"
+- `fpl_derivation_flag`: "Flag indicating how federal poverty level was derived"
 - `fpl`: "Household income as percentage of federal poverty level"
 - `fplcat`: "Household income as percentage of federal poverty level (categories)"
+
+### 8. **Geographic Variables** (`what = "geographic"`)
+
+Creates 25 geographic variables from ZIP code using database-backed crosswalk tables.
+
+**Input Variables**:
+- `sq001`: ZIP code
+
+**Output Variables** (25):
+```r
+# PUMA (Public Use Microdata Areas)
+puma, puma_afact
+
+# County
+county, county_name, county_afact
+
+# Census Tract
+tract, tract_afact
+
+# Core-Based Statistical Areas
+cbsa, cbsa_name, cbsa_afact
+
+# Urban/Rural Classification
+urban_rural, urban_rural_afact, urban_pct
+
+# School Districts
+school_dist, school_name, school_afact
+
+# State Legislative Districts
+sldl, sldl_afact      # Lower/House
+sldu, sldu_afact      # Upper/Senate
+
+# US Congressional Districts
+congress_dist, congress_afact
+
+# Native Lands (AIANNH)
+aiannh_code, aiannh_name, aiannh_afact
+```
+
+**Key Features**:
+- **Semicolon-separated format**: Preserves multiple assignments for ZIP codes spanning multiple geographies
+- **Allocation factors**: Proportion of ZIP population in each geography
+- **Database-backed**: Queries 10 crosswalk tables (126K rows) via Python hybrid approach
+
+**Variable Labels**: See `config/derived_variables.yaml` lines 330-353
+
+### 9. **Mental Health and ACE Variables** (`what = "mental health"` or `what = "ace"`)
+
+Creates mental health screening scores and Adverse Childhood Experiences (ACE) variables for both caregivers and children.
+
+**Input Variables**:
+- PHQ-2: `cqfb013`, `cqfb014` (depression screening)
+- GAD-2: `cqfb015`, `cqfb016` (anxiety screening)
+- Caregiver ACEs: `cace1`-`cace10` (caregiver's own childhood experiences)
+- Child ACEs: `cqr017`-`cqr024` (child's experiences as reported by caregiver)
+
+**Output Variables** (32):
+
+**PHQ-2 Depression Screening (5)**:
+```r
+phq2_interest   # Numeric (0-3): Little interest/pleasure in activities
+phq2_depressed  # Numeric (0-3): Feeling down, depressed, hopeless
+phq2_total      # Numeric (0-6): Sum of two items
+phq2_positive   # Numeric (0-1): Positive screen (≥3)
+phq2_risk_cat   # Factor: Minimal/None (0-1), Mild (2), Moderate/Severe (3-6)
+```
+
+**GAD-2 Anxiety Screening (5)**:
+```r
+gad2_nervous    # Numeric (0-3): Feeling nervous, anxious, on edge
+gad2_worry      # Numeric (0-3): Unable to stop/control worrying
+gad2_total      # Numeric (0-6): Sum of two items
+gad2_positive   # Numeric (0-1): Positive screen (≥3)
+gad2_risk_cat   # Factor: Minimal/None (0-1), Mild (2), Moderate (3-4), Severe (5-6)
+```
+
+**Caregiver ACEs (12)** - Caregiver's own childhood experiences (first 18 years):
+```r
+# Individual ACE items (binary 0/1)
+ace_neglect              # Physical/emotional neglect
+ace_parent_loss          # Lost parent (divorce, death, abandonment)
+ace_mental_illness       # Lived with mentally ill/suicidal person
+ace_substance_use        # Lived with person with alcohol/drug problems
+ace_domestic_violence    # Witnessed domestic violence between parents/adults
+ace_incarceration        # Lived with someone who went to jail/prison
+ace_verbal_abuse         # Experienced verbal/emotional abuse from parent/adult
+ace_physical_abuse       # Experienced physical abuse from parent/adult
+ace_emotional_neglect    # Felt unloved or not special in family
+ace_sexual_abuse         # Experienced unwanted sexual contact
+
+# Composite scores
+ace_total       # Numeric (0-10): Total count of ACEs
+ace_risk_cat    # Factor: No ACEs, 1 ACE, 2-3 ACEs, 4+ ACEs
+```
+
+**Child ACEs (10)** - Child's adverse experiences as reported by caregiver:
+```r
+# Individual ACE items (binary 0/1)
+child_ace_parent_divorce          # Parent/guardian divorced or separated
+child_ace_parent_death            # Parent/guardian died
+child_ace_parent_jail             # Parent/guardian served time in jail
+child_ace_domestic_violence       # Saw/heard parents/adults hit each other
+child_ace_neighborhood_violence   # Victim/witnessed neighborhood violence
+child_ace_mental_illness          # Lived with mentally ill/suicidal person
+child_ace_substance_use           # Lived with person with alcohol/drug problems
+child_ace_discrimination          # Treated unfairly due to race/ethnicity
+
+# Composite scores
+child_ace_total      # Numeric (0-8): Total count of child ACEs
+child_ace_risk_cat   # Factor: No ACEs, 1 ACE, 2-3 ACEs, 4+ ACEs
+```
+
+**Clinical Cutoffs**:
+- **PHQ-2 ≥3**: Indicates likely depression, further evaluation needed
+- **GAD-2 ≥3**: Indicates likely anxiety, further evaluation needed
+- **ACE Risk**: 4+ ACEs associated with significantly elevated health risks
+
+**Reference Levels**:
+- `phq2_risk_cat`: "Minimal/None" (reference)
+- `gad2_risk_cat`: "Minimal/None" (reference)
+- `ace_risk_cat`: "No ACEs" (reference)
+- `child_ace_risk_cat`: "No ACEs" (reference)
+
+**Variable Labels**: See `config/derived_variables.yaml` lines 277-315
+
+### 10. **Childcare Variables** (`what = "childcare"`)
+
+Creates 21 variables covering childcare access, costs, quality, subsidies, and derived indicators.
+
+**Input Variables**:
+- Access: `mmi013`, `mmi014` (difficulty finding care, reasons)
+- Type: `mmi009`, `mmi010` (primary arrangement, hours)
+- Costs: `mmi011`, `mmi012`, `mmi015` (weekly costs for different arrangements)
+- Quality: `mmi016`, `mmi018` (quality ratings)
+- Subsidies: `mmi021`, `mmi020` (subsidy receipt, family support)
+
+**Output Variables** (21):
+```r
+# Access and Difficulty
+cc_access_difficulty   # Factor: Difficulty finding care (past 12 months)
+cc_difficulty_reason   # Factor: Main reason care was difficult to find
+
+# Receipt and Type
+cc_receives_care       # Factor: Child currently receives non-parental care
+cc_primary_type        # Factor: Primary childcare arrangement type
+cc_hours_per_week      # Numeric: Hours per week in primary arrangement
+
+# Costs
+cc_weekly_cost_all     # Numeric: Weekly household childcare costs (all children)
+cc_weekly_cost_primary # Numeric: Weekly cost for primary arrangement (this child)
+cc_weekly_cost_total   # Numeric: Total weekly cost for all arrangements (this child)
+
+# Quality
+cc_quality_rating      # Factor: Quality rating of primary arrangement
+cc_quality_importance  # Factor: Importance of quality in choosing care
+
+# Subsidies and Support
+cc_subsidy             # Factor: Receives childcare subsidy
+cc_family_support      # Factor: Receives financial support from family
+
+# Derived Variables
+cc_formal_care         # Factor: Uses formal care (center/preschool/Head Start)
+cc_intensity           # Factor: Care intensity (part-time/full-time/extended)
+cc_any_support         # Factor: Receives any financial support (family or subsidy)
+```
+
+**Reference Levels**:
+- `cc_receives_care`: "No" (reference)
+- `cc_formal_care`: "No" (reference)
+- `cc_any_support`: "No" (reference)
+
+**Variable Labels**: See `config/derived_variables.yaml` lines 305-330
 
 ## Helper Functions
 
@@ -370,7 +543,7 @@ transformed_data <- recode_it(
   what = "all"
 )
 
-# Result: 588 original + 21 derived = 609 total variables
+# Result: 588 original + 99 derived = 687 total variables
 message(sprintf("Transformation complete: %d variables → %d variables",
                 ncol(harmonized_data), ncol(transformed_data)))
 ```
@@ -523,7 +696,8 @@ if(what == "new_transformation") {
 ```r
 if(what == "all") {
   vars <- c("include", "race", "caregiver relationship", "education",
-           "sex", "age", "income", "new_transformation")
+           "sex", "age", "income", "geographic", "mental health", "childcare",
+           "new_transformation")
 }
 ```
 

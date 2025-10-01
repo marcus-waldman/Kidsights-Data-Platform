@@ -174,6 +174,18 @@ all_derived_variables:
   - ace_total
   - ace_risk_cat
 
+  # Child ACE Variables (child's adverse experiences as reported by caregiver)
+  - child_ace_parent_divorce
+  - child_ace_parent_death
+  - child_ace_parent_jail
+  - child_ace_domestic_violence
+  - child_ace_neighborhood_violence
+  - child_ace_mental_illness
+  - child_ace_substance_use
+  - child_ace_discrimination
+  - child_ace_total
+  - child_ace_risk_cat
+
   # Childcare Access and Difficulty
   - cc_access_difficulty
   - cc_difficulty_reason
@@ -289,6 +301,18 @@ variable_labels:
   ace_sexual_abuse: "ACE - Experienced unwanted sexual contact"
   ace_total: "ACE Total Score (0-10) - Total count of adverse childhood experiences"
   ace_risk_cat: "ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)"
+
+  # Adverse Childhood Experiences (ACE) - Child (reported by caregiver)
+  child_ace_parent_divorce: "Child ACE - Child experienced parent/guardian divorce or separation"
+  child_ace_parent_death: "Child ACE - Child experienced parent/guardian death"
+  child_ace_parent_jail: "Child ACE - Child's parent/guardian served time in jail"
+  child_ace_domestic_violence: "Child ACE - Child saw/heard parents or adults hit each other in home"
+  child_ace_neighborhood_violence: "Child ACE - Child was victim/witnessed violence in neighborhood"
+  child_ace_mental_illness: "Child ACE - Child lived with someone mentally ill, suicidal, or severely depressed"
+  child_ace_substance_use: "Child ACE - Child lived with someone with alcohol/drug problems"
+  child_ace_discrimination: "Child ACE - Child treated unfairly due to race/ethnicity"
+  child_ace_total: "Child ACE Total Score (0-8) - Total count of child's adverse childhood experiences"
+  child_ace_risk_cat: "Child ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)"
 
   # Childcare - Access and Difficulty
   cc_access_difficulty: "Difficulty finding child care (past 12 months)"

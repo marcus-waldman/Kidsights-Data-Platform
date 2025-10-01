@@ -184,8 +184,18 @@ cpi_ratio_1999 <- function(date_vector, api_key_file = "C:/Users/waldmanm/my-API
   return(final_df$ratio)
 }
 
-# Poverty threshold function - downloads HHS poverty guidelines and returns year/family-size specific thresholds
-get_poverty_threshold <- function(dates, family_size) {
+# Poverty threshold function - returns year/family-size specific federal poverty guidelines
+#
+# Data source: Colorado Department of Local Affairs Federal Poverty Level Chart
+# URL: https://dlg.colorado.gov/federal-poverty-level-chart
+# Note: HHS API (https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/api/)
+#       should be used when government servers are operational
+#
+# This function uses hardcoded poverty guidelines for 2020-2025 (48 contiguous states)
+# When HHS API is available, consider switching to API-based approach for real-time updates
+#
+# Returns: List with two elements: threshold (numeric vector) and flag (character vector)
+get_poverty_threshold <- function(dates, family_size, return_flag = FALSE) {
   # Convert to proper format
   year_vec <- lubridate::year(dates)
   if (any(is.na(year_vec))) {
@@ -193,78 +203,62 @@ get_poverty_threshold <- function(dates, family_size) {
     year_vec[is.na(year_vec)] <- stats::median(year_vec, na.rm = TRUE)
   }
 
-  # Download the Excel file to a temp location
-  url <- "https://aspe.hhs.gov/sites/default/files/documents/3edbd42a9b8de4f2a87211283e541ca4/historical-poverty-guidelines-through-2024.xlsx"
-  tmp_file <- tempfile(fileext = ".xlsx")
-  utils::download.file(url, tmp_file, mode = "wb", quiet = TRUE)
-
-  # Identify the sheet containing the 48-state nonfarm table
-  all_sheets <- readxl::excel_sheets(tmp_file)
-  target_sheet <- all_sheets[grepl("48 Contiguous States--Nonfarm", all_sheets, ignore.case = TRUE)]
-
-  # Read that sheet into a data frame
-  raw_df <- readxl::read_excel(tmp_file, sheet = target_sheet, skip = 3)
-
-  # Locate column positions for "Year" and "$ For Each Additional Person (9+)"
-  col_start <- which(names(raw_df) == "Year")
-  col_end <- which(names(raw_df) == "$ For Each Additional Person (9+)")
-
-  # Subset to only those columns
-  trimmed_df <- raw_df %>%
-    dplyr::select(col_start:col_end) %>%
-    dplyr::rename_all(tolower)
-
-  names(trimmed_df) <- stringr::str_remove_all(names(trimmed_df), "person") %>%
-    stringr::str_remove_all("s") %>%
-    stringr::str_remove_all("\\$ for") %>%
-    stringr::str_trim("both")
-
-  # Clean up temp file
-  unlink(tmp_file)
-
-  # Grab latest guidelines from HHS
-  guidelines_url <- "https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines"
-  page <- rvest::read_html(guidelines_url)
-
-  # Extract table for 48 contiguous states (latest available)
-  tables <- page %>% rvest::html_table(header = TRUE)
-  poverty_table <- tables[[1]]  # Assumes first table is relevant
-  names(poverty_table) <- tolower(as.character(poverty_table[1, c(1:2)]))
-  poverty_table <- poverty_table[-1, ] %>%
-    tidyr::pivot_wider(names_from = `persons in family/household`, values_from = `poverty guideline`) %>%
-    dplyr::mutate(year = lubridate::year(lubridate::today())) %>%
-    dplyr::relocate(year)
-  names(poverty_table) <- names(trimmed_df)
-
-  poverty_table <- poverty_table %>%
-    tidyr::pivot_longer(`1`:`each additional  (9+)`) %>%
-    dplyr::mutate(value = stringr::str_remove_all(value, "\\$") %>%
-                    stringr::str_remove_all(",") %>%
-                    stringr::str_remove_all("For families/households with more than 8 persons add") %>%
-                    stringr::str_remove_all("for each additional person.") %>%
-                    stringr::str_trim("both") %>%
-                    as.numeric()
-    ) %>%
-    tidyr::pivot_wider(names_from = name, values_from = value)
-
-  poverty_table <- poverty_table %>%
-    dplyr::bind_rows(trimmed_df) %>%
-    dplyr::rename(additional = `each additional  (9+)`) %>%
-    tidyr::pivot_longer(`1`:`8`, names_to = 'family_size', values_to = "threshold") %>%
-    dplyr::mutate(
-      additional = ifelse(family_size < 8, 0, additional),
-      family_size = as.numeric(family_size)
+  # Hardcoded federal poverty guidelines for 48 contiguous states (2020-2025)
+  # Source: https://dlg.colorado.gov/federal-poverty-level-chart and HHS Federal Register
+  poverty_guidelines <- data.frame(
+    year = rep(c(2020, 2021, 2022, 2023, 2024, 2025), each = 8),
+    family_size = rep(1:8, 6),
+    threshold = c(
+      # 2020
+      12760, 17240, 21720, 26200, 30680, 35160, 39640, 44120,
+      # 2021
+      12880, 17420, 21960, 26500, 31040, 35580, 40120, 44660,
+      # 2022
+      13590, 18310, 23030, 27750, 32470, 37190, 41910, 46630,
+      # 2023
+      14580, 19720, 24860, 30000, 35140, 40280, 45420, 50560,
+      # 2024
+      15060, 20440, 25820, 31200, 36580, 41960, 47340, 52720,
+      # 2025
+      15650, 21150, 26650, 32150, 37650, 43150, 48650, 54150
     )
+  )
 
+  # Additional person amounts (for families > 8 persons)
+  additional_amounts <- data.frame(
+    year = c(2020, 2021, 2022, 2023, 2024, 2025),
+    additional = c(4480, 4540, 4720, 5140, 5380, 5500)
+  )
+
+  # Calculate thresholds
   final_df <- data.frame(date = dates, year = year_vec, family_size = family_size) %>%
     dplyr::mutate(
       above9 = ifelse(family_size > 8, family_size - 8, 0),
-      family_size = ifelse(family_size > 8, 8, family_size)
+      family_size_lookup = ifelse(family_size > 8, 8, family_size),
+      year_available = year %in% 2020:2025,
+      year_lookup = dplyr::case_when(
+        year < 2020 ~ 2020,
+        year > 2025 ~ 2025,
+        TRUE ~ year
+      )
     ) %>%
-    dplyr::left_join(poverty_table, by = c("year", "family_size")) %>%
-    dplyr::mutate(threshold = threshold + additional * above9)
+    dplyr::left_join(poverty_guidelines, by = c("year_lookup" = "year", "family_size_lookup" = "family_size")) %>%
+    dplyr::left_join(additional_amounts, by = c("year_lookup" = "year")) %>%
+    dplyr::mutate(
+      threshold = threshold + additional * above9,
+      fpl_derivation_flag = dplyr::case_when(
+        !year_available & above9 > 0 ~ paste0("extrapolated_", year_lookup, "_family_9plus"),
+        !year_available ~ paste0("extrapolated_", year_lookup),
+        above9 > 0 ~ paste0("guideline_", year_lookup, "_family_9plus"),
+        TRUE ~ paste0("guideline_", year_lookup)
+      )
+    )
 
-  return(final_df$threshold)
+  if (return_flag) {
+    return(list(threshold = final_df$threshold, flag = final_df$fpl_derivation_flag))
+  } else {
+    return(final_df$threshold)
+  }
 }
 
 # Main transformation function
@@ -482,8 +476,18 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
           fqlive1_1 < 999 & fqlive1_2 < 999 ~ fqlive1_1 + fqlive1_2,
           fqlive1_1 < 999 & fqlive1_2 == 999 ~ fqlive1_2 + 1,
           .default = NA
-        ),
-        federal_poverty_threshold = get_poverty_threshold(dates = consent_date, family_size = family_size),
+        )
+      )
+
+    # Get poverty thresholds with derivation flags
+    poverty_results <- get_poverty_threshold(dates = income_df$consent_date,
+                                             family_size = income_df$family_size,
+                                             return_flag = TRUE)
+
+    income_df <- income_df %>%
+      dplyr::mutate(
+        federal_poverty_threshold = poverty_results$threshold,
+        fpl_derivation_flag = poverty_results$flag,
         fpl = round(100 * income / federal_poverty_threshold, 0),
         fplcat = cut(fpl, c(-Inf, 100, 200, 300, 400, Inf), labels = c("<100% FPL", "100-199% FPL", "200-299% FPL", "300-399% FPL", "400+% FPL"))
       )
@@ -1016,6 +1020,49 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       }
     }
 
+    # Child ACE Variables (8 items - child's adverse experiences as reported by caregiver)
+    child_ace_vars <- paste0("cqr0", 17:24)
+    child_ace_vars_present <- child_ace_vars[child_ace_vars %in% names(dat)]
+
+    if(length(child_ace_vars_present) > 0) {
+      # Create renamed child ACE variables
+      child_ace_mapping <- c(
+        "cqr017" = "child_ace_parent_divorce",
+        "cqr018" = "child_ace_parent_death",
+        "cqr019" = "child_ace_parent_jail",
+        "cqr020" = "child_ace_domestic_violence",
+        "cqr021" = "child_ace_neighborhood_violence",
+        "cqr022" = "child_ace_mental_illness",
+        "cqr023" = "child_ace_substance_use",
+        "cqr024" = "child_ace_discrimination"
+      )
+
+      for(old_name in names(child_ace_mapping)) {
+        if(old_name %in% names(dat)) {
+          new_name <- child_ace_mapping[[old_name]]
+          mental_health_df[[new_name]] <- dat[[old_name]]
+        }
+      }
+
+      # Child ACE Total Score (0-8)
+      child_ace_cols <- child_ace_mapping[child_ace_vars_present]
+      if(length(child_ace_cols) > 0) {
+        mental_health_df$child_ace_total <- rowSums(
+          mental_health_df[child_ace_cols],
+          na.rm = FALSE
+        )
+
+        # Child ACE Risk Category
+        mental_health_df$child_ace_risk_cat <- dplyr::case_when(
+          mental_health_df$child_ace_total == 0 ~ "No ACEs",
+          mental_health_df$child_ace_total == 1 ~ "1 ACE",
+          mental_health_df$child_ace_total %in% 2:3 ~ "2-3 ACEs",
+          mental_health_df$child_ace_total >= 4 ~ "4+ ACEs",
+          TRUE ~ NA_character_
+        )
+      }
+    }
+
     # Convert categorical variables to factors
     if("phq2_risk_cat" %in% names(mental_health_df)) {
       mental_health_df$phq2_risk_cat <- factor(
@@ -1034,6 +1081,13 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     if("ace_risk_cat" %in% names(mental_health_df)) {
       mental_health_df$ace_risk_cat <- factor(
         mental_health_df$ace_risk_cat,
+        levels = c("No ACEs", "1 ACE", "2-3 ACEs", "4+ ACEs")
+      )
+    }
+
+    if("child_ace_risk_cat" %in% names(mental_health_df)) {
+      mental_health_df$child_ace_risk_cat <- factor(
+        mental_health_df$child_ace_risk_cat,
         levels = c("No ACEs", "1 ACE", "2-3 ACEs", "4+ ACEs")
       )
     }
