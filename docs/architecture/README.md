@@ -26,7 +26,12 @@ REDCap (4 projects) → R: Extract/Transform → Feather Files → Python: Datab
 - **Apache Feather**: Perfect R factor ↔ Python category preservation
 - **Temp Directory**: `tempdir()/ne25_pipeline/*.feather`
 
+## Detailed Architecture Documentation
+
+- **[PIPELINE_OVERVIEW.md](PIPELINE_OVERVIEW.md)** - Comprehensive architecture for all 4 pipelines (NE25, ACS, NHIS, NSCH), design rationales, and integration patterns
+- **[PIPELINE_STEPS.md](PIPELINE_STEPS.md)** - Step-by-step execution instructions, timing expectations, and troubleshooting
+
 ## Related Documentation
 
 - `/docs/python/architecture.md` - Python component details
-- Main `CLAUDE.md` - Full architecture overview and development standards
+- Main `CLAUDE.md` - Quick reference guide and development standards
