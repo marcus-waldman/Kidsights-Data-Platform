@@ -937,7 +937,35 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     recodes_df <- geographic_df
   }
 
+  #---------------------------------------------------------------------------
   # Mental Health and ACE Variables
+  #
+  # COMPOSITE VARIABLES: phq2_total, gad2_total, ace_total, child_ace_total
+  #
+  # MISSING DATA POLICY:
+  # All composite scores (phq2_total, gad2_total, ace_total, child_ace_total)
+  # use na.rm = FALSE in rowSums() calculations. This conservative approach
+  # ensures that if ANY component item is missing, the total score is marked
+  # as NA rather than creating potentially misleading partial scores.
+  #
+  # Example: If someone answered phq2_interest = 0 but declined phq2_depressed
+  # (coded as NA after recode_missing()), their phq2_total will be NA, not 0.
+  # This prevents misclassification of incomplete data as low-risk.
+  #
+  # DEFENSIVE RECODING:
+  # All component variables use recode_missing() to convert sentinel values
+  # (99 = "Prefer not to answer", 9 = "Don't know") to NA before calculation.
+  # This future-proofs against REDCap survey changes even if current data has
+  # no missing codes.
+  #
+  # DOCUMENTATION:
+  # See R/transform/README.md section "Composite Variables: Complete Inventory
+  # and Missing Data Policy" for full implementation details, validation
+  # procedures, and sample size impact analysis.
+  #
+  # See CLAUDE.md section "Missing Data Handling (CRITICAL)" for project-wide
+  # missing data policy and complete composite variables inventory table.
+  #---------------------------------------------------------------------------
   if(what %in% c("mental health", "ace", "phq", "gad")) {
 
     mental_health_df <- dat %>% dplyr::select(pid, record_id)
@@ -946,8 +974,9 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     if(all(c("cqfb013", "cqfb014") %in% names(dat))) {
       mental_health_df <- mental_health_df %>%
         dplyr::mutate(
-          phq2_interest = dat$cqfb013,
-          phq2_depressed = dat$cqfb014
+          # Defensive recoding for missing values (currently none, but future-proofs the code)
+          phq2_interest = recode_missing(dat$cqfb013, missing_codes = c(99, 9)),
+          phq2_depressed = recode_missing(dat$cqfb014, missing_codes = c(99, 9))
         )
 
       # PHQ-2 Total Score (0-6)
@@ -974,8 +1003,9 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     if(all(c("cqfb015", "cqfb016") %in% names(dat))) {
       mental_health_df <- mental_health_df %>%
         dplyr::mutate(
-          gad2_nervous = dat$cqfb015,
-          gad2_worry = dat$cqfb016
+          # Defensive recoding for missing values (currently none, but future-proofs the code)
+          gad2_nervous = recode_missing(dat$cqfb015, missing_codes = c(99, 9)),
+          gad2_worry = recode_missing(dat$cqfb016, missing_codes = c(99, 9))
         )
 
       # GAD-2 Total Score (0-6)

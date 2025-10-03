@@ -363,3 +363,142 @@ transformation_categories:
   age: "Age Categories"
   income: "Income and Federal Poverty Level"
   geographic: "Geographic Identifiers"
+  mental_health: "Mental Health Screening"
+  ace: "Adverse Childhood Experiences"
+  childcare: "Childcare Variables"
+
+# Composite Variables Metadata (October 2025)
+# Variables that combine multiple component items into summary scores
+# These require special missing data handling to prevent sentinel values
+# from contaminating calculations and to prevent misleading partial scores
+#
+# Documentation:
+# - See R/transform/README.md: "Composite Variables: Complete Inventory and Missing Data Policy"
+# - See CLAUDE.md: "Missing Data Handling (CRITICAL)"
+# - See docs/fixes/composite_variables_missing_data_plan.md for implementation details
+composite_variables:
+  phq2_total:
+    is_composite: true
+    components: ["phq2_interest", "phq2_depressed"]
+    valid_range: [0, 6]
+    missing_policy: "na.rm = FALSE"
+    defensive_recoding: "c(99, 9)"
+    category: "Mental Health Screening"
+    sample_size_impact: "3,108 non-missing (63.4%), 1,792 missing (36.6%)"
+
+  gad2_total:
+    is_composite: true
+    components: ["gad2_nervous", "gad2_worry"]
+    valid_range: [0, 6]
+    missing_policy: "na.rm = FALSE"
+    defensive_recoding: "c(99, 9)"
+    category: "Mental Health Screening"
+    sample_size_impact: "3,100 non-missing (63.3%), 1,800 missing (36.7%)"
+
+  ace_total:
+    is_composite: true
+    components: ["ace_neglect", "ace_parent_loss", "ace_mental_illness", "ace_substance_use", "ace_domestic_violence", "ace_incarceration", "ace_verbal_abuse", "ace_physical_abuse", "ace_emotional_neglect", "ace_sexual_abuse"]
+    valid_range: [0, 10]
+    missing_policy: "na.rm = FALSE"
+    defensive_recoding: "c(99)"
+    category: "Adverse Childhood Experiences"
+    sample_size_impact: "2,704 non-missing (55.2%), 2,196 missing (44.8%)"
+
+  child_ace_total:
+    is_composite: true
+    components: ["child_ace_parent_divorce", "child_ace_parent_death", "child_ace_parent_jail", "child_ace_domestic_violence", "child_ace_neighborhood_violence", "child_ace_mental_illness", "child_ace_substance_use", "child_ace_discrimination"]
+    valid_range: [0, 8]
+    missing_policy: "na.rm = FALSE"
+    defensive_recoding: "c(99, 9)"
+    category: "Adverse Childhood Experiences"
+    sample_size_impact: "3,881 non-missing (99.6%), 19 missing (0.4%)"
+
+  family_size:
+    is_composite: true
+    components: ["fqlive1_1", "fqlive1_2"]
+    valid_range: [1, 99]
+    missing_policy: "conditional (< 999 check)"
+    defensive_recoding: "via < 999 check"
+    category: "Income and Poverty"
+    sample_size_impact: "Production variable"
+
+  fpl:
+    is_composite: true
+    components: ["income", "federal_poverty_threshold"]
+    valid_range: [0, null]
+    missing_policy: "NA if components NA"
+    defensive_recoding: "via family_size"
+    category: "Income and Poverty"
+    sample_size_impact: "3,773 non-missing (97.4%), 127 missing (2.6%)"
+
+  fplcat:
+    is_composite: true
+    components: ["fpl"]
+    valid_range: "5 factor levels"
+    missing_policy: "Factor NA"
+    defensive_recoding: "via fpl"
+    category: "Income and Poverty"
+    sample_size_impact: "via fpl"
+
+  years_old:
+    is_composite: true
+    components: ["age_in_days"]
+    valid_range: [0, 5]
+    missing_policy: "NA if age_in_days NA"
+    defensive_recoding: "No sentinel values"
+    category: "Age"
+    sample_size_impact: "Production variable"
+
+  months_old:
+    is_composite: true
+    components: ["years_old"]
+    valid_range: [0, 60]
+    missing_policy: "NA if years_old NA"
+    defensive_recoding: "via years_old"
+    category: "Age"
+    sample_size_impact: "via years_old"
+
+  urban_pct:
+    is_composite: true
+    components: ["urban_rural (from ZIP crosswalk)"]
+    valid_range: [0, 100]
+    missing_policy: "NA if ZIP not found"
+    defensive_recoding: "Database lookup"
+    category: "Geographic"
+    sample_size_impact: "Production variable"
+
+  cc_weekly_cost_all:
+    is_composite: true
+    components: ["mmi011 (household childcare costs)"]
+    valid_range: [0, null]
+    missing_policy: "conditional"
+    defensive_recoding: "Factor 'Missing' level"
+    category: "Childcare"
+    sample_size_impact: "Production variable"
+
+  cc_weekly_cost_primary:
+    is_composite: true
+    components: ["mmi012 (primary arrangement cost)"]
+    valid_range: [0, null]
+    missing_policy: "conditional"
+    defensive_recoding: "Factor 'Missing' level"
+    category: "Childcare"
+    sample_size_impact: "Production variable"
+
+  cc_weekly_cost_total:
+    is_composite: true
+    components: ["mmi015 (total cost for this child)"]
+    valid_range: [0, null]
+    missing_policy: "conditional"
+    defensive_recoding: "Factor 'Missing' level"
+    category: "Childcare"
+    sample_size_impact: "Production variable"
+
+  cc_any_support:
+    is_composite: true
+    components: ["cc_family_support_child", "cc_receives_subsidy"]
+    valid_range: "Binary"
+    missing_policy: "conditional"
+    defensive_recoding: "Factor 'Missing' level"
+    category: "Childcare"
+    sample_size_impact: "Production variable"

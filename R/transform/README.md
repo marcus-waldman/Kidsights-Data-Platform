@@ -601,6 +601,137 @@ dbGetQuery(conn, "
 
 **Documentation**: See `docs/fixes/missing_data_audit_2025_10.md` for complete audit and validation results.
 
+## Composite Variables: Complete Inventory and Missing Data Policy
+
+### Overview
+
+The transformation pipeline creates **14 composite variables** that combine multiple component items into summary scores. These variables require special attention to missing data handling to ensure sentinel values (99, 9, etc.) don't contaminate calculations and to prevent misleading partial scores.
+
+**Key Principles**:
+1. **Defensive Recoding**: All component variables use `recode_missing()` before transformation
+2. **Conservative Missing Policy**: All composite scores use `na.rm = FALSE` in calculations
+3. **Future-Proofing**: Defensive recoding applied even when no current sentinel values exist
+
+### Complete Composite Variables Inventory
+
+| Composite Variable | Components | Valid Range | Missing Policy | Defensive Recoding | Status |
+|-------------------|-----------|-------------|---------------|-------------------|--------|
+| **Mental Health Composites** |
+| `phq2_total` | phq2_interest + phq2_depressed | 0-6 | na.rm = FALSE | ✓ Yes (c(99, 9)) | October 2025 |
+| `gad2_total` | gad2_nervous + gad2_worry | 0-6 | na.rm = FALSE | ✓ Yes (c(99, 9)) | October 2025 |
+| **ACE Composites** |
+| `ace_total` | 10 caregiver ACE items | 0-10 | na.rm = FALSE | ✓ Yes (c(99)) | October 2025 |
+| `child_ace_total` | 8 child ACE items | 0-8 | na.rm = FALSE | ✓ Yes (c(99, 9)) | October 2025 |
+| **Income/Poverty Composites** |
+| `family_size` | fqlive1_1 + fqlive1_2 + 1 | 1-99 | conditional | ✓ Yes (via < 999 check) | Production |
+| `fpl` | income / threshold × 100 | 0-∞ | NA if components NA | Via family_size | Production |
+| `fplcat` | Factor categories from fpl | 5 categories | Factor NA | Via fpl | Production |
+| **Age Composites** |
+| `years_old` | age_in_days / 365.25 | 0-5 | NA if age_in_days NA | No sentinel values | Production |
+| `months_old` | years_old × 12 | 0-60 | NA if years_old NA | Via years_old | Production |
+| **Geographic Composites** |
+| `urban_pct` | % urban from crosswalk | 0-100 | NA if ZIP not found | Database lookup | Production |
+| **Childcare Composites** |
+| `cc_weekly_cost_all` | Sum of all childcare costs | 0-∞ | conditional | Factor "Missing" level | Production |
+| `cc_weekly_cost_primary` | Primary arrangement cost | 0-∞ | conditional | Factor "Missing" level | Production |
+| `cc_weekly_cost_total` | Total for this child | 0-∞ | conditional | Factor "Missing" level | Production |
+| `cc_any_support` | family_support OR subsidy | Binary | conditional | Factor "Missing" level | Production |
+
+### Conservative Missing Data Approach
+
+All composite scores use **`na.rm = FALSE`** to preserve data quality:
+
+```r
+# Example: ACE total score calculation
+ace_total <- rowSums(
+  mental_health_df[ace_cols],
+  na.rm = FALSE  # If ANY component is NA, total is NA
+)
+```
+
+**Rationale**:
+- **Prevents misleading partial scores**: If someone answered 2 ACE items (both "No") but declined 8 items, their `ace_total` should be NA, not 0
+- **Maintains statistical validity**: Composite scores with missing components cannot be interpreted correctly
+- **Conservative by design**: Marks incomplete data as missing rather than creating potentially incorrect scores
+
+**Impact on Sample Size**: This approach reduces available sample size for composite variables but ensures data quality:
+
+| Variable | Non-Missing | Missing | Missing % | Reason |
+|----------|-------------|---------|-----------|--------|
+| `phq2_total` | 3,108 | 1,792 | 36.6% | Any component missing |
+| `gad2_total` | 3,100 | 1,800 | 36.7% | Any component missing |
+| `ace_total` | 2,704 | 2,196 | 44.8% | "Prefer not to answer" responses |
+| `child_ace_total` | 3,881 | 19 | 0.4% | Asked to all; minimal refusal |
+| `fpl` | 3,773 | 127 | 2.6% | Income or family size missing |
+
+### Defensive Recoding Implementation
+
+**Mental Health Variables** (PHQ-2, GAD-2):
+```r
+# Lines 949-951 in ne25_transforms.R
+phq2_interest = recode_missing(dat$cqfb013, missing_codes = c(99, 9)),
+phq2_depressed = recode_missing(dat$cqfb014, missing_codes = c(99, 9))
+
+# Lines 978-980 in ne25_transforms.R
+gad2_nervous = recode_missing(dat$cqfb015, missing_codes = c(99, 9)),
+gad2_worry = recode_missing(dat$cqfb016, missing_codes = c(99, 9))
+```
+
+**ACE Variables** (Caregiver and Child):
+```r
+# Caregiver ACEs: Lines ~1026-1038
+ace_neglect = recode_missing(dat$cace1, missing_codes = c(99)),
+ace_parent_loss = recode_missing(dat$cace2, missing_codes = c(99)),
+# ... (10 total)
+
+# Child ACEs: Lines ~1070-1085
+child_ace_parent_divorce = recode_missing(dat$cqr017, missing_codes = c(99, 9)),
+child_ace_parent_death = recode_missing(dat$cqr018, missing_codes = c(99, 9)),
+# ... (8 total)
+```
+
+**Income Variables** (Conditional Logic):
+```r
+# Lines ~499-514
+family_size = ifelse(
+  dat$fqlive1_1 < 999 & dat$fqlive1_2 < 999,
+  dat$fqlive1_1 + dat$fqlive1_2 + 1,
+  NA
+)
+
+fpl = ifelse(
+  !is.na(income_df$income) & !is.na(income_df$family_size),
+  (income_df$income / income_df$federal_poverty_threshold) * 100,
+  NA
+)
+```
+
+### Validation Checklist for Composite Variables
+
+When adding or modifying composite variables:
+
+- [ ] Check REDCap data dictionary for missing value codes
+- [ ] Apply `recode_missing()` to all component variables before calculation
+- [ ] Use `na.rm = FALSE` in `rowSums()` for composite scores
+- [ ] Test with sample data containing sentinel values (99, 9, etc.)
+- [ ] Verify no sentinel values persist in transformed data:
+  ```r
+  # Should return 0 records
+  transformed_data %>%
+    filter(composite_var > max_valid_value) %>%
+    nrow()
+  ```
+- [ ] Check missing data counts are reasonable
+- [ ] Document missing data patterns in validation report
+- [ ] Update this inventory table with new composite variable details
+
+### Related Documentation
+
+- **Missing Data Audit**: `docs/fixes/missing_data_audit_2025_10.md` - Complete audit identifying ACE sentinel value issue
+- **Implementation Plan**: `docs/fixes/composite_variables_missing_data_plan.md` - 5-phase defensive recoding implementation
+- **Validation Scripts**: `scripts/temp/validate_composite_variables.py` - Automated validation queries
+- **Main Documentation**: `CLAUDE.md` - Project-wide missing data handling guidelines
+
 ## Helper Functions
 
 ### `value_labels(lex, dict, varname = "lex_ne25")`

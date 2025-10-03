@@ -456,6 +456,68 @@ for(old_name in names(variable_mapping)) {
 - [ ] Documented missing data patterns and sample size impact
 - [ ] Updated composite variables inventory table if adding new composite variables
 
+### Creating New Composite Variables (Checklist)
+
+**When adding a new composite variable to the NE25 pipeline, follow this checklist to ensure proper missing data handling and documentation:**
+
+**1. Implementation (R/transform/ne25_transforms.R)**
+- [ ] Apply `recode_missing()` to ALL component variables before calculation
+- [ ] Use `na.rm = FALSE` in `rowSums()` or aggregation functions
+- [ ] Document valid range in code comments (e.g., "0-10 for ACE total")
+- [ ] Add descriptive variable label using `labelled::var_label()`
+- [ ] Test with sample data containing sentinel values (99, 9, etc.)
+
+**2. Validation**
+- [ ] Create validation query to check for values outside valid range
+- [ ] Verify no sentinel values (99, 9, -99, 999) persist in transformed data
+- [ ] Run automated validation script: `python scripts/validation/validate_composite_variables.py`
+- [ ] Document missing data patterns and sample size impact
+
+**3. Documentation Updates (Required for ALL new composites)**
+- [ ] Add variable to `config/derived_variables.yaml` composite_variables section with:
+  - `is_composite: true`
+  - `components: [list of source variables]`
+  - `valid_range: [min, max]`
+  - `missing_policy: "na.rm = FALSE"` (or describe custom logic)
+  - `defensive_recoding: "c(99, 9)"` (or specify codes)
+  - `category: "Mental Health"` (or appropriate category)
+  - `sample_size_impact: "stats or 'Production variable'"`
+- [ ] Add variable to composite inventory table in `R/transform/README.md` (lines 617-638)
+- [ ] Add variable to composite inventory table in `CLAUDE.md` (lines 424-437)
+- [ ] Update derived variable count in documentation (currently 99 → 100+)
+
+**4. Template Available**
+- See `R/transform/composite_variable_template.R` for complete example code
+- Includes defensive recoding pattern, calculation, validation, and documentation
+
+**Example: Adding a new 3-item scale "xyz_total"**
+```r
+# Step 1: Defensive recoding
+xyz_df <- dat %>%
+  dplyr::mutate(
+    xyz_item1 = recode_missing(dat$rawvar1, missing_codes = c(99, 9)),
+    xyz_item2 = recode_missing(dat$rawvar2, missing_codes = c(99, 9)),
+    xyz_item3 = recode_missing(dat$rawvar3, missing_codes = c(99, 9))
+  )
+
+# Step 2: Calculate composite (na.rm = FALSE)
+xyz_df$xyz_total <- rowSums(
+  xyz_df[c("xyz_item1", "xyz_item2", "xyz_item3")],
+  na.rm = FALSE  # Conservative: ANY missing component → NA total
+)
+
+# Step 3: Validation query (Python/DuckDB)
+# SELECT COUNT(*) FROM ne25_transformed WHERE xyz_total > 9  -- Should be 0
+# SELECT COUNT(*) - COUNT(xyz_total) as missing FROM ne25_transformed
+
+# Step 4: Update all 3 documentation files with new variable details
+```
+
+**Critical Reminders:**
+- ⚠️ **NEVER** use `na.rm = TRUE` for composite scores (creates misleading partial scores)
+- ⚠️ **ALWAYS** apply `recode_missing()` before calculation (prevents sentinel value contamination)
+- ⚠️ **ALWAYS** update all 3 documentation locations (README.md, CLAUDE.md, YAML)
+
 ### File Naming
 - R files: `snake_case.R`
 - Config files: `kebab-case.yaml`
