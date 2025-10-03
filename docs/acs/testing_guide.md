@@ -3,7 +3,7 @@
 **Purpose**: Guide for testing and validating the ACS pipeline to ensure correctness and reliability.
 
 **Version**: 1.0.0
-**Last Updated**: 2025-09-30
+**Last Updated**: 2025-10-03
 
 ---
 
@@ -13,6 +13,7 @@
 - [Test 1: API Connection](#test-1-api-connection)
 - [Test 2: End-to-End Pipeline](#test-2-end-to-end-pipeline)
 - [Test 3: Web UI Comparison](#test-3-web-ui-comparison)
+- [Test 4: Metadata Validation](#test-4-metadata-validation)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -341,6 +342,221 @@ all.equal(api_educ_mom, web_educ_mom)
 **Missing metadata columns**: API may add `state`, `year_range` columns - filter these out for comparison
 
 **Different missing value codes**: IPUMS sometimes uses different NA representations - verify coding
+
+---
+
+## Test 4: Metadata Validation
+
+### Purpose
+
+Verify that DDI metadata is correctly parsed, loaded into DuckDB, and accessible via Python and R utilities.
+
+### Prerequisites
+
+- ACS data extracted for at least one state (Nebraska or Minnesota)
+- Metadata tables populated in DuckDB
+
+### Python Metadata Tests
+
+#### Test 4.1: Verify Metadata Tables
+
+```python
+from python.db.connection import DatabaseManager
+
+db = DatabaseManager()
+
+with db.get_connection() as conn:
+    # Check acs_variables table
+    var_count = conn.execute("SELECT COUNT(*) FROM acs_variables").fetchone()[0]
+    print(f"✓ Variables: {var_count}")
+    # Expected: 42
+
+    # Check acs_value_labels table
+    label_count = conn.execute("SELECT COUNT(*) FROM acs_value_labels").fetchone()[0]
+    print(f"✓ Value Labels: {label_count}")
+    # Expected: 1,144
+
+    # Check acs_metadata_registry table
+    ddi_count = conn.execute("SELECT COUNT(*) FROM acs_metadata_registry").fetchone()[0]
+    print(f"✓ DDI Files: {ddi_count}")
+    # Expected: 2 (Nebraska + Minnesota)
+
+    # Check variable types
+    types = conn.execute("SELECT type, COUNT(*) FROM acs_variables GROUP BY type").df()
+    print("\n✓ Variables by Type:")
+    print(types)
+    # Expected: categorical=28, continuous=9, identifier=5
+```
+
+#### Test 4.2: Value Decoding
+
+```python
+from python.acs.metadata_utils import decode_value
+
+# Test state decoding
+assert decode_value('STATEFIP', 27, db) == "Minnesota"
+assert decode_value('STATEFIP', 31, db) == "Nebraska"
+print("✓ State decoding works")
+
+# Test sex decoding
+assert decode_value('SEX', 1, db) == "Male"
+assert decode_value('SEX', 2, db) == "Female"
+print("✓ Sex decoding works")
+
+# Test age decoding
+assert decode_value('AGE', 0, db) == "Under 1 year"
+assert decode_value('AGE', 5, db) == "5"
+print("✓ Age decoding works")
+```
+
+#### Test 4.3: DataFrame Decoding
+
+```python
+import pandas as pd
+from python.acs.metadata_utils import decode_dataframe
+
+# Create test DataFrame
+test_df = pd.DataFrame({
+    'STATEFIP': [27, 31, 27],
+    'SEX': [1, 2, 1],
+    'AGE': [0, 3, 5]
+})
+
+# Decode
+decoded = decode_dataframe(test_df, ['STATEFIP', 'SEX', 'AGE'], db)
+
+# Verify new columns exist
+assert 'STATEFIP_label' in decoded.columns
+assert 'SEX_label' in decoded.columns
+assert 'AGE_label' in decoded.columns
+print("✓ DataFrame decoding creates label columns")
+
+# Verify values
+assert decoded['STATEFIP_label'].iloc[0] == "Minnesota"
+assert decoded['SEX_label'].iloc[1] == "Female"
+print("✓ DataFrame decoding values correct")
+```
+
+#### Test 4.4: Variable Search
+
+```python
+from python.acs.metadata_utils import search_variables
+
+# Search for education variables
+educ_vars = search_variables('education', db)
+assert len(educ_vars) >= 2  # Should find EDUC, EDUCD
+print(f"✓ Found {len(educ_vars)} education variables")
+
+# Search for income variables
+income_vars = search_variables('income', db)
+assert len(income_vars) >= 3  # Should find HHINCOME, FTOTINC, etc.
+print(f"✓ Found {len(income_vars)} income variables")
+```
+
+### R Metadata Tests
+
+#### Test 4.5: R Metadata Access
+
+```r
+source("R/utils/acs/acs_metadata.R")
+
+# Test variable info
+var_info <- acs_get_variable_info("STATEFIP")
+stopifnot(var_info$type == "categorical")
+cat("✓ R variable info works\n")
+
+# Test value decoding
+state <- acs_decode_value("STATEFIP", 31)
+stopifnot(state == "Nebraska")
+cat("✓ R value decoding works\n")
+
+# Test DataFrame decoding
+test_df <- data.frame(
+  STATEFIP = c(27, 31, 27),
+  SEX = c(1, 2, 1)
+)
+decoded_df <- acs_decode_column(test_df, "STATEFIP")
+decoded_df <- acs_decode_column(decoded_df, "SEX")
+stopifnot("STATEFIP_label" %in% names(decoded_df))
+stopifnot(decoded_df$STATEFIP_label[1] == "Minnesota")
+cat("✓ R DataFrame decoding works\n")
+
+# Test variable search
+educ_vars <- acs_search_variables("education")
+stopifnot(nrow(educ_vars) >= 2)
+cat("✓ R variable search works (found", nrow(educ_vars), "education variables)\n")
+
+# Test type checking
+stopifnot(acs_is_categorical("STATEFIP") == TRUE)
+stopifnot(acs_is_categorical("PERWT") == FALSE)
+cat("✓ R type checking works\n")
+```
+
+### Expected Output
+
+**Successful Test Run:**
+```
+✓ Variables: 42
+✓ Value Labels: 1144
+✓ DDI Files: 2
+
+✓ Variables by Type:
+        type  count
+0  categorical     28
+1  continuous       9
+2  identifier       5
+
+✓ State decoding works
+✓ Sex decoding works
+✓ Age decoding works
+✓ DataFrame decoding creates label columns
+✓ DataFrame decoding values correct
+✓ Found 2 education variables
+✓ Found 4 income variables
+
+✓ R variable info works
+✓ R value decoding works
+✓ R DataFrame decoding works
+✓ R variable search works (found 2 education variables)
+✓ R type checking works
+
+[TEST PASSED] All metadata validation tests passed
+```
+
+### Common Issues
+
+#### Metadata Tables Empty
+
+**Problem**: Variable count is 0
+
+**Solution**:
+```bash
+# Load metadata manually
+python pipelines/python/acs/load_acs_metadata.py --load-all
+```
+
+#### Decoding Returns Original Value
+
+**Problem**: `decode_value('STATEFIP', 31)` returns `"31"` instead of `"Nebraska"`
+
+**Cause**: No value labels found for variable
+
+**Check**:
+```python
+from python.acs.metadata_utils import get_value_labels
+labels = get_value_labels('STATEFIP', db)
+print(f"Found {len(labels)} labels")
+```
+
+#### R Function Not Found
+
+**Problem**: `Error: object 'acs_decode_value' not found`
+
+**Solution**:
+```r
+# Source metadata functions
+source("R/utils/acs/acs_metadata.R")
+```
 
 ---
 

@@ -4,6 +4,11 @@
 
 **Important**: This document describes **raw IPUMS variables only**. No harmonization or recoding is applied. All variables use original IPUMS coding schemes.
 
+**Metadata Utilities Available**: This reference documents raw IPUMS codes. For decoding codes to human-readable labels, querying variable metadata, and harmonizing to NE25 categories, see:
+- **[Metadata Query Cookbook](metadata_query_cookbook.md)** - Python/R examples for decoding values and querying metadata
+- **[Transformation Mappings](transformation_mappings.md)** - IPUMS → NE25 category harmonization
+- **[Data Dictionary](data_dictionary.html)** - Auto-generated comprehensive variable reference
+
 ---
 
 ## Table of Contents

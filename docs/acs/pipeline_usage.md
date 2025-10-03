@@ -3,7 +3,7 @@
 **Purpose**: Complete guide to using the ACS data extraction and processing pipeline for statistical raking.
 
 **Version**: 1.0.0
-**Last Updated**: 2025-09-30
+**Last Updated**: 2025-10-03
 
 ---
 
@@ -605,6 +605,192 @@ Elapsed Time: 3.45 seconds
 ✓ INSERTION COMPLETE
 ====================================================================
 ```
+
+---
+
+## Querying Metadata
+
+The ACS pipeline includes a comprehensive metadata system that provides variable definitions, value labels, and harmonization tools. Metadata is automatically loaded during extraction (Step 4.6) and stored in DuckDB.
+
+### Metadata Tables
+
+**Database Tables:**
+- `acs_variables` - Variable definitions (42 variables: 28 categorical, 9 continuous, 5 identifier)
+- `acs_value_labels` - Value-to-label mappings (1,144 labels)
+- `acs_metadata_registry` - DDI files processed (2 files)
+
+### Python Metadata Queries
+
+**Import utilities:**
+```python
+from python.db.connection import DatabaseManager
+from python.acs.metadata_utils import (
+    get_variable_info,
+    decode_value,
+    decode_dataframe,
+    search_variables,
+    is_categorical
+)
+```
+
+**Get variable information:**
+```python
+db = DatabaseManager()
+
+# Get metadata for a variable
+var_info = get_variable_info('STATEFIP', db)
+print(f"Label: {var_info['label']}")
+print(f"Type: {var_info['type']}")
+# Label: State (FIPS code)
+# Type: categorical
+```
+
+**Decode single values:**
+```python
+# Decode state codes
+state = decode_value('STATEFIP', 31, db)  # "Nebraska"
+sex = decode_value('SEX', 1, db)          # "Male"
+```
+
+**Decode DataFrame columns:**
+```python
+import duckdb
+
+# Load data
+conn = duckdb.connect("data/duckdb/kidsights_local.duckdb")
+df = conn.execute("SELECT * FROM acs_raw WHERE state = 'nebraska' LIMIT 100").df()
+
+# Decode multiple columns
+df_decoded = decode_dataframe(df, ['STATEFIP', 'SEX', 'RACE'], db)
+
+# Result has new columns: STATEFIP_label, SEX_label, RACE_label
+print(df_decoded[['STATEFIP', 'STATEFIP_label', 'SEX', 'SEX_label']].head())
+```
+
+**Search variables:**
+```python
+# Search for education variables
+educ_vars = search_variables('education', db)
+for var in educ_vars[:5]:
+    print(f"{var['variable_name']}: {var['label']}")
+```
+
+**Check variable types:**
+```python
+print(is_categorical('STATEFIP', db))  # True
+print(is_categorical('PERWT', db))     # False
+```
+
+### R Metadata Queries
+
+**Source metadata functions:**
+```r
+source("R/utils/acs/acs_metadata.R")
+```
+
+**Get variable information:**
+```r
+var_info <- acs_get_variable_info("STATEFIP")
+cat("Label:", var_info$label, "\n")
+cat("Type:", var_info$type, "\n")
+# Label: State (FIPS code)
+# Type: categorical
+```
+
+**Decode single values:**
+```r
+state <- acs_decode_value("STATEFIP", 31)  # "Nebraska"
+sex <- acs_decode_value("SEX", 1)          # "Male"
+```
+
+**Decode DataFrame columns:**
+```r
+library(duckdb)
+
+# Load data
+conn <- dbConnect(duckdb::duckdb(), "data/duckdb/kidsights_local.duckdb", read_only = TRUE)
+df <- dbGetQuery(conn, "SELECT * FROM acs_raw WHERE state = 'nebraska' LIMIT 100")
+dbDisconnect(conn)
+
+# Decode columns
+df <- acs_decode_column(df, "STATEFIP")
+df <- acs_decode_column(df, "SEX")
+df <- acs_decode_column(df, "RACE")
+
+# Result has new columns: STATEFIP_label, SEX_label, RACE_label
+print(head(df[, c("STATEFIP", "STATEFIP_label", "SEX", "SEX_label")]))
+```
+
+**Search variables:**
+```r
+# Search for education variables
+educ_vars <- acs_search_variables("education")
+print(head(educ_vars[, c("variable_name", "label")], 5))
+```
+
+**Check variable types:**
+```r
+cat("STATEFIP is categorical:", acs_is_categorical("STATEFIP"), "\n")  # TRUE
+cat("PERWT is categorical:", acs_is_categorical("PERWT"), "\n")        # FALSE
+```
+
+### Harmonization Examples
+
+**Harmonize race/ethnicity to NE25 categories:**
+```python
+from python.acs.harmonization import harmonize_race_ethnicity
+
+# Load Nebraska data
+with db.get_connection() as conn:
+    df = conn.execute("SELECT * FROM acs_raw WHERE state = 'nebraska'").df()
+
+# Harmonize (Hispanic overrides race)
+df['ne25_race'] = harmonize_race_ethnicity(df, 'RACE', 'HISPAN', db)
+
+# Check distribution
+print(df['ne25_race'].value_counts())
+# White
+# Hispanic
+# Black
+# Asian/Pacific Islander
+# American Indian/Alaska Native
+# Multiracial
+# Other
+```
+
+**Harmonize education:**
+```python
+from python.acs.harmonization import harmonize_education
+
+# 8-category version (detailed)
+df['ne25_educ8'] = harmonize_education(df, 'EDUC', db, categories=8)
+
+# 4-category version (collapsed)
+df['ne25_educ4'] = harmonize_education(df, 'EDUC', db, categories=4)
+```
+
+**Calculate Federal Poverty Level:**
+```python
+from python.acs.harmonization import harmonize_income_to_fpl
+import pandas as pd
+
+# Calculate FPL percentage
+df['fpl_percent'] = harmonize_income_to_fpl(df, 'FTOTINC', 'FAMSIZE', year=2023)
+
+# Categorize into FPL bands
+df['fpl_category'] = pd.cut(
+    df['fpl_percent'],
+    bins=[0, 100, 200, 400, float('inf')],
+    labels=['<100%', '100-199%', '200-399%', '400%+']
+)
+```
+
+### Additional Resources
+
+For comprehensive metadata examples, see:
+- **[Metadata Query Cookbook](metadata_query_cookbook.md)** - Full examples in Python and R
+- **[Transformation Mappings](transformation_mappings.md)** - IPUMS → NE25 category mappings
+- **[Data Dictionary](data_dictionary.html)** - Auto-generated variable reference
 
 ---
 
@@ -1222,5 +1408,5 @@ print(df)
 
 **For variable definitions and IPUMS coding**, see [ipums_variables_reference.md](ipums_variables_reference.md)
 
-**Last Updated**: 2025-09-30
+**Last Updated**: 2025-10-03
 **Pipeline Version**: 1.0.0
