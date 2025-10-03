@@ -1,0 +1,86 @@
+# NHIS Sample Code Reference
+#
+# Maps calendar years to IPUMS NHIS sample codes
+# IPUMS uses "ih####" format for NHIS annual samples
+#
+# USAGE:
+#   This reference file documents sample codes for NHIS extracts
+#   Use these codes in the "samples" list of year-specific config files
+#
+# NOTES:
+#   - NHIS conducts continuous surveying throughout the year
+#   - Sample codes represent annual data collections
+#   - Variable availability may vary by year
+#   - Verify data availability at https://nhis.ipums.org/
+
+# Sample code mappings (year: sample_code)
+samples:
+  2024: ih2024
+  2023: ih2023
+  2022: ih2022
+  2021: ih2021
+  2020: ih2020
+  2019: ih2019
+  2018: ih2018
+  2017: ih2017
+  2016: ih2016
+  2015: ih2015
+  2014: ih2014
+  2013: ih2013
+  2012: ih2012
+  2011: ih2011
+  2010: ih2010
+
+# Sample characteristics
+characteristics:
+  sample_type: "Annual cross-sectional"
+  survey_mode: "Continuous (year-round)"
+  target_population: "Civilian non-institutionalized U.S. population"
+  typical_sample_size: "~30,000-50,000 completed interviews per year"
+
+# Variable availability notes
+variable_availability:
+  gad7_phq8:
+    description: "GAD-7 anxiety and PHQ-8 depression scales"
+    available_years: [2019, 2022]
+    note: "Not administered in all years. Verify for 2023-2024."
+
+  aces:
+    description: "Adverse Childhood Experiences (ACEs) variables"
+    available_years: [2019, 2020, 2021, 2022]
+    note: "Expanded ACE module introduced in 2019"
+
+  parent_characteristics:
+    description: "Parent relationship and demographic variables"
+    available_years: "All years"
+    note: "Available for sample children with parent present"
+
+  weights:
+    sampweight: "Primary weight for all persons (use for most analyses)"
+    longweight: "Longitudinal weight (2020 only, for multi-year analysis)"
+    partwt: "Partial year weight (2020 only, for pandemic analysis)"
+
+# Processing notes
+processing_notes:
+  data_format: "Fixed-width (.dat files)"
+  ddi_codebook: "Required for parsing (provided by IPUMS)"
+  recommended_software: "ipumspy (Python), ipumsr (R)"
+  expected_processing_time:
+    single_year: "5-15 minutes"
+    six_years: "30-45 minutes"
+  cache_benefit: "~10 seconds retrieval vs 30-45 min fresh extraction"
+
+# IPUMS resources
+resources:
+  website: "https://nhis.ipums.org/"
+  sample_descriptions: "https://nhis.ipums.org/nhis-action/samples"
+  variable_availability: "https://nhis.ipums.org/nhis-action/variables/group"
+  user_forum: "https://forum.ipums.org/"
+  technical_documentation: "https://nhis.ipums.org/nhis/documentation.shtml"
+
+# Citation
+citation: >
+  Minnesota Population Center and State Health Access Data Assistance Center.
+  Integrated Health Interview Series: Version 7.3 [dataset].
+  Minneapolis, MN: IPUMS, 2024.
+  https://doi.org/10.18128/D070.V7.3

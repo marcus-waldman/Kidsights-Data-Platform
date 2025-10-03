@@ -2,10 +2,11 @@
 
 ## Quick Start
 
-The Kidsights Data Platform is a multi-source ETL system for childhood development research with two primary pipelines:
+The Kidsights Data Platform is a multi-source ETL system for childhood development research with three primary pipelines:
 
 1. **NE25 Pipeline**: REDCap survey data processing (Nebraska 2025 study)
 2. **ACS Pipeline**: IPUMS USA census data extraction for statistical raking
+3. **NHIS Pipeline**: IPUMS Health Surveys data extraction for national benchmarking
 
 **Run NE25 Pipeline:**
 ```bash
@@ -23,6 +24,18 @@ python pipelines/python/acs/extract_acs_data.py --state nebraska --year-range 20
 
 # Insert into database
 python pipelines/python/acs/insert_acs_database.py --state nebraska --year-range 2019-2023
+```
+
+**Run NHIS Pipeline:**
+```bash
+# Extract data from IPUMS NHIS API
+python pipelines/python/nhis/extract_nhis_data.py --year-range 2019-2024
+
+# Validate in R
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" pipelines/orchestration/run_nhis_pipeline.R --year-range 2019-2024
+
+# Insert into database
+python pipelines/python/nhis/insert_nhis_database.py --year-range 2019-2024
 ```
 
 **Key Requirements:**
@@ -68,6 +81,127 @@ IPUMS USA API → Python: Extract/Cache → Feather Files → R: Validate → Py
 - **Standalone Design:** Independent of NE25 pipeline (no dependencies)
 - **Future Use:** Enables post-stratification raking after harmonization
 
+### NHIS Pipeline: Health Surveys Data Extraction (October 2025)
+
+**Purpose:** Extract National Health Interview Survey data from IPUMS Health Surveys API for national benchmarking and ACEs/mental health research
+
+**Architecture:**
+```
+IPUMS NHIS API → Python: Extract/Cache → Feather Files → R: Validate → Python: Database Ops → DuckDB
+  ih2019-ih2024    ipumspy, requests     arrow format    7 validation    Chunked inserts   nhis_raw table
+      ↓                    ↓                     ↓            checks              ↓              ↓
+  66 variables      SHA256 caching         3x faster I/O    Survey QC    Perfect types    300K+ records
+  6 annual samples  90+ day retention      R ↔ Python       ACE/MH       preservation     47+ MB
+```
+
+**Key Features:**
+- **API Integration:** Direct IPUMS NHIS API calls (collection: `nhis`)
+- **Multi-Year Samples:** 6 annual samples (2019-2024), not pooled like ACS
+- **Smart Caching:** SHA256 signatures based on years + samples + variables
+- **66 Variables:** Demographics, parent info, ACEs, GAD-7, PHQ-8, economic indicators
+- **No Case Selection:** Nationwide, all ages (vs ACS state/age filters)
+- **Survey Design:** Includes SAMPWEIGHT, STRATA, PSU for complex survey analysis
+- **Mental Health Focus:** GAD-7 anxiety and PHQ-8 depression (2019, 2022 only)
+- **ACEs Coverage:** 8 ACE variables with direct overlap to NE25
+- **Documentation:** Complete usage guides, testing procedures, transformation mappings
+
+**Use Cases:**
+- Compare NE25 ACE prevalence to national NHIS estimates
+- Extract PHQ-2/GAD-2 from full PHQ-8/GAD-7 scales for comparability
+- Population benchmarking for Nebraska sample
+- Future harmonization for raking (Phase 12+)
+
+### ACS Metadata System (October 2025)
+
+**Purpose:** Leverage IPUMS DDI (Data Documentation Initiative) metadata for transformation, harmonization, and documentation
+
+**Architecture:**
+```
+DDI XML Files → Python: Parse Metadata → DuckDB: Metadata Tables → Python/R: Query & Transform
+  Variable defs    metadata_parser.py    3 tables (42 vars, 1,144 labels)   Decode, harmonize
+```
+
+**Components:**
+
+1. **Metadata Extraction (Phase 1)**
+   - **Parser:** `python/acs/metadata_parser.py` - Extracts variables, value labels, dataset info from DDI
+   - **Schema:** `python/acs/metadata_schema.py` - Defines 3 DuckDB tables (acs_variables, acs_value_labels, acs_metadata_registry)
+   - **Loader:** `pipelines/python/acs/load_acs_metadata.py` - Populates metadata tables
+   - **Auto-loading:** Integrated into extraction pipeline (Step 4.6)
+
+2. **Transformation Utilities (Phase 2)**
+   - **Python Utilities:** `python/acs/metadata_utils.py`
+     - `decode_value()`: Decode single values (e.g., STATEFIP 27 → "Minnesota")
+     - `decode_dataframe()`: Decode entire columns
+     - `get_variable_info()`, `search_variables()`: Query metadata
+     - `is_categorical()`, `is_continuous()`, `is_identifier()`: Type checking
+   - **R Utilities:** `R/utils/acs/acs_metadata.R`
+     - `acs_decode_value()`, `acs_decode_column()`: Decode values
+     - `acs_get_variable_info()`, `acs_search_variables()`: Query metadata
+     - `acs_is_categorical()`, etc.: Type checking
+   - **Harmonization Tools:** `python/acs/harmonization.py`
+     - `harmonize_race_ethnicity()`: Maps IPUMS RACE/HISPAN to 7 NE25 categories
+     - `harmonize_education()`: Maps IPUMS EDUC to NE25 8-cat or 4-cat education levels
+     - `harmonize_income_to_fpl()`: Converts income to Federal Poverty Level percentages
+     - `apply_harmonization()`: Applies all harmonizations at once
+
+3. **Documentation & Analysis (Phase 3)**
+   - **Data Dictionary Generator:** `scripts/acs/generate_data_dictionary.py`
+     - Auto-generates HTML/Markdown data dictionaries from metadata
+     - Includes variable descriptions, value labels, data types
+   - **Transformation Docs:** `docs/acs/transformation_mappings.md`
+     - Documents IPUMS → NE25 category mappings
+     - Race/ethnicity, education, income/FPL transformations
+   - **Query Cookbook:** `docs/acs/metadata_query_cookbook.md`
+     - Practical examples in Python and R
+     - Common patterns for decoding, searching, harmonizing
+
+**Usage Examples:**
+
+*Python:*
+```python
+from python.acs.metadata_utils import decode_value, decode_dataframe
+from python.acs.harmonization import harmonize_race_ethnicity
+from python.db.connection import DatabaseManager
+
+db = DatabaseManager()
+
+# Decode values
+state = decode_value('STATEFIP', 27, db)  # "Minnesota"
+
+# Decode DataFrame columns
+df = decode_dataframe(df, ['STATEFIP', 'SEX'], db)
+
+# Harmonize to NE25 categories
+df['ne25_race'] = harmonize_race_ethnicity(df, 'RACE', 'HISPAN')
+```
+
+*R:*
+```r
+source("R/utils/acs/acs_metadata.R")
+
+# Decode values
+state <- acs_decode_value("STATEFIP", 27)  # "Minnesota"
+
+# Decode DataFrame columns
+df <- acs_decode_column(df, "STATEFIP")
+
+# Search variables
+educ_vars <- acs_search_variables("education")
+```
+
+**Key Benefits:**
+- **Precise transformations:** Know exactly what IPUMS codes mean
+- **Automated validation:** Check categorical values against DDI
+- **Reduced errors:** No guesswork in code-to-label mappings
+- **Self-documenting:** Auto-generated data dictionaries
+- **Category alignment:** Ensure ACS and NE25 categories match for raking
+
+**Documentation:**
+- Transformation mappings: `docs/acs/transformation_mappings.md`
+- Query cookbook: `docs/acs/metadata_query_cookbook.md`
+- Data dictionary: `docs/acs/data_dictionary.html` (auto-generated)
+
 ## Directory Structure
 
 ### Core Directories (NE25 Pipeline)
@@ -89,13 +223,25 @@ IPUMS USA API → Python: Extract/Cache → Feather Files → R: Validate → Py
 - **`/scripts/acs/`** - Maintenance scripts (test_api_connection.py, check_extract_status.py, manage_cache.py, run_multiple_states.py)
 - **`/docs/acs/`** - Documentation (ipums_variables_reference.md, pipeline_usage.md, testing_guide.md, cache_management.md)
 
+### NHIS Pipeline Directories
+- **`/python/nhis/`** - NHIS modules (auth.py, config_manager.py, extract_builder.py, extract_manager.py, cache_manager.py, data_loader.py)
+- **`/pipelines/python/nhis/`** - Executable scripts (extract_nhis_data.py, insert_nhis_database.py)
+- **`/pipelines/orchestration/`** - R validation script (run_nhis_pipeline.R)
+- **`/R/load/nhis/`** - Data loading functions (load_nhis_data.R)
+- **`/R/utils/nhis/`** - Validation utilities (validate_nhis_raw.R)
+- **`/config/sources/nhis/`** - Year-specific configurations (nhis-template.yaml, nhis-2019-2024.yaml, samples.yaml)
+- **`/scripts/nhis/`** - Test scripts (test_api_connection.py, test_configuration.py, test_cache.py, test_pipeline_end_to_end.R)
+- **`/docs/nhis/`** - Documentation (README.md, pipeline_usage.md, nhis_variables_reference.md, testing_guide.md, transformation_mappings.md)
+
 ### Data Storage
 - **Local DuckDB:** `data/duckdb/kidsights_local.duckdb`
 - **NE25 Temp Feather:** `tempdir()/ne25_pipeline/*.feather`
 - **ACS Raw Data:** `data/acs/{state}/{year_range}/raw.feather`
 - **ACS Cache:** `cache/ipums/{extract_id}/`
+- **NHIS Raw Data:** `data/nhis/{year_range}/raw.feather`, `data/nhis/{year_range}/processed.feather`
+- **NHIS Cache:** `cache/ipums/{extract_id}/` (shared with ACS)
 - **REDCap API Key:** `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv`
-- **IPUMS API Key:** `C:/Users/waldmanm/my-APIs/IPUMS.txt`
+- **IPUMS API Key:** `C:/Users/waldmanm/my-APIs/IPUMS.txt` (shared by ACS and NHIS)
 
 ## Development Standards
 
@@ -122,6 +268,34 @@ data %>%
 - `tidyr::` - pivot_longer(), pivot_wider(), separate()
 - `stringr::` - str_split(), str_extract(), str_detect()
 - `arrow::` - read_feather(), write_feather()
+
+### Windows Console Output (CRITICAL)
+
+**All Python print() statements MUST use ASCII characters only (no Unicode symbols).**
+
+```python
+# ✅ CORRECT - ASCII output (Windows-compatible)
+print("[OK] Data loaded successfully")
+print("[ERROR] Failed to connect")
+print("[WARN] Missing variables detected")
+print("[INFO] Processing records...")
+
+# ❌ INCORRECT - Unicode symbols (causes UnicodeEncodeError on Windows)
+print("✓ Data loaded successfully")  # U+2713
+print("✗ Failed to connect")  # U+2717
+print("⚠ Missing variables")  # U+26A0
+```
+
+**Rationale:**
+- Windows console uses cp1252 encoding (not UTF-8)
+- Unicode symbols cause `UnicodeEncodeError: 'charmap' codec can't encode character`
+- ASCII alternatives are universally compatible
+
+**Standard Replacements:**
+- `✓` → `[OK]`
+- `✗` → `[ERROR]` or `[FAIL]`
+- `⚠` → `[WARN]`
+- `ℹ` → `[INFO]`
 
 ### Missing Data Handling (CRITICAL)
 
@@ -521,7 +695,7 @@ pip install duckdb pandas pyyaml structlog
 pip install ipumspy requests
 ```
 
-## Current Status (September 2025)
+## Current Status (October 2025)
 
 ### ✅ NE25 Pipeline - Production Ready
 - **Pipeline Reliability:** 100% success rate (eliminated segmentation faults)
@@ -538,12 +712,22 @@ pip install ipumspy requests
 - **Documentation:** Complete usage guides, variable reference, testing procedures
 - **Status:** Standalone utility ready for use, raking integration deferred to Phase 12+
 
+### ✅ NHIS Pipeline - Production Ready (Phases 1-7 Complete)
+- **API Integration:** Direct IPUMS NHIS API extraction via ipumspy (collection: `nhis`)
+- **Multi-Year Data:** 6 annual samples (2019-2024), 64 variables, 229,609 records (Oct 2025)
+- **Smart Caching:** SHA256-based caching (years + samples + variables signature)
+- **R Validation:** 7 comprehensive checks (variables, years, survey design, ACEs, mental health)
+- **Testing (Phase 6):** Complete test suite passing - API connection test, end-to-end pipeline test (3.4s execution), performance benchmarks documented
+- **Production (Phase 7):** Full 2019-2024 extraction (61s processing), 188,620 sample persons + 40,989 non-sample, database insertion complete
+- **Performance:** Cache retrieval <1s (60x faster), production extraction 61s, database insertion <1s
+- **Status:** Production ready, all 7 phases complete (Oct 2025)
+
 ### ✅ Architecture Simplified
 - **CID8 Removed:** No more complex IRT analysis causing instability
 - **8 Eligibility Criteria:** CID1-7 + completion (was 9)
 - **Feather Migration:** Perfect R factor ↔ pandas category preservation
 - **Response Sets:** Study-specific missing value conventions (NE25: 9, others: -9)
-- **Dual Pipeline Design:** NE25 (survey) + ACS (census) as independent, complementary systems
+- **Three Pipeline Design:** NE25 (survey) + ACS (census) + NHIS (health surveys) as independent, complementary systems
 
 ### Quick Debugging
 1. **Database:** `python -c "from python.db.connection import DatabaseManager; print(DatabaseManager().test_connection())"`
@@ -553,4 +737,4 @@ pip install ipumspy requests
 5. **HTML Docs:** `python scripts/documentation/generate_html_documentation.py`
 
 ---
-*Updated: September 2025 | Version: 3.0.0*
+*Updated: October 2025 | Version: 3.1.0*

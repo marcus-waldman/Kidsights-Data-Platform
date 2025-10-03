@@ -1,0 +1,49 @@
+# NHIS 2019-2024 Extract Configuration
+# Extends: nhis-template.yaml
+#
+# This configuration specifies a 6-year NHIS extract (2019-2024)
+# for Kidsights research on childhood development, ACEs, and mental health.
+#
+# USAGE:
+#   python pipelines/python/nhis/extract_nhis_data.py --year-range 2019-2024
+#
+# NOTES:
+#   - GAD-7 and PHQ-8 variables available in 2019 and 2022
+#   - Verify variable availability for 2023-2024 before extraction
+#   - Expected ~300,000+ records (6 years × ~50,000/year)
+#   - Processing time: 30-45 minutes for first extraction, ~10 sec from cache
+
+# Year specification
+years:
+  - 2019
+  - 2020
+  - 2021
+  - 2022
+  - 2023
+  - 2024
+
+# NHIS sample codes (IPUMS uses ih##### format for NHIS annual samples)
+samples:
+  - ih2019
+  - ih2020
+  - ih2021
+  - ih2022
+  - ih2023
+  - ih2024
+
+# Year range descriptor
+year_range: "2019-2024"
+
+# Extract description
+description: "NHIS 2019-2024 (6 years) for Kidsights research, nationwide all ages"
+
+# Output directory
+output_directory: "data/nhis/2019-2024"
+
+# All other settings inherited from nhis-template.yaml
+# including:
+#   - collection: nhis
+#   - data_format: fixed_width
+#   - All 66 variables (identifiers, demographics, parent_info, aces, mental_health, etc.)
+#   - cache settings
+#   - metadata

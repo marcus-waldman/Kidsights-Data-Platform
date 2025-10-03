@@ -1,0 +1,26 @@
+# NHIS Test Configuration (2019 only)
+# Fast test extraction (~5-10 minutes)
+
+years: [2019]
+samples: [ih2019]
+year_range: "2019"
+output_directory: "data/nhis/2019-test"
+collection: nhis
+data_format: fixed_width
+
+description: "NHIS 2019 test extraction for pipeline validation"
+
+# Minimal variable set for fast testing (5 core variables)
+variables:
+  identifiers:
+    - YEAR
+    - SERIAL
+    - NHISPID
+    - SAMPWEIGHT
+  demographics:
+    - AGE
+
+cache:
+  enabled: true
+  max_age_days: 90
+

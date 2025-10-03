@@ -1,0 +1,170 @@
+# NHIS Data Extract Template
+# This template defines the standard structure for NHIS extracts from IPUMS Health Surveys
+#
+# HOW TO USE:
+# 1. Create a year-specific config file: config/sources/nhis/nhis-{year_range}.yaml
+#    Example: config/sources/nhis/nhis-2019-2024.yaml
+#
+# 2. In your year config, override only the year-specific fields:
+#    - years (list of years: [2019, 2020, 2021, ...])
+#    - samples (list of NHIS sample codes: [ih2019, ih2020, ...])
+#    - year_range (descriptive string: "2019-2024")
+#    - description
+#
+# 3. The config system will automatically merge your year config with this template
+#    (year values override template defaults)
+#
+# 4. All 66 variables defined below are included by default
+#
+# See config/sources/nhis/nhis-2019-2024.yaml for a complete example
+
+# Year specification (OVERRIDE THESE IN YEAR-SPECIFIC CONFIG)
+years: []  # List of years to extract (e.g., [2019, 2020, 2021, 2022, 2023, 2024])
+samples: []  # List of NHIS sample codes (e.g., [ih2019, ih2020, ih2021, ih2022, ih2023, ih2024])
+year_range: TEMPLATE_YEAR_RANGE  # Descriptive string (e.g., "2019-2024")
+
+# IPUMS collection settings
+collection: nhis
+data_format: fixed_width  # NHIS uses fixed-width format
+
+# Extract description (auto-generated from years)
+description: "NHIS ${years} for Kidsights research, nationwide all ages"
+
+# Population filters
+# NOTE: Unlike ACS, NHIS extracts are nationwide with no case selection
+# This allows for flexible analysis without server-side filtering
+filters:
+  nationwide: true
+  all_ages: true
+  no_case_selection: true
+
+# Cache settings
+cache:
+  enabled: true              # Use caching system to avoid re-downloading
+  max_age_days: 365          # Remove caches older than 1 year
+  validate_checksums: true   # Verify file integrity on cache load
+  auto_cleanup: false        # Manual cleanup only
+
+# Output directory (auto-generated from year_range)
+output_directory: "data/nhis/${year_range}"
+
+# IPUMS NHIS variables to extract (64 total - excludes 2020-specific weights)
+# See docs/nhis/nhis_variables_reference.md for variable definitions
+variables:
+  # Identifiers & Sampling (9 variables)
+  # NOTE: LONGWEIGHT and PARTWT are 2020-specific and not available in other years
+  identifiers:
+    - YEAR          # Survey year
+    - SERIAL        # Household serial number
+    - STRATA        # Variance estimation strata
+    - PSU           # Variance estimation PSU
+    - NHISHID       # NHIS household identifier
+    - PERNUM        # Person number within household
+    - NHISPID       # NHIS person identifier
+    - HHX           # Household number
+    - SAMPWEIGHT    # Sample weight (PRIMARY WEIGHT - use for all analyses)
+
+  # Geographic (2 variables)
+  geographic:
+    - REGION        # Census region
+    - URBRRL        # Urban/rural classification
+
+  # Demographics (2 variables)
+  demographics:
+    - AGE           # Age in years
+    - SEX           # Sex
+
+  # Parent Information (13 variables)
+  # Note: NHIS includes parent variables directly (no attached characteristics needed like ACS)
+  parent_info:
+    - ISPARENTSC    # Sample child has parent present
+    - PAR1REL       # Relationship of parent 1 to sample child
+    - PAR2REL       # Relationship of parent 2 to sample child
+    - PAR1AGE       # Age of parent 1
+    - PAR2AGE       # Age of parent 2
+    - PAR1SEX       # Sex of parent 1
+    - PAR2SEX       # Sex of parent 2
+    - PARRELTYPE    # Type of parental relationship
+    - PAR1MARST     # Marital status of parent 1 (general)
+    - PAR2MARST     # Marital status of parent 2 (general)
+    - PAR1MARSTAT   # Marital status of parent 1 (detailed)
+    - PAR2MARSTAT   # Marital status of parent 2 (detailed)
+    - EDUCPARENT    # Highest education of parents
+
+  # Race/Ethnicity (2 variables)
+  race_ethnicity:
+    - RACENEW       # Race (NIH categories)
+    - HISPETH       # Hispanic ethnicity
+
+  # Education (1 variable)
+  education:
+    - EDUC          # Educational attainment
+
+  # Economic (5 variables)
+  economic:
+    - FAMTOTINC     # Total family income
+    - POVERTY       # Poverty ratio (family income to poverty threshold)
+    - FSATELESS     # Food security: ate less than felt should
+    - FSBALANC      # Food security: couldn't afford balanced meals
+    - OWNERSHIP     # Home ownership status
+
+  # ACEs & Adversity (8 variables)
+  # Adverse Childhood Experiences and discrimination
+  aces:
+    - VIOLENEV      # Ever lived with someone violent
+    - JAILEV        # Ever lived with someone in jail/prison
+    - MENTDEPEV     # Ever lived with someone mentally ill/depressed
+    - ALCDRUGEV     # Ever lived with someone with alcohol/drug problem
+    - ADLTPUTDOWN   # How often adults put down or insulted child
+    - UNFAIRRACE    # Treated unfairly due to race/ethnicity
+    - UNFAIRSEXOR   # Treated unfairly due to sex/sexual orientation
+    - BASENEED      # Couldn't afford food, housing, or utilities
+
+  # Mental Health - GAD-7 Anxiety Scale (8 variables)
+  # NOTE: GAD-7 only available in specific years (2019, 2022)
+  mental_health_gad7:
+    - GADANX        # Feeling nervous, anxious, or on edge
+    - GADWORCTRL    # Not being able to stop/control worrying
+    - GADWORMUCH    # Worrying too much about different things
+    - GADRELAX      # Trouble relaxing
+    - GADRSTLS      # Being so restless hard to sit still
+    - GADANNOY      # Becoming easily annoyed or irritable
+    - GADFEAR       # Feeling afraid something awful might happen
+    - GADCAT        # GAD-7 anxiety scale category
+
+  # Mental Health - PHQ-8 Depression Scale (9 variables)
+  # NOTE: PHQ-8 only available in specific years (2019, 2022)
+  mental_health_phq8:
+    - PHQINTR       # Little interest/pleasure in doing things
+    - PHQDEP        # Feeling down, depressed, or hopeless
+    - PHQSLEEP      # Trouble falling/staying asleep or sleeping too much
+    - PHQENGY       # Feeling tired or having little energy
+    - PHQEAT        # Poor appetite or overeating
+    - PHQBAD        # Feeling bad about yourself or that you're a failure
+    - PHQCONC       # Trouble concentrating on things
+    - PHQMOVE       # Moving/speaking slowly or being fidgety/restless
+    - PHQCAT        # PHQ-8 depression scale category
+
+  # Flags (5 variables)
+  # Survey administration and response quality indicators
+  flags:
+    - SASCRESP      # Sample adult/child respondent
+    - ASTATFLG      # Sample adult status flag
+    - CSTATFLG      # Sample child status flag
+    - HHRESP        # Household respondent
+    - RELATIVERESPC # Relative of sample child is respondent
+
+# Case selections
+# NOTE: NHIS extracts have NO case selections (nationwide, all ages)
+# This differs from ACS which filters by state and age
+case_selections: {}
+
+# Notes and metadata
+metadata:
+  purpose: "Extract NHIS data for Kidsights research on childhood development, ACEs, and mental health"
+  target_population: "Nationwide, all ages (no case selection)"
+  geographic_scope: "United States (all regions)"
+  key_variables: ["ACEs", "mental_health_GAD7", "mental_health_PHQ8", "parent_characteristics"]
+  variable_availability_note: "GAD-7 and PHQ-8 variables only available in specific years (2019, 2022). Verify availability for 2023-2024."
+  codebook_source: "nhis_00010.cbk"
+  total_variables: 66
