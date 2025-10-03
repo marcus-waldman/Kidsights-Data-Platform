@@ -276,9 +276,30 @@ We verified the expected age patterns in estimates:
 
 ### External Validation
 
-We compared selected estimates to published official statistics:
-- ACS demographic distributions against published ACS state-level tables
-- NSCH child health indicators against published NSCH state profiles
+We compared selected estimates to published official statistics to assess face validity:
+
+**ACS demographic estimates:**
+We validated sex, race/ethnicity, and poverty distributions against published ACS 1-year estimates for the target state (2023) from the U.S. Census Bureau's data dissemination system (data.census.gov). Specifically, we compared:
+- Table B01001: Sex by age (proportion male for ages 0-5)
+- Table B01001H: White alone, not Hispanic or Latino, by age
+- Table B17024: Age by ratio of income to poverty level
+
+Expected agreement: Our pooled 5-year GLM predictions at 2023 should align closely (±2-3 percentage points) with published 1-year estimates, with some divergence due to temporal smoothing in our models.
+
+**NSCH child health estimates:**
+We validated child health and ACE indicators against published NSCH 2023 state-level estimates from the Data Resource Center for Child and Adolescent Health (nschdata.org). We compared:
+- Child ACE exposure prevalence (1+ ACE) by age
+- Proportion rated in excellent health by age
+- Child care utilization (10+ hours/week) by age
+
+Expected agreement: Our state-level mixed model predictions should match published state profiles within confidence intervals, accounting for differences in weighting methodology.
+
+**NHIS regional estimates:**
+We validated parent mental health and ACE estimates against published NHIS regional tabulations for the North Central census region. Since NHIS does not publish state-level estimates due to sample size limitations, we compared our North Central region predictions to:
+- Regional PHQ-8 depression prevalence from NHIS published tables
+- Regional ACE prevalence estimates (if available in NHIS data briefs)
+
+Expected agreement: Our regional random effects model predictions should closely match published regional estimates, as both use the same underlying NHIS microdata and survey weights.
 
 ---
 
