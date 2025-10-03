@@ -1,0 +1,168 @@
+======================================================================
+NSCH DATABASE SUMMARY
+======================================================================
+Generated: 2025-10-03 14:51:47
+Database: data\duckdb\kidsights_local.duckdb
+
+======================================================================
+TABLE OVERVIEW
+======================================================================
+
+Total NSCH Tables: 11
+
+All Tables:
+  - nsch_2016_raw (Data)
+  - nsch_2017_raw (Data)
+  - nsch_2018_raw (Data)
+  - nsch_2019_raw (Data)
+  - nsch_2020_raw (Data)
+  - nsch_2021_raw (Data)
+  - nsch_2022_raw (Data)
+  - nsch_2023_raw (Data)
+  - nsch_crosswalk (Metadata)
+  - nsch_value_labels (Metadata)
+  - nsch_variables (Metadata)
+
+======================================================================
+RECORD COUNTS BY YEAR
+======================================================================
+[EMPTY] nsch_2016_raw: 0 records
+[OK] nsch_2017_raw: 21,599 records
+[OK] nsch_2018_raw: 30,530 records
+[OK] nsch_2019_raw: 29,433 records
+[OK] nsch_2020_raw: 42,777 records
+[OK] nsch_2021_raw: 50,892 records
+[OK] nsch_2022_raw: 54,103 records
+[OK] nsch_2023_raw: 55,162 records
+
+Total Records (All Years): 284,496
+
+======================================================================
+COLUMN COUNTS BY YEAR
+======================================================================
+nsch_2016_raw: 840 columns
+nsch_2017_raw: 813 columns
+nsch_2018_raw: 835 columns
+nsch_2019_raw: 834 columns
+nsch_2020_raw: 847 columns
+nsch_2021_raw: 880 columns
+nsch_2022_raw: 923 columns
+nsch_2023_raw: 895 columns
+
+======================================================================
+TABLE SIZES
+======================================================================
+nsch_2016_raw: <0.01 MB (empty)
+nsch_2017_raw: 0.02 MB
+nsch_2018_raw: 0.03 MB
+nsch_2019_raw: 0.03 MB
+nsch_2020_raw: 0.04 MB
+nsch_2021_raw: 0.05 MB
+nsch_2022_raw: 0.05 MB
+nsch_2023_raw: 0.05 MB
+
+Total Database Size: 0.27 MB
+
+======================================================================
+METADATA TABLES
+======================================================================
+nsch_variables: 6,867 records
+nsch_value_labels: 36,164 records
+nsch_crosswalk: 0 records
+
+======================================================================
+COMMON VARIABLES (Present in All Years)
+======================================================================
+
+Variables present in all 7 years with data:
+Total common variables: 352
+
+First 20 common variables:
+  - A1_ACTIVE
+  - A1_AGE
+  - A1_BORN
+  - A1_DEPLSTAT
+  - A1_GRADE
+  - A1_GRADE_IF
+  - A1_MARITAL
+  - A1_MENTHEALTH
+  - A1_PHYSHEALTH
+  - A1_RELATION
+  - A1_SEX
+  - A2_ACTIVE
+  - A2_AGE
+  - A2_BORN
+  - A2_DEPLSTAT
+  - A2_GRADE
+  - A2_MARITAL
+  - A2_MENTHEALTH
+  - A2_PHYSHEALTH
+  - A2_RELATION
+  ... and 332 more
+
+======================================================================
+SAMPLE QUERIES
+======================================================================
+
+1. Query all records from a specific year:
+   SELECT * FROM nsch_2023_raw LIMIT 10;
+
+2. Get record count by year:
+   SELECT COUNT(*) FROM nsch_2023_raw;
+
+3. Query specific variables:
+   SELECT HHID, YEAR, SC_AGE_YEARS FROM nsch_2023_raw LIMIT 10;
+
+4. Get variable metadata:
+   SELECT * FROM nsch_variables WHERE year = 2023;
+
+5. Get value labels for a variable:
+   SELECT * FROM nsch_value_labels WHERE year = 2023 AND variable_name = 'SC_SEX';
+
+6. Cross-year comparison (example):
+   SELECT 2017 AS year, COUNT(*) AS count FROM nsch_2017_raw
+   UNION ALL
+   SELECT 2018, COUNT(*) FROM nsch_2018_raw
+   UNION ALL
+   SELECT 2019, COUNT(*) FROM nsch_2019_raw;
+
+======================================================================
+DATA QUALITY NOTES
+======================================================================
+
+- 2016 Data: Table exists but empty (0 records) due to schema differences
+  - Known issue: 2016 uses different variable encodings than 2017-2023
+  - Status: Acceptable for now, will be addressed in harmonization phase
+
+- 2017-2023 Data: Successfully loaded with complete data
+  - Total records: 284,496
+  - All tables have HHID as primary identifier
+  - Data types consistent (DOUBLE for all numeric variables)
+
+- Metadata:
+  - Variable definitions loaded from SPSS metadata
+  - Value labels preserved from SPSS files
+  - Crosswalk table available for variable name changes across years
+
+======================================================================
+NEXT STEPS
+======================================================================
+
+1. Harmonization (Future Phase):
+   - Create standardized variable names across years
+   - Align value coding schemes
+   - Create unified cross-year dataset
+
+2. Analysis Tables (Future Phase):
+   - Create derived variables
+   - Apply sampling weights
+   - Generate analysis-ready datasets
+
+3. Documentation (Future Phase):
+   - Auto-generate data dictionaries
+   - Create variable reference guides
+   - Document harmonization mappings
+
+======================================================================
+END OF SUMMARY
+======================================================================
