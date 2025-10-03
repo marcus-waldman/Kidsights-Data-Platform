@@ -454,6 +454,153 @@ cc_any_support         # Factor: Receives any financial support (family or subsi
 
 **Variable Labels**: See `config/derived_variables.yaml` lines 305-330
 
+## Missing Data Handling
+
+### Overview
+
+The transformation system includes systematic missing data handling to ensure "Prefer not to answer" and "Don't know" responses are properly converted to `NA` before calculating composite scores. This prevents invalid values (like 99, -99, 999) from contaminating derived variables.
+
+**Critical Issue Resolved (October 2025):** Prior to implementation of `recode_missing()`, caregiver ACE variables had "Prefer not to answer" responses coded as 99, which were being summed in `ace_total` calculations. This created invalid scores ranging from 99-990 instead of the valid 0-10 range, affecting 254+ records (5.2% of dataset with ACE data). The `recode_missing()` helper function was added to systematically prevent this class of errors.
+
+### `recode_missing(x, missing_codes = c(99, -99, 999, -999, 9999, -9999, 9))`
+
+**Systematic missing value recoding function** that converts sentinel missing value codes to `NA` before transformations.
+
+**Parameters**:
+- `x`: Vector of values (numeric or character)
+- `missing_codes`: Vector of codes to convert to NA (default: common missing codes)
+
+**Returns**: Vector with missing codes replaced by `NA`
+
+**Common Missing Value Codes**:
+- `99`: "Prefer not to answer" (most common)
+- `9`: "Don't know"
+- `-99`, `999`, `9999`: Alternative missing codes used in some variables
+- `-999`, `-9999`: Extreme missing codes
+
+**Usage**:
+```r
+# Basic usage - recode 99 to NA
+clean_values <- recode_missing(raw_values, missing_codes = c(99))
+
+# Multiple missing codes
+clean_values <- recode_missing(raw_values, missing_codes = c(99, 9, -99))
+
+# Default covers common patterns
+clean_values <- recode_missing(raw_values)
+```
+
+**Character Handling**: Automatically converts numeric characters ("99") to numeric before recoding
+
+### Variables with Missing Data Codes
+
+**Caregiver ACEs (cace1-10)**: Use 99 = "Prefer not to answer"
+```r
+# Example: Before recoding
+ace_neglect = c(0, 1, 1, 99, 0)  # 99 should be NA
+
+# After recoding with recode_missing()
+ace_neglect = c(0, 1, 1, NA, 0)  # Properly coded
+```
+
+**Frequency of "Prefer not to answer" in NE25 Data**:
+| Variable | Description | Count of 99 |
+|----------|-------------|-------------|
+| cace1 | Neglect | 72 |
+| cace2 | Parent loss | 71 |
+| cace3 | Mental illness | 83 |
+| cace4 | Substance use | 93 |
+| cace5 | Domestic violence | 93 |
+| cace6 | Incarceration | 91 |
+| cace7 | Verbal abuse | 76 |
+| cace8 | Physical abuse | 73 |
+| cace9 | Emotional neglect | 59 |
+| cace10 | Sexual abuse | 58 |
+| **TOTAL** | | **769** |
+
+**Other Variables**: Most other variables either have no missing codes or handle missing through factor levels (e.g., childcare variables use "Missing" as a factor level for value 9).
+
+### Composite Score Calculation with Missing Data
+
+All composite scores use `na.rm = FALSE` in `rowSums()` to preserve missingness:
+
+```r
+# ACE Total Score
+ace_total <- rowSums(
+  mental_health_df[ace_cols],
+  na.rm = FALSE  # If ANY item is NA, total is NA
+)
+```
+
+**Rationale for `na.rm = FALSE`**:
+- **Preserves data quality**: If any ACE item is missing, we don't know the true total
+- **Prevents misleading scores**: With `na.rm = TRUE`, someone who answered 1 item (score=1) and declined 9 items would have `ace_total = 1`, incorrectly suggesting low ACE burden when the true total is unknown
+- **Conservative approach**: Marks incomplete data as missing rather than creating potentially misleading partial scores
+
+### Impact Example: ACE Variables
+
+**Before Fix** (invalid handling):
+```r
+# Person declined 5 ACE items (coded as 99) and answered 5 items (scored 0-1)
+ace_neglect = 99         # Should be NA
+ace_parent_loss = 1
+ace_mental_illness = 99  # Should be NA
+ace_substance_use = 0
+ace_domestic_violence = 99  # Should be NA
+# ... etc.
+
+# WRONG calculation (without recode_missing):
+ace_total = 99 + 1 + 99 + 0 + 99 + ... = 495  # Invalid!
+```
+
+**After Fix** (proper handling):
+```r
+# Same person with recode_missing() applied
+ace_neglect = NA         # Properly recoded
+ace_parent_loss = 1
+ace_mental_illness = NA  # Properly recoded
+ace_substance_use = 0
+ace_domestic_violence = NA  # Properly recoded
+# ... etc.
+
+# CORRECT calculation (with recode_missing + na.rm=FALSE):
+ace_total = NA  # Incomplete data, total is unknown
+```
+
+**Result**:
+- Before: 254+ records had invalid `ace_total` scores (99-990)
+- After: 0 records have invalid scores; 2,196 records properly have `ace_total = NA`
+
+### Validation
+
+To verify missing data is properly handled:
+
+```r
+# Check for persisting sentinel values in transformed data
+library(dplyr)
+library(duckdb)
+
+conn <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
+
+# Should return 0 for all ACE variables
+dbGetQuery(conn, "
+  SELECT
+    COUNT(*) as invalid_records
+  FROM ne25_transformed
+  WHERE ace_total > 10
+")
+
+# Check NULL counts (people who declined or weren't asked)
+dbGetQuery(conn, "
+  SELECT
+    COUNT(*) as null_records
+  FROM ne25_transformed
+  WHERE ace_total IS NULL
+")
+```
+
+**Documentation**: See `docs/fixes/missing_data_audit_2025_10.md` for complete audit and validation results.
+
 ## Helper Functions
 
 ### `value_labels(lex, dict, varname = "lex_ne25")`

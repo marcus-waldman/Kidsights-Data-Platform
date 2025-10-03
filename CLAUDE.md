@@ -123,6 +123,78 @@ data %>%
 - `stringr::` - str_split(), str_extract(), str_detect()
 - `arrow::` - read_feather(), write_feather()
 
+### Missing Data Handling (CRITICAL)
+
+**All derived variables MUST use `recode_missing()` before transformation to prevent sentinel values from contaminating composite scores.**
+
+```r
+# ✅ CORRECT - Recode missing values before transformation
+for(old_name in names(variable_mapping)) {
+  if(old_name %in% names(dat)) {
+    new_name <- variable_mapping[[old_name]]
+    # Convert 99 (Prefer not to answer) to NA before assignment
+    derived_df[[new_name]] <- recode_missing(dat[[old_name]], missing_codes = c(99))
+  }
+}
+
+# ❌ INCORRECT - Copying raw values directly
+for(old_name in names(variable_mapping)) {
+  if(old_name %in% names(dat)) {
+    new_name <- variable_mapping[[old_name]]
+    derived_df[[new_name]] <- dat[[old_name]]  # 99 values persist!
+  }
+}
+```
+
+**Requirements for Adding New Derived Variables:**
+
+1. **Check REDCap Data Dictionary:** Before implementing any transformation, query the REDCap data dictionary to identify missing value codes:
+   ```r
+   # Check response options for variable
+   dict_entry <- redcap_dict[[variable_name]]
+   response_options <- dict_entry$select_choices_or_calculations
+   # Look for: "99, Prefer not to answer", "9, Don't know", etc.
+   ```
+
+2. **Apply Defensive Recoding:** Even if no current missing codes exist, apply `recode_missing()` as a safeguard:
+   ```r
+   # Defensive recoding (future-proofs against survey changes)
+   clean_var <- recode_missing(raw_var, missing_codes = c(99, 9))
+   ```
+
+3. **Use Conservative Composite Score Calculation:** Always use `na.rm = FALSE` in `rowSums()` for composite scores:
+   ```r
+   # ✅ CORRECT - Preserves missingness
+   total_score <- rowSums(item_df[item_cols], na.rm = FALSE)
+   # If ANY item is NA, total is NA (conservative, prevents misleading partial scores)
+
+   # ❌ INCORRECT - Creates misleading partial scores
+   total_score <- rowSums(item_df[item_cols], na.rm = TRUE)
+   # Person who answered 1 item and declined 9 would appear to have low score
+   ```
+
+4. **Document Missing Codes:** Add code comments explaining which missing codes are used:
+   ```r
+   # Recode missing values (99 = "Prefer not to answer")
+   # This ensures invalid responses don't contaminate the total score calculation
+   ```
+
+**Common Missing Value Codes:**
+- `99`: "Prefer not to answer" (most common in NE25 data)
+- `9`: "Don't know"
+- `-99`, `999`, `9999`: Alternative missing codes
+- Factor level "Missing": Used in some categorical variables (e.g., childcare)
+
+**Critical Issue Prevented:** The `recode_missing()` function was added after discovering that 254+ records (5.2% of dataset) had invalid ACE total scores (99-990 instead of 0-10) due to "Prefer not to answer" (99) being summed directly. See `docs/fixes/missing_data_audit_2025_10.md` for full audit.
+
+**Validation Checklist:**
+- [ ] Checked REDCap data dictionary for missing codes
+- [ ] Applied `recode_missing()` before variable assignment
+- [ ] Used `na.rm = FALSE` in composite score calculation
+- [ ] Tested with sample data containing 99 values
+- [ ] Verified no sentinel values (99, 9, etc.) persist in transformed data
+- [ ] Confirmed composite scores are NA when any component is missing
+
 ### File Naming
 - R files: `snake_case.R`
 - Config files: `kebab-case.yaml`
