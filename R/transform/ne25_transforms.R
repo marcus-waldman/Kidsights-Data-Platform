@@ -261,6 +261,30 @@ get_poverty_threshold <- function(dates, family_size, return_flag = FALSE) {
   }
 }
 
+# Helper function to recode missing values to NA
+# Systematically converts sentinel missing value codes to NA before transformations
+# Common missing codes: 99 (Prefer not to answer), 9 (Don't know), -99, 999, etc.
+recode_missing <- function(x, missing_codes = c(99, -99, 999, -999, 9999, -9999, 9)) {
+  # Handle NULL or zero-length input
+  if(is.null(x) || length(x) == 0) {
+    return(x)
+  }
+
+  # Convert to numeric if character representation of numbers
+  if(is.character(x)) {
+    x_numeric <- suppressWarnings(as.numeric(x))
+    # Only convert if all non-NA values successfully converted
+    if(!all(is.na(x_numeric[!is.na(x)]))) {
+      x <- x_numeric
+    }
+  }
+
+  # Replace missing codes with NA
+  x[x %in% missing_codes] <- NA
+
+  return(x)
+}
+
 # Main transformation function
 recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, add_labels = TRUE) {
 
@@ -994,10 +1018,12 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         "cace10" = "ace_sexual_abuse"
       )
 
+      # Recode missing values (99 = "Prefer not to answer") to NA before assignment
+      # This ensures invalid responses don't contaminate the ace_total calculation
       for(old_name in names(ace_mapping)) {
         if(old_name %in% names(dat)) {
           new_name <- ace_mapping[[old_name]]
-          mental_health_df[[new_name]] <- dat[[old_name]]
+          mental_health_df[[new_name]] <- recode_missing(dat[[old_name]], missing_codes = c(99))
         }
       }
 
@@ -1037,10 +1063,11 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         "cqr024" = "child_ace_discrimination"
       )
 
+      # Defensive recoding for missing values (currently none, but future-proofs the code)
       for(old_name in names(child_ace_mapping)) {
         if(old_name %in% names(dat)) {
           new_name <- child_ace_mapping[[old_name]]
-          mental_health_df[[new_name]] <- dat[[old_name]]
+          mental_health_df[[new_name]] <- recode_missing(dat[[old_name]], missing_codes = c(99, 9))
         }
       }
 

@@ -1,7 +1,7 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-10-01 11:51:01  
-**Total Records:** 4890  
+**Generated:** 2025-10-03 07:09:13  
+**Total Records:** 4897  
 **Total Variables:** 672  
 **Categories:** 15  
 
@@ -80,7 +80,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `educ6_a2` | Secondary caregiver education level (6 categories) | factor | 51.3% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)... |
 | `educ6_max` | Maximum education level among caregivers (6 categories) | factor | 35.5% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Bachelor's Degree), 5 (Master's Degree)... |
 | `educ6_mom` | Maternal education level (6 categories) | factor | 55.0% | 1 (Less than High School Graduate), 2 (High School Graduate (including Equivalency)), 3 (Some College or Associate's Degree), 4 (Master's Degree), 5 (Doctorate or Professional Degree)... |
-| `educ_a1` | Primary caregiver education level (8 categories) | factor | 35.8% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (Some College Credit, but No Degree), 4 (High School Graduate or GED Completed), 5 (Associate Degree (AA, AS))... |
+| `educ_a1` | Primary caregiver education level (8 categories) | factor | 35.8% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (High School Graduate or GED Completed), 4 (Some College Credit, but No Degree), 5 (Associate Degree (AA, AS))... |
 | `educ_a2` | Secondary caregiver education level (8 categories) | factor | 51.3% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (High School Graduate or GED Completed), 3 (Master's Degree (MA, MS, MSW, MBA)), 4 (Some College Credit, but No Degree), 5 (Associate Degree (AA, AS))... |
 | `educ_max` | Maximum education level among caregivers (8 categories) | factor | 35.5% | 1 (Bachelor's Degree (BA, BS, AB)), 2 (Master's Degree (MA, MS, MSW, MBA)), 3 (High School Graduate or GED Completed), 4 (Some College Credit, but No Degree), 5 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD))... |
 | `educ_mom` | Maternal education level (8 categories) | factor | 55.0% | 1 (Master's Degree (MA, MS, MSW, MBA)), 2 (Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)), 3 (Associate Degree (AA, AS)), 4 (Completed a vocational, trade, or business school program), 5 (Bachelor's Degree (BA, BS, AB))... |
@@ -97,7 +97,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
 | `female` | Female | logical | 39.4% | N/A |
-| `female_a1` | Female A1 | logical | 35.8% | N/A |
+| `female_a1` | Female A1 | logical | 35.7% | N/A |
 | `sex` | Sex | factor | 39.4% | 1 (Female), 2 (Male) |
 
 ## Age
@@ -128,11 +128,11 @@ for race/ethnicity, education categories, and other demographic variables.
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
-| `family_size` | Family Size | numeric | 38.3% | N/A |
+| `family_size` | Family Size | numeric | 38.2% | N/A |
 | `federal_poverty_threshold` | Federal Poverty Threshold | numeric | 38.5% | N/A |
-| `fpl` | Fpl | numeric | 38.7% | N/A |
+| `fpl` | Fpl | numeric | 38.6% | N/A |
 | `fpl_derivation_flag` | Fpl Derivation Flag | factor | 0.0% | 1 (guideline_2025), 2 (guideline_2025_family_9plus) |
-| `fplcat` | Fplcat | factor | 38.7% | 1 (<100% FPL), 2 (100-199% FPL), 3 (200-299% FPL), 4 (300-399% FPL), 5 (400+% FPL) |
+| `fplcat` | Fplcat | factor | 38.6% | 1 (<100% FPL), 2 (100-199% FPL), 3 (200-299% FPL), 4 (300-399% FPL), 5 (400+% FPL) |
 | `income` | Income | numeric | 35.4% | N/A |
 
 ## Adverse_Experiences
@@ -140,35 +140,35 @@ for race/ethnicity, education categories, and other demographic variables.
 **Description:** No description available
 
 **Variables:** 32  
-**Average Missing:** 38.0%  
+**Average Missing:** 38.9%  
 **Data Types:** 2 factors, 30 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
-| `ace_domestic_violence` | ACE - Witnessed domestic violence between parents/adults | numeric | 36.8% | N/A |
-| `ace_emotional_neglect` | ACE - Felt unloved or not special in family | numeric | 36.7% | N/A |
-| `ace_incarceration` | ACE - Lived with someone who went to jail/prison | numeric | 36.8% | N/A |
-| `ace_mental_illness` | ACE - Lived with someone with mental illness/depression/suicide | numeric | 36.5% | N/A |
-| `ace_neglect` | ACE - Physical/emotional neglect during childhood | numeric | 36.4% | N/A |
-| `ace_parent_loss` | ACE - Lost parent through divorce, abandonment, death | numeric | 36.4% | N/A |
-| `ace_physical_abuse` | ACE - Experienced physical abuse from parent/adult | numeric | 36.9% | N/A |
-| `ace_risk_cat` | ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk) | factor | 38.8% | 1 (1 ACE), 2 (2-3 ACEs), 3 (4+ ACEs), 4 (No ACEs) |
-| `ace_sexual_abuse` | ACE - Experienced unwanted sexual contact | numeric | 36.7% | N/A |
-| `ace_substance_use` | ACE - Lived with someone with alcohol/drug problems | numeric | 36.7% | N/A |
-| `ace_total` | ACE Total Score (0-10) - Total count of adverse childhood experiences | numeric | 38.8% | N/A |
-| `ace_verbal_abuse` | ACE - Experienced verbal/emotional abuse from parent/adult | numeric | 36.8% | N/A |
+| `ace_domestic_violence` | ACE - Witnessed domestic violence between parents/adults | numeric | 38.6% | N/A |
+| `ace_emotional_neglect` | ACE - Felt unloved or not special in family | numeric | 38.5% | N/A |
+| `ace_incarceration` | ACE - Lived with someone who went to jail/prison | numeric | 38.2% | N/A |
+| `ace_mental_illness` | ACE - Lived with someone with mental illness/depression/suicide | numeric | 37.9% | N/A |
+| `ace_neglect` | ACE - Physical/emotional neglect during childhood | numeric | 37.9% | N/A |
+| `ace_parent_loss` | ACE - Lost parent through divorce, abandonment, death | numeric | 37.5% | N/A |
+| `ace_physical_abuse` | ACE - Experienced physical abuse from parent/adult | numeric | 38.7% | N/A |
+| `ace_risk_cat` | ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk) | factor | 44.8% | 1 (1 ACE), 2 (2-3 ACEs), 3 (4+ ACEs), 4 (No ACEs) |
+| `ace_sexual_abuse` | ACE - Experienced unwanted sexual contact | numeric | 38.7% | N/A |
+| `ace_substance_use` | ACE - Lived with someone with alcohol/drug problems | numeric | 37.9% | N/A |
+| `ace_total` | ACE Total Score (0-10) - Total count of adverse childhood experiences | numeric | 44.8% | N/A |
+| `ace_verbal_abuse` | ACE - Experienced verbal/emotional abuse from parent/adult | numeric | 38.4% | N/A |
 | `cace1` | Did you feel that you didn't have enough to eat, had to wear dirty clothes, or had no one to protect or take care of you? | numeric | 36.4% | N/A |
 | `cace10` | Did you experience unwanted sexual contact, such as fondling or oral/anal/vaginal intercourse or penetration? | numeric | 36.7% | N/A |
 | `cace2` | Did you lose a parent through divorce, abandonment, death, or other reason? | numeric | 36.4% | N/A |
 | `cace3` | Did you live with anyone who was depressed, mentally ill, or attempted suicide? | numeric | 36.5% | N/A |
 | `cace4` | Did you live with anyone who had a problem with drinking or using drugs, including prescription drugs? | numeric | 36.7% | N/A |
-| `cace5` | Did your parents or adults in your home ever hit, punch, beat, or threaten to harm each other? | numeric | 36.8% | N/A |
-| `cace6` | Did you live with anyone who went to jail or prison? | numeric | 36.8% | N/A |
+| `cace5` | Did your parents or adults in your home ever hit, punch, beat, or threaten to harm each other? | numeric | 36.7% | N/A |
+| `cace6` | Did you live with anyone who went to jail or prison? | numeric | 36.7% | N/A |
 | `cace7` | Did a parent or adult in your home ever swear at you, insult you, or put you down? | numeric | 36.8% | N/A |
 | `cace8` | Did a parent or adult in your home ever hit, beat, kick, or physically hurt you in any way? | numeric | 36.9% | N/A |
 | `cace9` | Did you feel that no one in your family loved you or thought you were special? | numeric | 36.7% | N/A |
 | `child_ace_discrimination` | Child ACE - Child treated unfairly due to race/ethnicity | numeric | 40.1% | N/A |
-| `child_ace_domestic_violence` | Child ACE - Child saw/heard parents or adults hit each other in home | numeric | 40.2% | N/A |
+| `child_ace_domestic_violence` | Child ACE - Child saw/heard parents or adults hit each other in home | numeric | 40.1% | N/A |
 | `child_ace_mental_illness` | Child ACE - Child lived with someone mentally ill, suicidal, or severely depressed | numeric | 40.4% | N/A |
 | `child_ace_neighborhood_violence` | Child ACE - Child was victim/witnessed violence in neighborhood | numeric | 40.3% | N/A |
 | `child_ace_parent_death` | Child ACE - Child experienced parent/guardian death | numeric | 39.9% | N/A |
@@ -191,14 +191,14 @@ for race/ethnicity, education categories, and other demographic variables.
 | `cc_access_difficulty` | Difficulty finding child care (past 12 months) | factor | 39.2% | 1 (Did not need childcare), 2 (Missing), 3 (Not difficult), 4 (Somewhat difficult), 5 (Very difficult) |
 | `cc_any_support` | Receives any child care financial support (family or subsidy) | factor | 0.0% | 1 (No), 2 (Yes) |
 | `cc_difficulty_reason` | Main reason child care was difficult to find | factor | 89.0% | 1 (Cost too high), 2 (Hours not suitable), 3 (Location not convenient), 4 (Missing), 5 (No openings)... |
-| `cc_family_support_all` | Weekly family financial support - all children ($) | numeric | 74.2% | N/A |
+| `cc_family_support_all` | Weekly family financial support - all children ($) | numeric | 74.3% | N/A |
 | `cc_family_support_child` | Weekly family financial support - this child ($) | numeric | 66.0% | N/A |
 | `cc_financial_hardship` | Child care costs create financial hardship | factor | 73.5% | 1 (Missing), 2 (No), 3 (Yes) |
 | `cc_formal_care` | Uses formal child care (center/preschool/Head Start) | factor | 71.6% | 1 (No), 2 (Yes) |
 | `cc_hours_per_week` | Total hours in child care per week | numeric | 64.8% | N/A |
 | `cc_intensity` | Child care intensity level (part-time/full-time/extended) | factor | 64.8% | 1 (Extended (>50 hrs)), 2 (Full-time (30-50 hrs)), 3 (Part-time (<30 hrs)) |
 | `cc_nonstandard_hours` | Requires evening/weekend/overnight care | factor | 39.5% | 1 (Missing), 2 (No), 3 (Yes) |
-| `cc_pays_multiple_children` | Pays for childcare for multiple children (10+ hrs/week) | factor | 39.1% | 1 (Missing), 2 (No), 3 (Yes) |
+| `cc_pays_multiple_children` | Pays for childcare for multiple children (10+ hrs/week) | factor | 39.0% | 1 (Missing), 2 (No), 3 (Yes) |
 | `cc_primary_type` | Primary child care arrangement type | factor | 71.6% | 1 (Childcare center), 2 (Head Start/Early Head Start), 3 (Missing), 4 (Non-relative care), 5 (Other)... |
 | `cc_quality_satisfaction` | Satisfaction with primary child care quality | factor | 65.3% | 1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)... |
 | `cc_receives_care` | Child receives non-parental care (10+ hours/week) | factor | 39.1% | 1 (Missing), 2 (No), 3 (Yes) |
@@ -208,7 +208,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `cc_subsidy_sat_process` | Satisfaction with subsidy application process | factor | 93.6% | 1 (Dissatisfied), 2 (Missing), 3 (Neither), 4 (Satisfied), 5 (Very dissatisfied)... |
 | `cc_weekly_cost_all` | Weekly household child care costs - all children ($) | numeric | 74.3% | N/A |
 | `cc_weekly_cost_primary` | Weekly cost - primary child care arrangement ($) | numeric | 65.8% | N/A |
-| `cc_weekly_cost_total` | Weekly cost - all arrangements this child ($) | numeric | 66.1% | N/A |
+| `cc_weekly_cost_total` | Weekly cost - all arrangements this child ($) | numeric | 66.2% | N/A |
 
 ## Coglan
 
@@ -233,7 +233,7 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c047` | <div class="rich-text-field-label"><p>Does your child play by tapping an object on the ground or a table?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155619&doc_id_hash=f5c348369bf02899c3c80634f6ea87a0aba0749c" alt="" width="400" height="198"></p></div> | numeric | 99.5% | N/A |
 | `c048` | <div class="rich-text-field-label"><p>Does your child intentionally move or change his/her position to get objects that are out of reach?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155618&doc_id_hash=bd82cef1148f769f434f79472e193fa0fa4235c1" alt="" width="400" height="177"></p></div> | numeric | 99.3% | N/A |
 | `c051` | Does your child make two similar sounds together like baba, mumu, pepe, didi (single consonant vowel combinations)? | numeric | 95.0% | N/A |
-| `c059` | Does your child stop what he/she is doing when you say "Stop!" even if just for a second? | numeric | 95.0% | N/A |
+| `c059` | Does your child stop what he/she is doing when you say "Stop!" even if just for a second? | numeric | 95.1% | N/A |
 | `c068` | Does your child make a gesture to indicate "No", such as shaking his/her head? | numeric | 96.5% | N/A |
 | `c072` | Can your child follow a simple spoken command or direction without you making a gesture or motion? | numeric | 92.3% | N/A |
 | `c073` | Can your child fetch something when asked? | numeric | 94.0% | N/A |
@@ -242,12 +242,12 @@ for race/ethnicity, education categories, and other demographic variables.
 | `c090` | Can your child say ten or more words in addition to "Mama" and "Dada"? | numeric | 97.0% | N/A |
 | `c091` | Can your child speak using short sentences of two words that go together? For example, "Mama go" or "Dada eat." | numeric | 92.6% | N/A |
 | `c093` | Can your child ask for something, such as food or water, by name when he/she wants it? | numeric | 97.5% | N/A |
-| `c096` | Can your child correctly name at least one family member other than mom and dad? For example, name of brother, sister, aunt, or uncle. | numeric | 96.4% | N/A |
+| `c096` | Can your child correctly name at least one family member other than mom and dad? For example, name of brother, sister, aunt, or uncle. | numeric | 96.5% | N/A |
 | `c098` | When looking at pictures, if you say to your child "what is this?", can they say the name of the object that you point to? | numeric | 92.6% | N/A |
 | `c099` | Can your child recognize at least seven objects? 
 
 For example, if you ask, "Where is the ball, spoon, cup, cloth, door, plate, or bucket?" does your child look at, point to, or even name the objects? | numeric | 96.3% | N/A |
-| `c100` | Can your child name at least two body parts, such as arm, eye, or nose? | numeric | 96.8% | N/A |
+| `c100` | Can your child name at least two body parts, such as arm, eye, or nose? | numeric | 96.9% | N/A |
 | `c101` | If you show your child an object he/she knows well, such as a cup or an animal, can he/she consistently name it? | numeric | 97.1% | N/A |
 | `c102` | Does your child usually communicate with words what he/she wants in a way that is understandable to others? | numeric | 93.2% | N/A |
 | `c105` | Can your child say 15 or more separate words, such as names like "Mama" or objects like "ball"? | numeric | 92.6% | N/A |
@@ -260,29 +260,29 @@ For example, if you ask, "Give me the big spoon" can your child understand which
 | `c113` | Can your child correctly use any of the words "I," "you," "she," or "he"? 
 
 For example, "I go to store." or "He eats rice." | numeric | 91.9% | N/A |
-| `c115` | Can your child correctly ask questions using any of the words "what," "which," "where," or "who"? | numeric | 91.6% | N/A |
-| `c116` | Does your child pronounce most of his/her words correctly? | numeric | 89.9% | N/A |
+| `c115` | Can your child correctly ask questions using any of the words "what," "which," "where," or "who"? | numeric | 91.5% | N/A |
+| `c116` | Does your child pronounce most of his/her words correctly? | numeric | 89.8% | N/A |
 | `c117` | If you show your child two objects or people of a different size, can he/she tell you which one is the big one and which is the small one? | numeric | 88.2% | N/A |
 | `c118` | Can your child count objects, such as fingers or people, up to five?  | numeric | 91.1% | N/A |
 | `c119` | Can your child explain in words what common objects like a cup or chair are used for? | numeric | 92.1% | N/A |
 | `c120` | If you point to an object, can your child correctly use the words "on," "in," or "under" to describe where it is?
 
 For example, "The cup is on the table" instead of "The cup is in the table." | numeric | 93.0% | N/A |
-| `c121` | Does your child regularly use describing words such as "fast," "short," "hot," "fat," or "beautiful" correctly? | numeric | 92.5% | N/A |
+| `c121` | Does your child regularly use describing words such as "fast," "short," "hot," "fat," or "beautiful" correctly? | numeric | 92.4% | N/A |
 | `c122` | Can the child name at least one color, such as red, blue, or yellow? | numeric | 93.6% | N/A |
 | `c124` | Does your child ask "why" questions? 
 
 For example, "Why are you tall?" | numeric | 93.9% | N/A |
 | `c126` | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct amount? | numeric | 92.7% | N/A |
 | `c127` | Can your child tell a story? | numeric | 94.7% | N/A |
-| `c131` | <div class="rich-text-field-label"><p>Does your child understand the term 'longest'?</p> <p> </p> <p>For example, if you ask them to choose "Which is the longest of three objects, such as three spoons or sticks?" would they be able to choose the longest?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155657&doc_id_hash=1e4524b040b74f6000cdc7a35d12280ce59d90dd" alt="" width="400" height="200"></p></div> | numeric | 94.4% | N/A |
-| `c136` | Can your child say what others like or dislike? For example, "Mama doesn't like fruit," or "Papa likes football." | numeric | 93.5% | N/A |
+| `c131` | <div class="rich-text-field-label"><p>Does your child understand the term 'longest'?</p> <p> </p> <p>For example, if you ask them to choose "Which is the longest of three objects, such as three spoons or sticks?" would they be able to choose the longest?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155657&doc_id_hash=1e4524b040b74f6000cdc7a35d12280ce59d90dd" alt="" width="400" height="200"></p></div> | numeric | 94.3% | N/A |
+| `c136` | Can your child say what others like or dislike? For example, "Mama doesn't like fruit," or "Papa likes football." | numeric | 93.4% | N/A |
 | `c138` | Can your child talk about things that have happened in the past using correct language? 
 
 For example, "Yesterday I played with my friend" or "Last week she went to the market." | numeric | 91.1% | N/A |
 | `c139` | Can your child talk about things that will happen in the future using correct language?
 
-For example, "Tomorrow he will attend school," or "Next week we will go to the market." | numeric | 91.0% | N/A |
+For example, "Tomorrow he will attend school," or "Next week we will go to the market." | numeric | 90.9% | N/A |
 | `ecdi009x` | If you show your child an object he/she knows well, such as a cup or animal, can he/she consistently name it? 
 
 By consistently, we mean that he/she uses the same word to refer to the same object, even if the word used is not fully correct. | numeric | 94.5% | N/A |
@@ -290,9 +290,9 @@ By consistently, we mean that he/she uses the same word to refer to the same obj
 | `ecdi011` | Can your child write his/her own name? | numeric | 61.9% | N/A |
 | `ecdi014` | Can your child count 10 objects, such as fingers or blocks, without mistakes? | numeric | 89.7% | N/A |
 | `nom001` | Is this child able to understand in, on, and under? | numeric | 94.3% | N/A |
-| `nom002` | How often can your child recognize the beginning sound of a word? For example, the word ball starts with the 'buh' sound? | numeric | 82.1% | N/A |
+| `nom002` | How often can your child recognize the beginning sound of a word? For example, the word ball starts with the 'buh' sound? | numeric | 82.0% | N/A |
 | `nom002x` | How often can your child recognize the beginning sound of a word? For example, can this child tell you that the word "ball" starts with the "buh" sound? | numeric | 80.4% | N/A |
-| `nom003` | When you say a word, how often can your child come up with another word that starts with the same sound? | numeric | 82.2% | N/A |
+| `nom003` | When you say a word, how often can your child come up with another word that starts with the same sound? | numeric | 82.1% | N/A |
 | `nom003x` | How often can your child come up with words that start with the same sound? 
 
 For example, can this child come up with the words "sock" and "sun"? | numeric | 80.5% | N/A |
@@ -301,23 +301,23 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `nom006x` | How often can your child explain things they have seen or done so that you know what happened? | numeric | 95.4% | N/A |
 | `nom009` | Can this child sort objects by color? | numeric | 94.5% | N/A |
 | `nom012` | Can your child sort objects by length? | numeric | 89.8% | N/A |
-| `nom014` | If asked to count objects, how high could your child count correctly?  | numeric | 96.0% | N/A |
+| `nom014` | If asked to count objects, how high could your child count correctly?  | numeric | 95.9% | N/A |
 | `nom014x` | If asked to count objects, how high can your child count correctly? | numeric | 96.0% | N/A |
 | `nom015` | If you had four objects, could your child divide them in half so you have two and they have two? | numeric | 91.1% | N/A |
-| `nom017` | Can your child read one-digit numbers, such as 4 or 7? | numeric | 94.9% | N/A |
+| `nom017` | Can your child read one-digit numbers, such as 4 or 7? | numeric | 94.8% | N/A |
 | `nom017x` | How often can your child read one-digit numbers? For example, can your child read the numbers 2 or 8? | numeric | 94.9% | N/A |
 | `nom018` | How often can this child correctly add two numbers, like 2 plus 3? | numeric | 82.2% | N/A |
 | `nom018x` | How often can this child correctly do simple addition? For example, can this child tell you that two blocks and three blocks add to a total of five blocks? | numeric | 80.5% | N/A |
 | `nom019` | How often can this child correctly subtract two numbers, like 5 take away 2? | numeric | 62.7% | N/A |
-| `nom022` | Can your child identify a triangle? | numeric | 82.1% | N/A |
+| `nom022` | Can your child identify a triangle? | numeric | 82.0% | N/A |
 | `nom022x` | How often can your child identify basic shapes such as a triangle, circle, or square? | numeric | 80.4% | N/A |
-| `nom024` | Can your child consistently write his/her first name, even if some of the letters aren't quite right or are backwards? | numeric | 82.1% | N/A |
+| `nom024` | Can your child consistently write his/her first name, even if some of the letters aren't quite right or are backwards? | numeric | 82.0% | N/A |
 | `nom026` | How many letters of the alphabet can your child recognize? | numeric | 96.1% | N/A |
 | `nom026x` | About how many letters of the alphabet can your child recognize?  | numeric | 96.0% | N/A |
 | `nom061x` | Does your child bounce back quickly when things do not go their way? | numeric | 96.0% | N/A |
-| `nom2205` | How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks? | numeric | 63.0% | N/A |
+| `nom2205` | How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks? | numeric | 62.9% | N/A |
 | `sf122` | If you show your child two objects or people of different sizes, can he/she tell you which one is the big one and which is the small one? | numeric | 91.0% | N/A |
-| `sf127` | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct number? | numeric | 93.6% | N/A |
+| `sf127` | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct number? | numeric | 93.5% | N/A |
 
 ## Geography
 
@@ -340,8 +340,8 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `county` | County FIPS code(s) - semicolon-separated if ZIP spans multiple counties | character | 31.4% | N/A |
 | `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
 | `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.4% | N/A |
-| `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251001_114850) |
+| `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.6% | N/A |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251003_070645) |
 | `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.4% | N/A |
 | `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
 | `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.4% | N/A |
@@ -369,7 +369,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
 | `cqfa002` | In general, how would you describe your child's health? | numeric | 39.4% | N/A |
-| `cqr014x` | DURING THE PAST 12 MONTHS, how often have your child's health conditions or problems affected their ability to do things other children their age do? | numeric | 39.5% | N/A |
+| `cqr014x` | DURING THE PAST 12 MONTHS, how often have your child's health conditions or problems affected their ability to do things other children their age do? | numeric | 39.4% | N/A |
 | `nom044` | To what extent do your child's health conditions or problems affect their ability to do things? | numeric | 100.0% | N/A |
 | `nom046x` | How would you describe the condition of your child's teeth? | numeric | 39.4% | N/A |
 
@@ -384,11 +384,11 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
 | `gad2_nervous` | GAD-2 Item 1 - Feeling nervous, anxious, or on edge (past 2 weeks) | numeric | 36.6% | N/A |
-| `gad2_positive` | GAD-2 Positive Screen (â‰¥3) - Indicates likely anxiety, further evaluation needed | numeric | 36.8% | N/A |
-| `gad2_risk_cat` | GAD-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate (3-4), Severe (5-6) | factor | 36.8% | 1 (Mild), 2 (Minimal/None), 3 (Moderate), 4 (Severe) |
-| `gad2_total` | GAD-2 Total Score (0-6) - Anxiety screening score | numeric | 36.8% | N/A |
-| `gad2_worry` | GAD-2 Item 2 - Not being able to stop or control worrying (past 2 weeks) | numeric | 36.5% | N/A |
-| `phq2_depressed` | PHQ-2 Item 2 - Feeling down, depressed, or hopeless (past 2 weeks) | numeric | 36.6% | N/A |
+| `gad2_positive` | GAD-2 Positive Screen (â‰¥3) - Indicates likely anxiety, further evaluation needed | numeric | 36.7% | N/A |
+| `gad2_risk_cat` | GAD-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate (3-4), Severe (5-6) | factor | 36.7% | 1 (Mild), 2 (Minimal/None), 3 (Moderate), 4 (Severe) |
+| `gad2_total` | GAD-2 Total Score (0-6) - Anxiety screening score | numeric | 36.7% | N/A |
+| `gad2_worry` | GAD-2 Item 2 - Not being able to stop or control worrying (past 2 weeks) | numeric | 36.4% | N/A |
+| `phq2_depressed` | PHQ-2 Item 2 - Feeling down, depressed, or hopeless (past 2 weeks) | numeric | 36.5% | N/A |
 | `phq2_interest` | PHQ-2 Item 1 - Little interest or pleasure in doing things (past 2 weeks) | numeric | 36.3% | N/A |
 | `phq2_positive` | PHQ-2 Positive Screen (â‰¥3) - Indicates likely depression, further evaluation needed | numeric | 36.6% | N/A |
 | `phq2_risk_cat` | PHQ-2 Risk Category - Minimal/None (0-1), Mild (2), Moderate/Severe (3-6) | factor | 36.6% | 1 (Mild), 2 (Minimal/None), 3 (Moderate/Severe) |
@@ -439,7 +439,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `c062` | <div class="rich-text-field-label"><p>Can your child maintain a standing position on his/her own, without holding on or receiving support?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155642&doc_id_hash=05e933e8fd1751141459bb3a6ef0494c88ec2cb3" alt="" width="400" height="300"></p></div> | numeric | 92.8% | N/A |
 | `c063` | <div class="rich-text-field-label"><p>Can your child make any light marks on paper or in dirt with a crayon or a stick?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155639&doc_id_hash=11b9ddb859a2f7e801a0ba98097187f087070fa4" alt="" width="400" height="379"></p></div> | numeric | 92.3% | N/A |
 | `c064` | <div class="rich-text-field-label"><p>Can your child pick up small bits of food and feed him/her-self using his/her hand?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155627&doc_id_hash=f73463ea467ec77ef0856dca1a294ac826916425" alt="" width="400" height="277"></p></div> | numeric | 95.0% | N/A |
-| `c065` | <div class="rich-text-field-label"><p>Can your child climb onto an object? For example, a rock, porch, step, chair, bed, or low table.</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155638&doc_id_hash=1ea8b726c21f6aa946dc494dc93f52553fdf04db" alt="" width="400" height="369"></p> <p> </p></div> | numeric | 92.2% | N/A |
+| `c065` | <div class="rich-text-field-label"><p>Can your child climb onto an object? For example, a rock, porch, step, chair, bed, or low table.</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155638&doc_id_hash=1ea8b726c21f6aa946dc494dc93f52553fdf04db" alt="" width="400" height="369"></p> <p> </p></div> | numeric | 92.3% | N/A |
 | `c066` | <div class="rich-text-field-label"><p>Can your child take several steps (3-5) forward without holding onto any person or object, even if they fall down immediately afterward?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155644&doc_id_hash=228c9a68e57f1fcb333ac5d72f9d549927617ea7" alt="" width="400" height="178"></p></div> | numeric | 93.3% | N/A |
 | `c067` | Can your child move around by walking, rather than by crawling on his hands and knees? | numeric | 93.3% | N/A |
 | `c069` | <div class="rich-text-field-label"><p>Can your child stand up from sitting by himself and take several steps forward?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155645&doc_id_hash=6c2f9d47bbb0d5ba3dd5aaeedb50dd449505875a" alt="" width="400" height="208"></p></div> | numeric | 93.4% | N/A |
@@ -463,7 +463,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `c110` | <div class="rich-text-field-label"><p>Can your child unscrew the lid from a bottle or jar?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155656&doc_id_hash=19e23f88ac5ef5b1a73408f76c537d3946ed0e2d" alt="" width="400" height="200"></p></div> | numeric | 90.5% | N/A |
 | `c129` | Can your child dress him/herself completely, except for shoelaces, buttons, and zippers? | numeric | 91.3% | N/A |
 | `c132` | Can your child fasten and unfasten buttons without help? | numeric | 61.9% | N/A |
-| `c133` | If you draw a circle, can your child do it, just as you did? | numeric | 89.8% | N/A |
+| `c133` | If you draw a circle, can your child do it, just as you did? | numeric | 89.7% | N/A |
 | `c135` | <div class="rich-text-field-label"><p>Can your child stand on one foot WITHOUT any support for at least a few seconds?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155655&doc_id_hash=431105b1ac949a03f4db3d10146acaf83701da12" alt="" width="400" height="300"></p></div> | numeric | 89.5% | N/A |
 | `nom024x` | How often can your child write his/her first name, even if some of the letters aren't quite right or are backwards? | numeric | 80.4% | N/A |
 | `nom028` | Can your child draw a triangle? | numeric | 92.0% | N/A |
@@ -472,7 +472,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `nom031` | Can your child make a tower of three or more blocks? | numeric | 96.7% | N/A |
 | `nom033` | Can your child draw a face with eyes and mouth? | numeric | 95.7% | N/A |
 | `nom033x` | How well can your child draw a face with eyes and mouth? | numeric | 95.4% | N/A |
-| `nom034` | Can your child draw a person with arms and legs? | numeric | 96.1% | N/A |
+| `nom034` | Can your child draw a person with arms and legs? | numeric | 96.0% | N/A |
 | `nom034x` | How well can your child draw a person with a head, body, arms, and legs? | numeric | 96.0% | N/A |
 | `nom035` | When using a pencil, can your child use fingers to hold it? | numeric | 81.7% | N/A |
 | `nom035x` | How does your child usually hold a pencil? | numeric | 80.2% | N/A |
@@ -511,7 +511,7 @@ Providing your child's name is optional. We will only use if we follow-up in the
 | `consent_doc_timestamp` | Consent Doc Timestamp | character | 6.5% | N/A |
 | `cqfa001` | What is your marital status? | numeric | 36.7% | N/A |
 | `cqfa005` | Since your child was born, how often has it been very hard to cover the basics, like food and housing, on your family's income? | numeric | 36.0% | N/A |
-| `cqfa006` | DURING THE PAST 12 MONTHS, which of these statements best describes your household's ability to afford the food you need? | numeric | 36.2% | N/A |
+| `cqfa006` | DURING THE PAST 12 MONTHS, which of these statements best describes your household's ability to afford the food you need? | numeric | 36.1% | N/A |
 | `cqfa009` | How many times has your child moved to a new address since he or she was born? | numeric | 36.2% | N/A |
 | `cqfa010` | DURING THE PAST 12 MONTHS, was there someone that you could turn to for day-to-day emotional support with parenting or raising children? | numeric | 36.0% | N/A |
 | `cqfa010a___1` | Cqfa010A   1 | numeric | 0.0% | N/A |
@@ -524,18 +524,18 @@ Providing your child's name is optional. We will only use if we follow-up in the
 | `cqfb002` | In general, how is your mental or emotional health? | numeric | 36.1% | N/A |
 | `cqfb007x` | <div class="rich-text-field-label"><p><span style="text-decoration: underline;">The rest of the questions ask only about the child whose birthdate you entered at the beginning of the survey.</span><br><br>Does your child receive care for at least 10 hours per week from someone other than a parent or guardian?</p> <p>This could be a daycare center, preschool, Head Start program, family childcare home, nanny, au pair, babysitter, or relative.</p></div> | numeric | 39.1% | N/A |
 | `cqfb008` | DURING THE PAST 12 MONTHS, did you or anyone in the family have to quit a job, not take a job, or greatly change your job because of problems with childcare for your child? | numeric | 37.3% | N/A |
-| `cqfb009` | People in this neighborhood help each other out. | numeric | 36.3% | N/A |
+| `cqfb009` | People in this neighborhood help each other out. | numeric | 36.2% | N/A |
 | `cqfb010` | We watch out for each other's children in this neighborhood. | numeric | 36.5% | N/A |
 | `cqfb011` | This child is safe in our neighborhood. | numeric | 36.2% | N/A |
 | `cqfb012` | When we encounter difficulties, we know where to go for help in our community. | numeric | 36.5% | N/A |
 | `cqfb013` | Little interest or pleasure in doing things? | numeric | 36.3% | N/A |
-| `cqfb014` | Feeling down, depressed or hopeless? | numeric | 36.6% | N/A |
+| `cqfb014` | Feeling down, depressed or hopeless? | numeric | 36.5% | N/A |
 | `cqfb015` | Feeling nervous, anxious or on edge? | numeric | 36.6% | N/A |
-| `cqfb016` | Not being able to stop or control worrying? | numeric | 36.5% | N/A |
+| `cqfb016` | Not being able to stop or control worrying? | numeric | 36.4% | N/A |
 | `cqr0011` | DURING THE PAST WEEK, has your child been sick or unwell?
 
-For example, fever, earache, vomiting, and diarrhea. | numeric | 39.8% | N/A |
-| `cqr002` | What is your sex? | numeric | 35.8% | N/A |
+For example, fever, earache, vomiting, and diarrhea. | numeric | 39.7% | N/A |
+| `cqr002` | What is your sex? | numeric | 35.7% | N/A |
 | `cqr003` | <div class="rich-text-field-label"><p>What is your age?</p></div> | numeric | 36.7% | N/A |
 | `cqr004` | What is the highest grade or level of school you have completed? | numeric | 35.8% | N/A |
 | `cqr006` | What was your total family income, before taxes, for the year 2024?
@@ -571,11 +571,11 @@ Use the slider to select a value that best represents this value. | numeric | 35
 | `cqr011` | Is your child of Hispanic, Latino, or Spanish origin? | numeric | 39.1% | N/A |
 | `cqr013` | Does your child need or use more medical care, mental health, or educational services than is usual for most children of the same age? | numeric | 40.0% | N/A |
 | `cqr015` | Does your child need or get special therapy, such as physical, occupational, or speech therapy? | numeric | 40.0% | N/A |
-| `cqr016` | Does your child have any emotional, developmental, or behavioral problems for which he/she needs treatment or counseling? | numeric | 39.8% | N/A |
+| `cqr016` | Does your child have any emotional, developmental, or behavioral problems for which he/she needs treatment or counseling? | numeric | 39.7% | N/A |
 | `cqr017` | Parent or guardian divorced or separated? | numeric | 40.1% | N/A |
 | `cqr018` | Parent or guardian died? | numeric | 39.9% | N/A |
 | `cqr019` | Parent or guardian served time in jail? | numeric | 40.3% | N/A |
-| `cqr020` | Saw or heard parents or adults slap, hit, kick, punch one another in the home? | numeric | 40.2% | N/A |
+| `cqr020` | Saw or heard parents or adults slap, hit, kick, punch one another in the home? | numeric | 40.1% | N/A |
 | `cqr021` | Was a victim of violence or witnessed violence in his or her neighborhood? | numeric | 40.3% | N/A |
 | `cqr022` | Lived with anyone who was mentally ill, suicidal, or severely depressed? | numeric | 40.4% | N/A |
 | `cqr023` | Lived with anyone who had a problem with alcohol or drugs? | numeric | 40.4% | N/A |
@@ -607,12 +607,12 @@ Do not include books meant for very young children, such as picture books. | num
 | `fci_a_3` | How many times in a week does your child see you or other members of the household reading books, magazines or newspapers? | numeric | 40.2% | N/A |
 | `fci_b_1` | Do you have children's books or picture books at home for your child? | numeric | 40.6% | N/A |
 | `fci_b_2` | How many books do you have in your home for your child? | numeric | 43.0% | N/A |
-| `fci_c_1` | Home-made toys? For example, home-made play-dough, puppets, balls made of plastic papers, clay dolls, wire cars, or other toys made at home. | numeric | 40.2% | N/A |
+| `fci_c_1` | Home-made toys? For example, home-made play-dough, puppets, balls made of plastic papers, clay dolls, wire cars, or other toys made at home. | numeric | 40.1% | N/A |
 | `fci_c_10` | Things for pretending? | numeric | 40.5% | N/A |
 | `fci_c_11` | Does your child play with electronic devices other than radio or TV? | numeric | 40.2% | N/A |
 | `fci_c_2` | Toys from a shop or manufactured toys? For example, balls, dolls, cars, or other toys from a shop/store. | numeric | 40.1% | N/A |
 | `fci_c_3` | Household objects? For example, bowls, spoons, empty matchboxes, empty bottles or pots, large cardboard boxes. OR objects found outside? For example, sticks, rocks, animal shells or leaves. | numeric | 40.1% | N/A |
-| `fci_c_4` | Things which make or play music? | numeric | 40.1% | N/A |
+| `fci_c_4` | Things which make or play music? | numeric | 40.0% | N/A |
 | `fci_c_5` | Things for drawing or writing? | numeric | 40.2% | N/A |
 | `fci_c_6` | Picture books for children that are not schoolbooks? | numeric | 40.5% | N/A |
 | `fci_c_7` | Things meant for stacking, constructing, or building? For example, blocks, logs, maize cobs to build a pretend house, small pieces of timber, stones, small pieces of brick. | numeric | 40.5% | N/A |
@@ -620,17 +620,17 @@ Do not include books meant for very young children, such as picture books. | num
 | `fci_c_9` | Toys for learning colors or shapes, like circle, square, triangle? | numeric | 40.4% | N/A |
 | `fci_d_1` | Read books to or look at picture books, photos or posters with your child? | numeric | 40.2% | N/A |
 | `fci_d_10` | Do physical activities with your child? For example, walk, play on swings or slides, ride in toy tricycle, play in pool. | numeric | 40.4% | N/A |
-| `fci_d_11` | Does your child have a place of their own to keep toys or treasures? | numeric | 40.4% | N/A |
-| `fci_d_2` | Tell stories to your child? | numeric | 40.3% | N/A |
+| `fci_d_11` | Does your child have a place of their own to keep toys or treasures? | numeric | 40.3% | N/A |
+| `fci_d_2` | Tell stories to your child? | numeric | 40.2% | N/A |
 | `fci_d_3` | Sing songs or say rhymes with your child including lullabies? | numeric | 40.8% | N/A |
-| `fci_d_4` | Take your child outside the home or yard or enclosure? For example, play dates with other children, visiting other family, going to beach or park. | numeric | 40.5% | N/A |
+| `fci_d_4` | Take your child outside the home or yard or enclosure? For example, play dates with other children, visiting other family, going to beach or park. | numeric | 40.4% | N/A |
 | `fci_d_5` | Play with your child? For example, peek-a-boo, hand games (pat-a-cake), pretend play with dolls or other toys. | numeric | 40.5% | N/A |
 | `fci_d_6` | Count things with your child? | numeric | 40.3% | N/A |
-| `fci_d_7` | Draw or paint things with your child? | numeric | 40.5% | N/A |
+| `fci_d_7` | Draw or paint things with your child? | numeric | 40.4% | N/A |
 | `fci_d_8` | Construct things with your child? | numeric | 40.5% | N/A |
 | `fci_d_9` | Do any household chores with your child and talk while doing the work? For example, child put things away, sweep, set the table, do dishes, cook. | numeric | 40.7% | N/A |
 | `financial_compensation_be_sent_to_a_nebraska_residential_address___1` | Financial Compensation Be Sent To A Nebraska Residential Address   1 | numeric | 0.0% | N/A |
-| `first_5_nos_1097_2191` | First 5 Consecutive Nos | numeric | 61.9% | N/A |
+| `first_5_nos_1097_2191` | First 5 Consecutive Nos | numeric | 61.8% | N/A |
 | `first_5_nos_180_364` | First 5 Nos count | numeric | 94.9% | N/A |
 | `first_5_nos_365_548` | First 5 Nos count | numeric | 92.2% | N/A |
 | `first_5_nos_549_731` | First 5 Nos count | numeric | 92.5% | N/A |
@@ -665,13 +665,13 @@ Use the slider to select a value that best represents this value $[mmi003]
  | numeric | 65.8% | N/A |
 | `mmi003b` | In a typical week, about how much does your household pay for all childcare arrangements for your child?
 
-Use the slider to select a value that best represents this value $[mmi003b] | numeric | 66.1% | N/A |
+Use the slider to select a value that best represents this value $[mmi003b] | numeric | 66.2% | N/A |
 | `mmi009` | Do childcare costs affect your family's ability to pay for basic necessities such as food, housing, medicine, health care, and clothing? | numeric | 73.5% | N/A |
 | `mmi013` | DURING THE PAST 12 MONTHS, how difficult was it to find childcare when you needed it? | numeric | 39.2% | N/A |
 | `mmi014` | What was the main reason that it was difficult to find childcare? | numeric | 81.1% | N/A |
 | `mmi018` | Is your primary childcare arrangement paid for, at least in part, by a childcare subsidy program? | numeric | 64.7% | N/A |
 | `mmi019_1` | Application process? | numeric | 93.5% | N/A |
-| `mmi019_2` | Amount of assistance? | numeric | 93.5% | N/A |
+| `mmi019_2` | Amount of assistance? | numeric | 93.4% | N/A |
 | `mmi019_3` | Childcare options you can access with the subsidy? | numeric | 93.5% | N/A |
 | `mmi100` | Does your child require childcare on evenings, weekends, or overnight?  | numeric | 39.5% | N/A |
 | `mmi101` | DURING THE PAST 12 MONTHS, has a lack of reliable transportation kept you from getting to work, school, medical appointments, or other daily needs? | numeric | 36.5% | N/A |
@@ -686,24 +686,24 @@ Use the slider to select a value that best represents this value $[mmi003b] | nu
 | `mmifs009` | You were worried you would not have enough food to eat? | numeric | 76.2% | N/A |
 | `mmifs010` | You were unable to eat healthy and nutritious food? | numeric | 76.3% | N/A |
 | `mmifs011` | You ate only a few kinds of food? | numeric | 76.3% | N/A |
-| `mmifs012` | You had to skip a meal? | numeric | 76.4% | N/A |
+| `mmifs012` | You had to skip a meal? | numeric | 76.3% | N/A |
 | `mmifs013` | You ate less than you thought you should? | numeric | 76.3% | N/A |
 | `mmifs014` | Your household ran out of food? | numeric | 76.3% | N/A |
 | `mmifs015` | You were hungry but did not eat? | numeric | 76.3% | N/A |
 | `mmifs016` | You went without eating for a whole day? | numeric | 76.4% | N/A |
 | `mmihl002` | Is English the primary language spoken at home? | numeric | 36.6% | N/A |
 | `module_2_family_information_complete` | Module 2 Family Information Complete | numeric | 0.0% | N/A |
-| `module_2_family_information_timestamp` | Module 2 Family Information Timestamp | character | 35.2% | N/A |
+| `module_2_family_information_timestamp` | Module 2 Family Information Timestamp | character | 35.1% | N/A |
 | `module_3_child_information_complete` | Module 3 Child Information Complete | numeric | 0.0% | N/A |
 | `module_3_child_information_timestamp` | Module 3 Child Information Timestamp | character | 38.2% | N/A |
 | `module_4_home_learning_environment_complete` | Module 4 Home Learning Environment Complete | numeric | 0.0% | N/A |
 | `module_4_home_learning_environment_timestamp` | Module 4 Home Learning Environment Timestamp | character | 39.3% | N/A |
 | `module_5_birthdate_confirmation_complete` | Module 5 Birthdate Confirmation Complete | numeric | 0.0% | N/A |
-| `module_5_birthdate_confirmation_timestamp` | Module 5 Birthdate Confirmation Timestamp | character | 40.5% | N/A |
+| `module_5_birthdate_confirmation_timestamp` | Module 5 Birthdate Confirmation Timestamp | character | 40.4% | N/A |
 | `module_6_0_89_complete` | Module 6 0 89 Complete | numeric | 0.0% | N/A |
 | `module_6_0_89_timestamp` | Module 6 0 89 Timestamp | character | 99.4% | N/A |
 | `module_6_1097_2191_complete` | Module 6 1097 2191 Complete | numeric | 0.0% | N/A |
-| `module_6_1097_2191_timestamp` | Module 6 1097 2191 Timestamp | character | 61.9% | N/A |
+| `module_6_1097_2191_timestamp` | Module 6 1097 2191 Timestamp | character | 61.8% | N/A |
 | `module_6_180_364_complete` | Module 6 180 364 Complete | numeric | 0.0% | N/A |
 | `module_6_180_364_timestamp` | Module 6 180 364 Timestamp | character | 94.9% | N/A |
 | `module_6_365_548_complete` | Module 6 365 548 Complete | numeric | 0.0% | N/A |
@@ -724,7 +724,7 @@ Use the slider to select a value that best represents this value $[mmi003b] | nu
 
 Does your household pay for at least 10 hours of childcare per week for more than one child? 
 
-This could be a childcare center, preschool, family childcare home, nanny, au pair, babysitter, before/after school program, or relative. | numeric | 39.1% | N/A |
+This could be a childcare center, preschool, family childcare home, nanny, au pair, babysitter, before/after school program, or relative. | numeric | 39.0% | N/A |
 | `mrw002` | This question is about all of your children. 
 
 In a typical week, about how much does your household pay for childcare total across all childcare arrangements? | numeric | 74.3% | N/A |
@@ -732,7 +732,7 @@ In a typical week, about how much does your household pay for childcare total ac
 
 In a typical week, about how much financial support do you receive from other individuals, including family, to help cover the cost of childcare?  
 
-Enter 0 if you receive no such financial support. | numeric | 74.2% | N/A |
+Enter 0 if you receive no such financial support. | numeric | 74.3% | N/A |
 | `mrw003_2` | In a typical week, about how much financial support do you receive from other individuals, including family, to help cover the cost of childcare for your child?  
 
 Enter 0 if you receive no such financial support.
@@ -754,7 +754,7 @@ Use the slider to select a value that best represents this value $[mrw003_2] | n
 | `ps008` | If your child gets upset, do they cry for a long time? | numeric | 47.7% | N/A |
 | `ps009` | Does your child reject or turn away from affection (e.g., refuses or pulls away from hugs from well-known family members)? | numeric | 47.6% | N/A |
 | `ps010` | Does your child have difficulty staying asleep? | numeric | 47.8% | N/A |
-| `ps011` | Does your child have difficulty falling asleep at night? | numeric | 47.8% | N/A |
+| `ps011` | Does your child have difficulty falling asleep at night? | numeric | 47.7% | N/A |
 | `ps013` | Does your child wake up more than two times at night and want your attentions (e.g., cries, asks for you)? | numeric | 47.7% | N/A |
 | `ps014` | When upset, does your child get very still, freeze or does not move? | numeric | 47.7% | N/A |
 | `ps015` | Do you have any concerns about how your child gets along with others? | numeric | 47.8% | N/A |
@@ -764,15 +764,15 @@ Use the slider to select a value that best represents this value $[mrw003_2] | n
 | `ps019` | Does your child become extremely distressed/upset/disturbed (e.g., cries, screams) in response to loud sounds or bright lights? | numeric | 47.8% | N/A |
 | `ps020` | Does your child cry or whine when he/she is made to wait for something he/she wants (e.g., toy or food)? | numeric | 47.9% | N/A |
 | `ps022` | Does your child intentionally try to hurt you or other familiar adults? | numeric | 48.0% | N/A |
-| `ps023` | Does your child kick, bite, or hit familiar adults? | numeric | 48.1% | N/A |
+| `ps023` | Does your child kick, bite, or hit familiar adults? | numeric | 48.0% | N/A |
 | `ps024` | Does your child kick, bite, or hit other children for no apparent reason? | numeric | 47.9% | N/A |
 | `ps025` | Does your child not seem hungry when it is time to eat? | numeric | 47.9% | N/A |
 | `ps026` | Does your child cry for no reason (e.g., when he/she is not hungry or not tired)? | numeric | 47.9% | N/A |
-| `ps027` | Does your child have extreme changes in emotions (e.g., quickly changing from very happy to very angry) for not apparent reason? | numeric | 47.8% | N/A |
+| `ps027` | Does your child have extreme changes in emotions (e.g., quickly changing from very happy to very angry) for not apparent reason? | numeric | 47.7% | N/A |
 | `ps028` | Does your child lose their temper? | numeric | 47.8% | N/A |
 | `ps029` | Does your child show panic or fear for no reason? | numeric | 47.9% | N/A |
 | `ps030` | Does your child refuse to eat foods that you think are healthy? | numeric | 47.8% | N/A |
-| `ps031` | Does your child resist eating? | numeric | 47.9% | N/A |
+| `ps031` | Does your child resist eating? | numeric | 48.0% | N/A |
 | `ps032` | Is your child intentionally mean to other children? | numeric | 47.8% | N/A |
 | `ps034` | Does your child have trouble paying attention? | numeric | 47.8% | N/A |
 | `ps035` | Does your child prefer to play alone, even when other children are present? | numeric | 47.9% | N/A |
@@ -786,7 +786,7 @@ Use the slider to select a value that best represents this value $[mrw003_2] | n
 | `ps043` | Does your child scream while still asleep and cannot be comforted? | numeric | 48.1% | N/A |
 | `ps044` | After you have been separated, does your child seem upset (e.g., angry or withdrawn) when you are reunited? | numeric | 48.1% | N/A |
 | `ps045` | Is your child intentionally cruel to animals? | numeric | 48.1% | N/A |
-| `ps046` | Is your child impatient or unwilling to wait when you ask him/her to? | numeric | 48.1% | N/A |
+| `ps046` | Is your child impatient or unwilling to wait when you ask him/her to? | numeric | 48.0% | N/A |
 | `ps047` | Is your child unable to sit still? | numeric | 48.1% | N/A |
 | `ps048` | Is your child sad or unhappy? | numeric | 48.0% | N/A |
 | `ps049` | Does your child hurt himself/herself intentionally (e.g. pulling his/her hair out or banging his/her head)? | numeric | 47.9% | N/A |
@@ -801,7 +801,7 @@ Use the slider to select a value that best represents this value $[mrw003_2] | n
 | `q1502` | How well do you think you are handling the day-to-day demands of raising children? | numeric | 36.2% | N/A |
 | `q1503` | Angry with your child? | numeric | 36.3% | N/A |
 | `q1504` | That your child does things that really bother you a lot? | numeric | 36.7% | N/A |
-| `q1505` | That your child is much harder to care for than most children his or her age? | numeric | 36.5% | N/A |
+| `q1505` | That your child is much harder to care for than most children his or her age? | numeric | 36.4% | N/A |
 | `q939___1` | Q939   1 | numeric | 0.0% | N/A |
 | `q939___2` | Q939   2 | numeric | 0.0% | N/A |
 | `q939___3` | Q939   3 | numeric | 0.0% | N/A |
@@ -842,7 +842,7 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 | `sq002___7` | Sq002   7 | numeric | 0.0% | N/A |
 | `sq002___8` | Sq002   8 | numeric | 0.0% | N/A |
 | `sq002___9` | Sq002   9 | numeric | 0.0% | N/A |
-| `sq003` | Are you of Hispanic, Latino or Spanish origin? | numeric | 36.4% | N/A |
+| `sq003` | Are you of Hispanic, Latino or Spanish origin? | numeric | 36.3% | N/A |
 | `survey_stop` | survey Stop | numeric | 99.4% | N/A |
 | `urban_pct` | Percentage of ZIP population in urban areas (0-100) | numeric | 28.0% | N/A |
 
@@ -878,7 +878,7 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 | `c125` | Can your child tell you when he/she is happy, angry, or sad? | numeric | 88.2% | N/A |
 | `c128` | Can your child tell you when others are happy, angry, or sad? | numeric | 94.2% | N/A |
 | `c130` | Does your child help out around the house with simple chores, even if he/she doesn't do them well? | numeric | 97.5% | N/A |
-| `c134` | Can your child go to the toilet by him/herself? | numeric | 89.8% | N/A |
+| `c134` | Can your child go to the toilet by him/herself? | numeric | 89.7% | N/A |
 | `c137` | Does your child show respect around elders? | numeric | 93.9% | N/A |
 | `credi001` | Does the child smile when others smile at him/her? | numeric | 99.5% | N/A |
 | `credi005` | Does your child react differently according to the tone of your voice? For example, smile when you say something in a happy tone. | numeric | 99.5% | N/A |
@@ -895,7 +895,7 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 | `credi038` | Does your child usually finish an activity he/she enjoys, such as a game or book? | numeric | 94.0% | N/A |
 | `credi041` | Can your child tell you when he/she is tired or hungry? | numeric | 96.6% | N/A |
 | `credi045` | Is your child kind to younger children? For example, speaks to them nicely and touches them gently. | numeric | 94.6% | N/A |
-| `credi046` | Does the child greet neighbors or other people he/she knows without being told? For example, by saying hello or gesturing hello. | numeric | 92.6% | N/A |
+| `credi046` | Does the child greet neighbors or other people he/she knows without being told? For example, by saying hello or gesturing hello. | numeric | 92.5% | N/A |
 | `credi052` | Does your child sometimes save things like candy or new toys for the future? | numeric | 91.1% | N/A |
 | `credi058` | Does your child ask about familiar people other than parents when they are not there? For example, "Where is the neighbor?" | numeric | 88.2% | N/A |
 | `ecdi015` | Can your child do an activity such as coloring without repeatedly asking for help or giving up too quickly? | numeric | 93.6% | N/A |
@@ -905,16 +905,16 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 | `ecdi018` | Does your child get along well with other children? | numeric | 93.3% | N/A |
 | `nom006` | How often can your child explain things they have seen or done so that you understand? | numeric | 95.7% | N/A |
 | `nom047x` | How often does this child show concern when they see others who are hurt or unhappy?  | numeric | 98.9% | N/A |
-| `nom048x` | Compared to other children his or her age, how much difficulty does this child have making or keeping friends? | numeric | 63.1% | N/A |
+| `nom048x` | Compared to other children his or her age, how much difficulty does this child have making or keeping friends? | numeric | 63.0% | N/A |
 | `nom049` | How often does this child play well with others? | numeric | 98.7% | N/A |
-| `nom049x` | How often does this child play well with other children? | numeric | 98.8% | N/A |
-| `nom052y` | How often does this child lose their temper? | numeric | 63.1% | N/A |
+| `nom049x` | How often does this child play well with other children? | numeric | 98.9% | N/A |
+| `nom052y` | How often does this child lose their temper? | numeric | 63.0% | N/A |
 | `nom053` | Can your child recognize and name emotions in themselves? | numeric | 81.7% | N/A |
 | `nom053x` | How often can your child recognize and name their own emotions? | numeric | 80.3% | N/A |
-| `nom054x` | How often does this child get easily distracted? | numeric | 63.1% | N/A |
+| `nom054x` | How often does this child get easily distracted? | numeric | 63.0% | N/A |
 | `nom056x` | How often does this child have difficulty waiting for their turn? | numeric | 62.7% | N/A |
-| `nom057` | How often does your child take turns during games or fun activities? | numeric | 91.1% | N/A |
-| `nom059` | How often does your child show concern when they see others are hurt or unhappy? | numeric | 82.1% | N/A |
+| `nom057` | How often does your child take turns during games or fun activities? | numeric | 91.0% | N/A |
+| `nom059` | How often does your child show concern when they see others are hurt or unhappy? | numeric | 82.0% | N/A |
 | `nom059x` | How often does your child keep working on a task even when it is hard for them? | numeric | 80.5% | N/A |
 | `nom060y` | How often does this child have trouble calming down? | numeric | 62.8% | N/A |
 | `nom061` | My child bounces back easily when things do not go his/her way. | numeric | 96.0% | N/A |
@@ -923,7 +923,7 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 | `nom103` | When this child is paying attention, how often can he or she follow instructions to complete a simple task? | numeric | 62.9% | N/A |
 | `nom104` | Compared to other children their age, how often is this child able to sit still? | numeric | 62.9% | N/A |
 | `nom2202` | How often can this child focus on a task you give them for at least a few minutes? For example, can this child focus on simple chores? | numeric | 62.9% | N/A |
-| `nom2208` | How often does this child share toys or games with other children? | numeric | 63.0% | N/A |
+| `nom2208` | How often does this child share toys or games with other children? | numeric | 62.9% | N/A |
 | `sf021` | <div class="rich-text-field-label"><p>If you play a game with your child, does he/she respond with interest? For example, if you play peek-a-boo, pat-a-cake, wave bye-bye, etc. does your child smile, widen his/her eyes, kick or move arms or vocalize?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155603&doc_id_hash=99f6ddcda0c611bd8a9a0a1d5d64694c28c5ea8a" alt="" width="400" height="225"></p></div> | numeric | 99.5% | N/A |
 | `sf093` | Does your child show independence? For example, wants to go to visit a friend's house. | numeric | 96.7% | N/A |
 
@@ -936,4 +936,4 @@ Please enter a number, such as 20. | character | 64.8% | N/A |
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-10-01 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-10-03 by the Kidsights Data Platform*
