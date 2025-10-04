@@ -279,27 +279,23 @@ We verified the expected age patterns in estimates:
 We compared selected estimates to published official statistics to assess face validity:
 
 **ACS demographic estimates:**
-We validated sex, race/ethnicity, and poverty distributions against published ACS 1-year estimates for the target state (2023) from the U.S. Census Bureau's data dissemination system (data.census.gov). Specifically, we compared:
-- Table B01001: Sex by age (proportion male for ages 0-5)
-- Table B01001H: White alone, not Hispanic or Latino, by age
-- Table B17024: Age by ratio of income to poverty level
+We validated sex, race/ethnicity, and poverty distributions against published ACS 1-year estimates for the target state (2023) from the U.S. Census Bureau's data dissemination system (data.census.gov). Specifically, we compared our aggregated estimates (across ages 0-5) to:
+- Table B01001: Sex by age (proportion male for "Under 5 years" category)
+- Table B01001H: White alone, not Hispanic or Latino ("Under 5 years" category)
+- Table B17024: Age by ratio of income to poverty level ("Under 6 years" category)
 
-Expected agreement: Our pooled 5-year GLM predictions at 2023 should align closely (±2-3 percentage points) with published 1-year estimates, with some divergence due to temporal smoothing in our models.
+Note: Published ACS tables use coarse age groupings (Under 5, Under 6) rather than single-year ages. We aggregated our single-year age estimates (0-5) to match the published age categories. Expected agreement: Our pooled 5-year GLM predictions at 2023 should align closely (±2-3 percentage points) with published 1-year estimates, with some divergence due to temporal smoothing.
 
 **NSCH child health estimates:**
-We validated child health and ACE indicators against published NSCH 2023 state-level estimates from the Data Resource Center for Child and Adolescent Health (nschdata.org). We compared:
-- Child ACE exposure prevalence (1+ ACE) by age
-- Proportion rated in excellent health by age
-- Child care utilization (10+ hours/week) by age
+We validated child health and ACE indicators against published NSCH 2023 state-level estimates from the Data Resource Center for Child and Adolescent Health (nschdata.org). The NSCH Interactive Data Query system allows filtering to children ages 0-5 specifically. We compared:
+- Child ACE exposure prevalence (1+ ACE) for ages 0-5
+- Proportion rated in excellent health for ages 0-5
+- Child care utilization (10+ hours/week) for ages 0-5
 
-Expected agreement: Our state-level mixed model predictions should match published state profiles within confidence intervals, accounting for differences in weighting methodology.
+Expected agreement: Our state-level mixed model predictions should match published state profiles within confidence intervals, accounting for differences in weighting methodology and potential differences in age aggregation (our six single-year estimates averaged vs. their pooled ages 0-5 estimate).
 
-**NHIS regional estimates:**
-We validated parent mental health and ACE estimates against published NHIS regional tabulations for the North Central census region. Since NHIS does not publish state-level estimates due to sample size limitations, we compared our North Central region predictions to:
-- Regional PHQ-8 depression prevalence from NHIS published tables
-- Regional ACE prevalence estimates (if available in NHIS data briefs)
-
-Expected agreement: Our regional random effects model predictions should closely match published regional estimates, as both use the same underlying NHIS microdata and survey weights.
+**NHIS estimates - no external validation available:**
+External validation of NHIS-based estimates is not feasible because published NHIS tables report outcomes for all adults in a region, not specifically for parents of children ages 0-5. The household linkage procedure we used (linking parents to children's ages) is only possible in restricted-use microdata and is not reflected in any published NHIS tabulations. Therefore, we cannot compare our parent-specific estimates to published regional statistics. Instead, we rely on internal validation (model diagnostics, plausibility checks against known population patterns) and consistency with peer-reviewed literature on parent mental health and ACE prevalence in similar populations.
 
 ---
 
