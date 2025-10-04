@@ -138,10 +138,21 @@ We computed the following 26 population targets using this approach:
 
 Categories were derived from the income-to-poverty ratio variable, which represents household income as a percentage of the federal poverty threshold for the household size and composition.
 
+**Multinomial logit model specification:**
+Because FPL categories are mutually exclusive and exhaustive, we used a survey-weighted multinomial logistic regression model rather than five separate binary models. This approach:
+1. Ensures predicted probabilities automatically sum to 1.0 across categories
+2. Allows flexible effects of age and year across categories without assuming proportional odds
+3. More efficient than separate binary models
+
+The multinomial logit model was estimated using `svymultinom()` from the survey package in R, with age, year, and their interaction as predictors. The lowest FPL category (0-99%) served as the reference category. This yields five sets of predicted probabilities at year 2023 for each age 0-5.
+
 **4. Public Use Microdata Areas (14 estimands):**
 - Proportion residing in each of 14 state-specific PUMAs
 
 PUMAs are geographic units defined for census data with populations of approximately 100,000. They represent the finest geographic resolution available in ACS public-use microdata.
+
+**Multinomial logit model specification:**
+Because the 14 PUMA categories are mutually exclusive and exhaustive but have no natural ordering (they are geographic regions), we used a survey-weighted multinomial logistic regression model. This approach ensures predicted probabilities automatically sum to 1.0 across all 14 categories. The model was estimated using `svymultinom()` with age, year, and their interaction as predictors, yielding 14 sets of predicted probabilities at year 2023 for each age 0-5.
 
 **5. Mother's educational attainment (1 estimand, age-stratified):**
 - Proportion of children whose mother has a bachelor's degree or higher
@@ -266,7 +277,11 @@ We verified that all 204 target estimates (34 estimands × 6 age bins) were succ
 
 ### Internal Consistency
 
-For categorical variables that partition the population (race/ethnicity, federal poverty level, geographic units), we verified that proportions summed to 1.0 within each age bin (within rounding error of ±0.01).
+For categorical variables that partition the population, we ensured proportions summed to 1.0 within each age bin:
+
+- **Federal poverty level (5 categories):** Guaranteed by ordered logit model structure - predicted probabilities automatically sum to 1.0
+- **PUMA geography (14 categories):** Guaranteed by multinomial logit model structure - predicted probabilities automatically sum to 1.0
+- **Race/ethnicity (3 categories):** The three binary estimates (white non-Hispanic, Black any, Hispanic any) were verified to be internally consistent, though they do not form a mutually exclusive partition (individuals can appear in multiple categories). We verified that white non-Hispanic + other race categories approximated 100% of the population.
 
 ### Age Pattern Consistency
 
