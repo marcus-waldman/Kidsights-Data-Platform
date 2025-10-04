@@ -203,11 +203,12 @@ This ensured all estimates reflect parents of young children (ages 0-5) rather t
 
 #### Estimands
 
-**1. Maternal depression symptoms (2 estimands):**
-- Proportion reporting no/minimal depressive symptoms (PHQ-8 score 0-4)
-- Proportion reporting moderately severe/severe depressive symptoms (PHQ-8 score ≥15)
+**1. Maternal depression symptoms (1 estimand):**
+- Proportion with moderate/severe depressive symptoms (PHQ-2 score ≥3, positive screen)
 
-The Patient Health Questionnaire-8 (PHQ-8) was available in 2019 and 2022 survey years only (N=4,022 parents with children 0-5). PHQ-8 is a validated 8-item depression screening instrument with scores ranging 0-24 (Kroenke et al., 2009).
+The Patient Health Questionnaire-2 (PHQ-2) comprises the first two items of the PHQ-8: (1) little interest or pleasure in doing things, and (2) feeling down, depressed, or hopeless. These items were available in NHIS 2019 and 2022 survey years only (N=4,022 parents with children 0-5). The PHQ-2 is a validated brief depression screening instrument with scores ranging 0-6 (Kroenke et al., 2003). A score ≥3 indicates a positive screen for depression requiring further evaluation.
+
+**Note:** We use PHQ-2 (not PHQ-8) to match the depression measure available in the target survey data, which only includes these two items. The binary outcome (PHQ-2 ≥3 vs <3) uses the standard clinical cutpoint for positive depression screening.
 
 **2. Maternal adverse childhood experiences (3 estimands):**
 - Proportion exposed to zero ACEs

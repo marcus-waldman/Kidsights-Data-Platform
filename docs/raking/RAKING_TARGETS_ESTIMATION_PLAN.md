@@ -405,7 +405,7 @@ anova(model_main, model_mom_married, test = "F")
 
 ---
 
-## Phase 2: NHIS Estimates (5 estimands)
+## Phase 2: NHIS Estimates (4 estimands)
 
 ### Data Source
 - **Table:** `nhis_raw`
@@ -506,19 +506,20 @@ nc_estimate <- predict(model, type = "response")
 
 ### Estimands to Calculate
 
-#### 1. Depression - No Symptoms (1 estimand)
-**Estimand:** "Proportion of mothers describing no depressive symptoms"
+#### 1. Maternal Depression (1 estimand - PHQ-2)
 
-**Data Source:** NHIS 2019, 2022 (PHQ-8 available, N=4,022 parents with children 0-5)
+**Estimand:**
+- "Proportion of mothers with moderate/severe depressive symptoms (PHQ-2: 3-6)" [positive screen]
+
+**Data Source:** NHIS 2019, 2022 (PHQ-2 items available, N=4,022 parents with children 0-5)
 
 **Variables:**
-- `PHQCAT`: PHQ-8 severity category
-  - 1 = None/minimal (0-4)
-  - 2 = Mild (5-9)
-  - 3 = Moderate (10-14)
-  - 4 = Moderately severe/severe (15+)
+- `PHQINTR`: Little interest or pleasure in doing things (0-3 scale)
+- `PHQDEP`: Feeling down, depressed, or hopeless (0-3 scale)
 
-**Calculation:**
+**Rationale:** NE25 survey only includes PHQ-2 (2 items), not full PHQ-8. Raking targets must match the measure used in the target survey. Binary categorization uses standard PHQ-2 clinical cutpoint (≥3 = positive depression screen).
+
+**Calculation (Survey-Weighted Binary Logistic Regression):**
 ```r
 # Filter to parents with children 0-5, PHQ data (2019, 2022), and North Central region
 nhis_phq_nc <- nhis_data %>%
@@ -532,7 +533,28 @@ nhis_phq_nc <- nhis_data %>%
                 CSTATFLG == 0,
                 REGION == 2,
                 YEAR %in% c(2019, 2022),
-                !is.na(PHQCAT))
+                !is.na(PHQINTR), !is.na(PHQDEP)) %>%
+  dplyr::mutate(
+    # Recode from 1-4 scale to 0-3 scale (1=Not at all → 0 points, 4=Nearly every day → 3 points)
+    phq2_interest = dplyr::case_when(
+      PHQINTR == 1 ~ 0,
+      PHQINTR == 2 ~ 1,
+      PHQINTR == 3 ~ 2,
+      PHQINTR == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    phq2_depressed = dplyr::case_when(
+      PHQDEP == 1 ~ 0,
+      PHQDEP == 2 ~ 1,
+      PHQDEP == 3 ~ 2,
+      PHQDEP == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    # PHQ-2 total (0-6)
+    phq2_total = phq2_interest + phq2_depressed,
+    # PHQ-2 positive screen (≥3)
+    phq2_positive = (phq2_total >= 3)
+  )
 
 # Create survey design
 nhis_phq_design <- svydesign(
@@ -540,32 +562,13 @@ nhis_phq_design <- svydesign(
   data = nhis_phq_nc, nest = TRUE
 )
 
-# Fit survey-weighted model
-model_phq_none <- svyglm(I(PHQCAT == 1) ~ 1,
-                         design = nhis_phq_design,
-                         family = quasibinomial())
+# Fit survey-weighted logistic regression
+model_phq2 <- svyglm(phq2_positive ~ 1,
+                     design = nhis_phq_design,
+                     family = quasibinomial())
 
 # Extract probability
-prop_no_depression <- predict(model_phq_none, type = "response")[1]
-```
-
-**Fills rows:** Age 0-5 (same value × 6)
-
----
-
-#### 2. Depression - Severe Symptoms (1 estimand)
-**Estimand:** "Proportion of mothers describing severe depressive symptoms"
-
-**Variable:** `PHQCAT = 4` (moderately severe/severe)
-
-**Calculation:**
-```r
-# Use same filtered dataset and survey design (nhis_phq_nc and nhis_phq_design from above)
-model_phq_severe <- svyglm(I(PHQCAT == 4) ~ 1,
-                           design = nhis_phq_design,
-                           family = quasibinomial())
-
-prop_severe_depression <- predict(model_phq_severe, type = "response")[1]
+prop_phq2_positive <- predict(model_phq2, type = "response")[1]
 ```
 
 **Fills rows:** Age 0-5 (same value × 6)
@@ -1006,17 +1009,29 @@ nhis_parents_nc <- nhis_data %>%
   ) %>%
   dplyr::filter(ISPARENTSC == 1, CSTATFLG == 0, REGION == 2)
 
-# Depression estimates (2019, 2022; North Central region)
+# Depression estimates (2019, 2022; North Central region) - PHQ-2 binary
 nhis_phq_nc <- nhis_parents_nc %>%
-  dplyr::filter(YEAR %in% c(2019, 2022), !is.na(PHQCAT))
+  dplyr::filter(YEAR %in% c(2019, 2022), !is.na(PHQINTR), !is.na(PHQDEP)) %>%
+  dplyr::mutate(
+    # Recode from 1-4 to 0-3 scale
+    phq2_interest = dplyr::case_when(
+      PHQINTR == 1 ~ 0, PHQINTR == 2 ~ 1, PHQINTR == 3 ~ 2, PHQINTR == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    phq2_depressed = dplyr::case_when(
+      PHQDEP == 1 ~ 0, PHQDEP == 2 ~ 1, PHQDEP == 3 ~ 2, PHQDEP == 4 ~ 3,
+      TRUE ~ NA_real_
+    ),
+    phq2_total = phq2_interest + phq2_depressed,
+    phq2_positive = (phq2_total >= 3)
+  )
 
 nhis_phq_design <- svydesign(
   ids = ~PSU, strata = ~STRATA, weights = ~SAMPWEIGHT,
   data = nhis_phq_nc, nest = TRUE
 )
 
-model_phq_none <- svyglm(I(PHQCAT == 1) ~ 1, design = nhis_phq_design, family = quasibinomial())
-model_phq_severe <- svyglm(I(PHQCAT == 4) ~ 1, design = nhis_phq_design, family = quasibinomial())
+model_phq2 <- svyglm(phq2_positive ~ 1, design = nhis_phq_design, family = quasibinomial())
 
 # ACE estimates (2019, 2021-2023; North Central region) - multinomial logit
 nhis_ace_nc <- nhis_parents_nc %>%
@@ -1049,8 +1064,7 @@ model_ace <- survey::svymultinom(
 ace_predictions <- predict(model_ace, type = "probs")[1,]
 
 nhis_estimates <- list(
-  prop_no_depression = predict(model_phq_none, type = "response")[1],
-  prop_severe_depression = predict(model_phq_severe, type = "response")[1],
+  prop_phq2_positive = predict(model_phq2, type = "response")[1],
   prop_ace_0 = ace_predictions["0_ACEs"],
   prop_ace_1 = ace_predictions["1_ACE"],
   prop_ace_2plus = ace_predictions["2plus_ACEs"]
@@ -1200,9 +1214,9 @@ cat("✓ All validation checks passed!\n")
 | Source | Estimands | Age Variation | Total Rows |
 |--------|-----------|---------------|------------|
 | ACS | 26 (sex, race, FPL, PUMA, **mother education, mother marital status**) | 24 constant + **2 vary** | 24 × 6 + 12 = **156** |
-| NHIS | 5 (depression 2, **ACE 3**) | Constant | 5 × 6 = **30** |
+| NHIS | 4 (**PHQ-2 positive 1**, **ACE 3**) | Constant | 4 × 6 = **24** |
 | NSCH | 4 (child ACE, behavioral, health, childcare) | Varies | 4 × 6 = 24 |
-| **Total** | **35** | - | **210** |
+| **Total** | **34** | - | **204** |
 
 **⚠️ Note:** Original raking_targets.csv has only 186 rows (31 estimands). Need to add:
 - Mother's education (6 rows)
@@ -1251,9 +1265,9 @@ Total new rows: 18
      - Dataset: "NHIS", Estimator: "Multinomial GLMM"
    - **New total:** 210 rows (was 186)
 3. ☐ Implement ACS estimation script (26 estimands: multinomial for FPL/PUMA, GLM for others)
-4. ☐ Implement NHIS estimation script (5 estimands: 2 depression binary, 3 ACE multinomial)
+4. ☐ Implement NHIS estimation script (4 estimands: 1 PHQ-2 binary, 3 ACE multinomial)
 5. ☐ Implement NSCH estimation script (4 estimands)
-6. ☐ Create CSV filling script (handles 210 total rows)
+6. ☐ Create CSV filling script (handles 204 total rows)
 7. ☐ Run validation checks
 8. ☐ Review estimates with subject matter experts
 9. ☐ Finalize raking targets for use in post-stratification
