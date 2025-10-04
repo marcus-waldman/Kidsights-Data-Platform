@@ -170,32 +170,27 @@ Marital status showed meaningful age variation (range: 79-84% married across age
 
 ---
 
-### NHIS Estimation: Regional Mixed Models
+### NHIS Estimation: Survey-Weighted Estimates for North Central Region
 
 #### Rationale
 
-NHIS does not provide state-level identifiers due to confidentiality protections, reporting only four broad census regions. To estimate state-level targets, we modeled regional variation using generalized linear mixed models with regional random intercepts. This approach:
+NHIS does not provide state-level identifiers due to confidentiality protections, reporting only four broad census regions. The target state is located in the North Central census region (Region 2), which includes Iowa, Kansas, Minnesota, Missouri, Nebraska, North Dakota, and South Dakota.
 
-1. Accounts for unmeasured heterogeneity across regions
-2. Provides partial pooling toward the national mean
-3. Yields predictions for the North Central region, which serves as a proxy for the target state
+We directly filtered the data to the North Central region and computed survey-weighted estimates. This approach:
+
+1. Provides direct estimates for the region containing the target state
+2. Uses only relevant regional data (no modeling across geographically distant regions)
+3. Maintains transparency and simplicity in estimation
 
 #### Model Specification
 
-For binary outcomes related to parent mental health and adverse childhood experiences, we fit:
+We filtered NHIS data to parents with children ages 0-5 residing in the North Central region (REGION = 2). For binary outcomes (depression), we fit survey-weighted logistic regression using only the regional subset:
 
-$$\text{logit}(P(Y_{ir} = 1)) = \beta_0 + u_r$$
+$$\text{logit}(P(Y_i = 1)) = \beta_0$$
 
-where:
-- $Y_{ir}$ is the binary outcome for parent $i$ in region $r$
-- $\beta_0$ is the fixed intercept (national mean on logit scale)
-- $u_r \sim N(0, \sigma_u^2)$ is a region-specific random intercept
+where $Y_i$ is the binary outcome for parent $i$ in the North Central region. The model was estimated using survey design features (sampling weights, primary sampling units, stratification) to produce design-based variance estimates.
 
-The model was estimated using adaptive Gaussian quadrature in a generalized linear mixed model framework, with inverse-variance weighting using survey sampling weights.
-
-We predicted probabilities for the North Central region (census region 2) by extracting the region-specific random effect:
-
-$$\hat{p}_{\text{NC}} = \text{expit}(\hat{\beta}_0 + \hat{u}_{\text{NC}})$$
+For the three-category ACE outcome, we fit a survey-weighted multinomial logistic regression model using only North Central region data, ensuring predicted probabilities sum to 1.0
 
 #### Household Linkage Procedure
 
@@ -214,11 +209,15 @@ This ensured all estimates reflect parents of young children (ages 0-5) rather t
 
 The Patient Health Questionnaire-8 (PHQ-8) was available in 2019 and 2022 survey years only (N=4,022 parents with children 0-5). PHQ-8 is a validated 8-item depression screening instrument with scores ranging 0-24 (Kroenke et al., 2009).
 
-**2. Maternal adverse childhood experiences (2 estimands):**
+**2. Maternal adverse childhood experiences (3 estimands):**
+- Proportion exposed to zero ACEs
 - Proportion exposed to exactly one ACE
 - Proportion exposed to two or more ACEs
 
 We constructed an ACE total score by summing eight binary indicators of childhood adversity: living with someone with mental illness, substance use problems, or who was incarcerated; experiencing violence in the home; physical abuse; racial discrimination; sexual orientation/gender discrimination; and economic hardship (inability to afford basic needs). This ACE module was available in 2019, 2021, 2022, and 2023 (N=7,657 parents with children 0-5).
+
+**Multinomial logit model specification:**
+Because ACE categories are mutually exclusive and exhaustive (0, 1, 2+), we used a survey-weighted multinomial logistic regression model rather than separate binary models. The model was fit using only North Central region data (REGION = 2) with survey weights. This approach ensures predicted probabilities automatically sum to 1.0 across the three categories, with zero ACEs as the reference category.
 
 ---
 

@@ -177,22 +177,41 @@ prop_hispanic = np.average(hispanic_any, weights=acs_data['PERWT'])
 4. "Proportion of children in household at 300-399% Federal Poverty Level"
 5. "Proportion of children in household at 400+ % Federal Poverty Level"
 
-**Calculation:**
+**Calculation (Survey-Weighted Multinomial Logit):**
 ```r
-# Filter valid poverty values (exclude missing: 996-998)
-acs_valid <- acs_data[acs_data$POVERTY < 600, ]
+# Create FPL category variable (filter valid values, exclude missing 996-998)
+acs_data <- acs_data %>%
+  dplyr::filter(POVERTY < 600) %>%
+  dplyr::mutate(
+    fpl_category = dplyr::case_when(
+      POVERTY < 100 ~ "0-99%",
+      POVERTY < 200 ~ "100-199%",
+      POVERTY < 300 ~ "200-299%",
+      POVERTY < 400 ~ "300-399%",
+      POVERTY >= 400 ~ "400%+",
+      TRUE ~ NA_character_
+    ),
+    fpl_category = factor(fpl_category,
+                          levels = c("0-99%", "100-199%", "200-299%", "300-399%", "400%+"))
+  )
 
-# Calculate proportions
-fpl_0_99 <- np.average(acs_valid['POVERTY'] < 100, weights=acs_valid['PERWT'])
-fpl_100_199 <- np.average((acs_valid['POVERTY'] >= 100) & (acs_valid['POVERTY'] < 200), weights=acs_valid['PERWT'])
-fpl_200_299 <- np.average((acs_valid['POVERTY'] >= 200) & (acs_valid['POVERTY'] < 300), weights=acs_valid['PERWT'])
-fpl_300_399 <- np.average((acs_valid['POVERTY'] >= 300) & (acs_valid['POVERTY'] < 400), weights=acs_valid['PERWT'])
-fpl_400_plus <- np.average(acs_valid['POVERTY'] >= 400, weights=acs_valid['PERWT'])
+# Fit multinomial logit model with age × year interaction
+library(nnet)
+model_fpl <- survey::svymultinom(
+  fpl_category ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design,
+  trace = FALSE
+)
+
+# Predict at 2023 for each age
+pred_data <- data.frame(AGE = 0:5, MULTYEAR = 2023)
+fpl_predictions <- predict(model_fpl, newdata = pred_data, type = "probs")
+# Result: 6 rows (ages) × 5 columns (FPL categories)
 ```
 
-**Validation:** Sum of 5 proportions should = 1.0
+**Validation:** Multinomial model guarantees proportions sum to 1.0 for each age
 
-**Fills rows:** Age 0-5 (same value × 6 for each)
+**Fills rows:** Age 0-5 (same value × 6 for each category = 30 total rows)
 
 ---
 
@@ -216,20 +235,33 @@ fpl_400_plus <- np.average(acs_valid['POVERTY'] >= 400, weights=acs_valid['PERWT
 13. 3100903
 14. 3100904
 
-**Calculation:**
+**Calculation (Survey-Weighted Multinomial Logit):**
 ```r
-# For each PUMA
+# Ensure PUMA is a factor with all 14 categories
 puma_list <- c(3100100, 3100200, 3100300, 3100400, 3100500, 3100600,
-               3100701, 3100702, 3100801, 3100802, 3100901, 3100902, 3100903, 3100914)
+               3100701, 3100702, 3100801, 3100802, 3100901, 3100902, 3100903, 3100904)
 
-puma_props <- sapply(puma_list, function(p) {
-  np.average(acs_data['PUMA'] == p, weights=acs_data['PERWT'])
-})
+acs_data <- acs_data %>%
+  dplyr::mutate(
+    puma_factor = factor(PUMA, levels = puma_list)
+  )
+
+# Fit multinomial logit model with age × year interaction
+model_puma <- survey::svymultinom(
+  puma_factor ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design,
+  trace = FALSE
+)
+
+# Predict at 2023 for each age
+pred_data <- data.frame(AGE = 0:5, MULTYEAR = 2023)
+puma_predictions <- predict(model_puma, newdata = pred_data, type = "probs")
+# Result: 6 rows (ages) × 14 columns (PUMA categories)
 ```
 
-**Validation:** Sum of 14 proportions should = 1.0
+**Validation:** Multinomial model guarantees proportions sum to 1.0 for each age
 
-**Fills rows:** Age 0-5 (same value × 6 for each)
+**Fills rows:** Age 0-5 (same value × 6 for each PUMA = 84 total rows)
 
 ---
 
@@ -373,7 +405,7 @@ anova(model_main, model_mom_married, test = "F")
 
 ---
 
-## Phase 2: NHIS Estimates (4 estimands)
+## Phase 2: NHIS Estimates (5 estimands)
 
 ### Data Source
 - **Table:** `nhis_raw`
@@ -432,33 +464,45 @@ WHERE p.ISPARENTSC = 1  -- Is parent of sample child
 - Use **2019 and 2022** for depression estimates (PHQ-8 available)
 - Use **2019, 2021, 2022, 2023** for ACE estimates (combine years for larger sample)
 
-### Estimation Method: Mixed Models with Regional Random Effects
+### Estimation Method: Survey-Weighted Estimates for North Central Region
+
+**Approach:** Filter to North Central region (REGION = 2) and compute survey-weighted estimates directly, without random effects.
+
+**Rationale:**
+- Nebraska is in North Central region (includes IA, KS, MN, MO, NE, ND, SD)
+- Simple filtering provides direct regional estimates
+- More transparent than modeling across all 4 regions
+- NHIS doesn't identify states, so regional estimate is best available proxy
 
 **Model specification:**
 ```r
-library(lme4)
+library(survey)
 
-# Filter to parents with children 0-5
-nhis_parents_young <- nhis_data %>%
-  inner_join(
+# Filter to parents with children 0-5 in North Central region
+nhis_parents_nc <- nhis_data %>%
+  dplyr::inner_join(
     nhis_data %>%
-      filter(CSTATFLG == 1, AGE <= 5) %>%
-      select(NHISHID, child_age = AGE),
+      dplyr::filter(CSTATFLG == 1, AGE <= 5) %>%
+      dplyr::select(NHISHID, child_age = AGE),
     by = "NHISHID"
   ) %>%
-  filter(ISPARENTSC == 1, CSTATFLG == 0)
+  dplyr::filter(ISPARENTSC == 1, CSTATFLG == 0, REGION == 2)
 
-# Logistic mixed model with regional random intercept
-model <- glmer(outcome ~ 1 + (1|REGION),
-               data = nhis_parents_young,
-               family = binomial,
-               weights = SAMPWEIGHT)
+# Create survey design object for North Central region only
+nhis_design_nc <- svydesign(
+  ids = ~PSU,           # Primary sampling unit
+  strata = ~STRATA,     # Stratification variable
+  weights = ~SAMPWEIGHT,
+  data = nhis_parents_nc,
+  nest = TRUE
+)
 
-# Extract Nebraska prediction (REGION = 2, North Central)
-nebraska_pred <- predict(model, newdata = data.frame(REGION = 2), type = "response")
+# Survey-weighted logistic regression (intercept-only model)
+model <- svyglm(outcome ~ 1, design = nhis_design_nc, family = quasibinomial())
+
+# Extract predicted probability
+nc_estimate <- predict(model, type = "response")
 ```
-
-**Note:** NHIS doesn't identify individual states, only census regions. Nebraska is in Region 2 (North Central). Regional estimate serves as proxy for Nebraska.
 
 ### Estimands to Calculate
 
@@ -476,29 +520,33 @@ nebraska_pred <- predict(model, newdata = data.frame(REGION = 2), type = "respon
 
 **Calculation:**
 ```r
-# Filter to parents with children 0-5 and PHQ data (2019, 2022)
-nhis_phq <- nhis_data %>%
-  inner_join(
+# Filter to parents with children 0-5, PHQ data (2019, 2022), and North Central region
+nhis_phq_nc <- nhis_data %>%
+  dplyr::inner_join(
     nhis_data %>%
-      filter(CSTATFLG == 1, AGE <= 5) %>%
-      select(NHISHID, child_age = AGE),
+      dplyr::filter(CSTATFLG == 1, AGE <= 5) %>%
+      dplyr::select(NHISHID, child_age = AGE),
     by = "NHISHID"
   ) %>%
-  filter(ISPARENTSC == 1,
-         CSTATFLG == 0,
-         YEAR %in% c(2019, 2022),
-         !is.na(PHQCAT))
+  dplyr::filter(ISPARENTSC == 1,
+                CSTATFLG == 0,
+                REGION == 2,
+                YEAR %in% c(2019, 2022),
+                !is.na(PHQCAT))
 
-# Fit mixed model (n=4,022)
-model_phq_none <- glmer(I(PHQCAT == 1) ~ 1 + (1|REGION),
-                        data = nhis_phq,
-                        family = binomial,
-                        weights = SAMPWEIGHT)
+# Create survey design
+nhis_phq_design <- svydesign(
+  ids = ~PSU, strata = ~STRATA, weights = ~SAMPWEIGHT,
+  data = nhis_phq_nc, nest = TRUE
+)
 
-# Predict for North Central region
-prop_no_depression <- predict(model_phq_none,
-                               newdata = data.frame(REGION = 2),
-                               type = "response")
+# Fit survey-weighted model
+model_phq_none <- svyglm(I(PHQCAT == 1) ~ 1,
+                         design = nhis_phq_design,
+                         family = quasibinomial())
+
+# Extract probability
+prop_no_depression <- predict(model_phq_none, type = "response")[1]
 ```
 
 **Fills rows:** Age 0-5 (same value × 6)
@@ -512,23 +560,24 @@ prop_no_depression <- predict(model_phq_none,
 
 **Calculation:**
 ```r
-# Use same filtered dataset (nhis_phq from above)
-model_phq_severe <- glmer(I(PHQCAT == 4) ~ 1 + (1|REGION),
-                          data = nhis_phq,
-                          family = binomial,
-                          weights = SAMPWEIGHT)
+# Use same filtered dataset and survey design (nhis_phq_nc and nhis_phq_design from above)
+model_phq_severe <- svyglm(I(PHQCAT == 4) ~ 1,
+                           design = nhis_phq_design,
+                           family = quasibinomial())
 
-prop_severe_depression <- predict(model_phq_severe,
-                                   newdata = data.frame(REGION = 2),
-                                   type = "response")
+prop_severe_depression <- predict(model_phq_severe, type = "response")[1]
 ```
 
 **Fills rows:** Age 0-5 (same value × 6)
 
 ---
 
-#### 3. ACE Exposure - 1 ACE (1 estimand)
-**Estimand:** "Proportion of mothers exposed to one adverse childhood experience"
+#### 3. Maternal ACE Exposure (3 estimands)
+
+**Estimands:**
+- "Proportion of mothers exposed to zero adverse childhood experiences"
+- "Proportion of mothers exposed to one adverse childhood experience"
+- "Proportion of mothers exposed to 2 or more adverse childhood experiences"
 
 **Data Source:** NHIS 2019, 2021, 2022, 2023 (ACE variables available, N=7,657 parents with children 0-5)
 
@@ -542,57 +591,55 @@ prop_severe_depression <- predict(model_phq_severe,
 - `UNFAIRSEXOR`: Discrimination (sex/orientation)
 - `BASENEED`: Couldn't afford basic needs
 
-**Calculation:**
+**Calculation (Survey-Weighted Multinomial Logit):**
 ```r
-# Filter to parents with children 0-5 and ACE data (2019, 2021-2023)
-nhis_ace <- nhis_data %>%
-  inner_join(
+# Filter to parents with children 0-5, ACE data (2019, 2021-2023), and North Central region
+nhis_ace_nc <- nhis_data %>%
+  dplyr::inner_join(
     nhis_data %>%
-      filter(CSTATFLG == 1, AGE <= 5) %>%
-      select(NHISHID, child_age = AGE),
+      dplyr::filter(CSTATFLG == 1, AGE <= 5) %>%
+      dplyr::select(NHISHID, child_age = AGE),
     by = "NHISHID"
   ) %>%
-  filter(ISPARENTSC == 1,
-         CSTATFLG == 0,
-         YEAR %in% c(2019, 2021, 2022, 2023)) %>%
-  mutate(
-    ace_total = rowSums(select(., VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV,
-                                ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED) == 1,
-                        na.rm = FALSE)
+  dplyr::filter(ISPARENTSC == 1,
+                CSTATFLG == 0,
+                REGION == 2,
+                YEAR %in% c(2019, 2021, 2022, 2023)) %>%
+  dplyr::mutate(
+    ace_total = rowSums(dplyr::select(., VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV,
+                                      ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED) == 1,
+                        na.rm = FALSE),
+    ace_category = dplyr::case_when(
+      ace_total == 0 ~ "0_ACEs",
+      ace_total == 1 ~ "1_ACE",
+      ace_total >= 2 ~ "2plus_ACEs",
+      TRUE ~ NA_character_
+    ),
+    ace_category = factor(ace_category, levels = c("0_ACEs", "1_ACE", "2plus_ACEs"))
   )
 
-# Fit mixed model for exactly 1 ACE (n=7,657)
-model_ace_1 <- glmer(I(ace_total == 1) ~ 1 + (1|REGION),
-                     data = nhis_ace,
-                     family = binomial,
-                     weights = SAMPWEIGHT)
+# Create survey design for North Central region
+nhis_ace_design <- svydesign(
+  ids = ~PSU, strata = ~STRATA, weights = ~SAMPWEIGHT,
+  data = nhis_ace_nc, nest = TRUE
+)
 
-prop_ace_1 <- predict(model_ace_1,
-                      newdata = data.frame(REGION = 2),
-                      type = "response")
+# Fit survey-weighted multinomial logit
+library(nnet)
+model_ace <- survey::svymultinom(
+  ace_category ~ 1,
+  design = nhis_ace_design,
+  trace = FALSE
+)
+
+# Predict probabilities (intercept-only model gives marginal proportions)
+ace_predictions <- predict(model_ace, type = "probs")[1,]
+# Result: Named vector with probabilities for 0_ACEs, 1_ACE, 2plus_ACEs (sum to 1.0)
 ```
 
-**Fills rows:** Age 0-5 (same value × 6)
+**Validation:** Multinomial model guarantees proportions sum to 1.0
 
----
-
-#### 4. ACE Exposure - 2+ ACEs (1 estimand)
-**Estimand:** "Proportion of mothers exposed to 2 or more adverse childhood experiences"
-
-**Calculation:**
-```r
-# Use same filtered dataset (nhis_ace from above)
-model_ace_2plus <- glmer(I(ace_total >= 2) ~ 1 + (1|REGION),
-                         data = nhis_ace,
-                         family = binomial,
-                         weights = SAMPWEIGHT)
-
-prop_ace_2plus <- predict(model_ace_2plus,
-                          newdata = data.frame(REGION = 2),
-                          type = "response")
-```
-
-**Fills rows:** Age 0-5 (same value × 6)
+**Fills rows:** Age 0-5 (same value × 6 for each category = 18 total rows)
 
 ---
 
@@ -809,11 +856,65 @@ results <- list(
   race_hispanic = fit_glm_estimates(
     I(HISPAN >= 1) ~ AGE + MULTYEAR + AGE:MULTYEAR,
     design = acs_design
-  ),
+  )
+)
 
-  # FPL categories (add all 5)
-  # PUMAs (add all 14)
+# FPL categories - multinomial logit model
+acs_data_clean <- acs_data %>%
+  dplyr::filter(POVERTY < 600) %>%
+  dplyr::mutate(
+    fpl_category = dplyr::case_when(
+      POVERTY < 100 ~ "0-99%",
+      POVERTY < 200 ~ "100-199%",
+      POVERTY < 300 ~ "200-299%",
+      POVERTY < 400 ~ "300-399%",
+      POVERTY >= 400 ~ "400%+",
+      TRUE ~ NA_character_
+    ),
+    fpl_category = factor(fpl_category,
+                          levels = c("0-99%", "100-199%", "200-299%", "300-399%", "400%+"))
+  )
 
+acs_design_clean <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_clean
+)
+
+model_fpl <- survey::svymultinom(
+  fpl_category ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design_clean,
+  trace = FALSE
+)
+
+pred_data <- data.frame(AGE = 0:5, MULTYEAR = 2023)
+fpl_predictions <- predict(model_fpl, newdata = pred_data, type = "probs")
+
+# PUMA geography - multinomial logit model
+puma_list <- c(3100100, 3100200, 3100300, 3100400, 3100500, 3100600,
+               3100701, 3100702, 3100801, 3100802, 3100901, 3100902, 3100903, 3100904)
+
+acs_data_puma <- acs_data %>%
+  dplyr::mutate(puma_factor = factor(PUMA, levels = puma_list))
+
+acs_design_puma <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_puma
+)
+
+model_puma <- survey::svymultinom(
+  puma_factor ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design_puma,
+  trace = FALSE
+)
+
+puma_predictions <- predict(model_puma, newdata = pred_data, type = "probs")
+
+# Continue with binary GLMs for other variables
+results_binary <- list(
   # Mother's education (Bachelor's+)
   mom_educ_bachelors = fit_glm_estimates(
     I(EDUC_MOM >= 10) ~ AGE + MULTYEAR + AGE:MULTYEAR,
@@ -827,24 +928,56 @@ results <- list(
   )
 )
 
-# Extract estimates
-acs_estimates <- lapply(results, function(x) x$estimates)
+# Extract estimates from binary models
+acs_estimates_binary <- lapply(results_binary, function(x) x$estimates)
+
+# Combine all estimates
+acs_estimates <- c(
+  acs_estimates_binary,
+  list(
+    fpl_0_99 = fpl_predictions[, "0-99%"],
+    fpl_100_199 = fpl_predictions[, "100-199%"],
+    fpl_200_299 = fpl_predictions[, "200-299%"],
+    fpl_300_399 = fpl_predictions[, "300-399%"],
+    fpl_400_plus = fpl_predictions[, "400%+"],
+    puma_3100100 = puma_predictions[, "3100100"],
+    puma_3100200 = puma_predictions[, "3100200"],
+    puma_3100300 = puma_predictions[, "3100300"],
+    puma_3100400 = puma_predictions[, "3100400"],
+    puma_3100500 = puma_predictions[, "3100500"],
+    puma_3100600 = puma_predictions[, "3100600"],
+    puma_3100701 = puma_predictions[, "3100701"],
+    puma_3100702 = puma_predictions[, "3100702"],
+    puma_3100801 = puma_predictions[, "3100801"],
+    puma_3100802 = puma_predictions[, "3100802"],
+    puma_3100901 = puma_predictions[, "3100901"],
+    puma_3100902 = puma_predictions[, "3100902"],
+    puma_3100903 = puma_predictions[, "3100903"],
+    puma_3100904 = puma_predictions[, "3100904"]
+  )
+)
 
 # Save results
 saveRDS(list(
   estimates = acs_estimates,
-  models = lapply(results, function(x) x$model),
-  interaction_tests = lapply(results, function(x) x$interaction_significant)
+  binary_models = lapply(results_binary, function(x) x$model),
+  multinomial_models = list(fpl = model_fpl, puma = model_puma),
+  interaction_tests = lapply(results_binary, function(x) x$interaction_significant)
 ), "scripts/raking/acs_estimates.rds")
 
 # Print summary
-cat("ACS GLM Estimation Summary:\n")
-cat("===========================\n")
-for(name in names(results)) {
-  cat(sprintf("%s: Interaction %s\n",
+cat("ACS Estimation Summary:\n")
+cat("======================\n")
+cat("\nBinary GLM models (with age x year interaction tests):\n")
+for(name in names(results_binary)) {
+  cat(sprintf("  %s: Interaction %s\n",
               name,
-              ifelse(results[[name]]$interaction_significant, "significant", "not significant")))
+              ifelse(results_binary[[name]]$interaction_significant, "significant", "not significant")))
 }
+cat("\nMultinomial logit models:\n")
+cat("  FPL (5 categories): Age x year interaction included\n")
+cat("  PUMA (14 categories): Age x year interaction included\n")
+cat(sprintf("\nTotal estimands: %d (4 binary + 5 FPL + 14 PUMA + 2 mother vars = 25)\n", length(acs_estimates)))
 ```
 
 ---
@@ -854,7 +987,8 @@ for(name in names(results)) {
 
 ```r
 library(dplyr)
-library(lme4)
+library(survey)
+library(nnet)
 library(DBI)
 library(duckdb)
 
@@ -862,47 +996,64 @@ library(duckdb)
 conn <- dbConnect(duckdb::duckdb(), "data/duckdb/kidsights_local.duckdb")
 nhis_data <- dbGetQuery(conn, "SELECT * FROM nhis_raw")
 
-# CRITICAL: Filter to parents with children ages 0-5
-nhis_parents_young <- nhis_data %>%
-  inner_join(
+# CRITICAL: Filter to parents with children ages 0-5 in North Central region
+nhis_parents_nc <- nhis_data %>%
+  dplyr::inner_join(
     nhis_data %>%
-      filter(CSTATFLG == 1, AGE <= 5) %>%
-      select(NHISHID, child_age = AGE),
+      dplyr::filter(CSTATFLG == 1, AGE <= 5) %>%
+      dplyr::select(NHISHID, child_age = AGE),
     by = "NHISHID"
   ) %>%
-  filter(ISPARENTSC == 1, CSTATFLG == 0)
+  dplyr::filter(ISPARENTSC == 1, CSTATFLG == 0, REGION == 2)
 
-# Depression estimates (2019, 2022; n=4,022)
-nhis_phq <- nhis_parents_young %>%
-  filter(YEAR %in% c(2019, 2022), !is.na(PHQCAT))
+# Depression estimates (2019, 2022; North Central region)
+nhis_phq_nc <- nhis_parents_nc %>%
+  dplyr::filter(YEAR %in% c(2019, 2022), !is.na(PHQCAT))
 
-model_phq_none <- glmer(I(PHQCAT == 1) ~ 1 + (1|REGION),
-                        data = nhis_phq, family = binomial,
-                        weights = SAMPWEIGHT)
-model_phq_severe <- glmer(I(PHQCAT == 4) ~ 1 + (1|REGION),
-                          data = nhis_phq, family = binomial,
-                          weights = SAMPWEIGHT)
+nhis_phq_design <- svydesign(
+  ids = ~PSU, strata = ~STRATA, weights = ~SAMPWEIGHT,
+  data = nhis_phq_nc, nest = TRUE
+)
 
-# ACE estimates (2019, 2021-2023; n=7,657)
-nhis_ace <- nhis_parents_young %>%
-  filter(YEAR %in% c(2019, 2021, 2022, 2023)) %>%
-  mutate(ace_total = rowSums(select(., VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV,
-                                    ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED) == 1,
-                            na.rm = FALSE))
+model_phq_none <- svyglm(I(PHQCAT == 1) ~ 1, design = nhis_phq_design, family = quasibinomial())
+model_phq_severe <- svyglm(I(PHQCAT == 4) ~ 1, design = nhis_phq_design, family = quasibinomial())
 
-model_ace_1 <- glmer(I(ace_total == 1) ~ 1 + (1|REGION),
-                     data = nhis_ace, family = binomial,
-                     weights = SAMPWEIGHT)
-model_ace_2plus <- glmer(I(ace_total >= 2) ~ 1 + (1|REGION),
-                         data = nhis_ace, family = binomial,
-                         weights = SAMPWEIGHT)
+# ACE estimates (2019, 2021-2023; North Central region) - multinomial logit
+nhis_ace_nc <- nhis_parents_nc %>%
+  dplyr::filter(YEAR %in% c(2019, 2021, 2022, 2023)) %>%
+  dplyr::mutate(
+    ace_total = rowSums(dplyr::select(., VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV,
+                                      ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED) == 1,
+                        na.rm = FALSE),
+    ace_category = dplyr::case_when(
+      ace_total == 0 ~ "0_ACEs",
+      ace_total == 1 ~ "1_ACE",
+      ace_total >= 2 ~ "2plus_ACEs",
+      TRUE ~ NA_character_
+    ),
+    ace_category = factor(ace_category, levels = c("0_ACEs", "1_ACE", "2plus_ACEs"))
+  )
 
-# Extract predictions for North Central region (REGION = 2)
+nhis_ace_design <- svydesign(
+  ids = ~PSU, strata = ~STRATA, weights = ~SAMPWEIGHT,
+  data = nhis_ace_nc, nest = TRUE
+)
+
+model_ace <- survey::svymultinom(
+  ace_category ~ 1,
+  design = nhis_ace_design,
+  trace = FALSE
+)
+
+# Extract predictions (intercept-only models give marginal proportions)
+ace_predictions <- predict(model_ace, type = "probs")[1,]
+
 nhis_estimates <- list(
-  prop_no_depression = predict(model_phq_none, newdata = data.frame(REGION = 2), type = "response"),
-  prop_severe_depression = predict(model_phq_severe, newdata = data.frame(REGION = 2), type = "response"),
-  prop_ace_1 = predict(model_ace_1, newdata = data.frame(REGION = 2), type = "response"),
-  prop_ace_2plus = predict(model_ace_2plus, newdata = data.frame(REGION = 2), type = "response")
+  prop_no_depression = predict(model_phq_none, type = "response")[1],
+  prop_severe_depression = predict(model_phq_severe, type = "response")[1],
+  prop_ace_0 = ace_predictions["0_ACEs"],
+  prop_ace_1 = ace_predictions["1_ACE"],
+  prop_ace_2plus = ace_predictions["2plus_ACEs"]
 )
 
 saveRDS(nhis_estimates, "scripts/raking/nhis_estimates.rds")
@@ -987,11 +1138,12 @@ raking_targets.to_csv("C:/Users/waldmanm/OneDrive - The University of Colorado D
 
 ### Validation Checks
 
-1. **Completeness:** All 192 rows have non-missing `est` values
+1. **Completeness:** All 210 rows have non-missing `est` values
 2. **Range:** All estimates are between 0 and 1
 3. **Consistency within categories:**
-   - 5 FPL categories sum to 1.0 (within each age)
-   - 14 PUMA categories sum to 1.0 (within each age)
+   - ACS: 5 FPL categories sum to 1.0 (guaranteed by multinomial model)
+   - ACS: 14 PUMA categories sum to 1.0 (guaranteed by multinomial model)
+   - NHIS: 3 maternal ACE categories sum to 1.0 (guaranteed by multinomial model)
 4. **Age patterns:**
    - ACS/NHIS estimates identical across ages 0-5
    - NSCH estimates vary by age
@@ -1017,16 +1169,23 @@ stopifnot(all(abs(fpl_check$total - 1.0) < 0.01))
 
 # Check PUMA sums
 puma_check <- targets %>%
-  filter(grepl("Public-Use Micro Area", estimand)) %>%
-  group_by(age_years) %>%
-  summarise(total = sum(est))
+  dplyr::filter(grepl("Public-Use Micro Area", estimand)) %>%
+  dplyr::group_by(age_years) %>%
+  dplyr::summarise(total = sum(est))
 stopifnot(all(abs(puma_check$total - 1.0) < 0.01))
+
+# Check maternal ACE sums
+ace_check <- targets %>%
+  dplyr::filter(grepl("adverse childhood experience", estimand) & dataset == "NHIS") %>%
+  dplyr::group_by(age_years) %>%
+  dplyr::summarise(total = sum(est))
+stopifnot(all(abs(ace_check$total - 1.0) < 0.01))
 
 # Check ACS consistency across ages
 acs_check <- targets %>%
-  filter(dataset == "ACS NE 5-year") %>%
-  group_by(estimand) %>%
-  summarise(unique_values = n_distinct(est))
+  dplyr::filter(dataset == "ACS NE 5-year") %>%
+  dplyr::group_by(estimand) %>%
+  dplyr::summarise(unique_values = n_distinct(est))
 stopifnot(all(acs_check$unique_values == 1))
 
 cat("✓ All validation checks passed!\n")
@@ -1041,11 +1200,15 @@ cat("✓ All validation checks passed!\n")
 | Source | Estimands | Age Variation | Total Rows |
 |--------|-----------|---------------|------------|
 | ACS | 26 (sex, race, FPL, PUMA, **mother education, mother marital status**) | 24 constant + **2 vary** | 24 × 6 + 12 = **156** |
-| NHIS | 4 (depression, ACE) | Constant | 4 × 6 = 24 |
+| NHIS | 5 (depression 2, **ACE 3**) | Constant | 5 × 6 = **30** |
 | NSCH | 4 (child ACE, behavioral, health, childcare) | Varies | 4 × 6 = 24 |
-| **Total** | **34** | - | **204** |
+| **Total** | **35** | - | **210** |
 
-**⚠️ Note:** Original raking_targets.csv has only 186 rows (31 estimands) - mother's education and marital status are **missing** and need to be added (12 new rows total).
+**⚠️ Note:** Original raking_targets.csv has only 186 rows (31 estimands). Need to add:
+- Mother's education (6 rows)
+- Mother's marital status (6 rows)
+- Maternal ACE - 0 ACEs (6 rows, **new category**)
+Total new rows: 18
 
 ### Key Considerations
 
@@ -1076,18 +1239,21 @@ cat("✓ All validation checks passed!\n")
 ### Next Steps
 
 1. ✓ Create detailed documentation (this file)
-2. ☐ **Add new rows to raking_targets.csv** (12 new rows total):
+2. ☐ **Add new rows to raking_targets.csv** (18 new rows total):
    - **Mother's education** (6 rows, ages 0-5):
      - Estimand: "Proportion of children whose mother has Bachelor's degree or higher"
-     - Dataset: "ACS NE 5-year", Estimator: "GLM"
+     - Dataset: "ACS NE 5-year", Estimator: "Multinomial/GLM"
    - **Mother's marital status** (6 rows, ages 0-5):
      - Estimand: "Proportion of children whose mother is married"
-     - Dataset: "ACS NE 5-year", Estimator: "GLM"
-   - **New total:** 204 rows (was 186)
-3. ☐ Implement ACS estimation script (26 estimands including mother education and marital status)
-4. ☐ Implement NHIS estimation script (4 estimands)
+     - Dataset: "ACS NE 5-year", Estimator: "Multinomial/GLM"
+   - **Maternal ACE - 0 ACEs** (6 rows, ages 0-5):
+     - Estimand: "Proportion of mothers exposed to zero adverse childhood experiences"
+     - Dataset: "NHIS", Estimator: "Multinomial GLMM"
+   - **New total:** 210 rows (was 186)
+3. ☐ Implement ACS estimation script (26 estimands: multinomial for FPL/PUMA, GLM for others)
+4. ☐ Implement NHIS estimation script (5 estimands: 2 depression binary, 3 ACE multinomial)
 5. ☐ Implement NSCH estimation script (4 estimands)
-6. ☐ Create CSV filling script (handles 204 total rows)
+6. ☐ Create CSV filling script (handles 210 total rows)
 7. ☐ Run validation checks
 8. ☐ Review estimates with subject matter experts
 9. ☐ Finalize raking targets for use in post-stratification
