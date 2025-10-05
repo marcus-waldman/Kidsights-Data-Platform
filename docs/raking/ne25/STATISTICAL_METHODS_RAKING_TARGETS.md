@@ -61,12 +61,28 @@ We used NSCH 2023 data, a household survey sponsored by the Health Resources and
 
 ## Statistical Methods
 
+### Data Quality and Missing Data Handling
+
+Prior to all analyses, we implemented rigorous data quality procedures to exclude records with missing or invalid data codes on key demographic variables. IPUMS data products use special numeric codes to indicate missing or indeterminate values that can corrupt estimates if included in analyses. We applied the following exclusion criteria:
+
+**ACS data cleaning:**
+- **Sex:** Excluded code 9 (missing/blank)
+- **Hispanic origin (HISPAN):** Excluded codes 9 (not reported), 498, and 499 (other/not specified); retained valid codes 0-4
+- **Race:** Excluded codes 363 and 380 (not specified American Indian/Alaska Native), 996 (two or more races, not elsewhere classified), and 997 (unknown)
+- **Poverty ratio:** Excluded code 000 (not applicable); retained codes 001-501 representing valid income-to-poverty ratios
+- **Education:** Excluded codes 001 (not applicable) and 999 (missing); retained codes 2-998 representing valid educational attainment
+- **Marital status:** Excluded code 9 (blank/missing); retained codes 1-6 representing valid marital status categories
+
+These exclusion criteria were applied *before* creating survey design objects to ensure all subsequent estimates and standard errors reflected only complete, valid data. For household-level derived variables (mother's education, mother's marital status), we additionally restricted to children with mother present in household (mother location code > 0).
+
+The proportion of records excluded due to missing data was <1% for core demographics (sex, race, Hispanic origin) and <5% for derived household variables (mother's education, mother's marital status), indicating negligible impact on population representativeness.
+
 ### General Approach
 
 We used model-based estimation approaches to leverage temporal trends, reduce sampling variability, and provide principled measures of uncertainty. The specific modeling strategy varied by data source based on data structure and availability:
 
 1. **ACS:** Survey-weighted generalized linear models (GLM) with temporal effects
-2. **NHIS:** Generalized linear mixed models (GLMM) with regional random effects
+2. **NHIS:** Survey-weighted estimates for North Central census region (direct regional filtering)
 3. **NSCH:** Age-stratified generalized linear mixed models with state-level random effects
 
 All models incorporated survey design features (weights, clustering, stratification) to produce design-based variance estimates.

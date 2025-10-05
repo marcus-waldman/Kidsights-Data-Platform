@@ -59,26 +59,79 @@ The `raking_targets.csv` file contains:
 3. **Principled Uncertainty:** Provides proper standard errors accounting for survey design
 4. **Consistency:** Aligns with NHIS/NSCH model-based approaches
 
+### CRITICAL: Defensive Coding for Missing Data
+
+**⚠️ Problem:** IPUMS ACS variables contain special missing data codes that can corrupt estimates if not explicitly filtered.
+
+**Solution:** All data preparation steps MUST explicitly exclude missing codes before creating binary/categorical outcomes.
+
+**IPUMS ACS Missing Data Codes:**
+| Variable | Missing Codes | Valid Range | Defensive Filter |
+|----------|--------------|-------------|------------------|
+| SEX | 9 (Missing/blank) | 1-2 | `SEX %in% c(1, 2)` |
+| HISPAN | 9 (Not Reported), 498-499 (Other) | 0-4 | `HISPAN %in% 0:4` |
+| RACE | 997 (Unknown), 996, 363, 380 | 1-9 (excluding missing) | `RACE %in% 1:9 & !(RACE %in% c(363, 380, 996, 997))` |
+| POVERTY | 000 (N/A) | 1-501 | `POVERTY >= 1 & POVERTY <= 501` |
+| EDUC | 999 (Missing), 001 (N/A) | 2-998 | `EDUC >= 2 & EDUC <= 998` |
+| MARST | 9 (Blank, missing) | 1-6 | `MARST %in% 1:6` |
+| PUMA | 77777 (Special code) | 5-digit valid codes | Check state-specific valid codes |
+
+**Example - WRONG vs RIGHT:**
+```r
+# ❌ WRONG - Includes HISPAN=9 (Not Reported)
+I(HISPAN >= 1)
+
+# ✅ RIGHT - Explicitly filters to valid Hispanic codes
+I(HISPAN >= 1 & HISPAN <= 4)
+
+# ❌ WRONG - Includes RACE=997 (Unknown)
+I(RACE == 2)
+
+# ✅ RIGHT - Filters valid RACE values first
+acs_data_clean <- acs_data %>%
+  dplyr::filter(RACE %in% 1:9, !(RACE %in% c(363, 380, 996, 997)))
+
+# Then use clean data
+I(RACE == 2)
+```
+
+**Implementation Strategy:**
+1. **Filter missing codes BEFORE creating survey design object** (preferred)
+2. Apply defensive filters to all binary outcomes: `I((condition) & valid_range_check)`
+3. Document which codes were excluded in script comments
+
 **Model Specification:**
 ```r
 library(survey)
 
-# Create survey design object
+# STEP 1: Filter out missing data codes BEFORE creating survey design
+acs_data_clean <- acs_data %>%
+  dplyr::filter(
+    # Exclude missing codes for core demographics
+    SEX %in% c(1, 2),                                    # Valid sex codes
+    HISPAN %in% 0:4,                                     # Valid Hispanic codes (exclude 9, 498-499)
+    RACE %in% 1:9,                                       # Valid race codes
+    !(RACE %in% c(363, 380, 996, 997)),                 # Exclude special missing codes
+    POVERTY >= 1 & POVERTY <= 501,                      # Valid poverty ratio (exclude 000)
+    AGE >= 0 & AGE <= 5                                 # Target age range
+  )
+
+# STEP 2: Create survey design object from clean data
 acs_design <- svydesign(
   ids = ~CLUSTER,
   strata = ~STRATA,
   weights = ~PERWT,
-  data = acs_data
+  data = acs_data_clean
 )
 
-# Fit weighted logistic regression
+# STEP 3: Fit weighted logistic regression
 model <- svyglm(
   outcome ~ AGE + MULTYEAR + AGE:MULTYEAR,
   design = acs_design,
   family = quasibinomial()
 )
 
-# Predict at MULTYEAR=2023 (most recent year) for each age
+# STEP 4: Predict at MULTYEAR=2023 (most recent year) for each age
 pred_data <- data.frame(AGE = 0:5, MULTYEAR = 2023)
 estimates <- predict(model, newdata = pred_data, type = "response", se.fit = TRUE)
 ```
@@ -100,13 +153,16 @@ estimates <- predict(model, newdata = pred_data, type = "response", se.fit = TRU
 **Variable:** `SEX`
 - 1 = Male
 - 2 = Female
+- 9 = Missing/blank ⚠️ EXCLUDE
 
-**Calculation (GLM):**
+**Calculation (GLM with defensive coding):**
 ```r
+# Data already filtered for SEX %in% c(1, 2) in acs_data_clean
+
 # Fit model
 model_sex <- svyglm(
   I(SEX == 1) ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = acs_design,
+  design = acs_design,  # Uses acs_data_clean
   family = quasibinomial()
 )
 
@@ -127,48 +183,75 @@ pred_sex <- predict(model_sex,
 **Estimand 1:** "Proportion of children identifying as white alone, non-Hispanic"
 
 **Variables:** `RACE`, `HISPAN`
-- `HISPAN = 0` (Not Hispanic)
 - `RACE = 1` (White)
+- `HISPAN = 0` (Not Hispanic)
+- ⚠️ EXCLUDE: HISPAN 9, 498-499 (missing); RACE 363, 380, 996, 997 (missing)
 
-**Calculation:**
+**Calculation (GLM with defensive coding):**
 ```r
-from python.acs.harmonization import harmonize_race_ethnicity
+# Data already filtered in acs_data_clean
+# HISPAN %in% 0:4, RACE %in% 1:9, !(RACE %in% c(363, 380, 996, 997))
 
-# Harmonize race/ethnicity
-acs_data['ne25_race'] = harmonize_race_ethnicity(acs_data, 'RACE', 'HISPAN')
+model_white_nh <- svyglm(
+  I((RACE == 1) & (HISPAN == 0)) ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design,  # Uses acs_data_clean
+  family = quasibinomial()
+)
 
-# Calculate proportion white non-Hispanic
-white_nh = (acs_data['ne25_race'] == 'White') & (acs_data['HISPAN'] == 0)
-prop_white_nh = np.average(white_nh, weights=acs_data['PERWT'])
+pred_white_nh <- predict(model_white_nh,
+                         newdata = data.frame(AGE = 0:5, MULTYEAR = 2023),
+                         type = "response")
 ```
 
 **Estimand 2:** "Proportion of children identifying as Black, including those that listed more than one race and also Hispanic"
 
 **Logic:** Any person with `RACE = 2` (Black), regardless of `HISPAN` value
 
-**Calculation:**
+**Calculation (GLM with defensive coding):**
 ```r
-black_any = acs_data['RACE'] == 2
-prop_black = np.average(black_any, weights=acs_data['PERWT'])
+# Data already filtered in acs_data_clean for valid RACE codes
+
+model_black <- svyglm(
+  I(RACE == 2) ~ AGE + MULTYEAR + AGE:MULTYEAR,
+  design = acs_design,  # Uses acs_data_clean
+  family = quasibinomial()
+)
+
+pred_black <- predict(model_black,
+                      newdata = data.frame(AGE = 0:5, MULTYEAR = 2023),
+                      type = "response")
 ```
 
 **Estimand 3:** "Proportion of children identifying as Hispanic (any race)"
 
-**Variable:** `HISPAN ≥ 1` (any Hispanic origin)
+**Variable:** `HISPAN` (1-4 = Hispanic origins)
+- ⚠️ DEFENSIVE: Must use `HISPAN >= 1 & HISPAN <= 4` (NOT `HISPAN >= 1`)
+- This excludes HISPAN=9 (Not Reported), 498, 499 (Other)
 
-**Calculation:**
+**Calculation (GLM with defensive coding):**
 ```r
-hispanic_any = acs_data['HISPAN'] >= 1
-prop_hispanic = np.average(hispanic_any, weights=acs_data['PERWT'])
+# Data already filtered in acs_data_clean for HISPAN %in% 0:4
+
+model_hispanic <- svyglm(
+  I(HISPAN >= 1) ~ AGE + MULTYEAR + AGE:MULTYEAR,  # Safe because filtered to 0-4
+  design = acs_design,  # Uses acs_data_clean
+  family = quasibinomial()
+)
+
+pred_hispanic <- predict(model_hispanic,
+                         newdata = data.frame(AGE = 0:5, MULTYEAR = 2023),
+                         type = "response")
 ```
 
-**Fills rows:** Age 0-5 (same value × 6 for each)
+**Fills rows:** Age 0-5 (same value × 6 for each = 18 total rows)
 
 ---
 
 #### 3. Federal Poverty Level (5 estimands)
 
-**Variables:** `POVERTY` (income as percentage of poverty threshold, 0-500)
+**Variables:** `POVERTY` (income as percentage of poverty threshold, 1-501)
+- Valid codes: 001-501 (1% or less to 501%+)
+- ⚠️ EXCLUDE: 000 (N/A - not applicable)
 
 **Estimands:**
 1. "Proportion of children in household at 0-99% Federal Poverty Level"
@@ -177,11 +260,12 @@ prop_hispanic = np.average(hispanic_any, weights=acs_data['PERWT'])
 4. "Proportion of children in household at 300-399% Federal Poverty Level"
 5. "Proportion of children in household at 400+ % Federal Poverty Level"
 
-**Calculation (Survey-Weighted Multinomial Logit):**
+**Calculation (Survey-Weighted Multinomial Logit with defensive coding):**
 ```r
-# Create FPL category variable (filter valid values, exclude missing 996-998)
-acs_data <- acs_data %>%
-  dplyr::filter(POVERTY < 600) %>%
+# Data already filtered in acs_data_clean for POVERTY >= 1 & POVERTY <= 501
+
+# Create FPL category variable
+acs_data_fpl <- acs_data_clean %>%
   dplyr::mutate(
     fpl_category = dplyr::case_when(
       POVERTY < 100 ~ "0-99%",
@@ -195,11 +279,19 @@ acs_data <- acs_data %>%
                           levels = c("0-99%", "100-199%", "200-299%", "300-399%", "400%+"))
   )
 
+# Create survey design from FPL-specific data
+acs_design_fpl <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_fpl
+)
+
 # Fit multinomial logit model with age × year interaction
 library(nnet)
 model_fpl <- survey::svymultinom(
   fpl_category ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = acs_design,
+  design = acs_design_fpl,  # Uses clean data
   trace = FALSE
 )
 
@@ -235,21 +327,32 @@ fpl_predictions <- predict(model_fpl, newdata = pred_data, type = "probs")
 13. 3100903
 14. 3100904
 
-**Calculation (Survey-Weighted Multinomial Logit):**
+**Calculation (Survey-Weighted Multinomial Logit with defensive coding):**
 ```r
-# Ensure PUMA is a factor with all 14 categories
+# Data already filtered in acs_data_clean (no special missing code checks needed for PUMA)
+# Nebraska-specific PUMA codes should all be valid 7-digit codes
+
+# Ensure PUMA is a factor with all 14 Nebraska categories
 puma_list <- c(3100100, 3100200, 3100300, 3100400, 3100500, 3100600,
                3100701, 3100702, 3100801, 3100802, 3100901, 3100902, 3100903, 3100904)
 
-acs_data <- acs_data %>%
+acs_data_puma <- acs_data_clean %>%
   dplyr::mutate(
     puma_factor = factor(PUMA, levels = puma_list)
   )
 
+# Create survey design
+acs_design_puma <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_puma
+)
+
 # Fit multinomial logit model with age × year interaction
 model_puma <- survey::svymultinom(
   puma_factor ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = acs_design,
+  design = acs_design_puma,  # Uses clean data
   trace = FALSE
 )
 
@@ -272,21 +375,39 @@ puma_predictions <- predict(model_puma, newdata = pred_data, type = "probs")
 **Variables:** `EDUC_MOM` (mother's education), `MOMLOC` (mother location in household)
 
 **Mother Education Coding:**
+- Valid: 2-998 (educational attainment levels)
 - 0-6: Less than Bachelor's
 - 7: High school graduate/GED
 - 8: Some college, no degree
 - 10: Bachelor's degree
 - 11: Master's degree
 - 12-13: Professional/Doctoral degree
+- ⚠️ EXCLUDE: 999 (Missing), 001 (N/A)
 
 **Definition:** Bachelor's or higher = `EDUC_MOM >= 10`
 
-**Calculation (GLM with Temporal Trends):**
+**Calculation (GLM with Temporal Trends and defensive coding):**
 ```r
-# Fit model (exclude missing mother links)
+# Filter to children with valid mother education data
+acs_data_mom_educ <- acs_data_clean %>%
+  dplyr::filter(
+    MOMLOC > 0,                          # Mother in household
+    !is.na(EDUC_MOM),                    # EDUC_MOM exists
+    EDUC_MOM >= 2 & EDUC_MOM <= 998      # Valid education codes
+  )
+
+# Create survey design
+acs_design_mom_educ <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_mom_educ
+)
+
+# Fit model
 model_mom_educ <- svyglm(
   I(EDUC_MOM >= 10) ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = subset(acs_design, !is.na(EDUC_MOM) & MOMLOC > 0),
+  design = acs_design_mom_educ,
   family = quasibinomial()
 )
 
@@ -301,7 +422,7 @@ pred_mom_educ <- predict(model_mom_educ,
 # Test interaction significance
 model_main <- svyglm(
   I(EDUC_MOM >= 10) ~ AGE + MULTYEAR,
-  design = subset(acs_design, !is.na(EDUC_MOM) & MOMLOC > 0),
+  design = acs_design_mom_educ,
   family = quasibinomial()
 )
 
@@ -347,21 +468,38 @@ anova(model_main, model_mom_educ, test = "F")
 - **Result:** `MARST_HEAD = 1` serves as proxy for "mother is married"
 
 **MARST_HEAD Coding:**
+- Valid: 1-6 (marital status categories)
 - 1 = Married, spouse present ✓
 - 2 = Married, spouse absent
 - 3 = Separated
 - 4 = Divorced
 - 5 = Widowed
 - 6 = Never married/single
+- ⚠️ EXCLUDE: 9 (Blank, missing)
 
 **Definition:** Mother married = `MARST_HEAD = 1` (married, spouse present)
 
-**Calculation (GLM with Temporal Trends):**
+**Calculation (GLM with Temporal Trends and defensive coding):**
 ```r
-# Fit model (exclude children with no mother link)
+# Filter to children with valid mother marital status data
+acs_data_mom_marst <- acs_data_clean %>%
+  dplyr::filter(
+    MOMLOC > 0,                          # Mother in household
+    MARST_HEAD %in% 1:6                  # Valid marital status codes (exclude 9)
+  )
+
+# Create survey design
+acs_design_mom_marst <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_mom_marst
+)
+
+# Fit model
 model_mom_married <- svyglm(
   I(MARST_HEAD == 1) ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = subset(acs_design, MOMLOC > 0),
+  design = acs_design_mom_marst,
   family = quasibinomial()
 )
 
@@ -376,7 +514,7 @@ pred_mom_married <- predict(model_mom_married,
 # Test interaction significance
 model_main <- svyglm(
   I(MARST_HEAD == 1) ~ AGE + MULTYEAR,
-  design = subset(acs_design, MOMLOC > 0),
+  design = acs_design_mom_marst,
   family = quasibinomial()
 )
 
@@ -799,18 +937,32 @@ library(duckdb)
 
 # Load ACS data
 conn <- dbConnect(duckdb::duckdb(), "data/duckdb/kidsights_local.duckdb")
-acs_data <- dbGetQuery(conn, "
+acs_data_raw <- dbGetQuery(conn, "
   SELECT * FROM acs_data
   WHERE state = 'nebraska'
   AND AGE BETWEEN 0 AND 5
 ")
 
-# Create survey design object
+# DEFENSIVE CODING: Filter out missing data codes
+acs_data_clean <- acs_data_raw %>%
+  dplyr::filter(
+    # Core demographics - exclude missing codes
+    SEX %in% c(1, 2),                                    # Valid sex codes
+    HISPAN %in% 0:4,                                     # Valid Hispanic codes (exclude 9, 498-499)
+    RACE %in% 1:9,                                       # Valid race codes
+    !(RACE %in% c(363, 380, 996, 997)),                 # Exclude special missing race codes
+    POVERTY >= 1 & POVERTY <= 501                        # Valid poverty ratio (exclude 000)
+  )
+
+cat(sprintf("[OK] Filtered ACS data: %d -> %d records\n",
+            nrow(acs_data_raw), nrow(acs_data_clean)))
+
+# Create survey design object from clean data
 acs_design <- svydesign(
   ids = ~CLUSTER,
   strata = ~STRATA,
   weights = ~PERWT,
-  data = acs_data
+  data = acs_data_clean
 )
 
 # Helper function to fit GLM and extract predictions
@@ -862,9 +1014,8 @@ results <- list(
   )
 )
 
-# FPL categories - multinomial logit model
-acs_data_clean <- acs_data %>%
-  dplyr::filter(POVERTY < 600) %>%
+# FPL categories - multinomial logit model (data already filtered)
+acs_data_fpl <- acs_data_clean %>%
   dplyr::mutate(
     fpl_category = dplyr::case_when(
       POVERTY < 100 ~ "0-99%",
@@ -878,27 +1029,27 @@ acs_data_clean <- acs_data %>%
                           levels = c("0-99%", "100-199%", "200-299%", "300-399%", "400%+"))
   )
 
-acs_design_clean <- svydesign(
+acs_design_fpl <- svydesign(
   ids = ~CLUSTER,
   strata = ~STRATA,
   weights = ~PERWT,
-  data = acs_data_clean
+  data = acs_data_fpl
 )
 
 model_fpl <- survey::svymultinom(
   fpl_category ~ AGE + MULTYEAR + AGE:MULTYEAR,
-  design = acs_design_clean,
+  design = acs_design_fpl,
   trace = FALSE
 )
 
 pred_data <- data.frame(AGE = 0:5, MULTYEAR = 2023)
 fpl_predictions <- predict(model_fpl, newdata = pred_data, type = "probs")
 
-# PUMA geography - multinomial logit model
+# PUMA geography - multinomial logit model (data already filtered)
 puma_list <- c(3100100, 3100200, 3100300, 3100400, 3100500, 3100600,
                3100701, 3100702, 3100801, 3100802, 3100901, 3100902, 3100903, 3100904)
 
-acs_data_puma <- acs_data %>%
+acs_data_puma <- acs_data_clean %>%
   dplyr::mutate(puma_factor = factor(PUMA, levels = puma_list))
 
 acs_design_puma <- svydesign(
@@ -916,18 +1067,46 @@ model_puma <- survey::svymultinom(
 
 puma_predictions <- predict(model_puma, newdata = pred_data, type = "probs")
 
-# Continue with binary GLMs for other variables
+# Mother variables - need additional filtering for EDUC and MARST
+acs_data_mom_educ <- acs_data_clean %>%
+  dplyr::filter(
+    MOMLOC > 0,                          # Mother in household
+    !is.na(EDUC_MOM),                    # EDUC_MOM exists
+    EDUC_MOM >= 2 & EDUC_MOM <= 998      # Valid education codes (exclude 999, 001)
+  )
+
+acs_design_mom_educ <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_mom_educ
+)
+
+acs_data_mom_marst <- acs_data_clean %>%
+  dplyr::filter(
+    MOMLOC > 0,                          # Mother in household
+    MARST_HEAD %in% 1:6                  # Valid marital status codes (exclude 9)
+  )
+
+acs_design_mom_marst <- svydesign(
+  ids = ~CLUSTER,
+  strata = ~STRATA,
+  weights = ~PERWT,
+  data = acs_data_mom_marst
+)
+
+# Binary GLMs for mother variables
 results_binary <- list(
   # Mother's education (Bachelor's+)
   mom_educ_bachelors = fit_glm_estimates(
     I(EDUC_MOM >= 10) ~ AGE + MULTYEAR + AGE:MULTYEAR,
-    design = subset(acs_design, !is.na(EDUC_MOM) & MOMLOC > 0)
+    design = acs_design_mom_educ
   ),
 
   # Mother's marital status (married)
   mom_married = fit_glm_estimates(
     I(MARST_HEAD == 1) ~ AGE + MULTYEAR + AGE:MULTYEAR,
-    design = subset(acs_design, MOMLOC > 0)
+    design = acs_design_mom_marst
   )
 )
 
