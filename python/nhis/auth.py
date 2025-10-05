@@ -10,10 +10,15 @@ Functions:
     get_ipums_client: Convenience function to get authenticated client (cached)
 """
 
+import os
 import structlog
 from pathlib import Path
 from typing import Optional
 from ipumspy import IpumsApiClient
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure structured logging
 log = structlog.get_logger()
@@ -23,12 +28,39 @@ _CLIENT_CACHE: Optional[IpumsApiClient] = None
 _API_KEY_CACHE: Optional[str] = None
 
 
-def read_api_key(api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt") -> str:
+def _get_default_api_key_path() -> str:
+    """
+    Get default API key path from environment or fallback to sensible defaults.
+
+    Priority:
+        1. IPUMS_API_KEY_PATH environment variable
+        2. ~/.kidsights/IPUMS.txt (cross-platform home directory)
+        3. Legacy hardcoded path (backward compatibility)
+
+    Returns:
+        str: Path to IPUMS API key file
+    """
+    # Priority 1: Environment variable (from .env file or system)
+    env_path = os.getenv('IPUMS_API_KEY_PATH')
+    if env_path:
+        return env_path
+
+    # Priority 2: Cross-platform home directory default
+    home_path = Path.home() / '.kidsights' / 'IPUMS.txt'
+    if home_path.exists():
+        return str(home_path)
+
+    # Priority 3: Legacy hardcoded path (backward compatibility)
+    legacy_path = "C:/Users/waldmanm/my-APIs/IPUMS.txt"
+    return legacy_path
+
+
+def read_api_key(api_key_path: Optional[str] = None) -> str:
     """Read IPUMS API key from file.
 
     Args:
         api_key_path: Path to file containing IPUMS API key.
-            Default: C:/Users/waldmanm/my-APIs/IPUMS.txt
+            If None, uses IPUMS_API_KEY_PATH environment variable or default locations.
 
     Returns:
         str: IPUMS API key (whitespace stripped)
@@ -42,6 +74,10 @@ def read_api_key(api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt") -> s
         >>> print(f"API key length: {len(api_key)}")
         API key length: 56
     """
+    # Use provided path or get default
+    if api_key_path is None:
+        api_key_path = _get_default_api_key_path()
+
     key_file = Path(api_key_path)
 
     log.debug("Reading IPUMS API key", path=api_key_path)
@@ -80,13 +116,13 @@ def read_api_key(api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt") -> s
 
 def initialize_ipums_client(
     api_key: Optional[str] = None,
-    api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt"
+    api_key_path: Optional[str] = None
 ) -> IpumsApiClient:
     """Initialize IPUMS API client for NHIS data extraction.
 
     Args:
         api_key: IPUMS API key string. If None, will read from api_key_path.
-        api_key_path: Path to API key file. Only used if api_key is None.
+        api_key_path: Path to API key file. If None, uses environment variable or default.
 
     Returns:
         IpumsApiClient: Initialized and authenticated IPUMS API client
@@ -140,7 +176,7 @@ def initialize_ipums_client(
 
 def get_ipums_client(
     force_new: bool = False,
-    api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt"
+    api_key_path: Optional[str] = None
 ) -> IpumsApiClient:
     """Get IPUMS API client (cached singleton).
 
@@ -149,7 +185,7 @@ def get_ipums_client(
 
     Args:
         force_new: If True, create a new client instance even if cached
-        api_key_path: Path to API key file
+        api_key_path: Path to API key file. If None, uses environment variable or default.
 
     Returns:
         IpumsApiClient: Initialized IPUMS API client
@@ -200,8 +236,11 @@ def clear_client_cache():
 
 
 # Convenience functions for common operations
-def get_api_key(api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt") -> str:
+def get_api_key(api_key_path: Optional[str] = None) -> str:
     """Get API key (cached).
+
+    Args:
+        api_key_path: Path to API key file. If None, uses environment variable or default.
 
     Returns:
         str: IPUMS API key

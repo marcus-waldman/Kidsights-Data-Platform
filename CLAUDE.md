@@ -45,14 +45,53 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 ### Key Requirements
 
 - **R 4.5.1** with arrow, duckdb packages
-- **Python 3.13+** with duckdb, pandas, pyyaml, ipumspy
-- **IPUMS API key:** `C:/Users/waldmanm/my-APIs/IPUMS.txt`
-- **REDCap API key:** `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv`
+- **Python 3.13+** with duckdb, pandas, pyyaml, ipumspy, python-dotenv
+- **IPUMS API key:** Configure via `.env` file (see [Environment Configuration](#environment-configuration))
+- **REDCap API key:** Configure via `.env` file (see [Environment Configuration](#environment-configuration))
 
 **📖 For detailed pipeline documentation, see:**
 - [Quick Reference](docs/QUICK_REFERENCE.md) - Command cheatsheet
 - [Pipeline Overview](docs/architecture/PIPELINE_OVERVIEW.md) - Architecture details
 - [Pipeline Steps](docs/architecture/PIPELINE_STEPS.md) - Execution instructions
+
+---
+
+## Environment Configuration
+
+**🌍 Cross-Platform Portability via Environment Variables**
+
+The platform uses a **3-tier configuration system** for portability across machines and operating systems:
+
+1. **Environment Variables** (`.env` file) - **HIGHEST PRIORITY**
+2. **Config YAML Files** (`config/sources/*.yaml`) - Secondary
+3. **Cross-Platform Defaults** (`~/.kidsights/`) - Fallback
+
+### Quick Setup for New Machines
+
+```bash
+# 1. Copy environment template
+cp .env.template .env
+
+# 2. Edit with your local paths
+# Windows: notepad .env
+# Mac/Linux: nano .env
+
+# 3. Configure API key paths
+IPUMS_API_KEY_PATH=C:/Users/YOUR_USERNAME/my-APIs/IPUMS.txt
+REDCAP_API_CREDENTIALS_PATH=C:/Users/YOUR_USERNAME/my-APIs/kidsights_redcap_api.csv
+```
+
+### Environment Variables Reference
+
+| Variable | Purpose | Default Fallback |
+|----------|---------|------------------|
+| `IPUMS_API_KEY_PATH` | IPUMS API key location (ACS/NHIS) | `~/.kidsights/IPUMS.txt` |
+| `REDCAP_API_CREDENTIALS_PATH` | REDCap API credentials (NE25) | `~/.kidsights/kidsights_redcap_api.csv` |
+| `KIDSIGHTS_DB_PATH` | DuckDB database override (optional) | `data/duckdb/kidsights_local.duckdb` |
+
+**📖 Complete installation guide:** [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATION_GUIDE.md)
+
+**⚠️ Security:** The `.env` file is gitignored and never committed. Each collaborator maintains their own `.env` file with machine-specific paths.
 
 ---
 
@@ -220,7 +259,7 @@ print(f"Total records: {result[0][0]}")
 ### Python Packages
 ```bash
 # Core packages (NE25 pipeline)
-pip install duckdb pandas pyyaml structlog
+pip install duckdb pandas pyyaml structlog python-dotenv
 
 # ACS/NHIS pipeline packages
 pip install ipumspy requests
@@ -229,9 +268,12 @@ pip install ipumspy requests
 pip install pyreadstat
 ```
 
-### API Keys
-- **REDCap:** `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv`
-- **IPUMS:** `C:/Users/waldmanm/my-APIs/IPUMS.txt` (shared by ACS and NHIS)
+### API Keys Configuration
+**Configure via `.env` file** (see [Environment Configuration](#environment-configuration) above)
+
+- **REDCap:** Set `REDCAP_API_CREDENTIALS_PATH` in `.env`
+- **IPUMS:** Set `IPUMS_API_KEY_PATH` in `.env` (shared by ACS and NHIS)
+- **Security:** Never commit `.env` file (already gitignored)
 
 ### Data Storage
 - **Local DuckDB:** `data/duckdb/kidsights_local.duckdb`

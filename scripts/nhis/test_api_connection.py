@@ -3,10 +3,21 @@
 Test IPUMS NHIS API Connection
 
 Tests IPUMS Health Surveys API authentication and connectivity for NHIS data extraction.
+
+Requirements:
+    - IPUMS API key configured via .env file (IPUMS_API_KEY_PATH)
+    - ipumspy package installed
+
+Usage:
+    python scripts/nhis/test_api_connection.py
 """
 
 import sys
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add project root to Python path
 project_root = Path(__file__).parent.parent.parent

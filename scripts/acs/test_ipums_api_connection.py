@@ -9,46 +9,47 @@ Usage:
     python scripts/acs/test_ipums_api_connection.py
 
 Requirements:
-    - IPUMS API key at C:/Users/waldmanm/my-APIs/IPUMS.txt
+    - IPUMS API key configured via .env file (IPUMS_API_KEY_PATH)
     - ipumspy package installed
 """
 
 import sys
+import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 
-def read_api_key(api_key_path: str = "C:/Users/waldmanm/my-APIs/IPUMS.txt") -> str:
-    """Read IPUMS API key from file.
-
-    Args:
-        api_key_path: Path to IPUMS API key file
+def read_api_key() -> str:
+    """Read IPUMS API key from file using environment variable or default.
 
     Returns:
         API key string (stripped of whitespace)
 
     Raises:
         FileNotFoundError: If API key file doesn't exist
+        ValueError: If .env not configured and default path doesn't exist
     """
-    key_file = Path(api_key_path)
+    # Use auth module which handles environment variables
+    from python.acs.auth import read_api_key as auth_read_key
 
-    if not key_file.exists():
+    try:
+        return auth_read_key()
+    except FileNotFoundError as e:
+        # Provide helpful error message
         raise FileNotFoundError(
-            f"IPUMS API key file not found: {api_key_path}\n"
-            f"Please create this file with your IPUMS API key.\n"
-            f"Get your API key from: https://account.ipums.org/api_keys"
+            f"{e}\n\n"
+            f"Setup steps:\n"
+            f"  1. Copy .env.template to .env\n"
+            f"  2. Set IPUMS_API_KEY_PATH in .env\n"
+            f"  3. Get your API key from: https://account.ipums.org/api_keys"
         )
-
-    with open(key_file, 'r') as f:
-        api_key = f.read().strip()
-
-    if not api_key:
-        raise ValueError(f"IPUMS API key file is empty: {api_key_path}")
-
-    return api_key
 
 
 def test_ipumspy_import():

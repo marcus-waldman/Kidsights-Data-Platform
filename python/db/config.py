@@ -3,6 +3,11 @@ Configuration loader for Kidsights database operations.
 
 Reads configuration from YAML files and provides centralized access
 to database settings, paths, and other configuration values.
+
+Environment Variables:
+    REDCAP_API_CREDENTIALS_PATH: Override REDCap API credentials file location
+    KIDSIGHTS_DB_PATH: Override DuckDB database path
+    IPUMS_API_KEY_PATH: IPUMS API key location (used by ACS/NHIS pipelines)
 """
 
 import os
@@ -10,6 +15,9 @@ import yaml
 from pathlib import Path
 from typing import Dict, Any, Optional
 from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def load_config(config_path: str = "config/sources/ne25.yaml") -> Dict[str, Any]:
@@ -79,6 +87,10 @@ def _resolve_paths(config: Dict[str, Any], project_root: Path) -> Dict[str, Any]
     """
     Resolve relative paths in configuration to absolute paths.
 
+    Environment variable overrides:
+        KIDSIGHTS_DB_PATH: Override database path
+        REDCAP_API_CREDENTIALS_PATH: Override REDCap API credentials file
+
     Args:
         config: Configuration dictionary
         project_root: Project root directory
@@ -86,10 +98,25 @@ def _resolve_paths(config: Dict[str, Any], project_root: Path) -> Dict[str, Any]
     Returns:
         Configuration with resolved paths
     """
+    # Resolve database path with environment variable override
     if 'output' in config and 'database_path' in config['output']:
-        db_path = Path(config['output']['database_path'])
-        if not db_path.is_absolute():
-            config['output']['database_path'] = str(project_root / db_path)
+        # Priority 1: Environment variable
+        env_db_path = os.getenv('KIDSIGHTS_DB_PATH')
+        if env_db_path:
+            config['output']['database_path'] = env_db_path
+        else:
+            # Priority 2: Config file (resolve relative paths)
+            db_path = Path(config['output']['database_path'])
+            if not db_path.is_absolute():
+                config['output']['database_path'] = str(project_root / db_path)
+
+    # Resolve REDCap API credentials path with environment variable override
+    if 'redcap' in config and 'api_credentials_file' in config['redcap']:
+        # Priority 1: Environment variable
+        env_creds_path = os.getenv('REDCAP_API_CREDENTIALS_PATH')
+        if env_creds_path:
+            config['redcap']['api_credentials_file'] = env_creds_path
+        # Note: If not in environment, keep the value from YAML (may be absolute or relative)
 
     return config
 
