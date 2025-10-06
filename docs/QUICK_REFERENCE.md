@@ -117,6 +117,33 @@ python scripts/nsch/process_all_years.py --years 2020-2023
 
 ---
 
+### Raking Targets Pipeline
+
+**Purpose:** Generate population-representative raking targets for post-stratification weighting
+
+```bash
+# Run full pipeline (Phases 1-5)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_raking_targets_pipeline.R
+
+# Verify results
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
+```
+
+**What it does:**
+- Loads ACS estimates (25 estimands from Phase 1)
+- Estimates NHIS outcomes (1 estimand: parent PHQ-2)
+- Estimates NSCH outcomes (4 estimands: ACEs, health, child care)
+- Consolidates to 180 raking targets (30 estimands × 6 ages)
+- Loads to database table `raking_targets_ne25`
+
+**Timing:** ~2-3 minutes
+
+**Output:** 180 raking targets in DuckDB with 4 indexes
+
+**Documentation:** [docs/raking/NE25_RAKING_TARGETS_PIPELINE.md](raking/NE25_RAKING_TARGETS_PIPELINE.md)
+
+---
+
 ## ACS Utility Scripts
 
 ### Test API Connection

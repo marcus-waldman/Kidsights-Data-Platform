@@ -52,6 +52,7 @@ Comprehensive documentation for the Kidsights Data Platform - a multi-source ETL
 - **[ACS Pipeline](acs/)** - Census data extraction, metadata system, IPUMS variables
 - **[NHIS Pipeline](nhis/)** - Health surveys data, ACEs, mental health measures
 - **[NSCH Pipeline](nsch/)** - Children's health survey, database schema, queries
+- **[Raking Targets](raking/)** - Population-representative targets, statistical methods, pipeline execution
 
 ### 🛠️ Development & References
 
@@ -83,7 +84,7 @@ Root-level markdown files in `/docs`:
 - **Census data extraction** from IPUMS USA API
 - **Metadata system** with 3 DuckDB tables for transformations
 - **Smart caching** with 90+ day retention
-- **Status:** Standalone utility ready for future raking integration
+- **Status:** Standalone utility, integrated with raking targets pipeline
 
 ### NHIS Pipeline (Production Ready)
 - **229,609 records** across 6 annual samples (2019-2024)
@@ -96,6 +97,12 @@ Root-level markdown files in `/docs`:
 - **3,780 unique variables** from SPSS files
 - **Automated pipeline** - SPSS → Feather → R validation → Database
 - **Performance:** Single year in 20 seconds, batch in 2 minutes
+
+### Raking Targets Pipeline (Complete)
+- **180 raking targets** (30 estimands × 6 age groups)
+- **3 data sources** - ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
+- **Database integration** - `raking_targets_ne25` table with 4 indexes
+- **Execution:** ~2-3 minutes with automated verification
 
 ### Codebook System
 - **305 items** across 8 studies (NE25, NE22, NE20, CAHMI22, CAHMI21, ECDI, CREDI, GSED)

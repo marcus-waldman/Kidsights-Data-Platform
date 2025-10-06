@@ -352,17 +352,34 @@ ne25_transformed            ↓                   ↓                  ↓
         Generates raked estimates          Population benchmarking
 ```
 
-### Future Integration (Phase 12+)
+### Raking Targets Pipeline (October 2025)
 
-**Raking Module (ACS):**
-- **Harmonization:** Match NE25 ZIP codes to ACS geographic units (PUMA, county)
-- **Raking:** Adjust NE25 sample weights to match ACS population distributions
-- **Module Location:** `R/utils/raking_utils.R` (deferred)
+**Status:** Implemented and operational
 
-**Benchmarking Module (NHIS/NSCH):**
-- **Measure Alignment:** Map NE25 ACEs, PHQ-2, GAD-2 to NHIS/NSCH equivalents
-- **Comparison:** Generate comparative statistics (Nebraska vs National)
-- **Trend Analysis:** Track changes over time using NSCH multi-year data
+**Purpose:** Generate population-representative raking targets for post-stratification weighting of NE25 survey data
+
+**Architecture Diagram:**
+
+```
+ACS (25 estimands) →  ╮
+NHIS (1 estimand)  → ─┤ Phase 1-4: Estimation → Phase 5: Consolidation → DuckDB
+NSCH (4 estimands) →  ╯   GLM/GLMM models         180 raking targets      raking_targets_ne25
+```
+
+**Key Features:**
+- **30 Estimands:** Demographics (ACS), parent mental health (NHIS), child health (NSCH)
+- **Age-Specific:** 6 age groups (0-5 years) = 180 total targets
+- **Statistical Methods:** GLM for ACS/NHIS, GLMM with state random effects for NSCH
+- **Database Integration:** Indexed table for efficient querying
+- **Execution:** Streamlined pipeline (~2-3 minutes)
+
+**Pipeline Location:** `scripts/raking/ne25/run_raking_targets_pipeline.R`
+
+**Documentation:** [docs/raking/NE25_RAKING_TARGETS_PIPELINE.md](../raking/NE25_RAKING_TARGETS_PIPELINE.md)
+
+**Future Integration:**
+- **Raking Implementation:** Apply targets to NE25 using survey package (Phase 6+)
+- **Benchmarking Module:** Compare NE25 to national estimates from NHIS/NSCH
 
 ### When to Run Each Pipeline
 
@@ -395,6 +412,15 @@ python scripts/nsch/process_all_years.py --years 2023
 
 # Or process all years
 python scripts/nsch/process_all_years.py --years all
+```
+
+**Raking Targets Pipeline:**
+```bash
+# Run when ACS/NHIS/NSCH data is updated or NE25 raking targets need refresh
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_raking_targets_pipeline.R
+
+# Verify results
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
 ```
 
 ---

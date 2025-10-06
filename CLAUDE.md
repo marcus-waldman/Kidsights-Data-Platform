@@ -8,12 +8,13 @@ This is a quick reference guide for AI assistants working with the Kidsights Dat
 
 ## Quick Start
 
-The Kidsights Data Platform is a multi-source ETL system for childhood development research with **four independent pipelines**:
+The Kidsights Data Platform is a multi-source ETL system for childhood development research with **five independent pipelines**:
 
 1. **NE25 Pipeline** - REDCap survey data processing (Nebraska 2025 study)
-2. **ACS Pipeline** - IPUMS USA census data extraction for statistical raking
-3. **NHIS Pipeline** - IPUMS Health Surveys data extraction for national benchmarking
+2. **ACS Pipeline** - IPUMS USA census data extraction
+3. **NHIS Pipeline** - IPUMS Health Surveys data extraction
 4. **NSCH Pipeline** - National Survey of Children's Health data integration
+5. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
 
 ### Running Pipelines
 
@@ -40,6 +41,14 @@ python pipelines/python/nhis/insert_nhis_database.py --year-range 2019-2024
 ```bash
 python scripts/nsch/process_all_years.py --years 2023
 python scripts/nsch/process_all_years.py --years all  # Process all years (2016-2023)
+```
+
+**Raking Targets Pipeline:**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_raking_targets_pipeline.R
+
+# Verify results
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
 ```
 
 ### Key Requirements
@@ -246,6 +255,7 @@ print(f"Total records: {result[0][0]}")
 - **ACS Pipeline:** [docs/acs/](docs/acs/) - IPUMS variables reference, pipeline usage, testing guide, cache management
 - **NHIS Pipeline:** [docs/nhis/](docs/nhis/) - NHIS variables reference, pipeline usage, testing guide, transformation mappings
 - **NSCH Pipeline:** [docs/nsch/](docs/nsch/) - Database schema, example queries, troubleshooting, variables reference
+- **Raking Targets:** [docs/raking/](docs/raking/) - Raking targets pipeline, statistical methods, implementation plan
 
 ---
 
@@ -296,7 +306,7 @@ pip install pyreadstat
 - **API Integration:** Direct IPUMS USA API extraction via ipumspy
 - **Metadata System:** 3 DuckDB tables with DDI metadata for transformations
 - **Smart Caching:** 90+ day retention with checksum validation
-- **Status:** Standalone utility ready for use, raking integration deferred to Phase 12+
+- **Status:** Standalone utility, integrated with raking targets pipeline
 
 ### ✅ NHIS Pipeline - Production Ready
 - **Multi-Year Data:** 6 annual samples (2019-2024), 66 variables, 229,609 records
@@ -310,11 +320,17 @@ pip install pyreadstat
 - **Performance:** Single year in 20 seconds, batch (7 years) in 2 minutes
 - **Metadata System:** Auto-generated variable reference, 36,164 value label mappings
 
+### ✅ Raking Targets Pipeline - Complete (October 2025)
+- **Population Targets:** 180 raking targets (30 estimands × 6 age groups)
+- **Data Sources:** ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
+- **Database Integration:** `raking_targets_ne25` table with 4 indexes for efficient querying
+- **Execution:** Streamlined pipeline (~2-3 minutes), automated verification
+
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
 - **Feather Format:** 3x faster R/Python data exchange, perfect type preservation
-- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) as complementary systems
-- **Future Integration:** Post-stratification raking module deferred to Phase 12+
+- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting)
+- **Statistical Integration:** Raking targets ready for post-stratification weighting implementation
 
 **📖 Complete status and architecture:** [PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)
 

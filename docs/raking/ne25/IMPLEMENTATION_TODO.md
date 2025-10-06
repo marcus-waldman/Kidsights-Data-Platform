@@ -2,19 +2,25 @@
 
 **Purpose:** Complete implementation of raking targets estimation for NE25 survey data post-stratification
 
-**Last Updated:** 2025-10-03
-**Status:** Phase 1 - Not Started
+**Last Updated:** 2025-10-05
+**Status:** ✅ Phase 5 - Complete
 
 ---
 
 ## Overview
 
-This document tracks the implementation of 34 raking target estimands (204 total rows) from three data sources:
-- **ACS:** 26 estimands (156 rows) - Demographics, SES
-- **NHIS:** 4 estimands (24 rows) - Parent mental health, ACEs
+This document tracks the implementation of 30 raking target estimands (180 total rows) from three data sources:
+- **ACS:** 25 estimands (150 rows) - Demographics, SES, geography
+- **NHIS:** 1 estimand (6 rows) - Parent mental health (PHQ-2 depression)
 - **NSCH:** 4 estimands (24 rows) - Child health outcomes
 
-**Total Deliverable:** Database table `raking_targets_ne25` with 204 rows + metadata
+**Total Deliverable:** Database table `raking_targets_ne25` with 180 rows + metadata ✅
+
+**Implementation Complete:** October 2025
+
+**Pipeline Documentation:** [NE25_RAKING_TARGETS_PIPELINE.md](../../NE25_RAKING_TARGETS_PIPELINE.md)
+
+**Master Script:** `scripts/raking/ne25/run_raking_targets_pipeline.R`
 
 ---
 
@@ -142,60 +148,56 @@ This document tracks the implementation of 34 raking target estimands (204 total
 
 ---
 
-## Phase 3: NHIS Estimates (4 estimands, 24 rows)
+## Phase 3: NHIS Estimates (1 estimand, 6 rows)
 
-**Goal:** Compute NHIS-based parent mental health and ACE targets
+**Goal:** Compute NHIS-based parent mental health targets
+
+**Note:** Maternal ACEs removed due to data quality issues in North Central region (all values = 0)
 
 ### Tasks
 
-- [ ] **3.1: Filter to North Central region parents**
-  - Perform household linkage (parents → children 0-5)
-  - Filter to REGION = 2 (North Central)
-  - Filter to ISPARENTSC = 1, CSTATFLG = 0
-  - Document final sample size by year
+- [x] **3.1: Filter to North Central region parents**
+  - ✓ Performed household linkage (parents → children 0-5)
+  - ✓ Filtered to REGION = 2 (North Central)
+  - ✓ Used PAR1REL for parent linkage
+  - ✓ Final sample: 2,683 parent-child pairs
+  - Script: `scripts/raking/ne25/12_filter_nhis_parents.R`
 
-- [ ] **3.2: Estimate PHQ-2 depression (1 estimand, binary)**
-  - Filter to 2019, 2022 (years with PHQ items)
-  - Recode PHQINTR and PHQDEP from 1-4 scale to 0-3 scale
-  - Calculate PHQ-2 total (0-6)
-  - Create binary outcome: PHQ-2 ≥3 (positive screen)
-  - Create survey design with PSU, STRATA, SAMPWEIGHT
-  - Fit `svyglm(phq2_positive ~ 1, family = quasibinomial())`
-  - Extract single probability estimate
-  - Expected: 5-15% positive (based on national rates)
+- [x] **3.2: Estimate PHQ-2 depression (1 estimand, binary)**
+  - ✓ Filtered to 2019, 2022, 2023 (years with PHQ items)
+  - ✓ Recoded PHQINTR and PHQDEP (0-3 valid, 7/8/9 missing)
+  - ✓ Calculated PHQ-2 total (0-6)
+  - ✓ Created binary outcome: PHQ-2 ≥3 (positive screen)
+  - ✓ Created survey design with PSU, STRATA, SAMPWEIGHT
+  - ✓ Fit `svyglm(phq2_positive ~ YEAR, family = quasibinomial())`
+  - ✓ Predicted at YEAR = 2023
+  - ✓ Result: 5.8% positive (within expected 3-10% range)
+  - Script: `scripts/raking/ne25/13_estimate_phq2.R`
 
-- [ ] **3.3: Estimate maternal ACEs (3 estimands, multinomial)**
-  - Filter to 2019, 2021, 2022, 2023 (years with ACE items)
-  - Calculate ACE total from 8 items (VIOLENEV, JAILEV, etc.)
-  - Create 3-category variable: 0 ACEs, 1 ACE, 2+ ACEs
-  - Create survey design
-  - Fit `survey::svymultinom(ace_category ~ 1)`
-  - Extract 3 probability estimates
-  - **Validate:** Sum to 1.0
-  - Expected distribution: ~40-50% zero, ~25-30% one, ~20-30% 2+
+- [x] **3.3: Compile NHIS estimates**
+  - ✓ Expanded PHQ-2 to 6 rows (1 estimand × 6 ages)
+  - ✓ All estimates constant across child ages
+  - Script: `scripts/raking/ne25/14_compile_nhis_estimates.R`
 
-- [ ] **3.4: Compile NHIS estimates**
-  - Combine PHQ-2 and ACE estimates
-  - Expand to 24 rows (4 estimands × 6 ages)
-  - Note: All NHIS estimates constant across child ages
+- [x] **3.4: Validate NHIS estimates**
+  - ✓ Range check: All values in [0, 1]
+  - ✓ Age pattern check: Constant across ages 0-5
+  - ✓ Comparison: 5.8% within national 3-10% range
+  - ✓ Validation: PASSED
+  - Script: `scripts/raking/ne25/15_validate_nhis_estimates.R`
 
-- [ ] **3.5: Validate NHIS estimates**
-  - Range check: All values in [0, 1]
-  - Sum check: ACE categories sum to 1.0
-  - Age pattern check: All 4 estimands constant across ages
-  - Compare PHQ-2 rate to published NHIS depression statistics (if available)
+- [x] **3.5: Save NHIS estimates**
+  - ✓ Saved as `data/raking/ne25/nhis_estimates.rds`
+  - ✓ 6 rows (ages 0-5), 3 columns (age, estimand, estimate)
+  - ✓ Verified file integrity
+  - Script: `scripts/raking/ne25/16_save_nhis_estimates.R`
 
-- [ ] **3.6: Save NHIS estimates**
-  - Save as `data/raking/ne25/nhis_estimates.rds`
-  - Include model objects and sample sizes by year
-  - Document regional vs. state limitation
-
-- [ ] **3.7: PHASE 3 VERIFICATION**
-  - ✓ Verify all Phase 3 tasks marked complete
-  - ✓ Review NHIS validation report
-  - ✓ Confirm 24 rows generated with plausible values
-  - ✓ Load Phase 4 tasks into Claude todo list
-  - ✓ Update status header to "Phase 4 - In Progress"
+- [x] **3.6: PHASE 3 VERIFICATION**
+  - ✓ All Phase 3 tasks marked complete
+  - ✓ NHIS validation report reviewed (PASSED)
+  - ✓ 6 rows generated with plausible values
+  - ✓ Status header updated to "Phase 3 - Complete"
+  - Ready for Phase 4
 
 ---
 
