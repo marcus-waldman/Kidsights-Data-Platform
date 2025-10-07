@@ -13,22 +13,27 @@
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS imputation_metadata (
-  variable_name VARCHAR PRIMARY KEY,
+  study_id VARCHAR NOT NULL,
+  variable_name VARCHAR NOT NULL,
   n_imputations INTEGER NOT NULL,
   imputation_method VARCHAR,
   predictors TEXT,  -- JSON array of predictor variables
   created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   created_by VARCHAR,
   software_version VARCHAR,
-  notes TEXT
+  notes TEXT,
+  PRIMARY KEY (study_id, variable_name)
 );
+
+CREATE INDEX IF NOT EXISTS idx_imputation_metadata_study
+  ON imputation_metadata(study_id);
 
 -- ============================================================================
 -- GEOGRAPHY IMPUTATION TABLES
 -- ============================================================================
 
 -- PUMA (Public Use Microdata Area)
-CREATE TABLE IF NOT EXISTS imputed_puma (
+CREATE TABLE IF NOT EXISTS ne25_imputed_puma (
   study_id VARCHAR NOT NULL,
   pid INTEGER NOT NULL,
   record_id INTEGER NOT NULL,
@@ -37,15 +42,15 @@ CREATE TABLE IF NOT EXISTS imputed_puma (
   PRIMARY KEY (study_id, pid, record_id, imputation_m)
 );
 
-CREATE INDEX IF NOT EXISTS idx_imputed_puma_m
-  ON imputed_puma(imputation_m);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_puma_m
+  ON ne25_imputed_puma(imputation_m);
 
-CREATE INDEX IF NOT EXISTS idx_imputed_puma_study
-  ON imputed_puma(study_id, pid);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_puma_study
+  ON ne25_imputed_puma(study_id, pid);
 
 
 -- County
-CREATE TABLE IF NOT EXISTS imputed_county (
+CREATE TABLE IF NOT EXISTS ne25_imputed_county (
   study_id VARCHAR NOT NULL,
   pid INTEGER NOT NULL,
   record_id INTEGER NOT NULL,
@@ -54,15 +59,15 @@ CREATE TABLE IF NOT EXISTS imputed_county (
   PRIMARY KEY (study_id, pid, record_id, imputation_m)
 );
 
-CREATE INDEX IF NOT EXISTS idx_imputed_county_m
-  ON imputed_county(imputation_m);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_county_m
+  ON ne25_imputed_county(imputation_m);
 
-CREATE INDEX IF NOT EXISTS idx_imputed_county_study
-  ON imputed_county(study_id, pid);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_county_study
+  ON ne25_imputed_county(study_id, pid);
 
 
 -- Census Tract
-CREATE TABLE IF NOT EXISTS imputed_census_tract (
+CREATE TABLE IF NOT EXISTS ne25_imputed_census_tract (
   study_id VARCHAR NOT NULL,
   pid INTEGER NOT NULL,
   record_id INTEGER NOT NULL,
@@ -71,11 +76,11 @@ CREATE TABLE IF NOT EXISTS imputed_census_tract (
   PRIMARY KEY (study_id, pid, record_id, imputation_m)
 );
 
-CREATE INDEX IF NOT EXISTS idx_imputed_census_tract_m
-  ON imputed_census_tract(imputation_m);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_census_tract_m
+  ON ne25_imputed_census_tract(imputation_m);
 
-CREATE INDEX IF NOT EXISTS idx_imputed_census_tract_study
-  ON imputed_census_tract(study_id, pid);
+CREATE INDEX IF NOT EXISTS idx_ne25_imputed_census_tract_study
+  ON ne25_imputed_census_tract(study_id, pid);
 
 
 -- ============================================================================

@@ -198,19 +198,23 @@ get_imputation_metadata <- function() {
 #' Get summary statistics for an imputed variable across all imputations via Python
 #'
 #' @param variable_name Character, name of the imputed variable
+#' @param study_id Character, study identifier. Default: "ne25"
 #'
 #' @return data.frame with summary statistics
 #'
 #' @examples
-#' summary <- get_imputed_variable_summary("puma")
+#' summary <- get_imputed_variable_summary("puma", study_id = "ne25")
 #' print(summary)
 #'
 #' @export
-get_imputed_variable_summary <- function(variable_name) {
+get_imputed_variable_summary <- function(variable_name, study_id = "ne25") {
   py_helpers <- .get_python_helpers()
 
   # Call Python function
-  summary_py <- py_helpers$get_imputed_variable_summary(variable_name = variable_name)
+  summary_py <- py_helpers$get_imputed_variable_summary(
+    variable_name = variable_name,
+    study_id = study_id
+  )
 
   # Convert to R data.frame
   summary_r <- reticulate::py_to_r(summary_py)
@@ -223,10 +227,12 @@ get_imputed_variable_summary <- function(variable_name) {
 #'
 #' Validate imputation tables for completeness and consistency via Python
 #'
+#' @param study_id Character, study identifier. Default: "ne25"
+#'
 #' @return List with validation results
 #'
 #' @examples
-#' results <- validate_imputations()
+#' results <- validate_imputations(study_id = "ne25")
 #' if (results$all_valid) {
 #'   cat("All imputations valid!\n")
 #' } else {
@@ -237,11 +243,11 @@ get_imputed_variable_summary <- function(variable_name) {
 #' }
 #'
 #' @export
-validate_imputations <- function() {
+validate_imputations <- function(study_id = "ne25") {
   py_helpers <- .get_python_helpers()
 
   # Call Python function
-  results_py <- py_helpers$validate_imputations()
+  results_py <- py_helpers$validate_imputations(study_id = study_id)
 
   # Convert to R list
   results_r <- reticulate::py_to_r(results_py)

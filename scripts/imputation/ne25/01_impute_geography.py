@@ -14,11 +14,13 @@ import numpy as np
 import pandas as pd
 
 # Add project root to path
-project_root = Path(__file__).parent.parent.parent
+# __file__ is scripts/imputation/ne25/01_impute_geography.py
+# parent = ne25/, parent.parent = imputation/, parent.parent.parent = scripts/, parent.parent.parent.parent = project_root
+project_root = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from python.db.connection import DatabaseManager
-from python.imputation.config import get_imputation_config, get_n_imputations, get_random_seed
+from python.imputation.config import get_study_config, get_n_imputations, get_random_seed, get_table_prefix
 
 
 def parse_semicolon_delimited(value_str: str, afact_str: str):
@@ -176,7 +178,8 @@ def impute_geography_variable(
     print(f"  Generated {len(imputations_df)} imputation rows ({n_ambiguous} records x {n_imputations} imputations)")
 
     # Insert into database
-    table_name = f"imputed_{variable_name}"
+    table_prefix = get_table_prefix(study_id)
+    table_name = f"{table_prefix}_{variable_name}"
 
     with db.get_connection() as conn:
         # Clear existing imputations for this study
@@ -198,6 +201,7 @@ def impute_geography_variable(
 
 def update_imputation_metadata(
     db: DatabaseManager,
+    study_id: str,
     variable_name: str,
     n_imputations: int,
     n_records_imputed: int
@@ -209,6 +213,8 @@ def update_imputation_metadata(
     ----------
     db : DatabaseManager
         Database connection manager
+    study_id : str
+        Study identifier (e.g., "ne25")
     variable_name : str
         Name of imputed variable
     n_imputations : int
@@ -224,7 +230,7 @@ def update_imputation_metadata(
         exists = conn.execute(f"""
             SELECT COUNT(*) as count
             FROM imputation_metadata
-            WHERE variable_name = '{variable_name}'
+            WHERE study_id = '{study_id}' AND variable_name = '{variable_name}'
         """).df()
 
         if exists['count'].iloc[0] > 0:
@@ -235,14 +241,15 @@ def update_imputation_metadata(
                     created_date = CURRENT_TIMESTAMP,
                     created_by = '01_impute_geography.py',
                     notes = 'Sampled from afact probabilities for {n_records_imputed} ambiguous records'
-                WHERE variable_name = '{variable_name}'
+                WHERE study_id = '{study_id}' AND variable_name = '{variable_name}'
             """)
         else:
             # Insert new
             conn.execute(f"""
                 INSERT INTO imputation_metadata
-                (variable_name, n_imputations, imputation_method, predictors, created_by, notes)
+                (study_id, variable_name, n_imputations, imputation_method, predictors, created_by, notes)
                 VALUES (
+                    '{study_id}',
                     '{variable_name}',
                     {n_imputations},
                     'probabilistic_allocation',
@@ -260,13 +267,15 @@ def main():
     print("Geography Imputation for NE25")
     print("=" * 60)
 
-    # Load configuration
-    config = get_imputation_config()
+    # Load study-specific configuration
+    study_id = "ne25"
+    config = get_study_config(study_id)
     n_imputations = get_n_imputations()
     random_seed = get_random_seed()
 
     print(f"Configuration:")
-    print(f"  Study ID: ne25")
+    print(f"  Study: {config['study_name']}")
+    print(f"  Study ID: {study_id}")
     print(f"  Number of imputations (M): {n_imputations}")
     print(f"  Random seed: {random_seed}")
     print(f"  Variables: {', '.join(config['geography']['variables'])}")
@@ -281,7 +290,7 @@ def main():
     # PUMA
     n_puma = impute_geography_variable(
         db=db,
-        study_id='ne25',
+        study_id=study_id,
         variable_name='puma',
         value_col='puma',
         afact_col='puma_afact',
@@ -289,12 +298,12 @@ def main():
         random_seed=random_seed
     )
     results['puma'] = n_puma
-    update_imputation_metadata(db, 'puma', n_imputations, n_puma)
+    update_imputation_metadata(db, study_id, 'puma', n_imputations, n_puma)
 
     # County
     n_county = impute_geography_variable(
         db=db,
-        study_id='ne25',
+        study_id=study_id,
         variable_name='county',
         value_col='county',
         afact_col='county_afact',
@@ -302,12 +311,12 @@ def main():
         random_seed=random_seed
     )
     results['county'] = n_county
-    update_imputation_metadata(db, 'county', n_imputations, n_county)
+    update_imputation_metadata(db, study_id, 'county', n_imputations, n_county)
 
     # Census Tract
     n_tract = impute_geography_variable(
         db=db,
-        study_id='ne25',
+        study_id=study_id,
         variable_name='census_tract',
         value_col='tract',
         afact_col='tract_afact',
@@ -315,7 +324,7 @@ def main():
         random_seed=random_seed
     )
     results['census_tract'] = n_tract
-    update_imputation_metadata(db, 'census_tract', n_imputations, n_tract)
+    update_imputation_metadata(db, study_id, 'census_tract', n_imputations, n_tract)
 
     # Summary
     print("\n" + "=" * 60)

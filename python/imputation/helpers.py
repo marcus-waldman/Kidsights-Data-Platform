@@ -8,7 +8,7 @@ tables with base observed data.
 import pandas as pd
 from typing import List, Optional
 from python.db.connection import DatabaseManager
-from .config import get_imputation_config, get_n_imputations
+from .config import get_imputation_config, get_n_imputations, get_table_prefix
 
 
 def get_completed_dataset(
@@ -68,14 +68,22 @@ def get_completed_dataset(
     # Get list of available imputed variables
     if variables is None:
         with db.get_connection(read_only=True) as conn:
-            meta = conn.execute("SELECT variable_name FROM imputation_metadata").df()
+            meta = conn.execute(f"""
+                SELECT variable_name
+                FROM imputation_metadata
+                WHERE study_id = '{study_id}'
+            """).df()
         variables = meta['variable_name'].tolist()
+
+    # Get table prefix for study-specific table names
+    table_prefix = get_table_prefix(study_id)
 
     # Join each imputed variable table
     for var in variables:
+        table_name = f"{table_prefix}_{var}"
         query = f"""
             SELECT pid, record_id, {var}
-            FROM imputed_{var}
+            FROM {table_name}
             WHERE imputation_m = {imputation_m}
               AND study_id = '{study_id}'
         """
@@ -159,7 +167,7 @@ def get_imputation_metadata() -> pd.DataFrame:
     return metadata
 
 
-def get_imputed_variable_summary(variable_name: str) -> pd.DataFrame:
+def get_imputed_variable_summary(variable_name: str, study_id: str = "ne25") -> pd.DataFrame:
     """
     Get summary statistics for an imputed variable across all imputations
 
@@ -167,6 +175,8 @@ def get_imputed_variable_summary(variable_name: str) -> pd.DataFrame:
     ----------
     variable_name : str
         Name of the imputed variable
+    study_id : str, default "ne25"
+        Study identifier for filtering imputations
 
     Returns
     -------
@@ -175,23 +185,27 @@ def get_imputed_variable_summary(variable_name: str) -> pd.DataFrame:
 
     Examples
     --------
-    >>> summary = get_imputed_variable_summary('puma')
+    >>> summary = get_imputed_variable_summary('puma', study_id='ne25')
     >>> print(summary)
     """
     db = DatabaseManager()
     config = get_imputation_config()
     max_m = config['n_imputations']
 
+    # Get table prefix for study-specific table names
+    table_prefix = get_table_prefix(study_id)
+    table_name = f"{table_prefix}_{variable_name}"
+
     # Check if variable exists
     with db.get_connection(read_only=True) as conn:
         table_check = conn.execute(f"""
             SELECT COUNT(*) as count
             FROM information_schema.tables
-            WHERE table_name = 'imputed_{variable_name}'
+            WHERE table_name = '{table_name}'
         """).df()
 
     if table_check['count'].iloc[0] == 0:
-        raise ValueError(f"No imputation table found for variable: {variable_name}")
+        raise ValueError(f"No imputation table found for variable: {variable_name} (table: {table_name})")
 
     # Get value counts across all imputations
     with db.get_connection(read_only=True) as conn:
@@ -200,7 +214,8 @@ def get_imputed_variable_summary(variable_name: str) -> pd.DataFrame:
                 imputation_m,
                 {variable_name} as value,
                 COUNT(*) as count
-            FROM imputed_{variable_name}
+            FROM {table_name}
+            WHERE study_id = '{study_id}'
             GROUP BY imputation_m, {variable_name}
             ORDER BY imputation_m, count DESC
         """).df()
@@ -208,9 +223,14 @@ def get_imputed_variable_summary(variable_name: str) -> pd.DataFrame:
     return summary
 
 
-def validate_imputations() -> dict:
+def validate_imputations(study_id: str = "ne25") -> dict:
     """
     Validate imputation tables for completeness and consistency
+
+    Parameters
+    ----------
+    study_id : str, default "ne25"
+        Study identifier for filtering imputations
 
     Returns
     -------
@@ -219,7 +239,7 @@ def validate_imputations() -> dict:
 
     Examples
     --------
-    >>> results = validate_imputations()
+    >>> results = validate_imputations(study_id='ne25')
     >>> if results['all_valid']:
     ...     print("All imputations valid!")
     ... else:
@@ -230,17 +250,26 @@ def validate_imputations() -> dict:
     expected_m = config['n_imputations']
     issues = []
 
-    # Get list of imputed variables
+    # Get table prefix for study-specific table names
+    table_prefix = get_table_prefix(study_id)
+
+    # Get list of imputed variables for this study
     with db.get_connection(read_only=True) as conn:
-        meta = conn.execute("SELECT variable_name FROM imputation_metadata").df()
+        meta = conn.execute(f"""
+            SELECT variable_name
+            FROM imputation_metadata
+            WHERE study_id = '{study_id}'
+        """).df()
     variables = meta['variable_name'].tolist()
 
     for var in variables:
+        table_name = f"{table_prefix}_{var}"
         with db.get_connection(read_only=True) as conn:
             # Check number of imputations
             m_count = conn.execute(f"""
                 SELECT COUNT(DISTINCT imputation_m) as count
-                FROM imputed_{var}
+                FROM {table_name}
+                WHERE study_id = '{study_id}'
             """).df()
 
             actual_m = m_count['count'].iloc[0]
@@ -252,8 +281,8 @@ def validate_imputations() -> dict:
             # Check for NULL values
             null_check = conn.execute(f"""
                 SELECT COUNT(*) as count
-                FROM imputed_{var}
-                WHERE {var} IS NULL
+                FROM {table_name}
+                WHERE study_id = '{study_id}' AND {var} IS NULL
             """).df()
 
             null_count = null_check['count'].iloc[0]

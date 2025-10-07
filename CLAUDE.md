@@ -54,11 +54,11 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 
 **Imputation Pipeline:**
 ```bash
-# Setup database schema (one-time)
-python scripts/imputation/00_setup_imputation_schema.py
+# Setup database schema (one-time, study-specific)
+python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Generate M=5 geography imputations
-python scripts/imputation/01_impute_geography.py
+# Run full pipeline (geography + sociodem + database insertion)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
 python -m python.imputation.helpers
@@ -344,11 +344,14 @@ pip install pyreadstat
 - **Execution Time:** ~15-20 minutes (4096 replicates, 16 parallel workers)
 
 ### ✅ Imputation Pipeline - Production Ready (October 2025)
-- **Multiple Imputations:** M=5 imputations for geographic uncertainty (easily scalable to M=20+)
-- **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations
-- **Storage Efficiency:** Variable-specific tables (50% smaller than naive approach)
+- **Multi-Study Architecture:** Independent studies (ne25, ia26, co27) with shared codebase
+- **Multiple Imputations:** M=5 imputations (easily scalable to M=20+)
+- **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations (ne25)
+- **Sociodemographic Variables:** 7 variables imputed via mice (female, raceG, educ_mom, educ_a2, income, family_size, fplcat)
+- **Storage Efficiency:** Study-specific variable tables (`{study_id}_imputed_{variable}`)
 - **Language Support:** Python native + R via reticulate (single source of truth)
-- **Database:** 25,483 imputation rows across 4 tables
+- **Database:** 51,918 total imputation rows (25,480 geography + 26,438 sociodem) for ne25
+- **Execution Time:** ~2 minutes for complete pipeline (3 stages)
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations

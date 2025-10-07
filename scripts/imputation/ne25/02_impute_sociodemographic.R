@@ -59,13 +59,17 @@ source("R/imputation/config.R")
 # LOAD CONFIGURATION
 # =============================================================================
 
+study_id <- "ne25"
+study_config <- get_study_config(study_id)
 config <- get_imputation_config()
 sociodem_config <- get_sociodem_config()
 
 cat("\nConfiguration:\n")
-cat("  Study ID: ne25\n")
+cat("  Study ID:", study_id, "\n")
+cat("  Study Name:", study_config$study_name, "\n")
 cat("  Number of imputations (M):", config$n_imputations, "\n")
 cat("  Random seed:", config$random_seed, "\n")
+cat("  Data directory:", study_config$data_dir, "\n")
 cat("  Variables to impute:", paste(sociodem_config$variables, collapse = ", "), "\n")
 cat("  Auxiliary variables:", paste(sociodem_config$auxiliary_variables, collapse = ", "), "\n")
 cat("  Eligible only:", sociodem_config$eligible_only, "\n")
@@ -151,7 +155,7 @@ merge_geography_imputation <- function(base_data, db_path, m) {
       CAST(pid AS INTEGER) as pid,
       CAST(record_id AS INTEGER) as record_id,
       puma
-    FROM imputed_puma
+    FROM ne25_imputed_puma
     WHERE imputation_m = %d AND study_id = 'ne25'
   ", m)
 
@@ -163,7 +167,7 @@ merge_geography_imputation <- function(base_data, db_path, m) {
       CAST(pid AS INTEGER) as pid,
       CAST(record_id AS INTEGER) as record_id,
       county
-    FROM imputed_county
+    FROM ne25_imputed_county
     WHERE imputation_m = %d AND study_id = 'ne25'
   ", m)
 
@@ -320,8 +324,8 @@ cat("\n", strrep("=", 60), "\n")
 cat("Starting Chained Imputation\n")
 cat(strrep("=", 60), "\n")
 
-# Setup output directory
-output_dir <- file.path("data", "imputation", "sociodem_feather")
+# Setup study-specific output directory
+output_dir <- file.path(study_config$data_dir, "sociodem_feather")
 if (!dir.exists(output_dir)) {
   dir.create(output_dir, recursive = TRUE)
   cat("[INFO] Created output directory:", output_dir, "\n")

@@ -1,0 +1,106 @@
+# NE25 Imputation Configuration
+# Study-specific configuration for Nebraska 2025 imputation pipeline
+
+# Study identification
+study_id: "ne25"
+study_name: "Nebraska 2025"
+
+# Study-specific paths (relative to project root)
+data_dir: "data/imputation/ne25"
+scripts_dir: "scripts/imputation/ne25"
+
+# Database table prefix (creates tables like: ne25_imputed_female, ne25_imputed_puma, etc.)
+table_prefix: "ne25_imputed"
+
+# Number of imputations to generate (M)
+# Start small (M=5) for testing, scale up to M=20+ for production
+n_imputations: 5
+
+# Random seed for reproducibility
+# Set to null for different imputations each run
+random_seed: 42
+
+# Geography imputation settings
+geography:
+  # Geographic variables to impute
+  variables:
+    - puma
+    - county
+    - census_tract
+
+  # Method for sampling geography assignments
+  method: "probabilistic_allocation"  # Uses afact as sampling weights
+
+  # Minimum afact threshold to include a geography candidate
+  # Set to 0 to include all possible assignments
+  min_afact: 0.0
+
+# Sociodemographic imputation settings (CART + Random Forest via mice)
+sociodemographic:
+  # Variables to impute
+  variables:
+    - female       # Child is female (binary: TRUE/FALSE) - ~39% missing
+    - raceG        # Child's race/ethnicity grouped (7 categories) - ~40% missing
+    - educ_mom     # Maternal education (8 categories, ordinal) - ~55% missing
+    - educ_a2      # Adult 2 education (8 categories, ordinal) - ~51% missing
+    - income       # Family income in dollars (continuous) - ~35% missing
+    - family_size  # Household size (count: 1-99) - ~38% missing
+    # fplcat is DERIVED from income + family_size after imputation
+
+  # Auxiliary predictor variables (complete or from geography imputation)
+  auxiliary_variables:
+    - puma           # Geographic PUMA from geography imputation m
+    - county         # County FIPS from geography imputation m
+    - source_project # REDCap project ID (complete)
+    - authentic.x    # Authenticity flag (complete)
+    - age_in_days    # Child age in days (complete)
+    - consent_date   # Survey completion date (complete)
+    - mom_a1         # Is Adult 1 the mother? (TRUE/FALSE)
+    - relation1      # Adult 1's relationship to child (6 levels)
+
+  # Filter to eligible records only (eligible.x == TRUE, n=3,460)
+  eligible_only: true
+
+  # mice imputation methods by variable
+  mice_method:
+    female: "cart"      # CART for binary (TRUE/FALSE)
+    raceG: "cart"       # CART for multi-level categorical
+    educ_mom: "rf"      # Random Forest for ordinal (ranger)
+    educ_a2: "rf"       # Random Forest for ordinal (ranger)
+    income: "cart"      # CART for continuous
+    family_size: "cart" # CART for count data
+
+  # Random Forest package for method="rf"
+  rf_package: "ranger"
+
+  # Keep collinear predictors (important for geographic variables)
+  remove_collinear: false
+
+  # Maximum iterations for mice algorithm
+  maxit: 20
+
+  # Chained imputation (run mice once per geography imputation)
+  # If true: run mice 5 times (m=1 each time, once per geography imputation)
+  # If false: run mice once with m=5
+  chained: true
+
+# Future: Additional substantive imputation settings
+substantive:
+  # Variables requiring other substantive imputation methods (placeholder)
+  variables: []
+
+  # Imputation method (placeholder)
+  method: null  # Options: "amelia", "missForest"
+
+# Database settings
+database:
+  # Path to DuckDB database (relative to project root)
+  db_path: "data/duckdb/kidsights_local.duckdb"
+
+  # Schema for imputation tables
+  schema: "main"  # DuckDB default schema
+
+# Logging settings
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  format: "[%(levelname)s] %(message)s"

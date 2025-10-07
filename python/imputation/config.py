@@ -174,6 +174,97 @@ def get_auxiliary_variables() -> list:
     return sociodem['auxiliary_variables']
 
 
+def get_study_config(study_id: str = "ne25") -> Dict[str, Any]:
+    """
+    Load study-specific imputation configuration
+
+    Parameters
+    ----------
+    study_id : str
+        Study identifier (e.g., "ne25", "ia26", "co27")
+
+    Returns
+    -------
+    dict
+        Study-specific configuration dictionary
+
+    Examples
+    --------
+    >>> config = get_study_config("ne25")
+    >>> print(config['study_name'])
+    Nebraska 2025
+
+    >>> print(config['table_prefix'])
+    ne25_imputed
+
+    >>> print(config['data_dir'])
+    data/imputation/ne25
+    """
+    project_root = Path(__file__).parent.parent.parent
+
+    # Try study-specific config first
+    study_config_path = project_root / "config" / "imputation" / f"{study_id}_config.yaml"
+
+    if study_config_path.exists():
+        with open(study_config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        return config
+
+    # Fall back to legacy imputation_config.yaml with study_id injection
+    legacy_config_path = project_root / "config" / "imputation" / "imputation_config.yaml"
+
+    if legacy_config_path.exists():
+        with open(legacy_config_path, 'r') as f:
+            config = yaml.safe_load(f)
+
+        # Inject study_id if not present (for backward compatibility)
+        if 'study_id' not in config:
+            config['study_id'] = study_id
+        if 'table_prefix' not in config:
+            config['table_prefix'] = f"{study_id}_imputed"
+        if 'data_dir' not in config:
+            config['data_dir'] = f"data/imputation/{study_id}"
+        if 'scripts_dir' not in config:
+            config['scripts_dir'] = f"scripts/imputation/{study_id}"
+
+        return config
+
+    raise FileNotFoundError(
+        f"No configuration found for study '{study_id}'.\n"
+        f"Expected: {study_config_path}\n"
+        f"Or legacy: {legacy_config_path}"
+    )
+
+
+def get_table_prefix(study_id: str = "ne25") -> str:
+    """
+    Get database table prefix for a study
+
+    Parameters
+    ----------
+    study_id : str
+        Study identifier (e.g., "ne25", "ia26", "co27")
+
+    Returns
+    -------
+    str
+        Table prefix (e.g., "ne25_imputed")
+
+    Examples
+    --------
+    >>> prefix = get_table_prefix("ne25")
+    >>> print(prefix)
+    ne25_imputed
+
+    >>> # Use to construct table names
+    >>> table_name = f"{get_table_prefix('ne25')}_female"
+    >>> print(table_name)
+    ne25_imputed_female
+    """
+    config = get_study_config(study_id)
+    return config.get('table_prefix', f"{study_id}_imputed")
+
+
 if __name__ == "__main__":
     # Test configuration loading
     config = get_imputation_config()

@@ -45,9 +45,30 @@ install.packages(c(
   "yaml",
   "REDCapR",
   "arrow",
-  "duckdb"
+  "duckdb",
+  "reticulate"  # Required for imputation pipeline (R-Python integration)
 ), dependencies = TRUE)
 ```
+
+**⚠️ Important for R Users (Imputation Pipeline):**
+
+If you plan to use the R imputation helpers (`R/imputation/helpers.R`), you must install `pyarrow` in the R reticulate Python environment:
+
+```r
+# Install pyarrow in reticulate environment
+reticulate::py_install("pyarrow")
+```
+
+Or from command line:
+```bash
+# Windows
+"C:/Users/YOUR_USERNAME/.virtualenvs/r-reticulate/Scripts/python.exe" -m pip install pyarrow
+
+# Mac/Linux
+~/.virtualenvs/r-reticulate/bin/python -m pip install pyarrow
+```
+
+**Why is pyarrow needed?** The imputation pipeline uses feather files for R-Python data exchange. Pandas requires pyarrow to read feather format. Without pyarrow, you'll see: `ImportError: Missing optional dependency 'pyarrow'`
 
 ### Required Python Packages
 
@@ -335,7 +356,49 @@ pip install --upgrade duckdb pandas pyyaml structlog ipumspy pyreadstat python-d
 
 ```r
 # In R console
-install.packages(c("dplyr", "tidyr", "stringr", "yaml", "REDCapR", "arrow", "duckdb"))
+install.packages(c("dplyr", "tidyr", "stringr", "yaml", "REDCapR", "arrow", "duckdb", "reticulate"))
+```
+
+### Issue: "ImportError: Missing optional dependency 'pyarrow'" (R Imputation Pipeline)
+
+**Symptom:** When running imputation pipeline from R, you see:
+```
+ImportError: Missing optional dependency 'pyarrow'. pyarrow is required for feather support.
+```
+
+**Root Cause:** The R reticulate package uses a separate Python environment that doesn't have pyarrow installed.
+
+**Solution:** Install pyarrow in the R reticulate Python environment
+
+**Option 1 - From R (Recommended):**
+```r
+# Install pyarrow in reticulate environment
+reticulate::py_install("pyarrow")
+```
+
+**Option 2 - From Command Line:**
+```bash
+# Windows - Find your reticulate Python path
+"C:/Users/YOUR_USERNAME/.virtualenvs/r-reticulate/Scripts/python.exe" -m pip install pyarrow
+
+# Mac - Common location
+~/.virtualenvs/r-reticulate/bin/python -m pip install pyarrow
+
+# Linux - Common location
+~/.virtualenvs/r-reticulate/bin/python -m pip install pyarrow
+```
+
+**To find your reticulate Python path:**
+```r
+# In R console
+reticulate::py_config()
+# Look for "python:" line - that's your reticulate Python executable
+```
+
+**Verification:**
+```r
+# Test that pyarrow is available
+reticulate::py_module_available("pyarrow")  # Should return TRUE
 ```
 
 ### Issue: Permission denied on API key file

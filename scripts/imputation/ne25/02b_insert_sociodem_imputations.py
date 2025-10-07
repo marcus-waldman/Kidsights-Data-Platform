@@ -13,11 +13,13 @@ from pathlib import Path
 import pandas as pd
 
 # Add project root to path
-project_root = Path(__file__).parent.parent.parent
+# __file__ is scripts/imputation/ne25/02b_insert_sociodem_imputations.py
+# parent = ne25/, parent.parent = imputation/, parent.parent.parent = scripts/, parent.parent.parent.parent = project_root
+project_root = Path(__file__).resolve().parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from python.db.connection import DatabaseManager
-from python.imputation.config import get_imputation_config, get_sociodem_variables
+from python.imputation.config import get_study_config, get_sociodem_variables, get_table_prefix
 
 
 def load_feather_files(feather_dir: Path, variable_name: str, n_imputations: int):
@@ -103,7 +105,8 @@ def insert_variable_imputations(
     """
     print(f"\n[INFO] Inserting {variable_name} imputations...")
 
-    table_name = f"imputed_{variable_name}"
+    table_prefix = get_table_prefix(study_id)
+    table_name = f"{table_prefix}_{variable_name}"
 
     # Combine all imputations for this variable
     all_imputations = []
@@ -152,6 +155,7 @@ def insert_variable_imputations(
 
 def update_metadata(
     db: DatabaseManager,
+    study_id: str,
     variable_name: str,
     n_imputations: int,
     n_records_imputed: int,
@@ -162,6 +166,8 @@ def update_metadata(
 
     Parameters
     ----------
+    study_id : str
+        Study identifier (e.g., "ne25")
     db : DatabaseManager
         Database connection manager
     variable_name : str
@@ -178,7 +184,7 @@ def update_metadata(
         exists = conn.execute(f"""
             SELECT COUNT(*) as count
             FROM imputation_metadata
-            WHERE variable_name = '{variable_name}'
+            WHERE study_id = '{study_id}' AND variable_name = '{variable_name}'
         """).df()
 
         if exists['count'].iloc[0] > 0:
@@ -190,14 +196,15 @@ def update_metadata(
                     created_date = CURRENT_TIMESTAMP,
                     created_by = '02b_insert_sociodem_imputations.py',
                     notes = 'Imputed via mice package for {n_records_imputed} records with missing values'
-                WHERE variable_name = '{variable_name}'
+                WHERE study_id = '{study_id}' AND variable_name = '{variable_name}'
             """)
         else:
             # Insert new
             conn.execute(f"""
                 INSERT INTO imputation_metadata
-                (variable_name, n_imputations, imputation_method, created_by, notes)
+                (study_id, variable_name, n_imputations, imputation_method, created_by, notes)
                 VALUES (
+                    '{study_id}',
                     '{variable_name}',
                     {n_imputations},
                     '{imputation_method}',
@@ -214,12 +221,14 @@ def main():
     print("Insert Sociodemographic Imputations into DuckDB")
     print("=" * 60)
 
-    # Load configuration
-    config = get_imputation_config()
+    # Load study-specific configuration
+    study_id = "ne25"
+    config = get_study_config(study_id)
     sociodem_vars = get_sociodem_variables()
 
     print(f"Configuration:")
-    print(f"  Study ID: ne25")
+    print(f"  Study: {config['study_name']}")
+    print(f"  Study ID: {study_id}")
     print(f"  Number of imputations (M): {config['n_imputations']}")
     print(f"  Variables: {', '.join(sociodem_vars)}")
     print(f"  Database: {config['database']['db_path']}")
@@ -228,8 +237,8 @@ def main():
     db = DatabaseManager()
     print(f"\n[OK] Connected to database")
 
-    # Feather files directory
-    feather_dir = project_root / "data" / "imputation" / "sociodem_feather"
+    # Feather files directory (study-specific)
+    feather_dir = project_root / config['data_dir'] / "sociodem_feather"
 
     # Add derived variable (fplcat)
     all_vars = sociodem_vars + ["fplcat"]
@@ -275,7 +284,7 @@ def main():
             all_records.extend(df['record_id'].unique())
         n_unique_records = len(set(all_records))
 
-        update_metadata(db, var, config['n_imputations'], n_unique_records, method)
+        update_metadata(db, study_id, var, config['n_imputations'], n_unique_records, method)
 
     # Summary
     print("\n" + "=" * 60)
