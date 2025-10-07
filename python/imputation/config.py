@@ -51,7 +51,7 @@ def get_imputation_config(config_path: str = None) -> Dict[str, Any]:
         config = yaml.safe_load(f)
 
     # Validate required fields
-    required_fields = ['n_imputations', 'random_seed', 'geography', 'database']
+    required_fields = ['n_imputations', 'random_seed', 'geography', 'sociodemographic', 'database']
     missing_fields = [field for field in required_fields if field not in config]
 
     if missing_fields:
@@ -100,6 +100,80 @@ def get_random_seed() -> int:
     return config['random_seed']
 
 
+def get_sociodem_config() -> Dict[str, Any]:
+    """
+    Get sociodemographic imputation configuration
+
+    Returns
+    -------
+    dict
+        Sociodemographic imputation settings including:
+        - variables: List of variables to impute
+        - auxiliary_variables: List of predictor variables
+        - eligible_only: Whether to filter to eligible records
+        - mice_method: Dict mapping variables to imputation methods
+        - rf_package: Random Forest package name
+        - remove_collinear: Whether to remove collinear predictors
+        - maxit: Maximum iterations for mice
+        - chained: Whether to use chained imputation
+
+    Examples
+    --------
+    >>> sociodem = get_sociodem_config()
+    >>> print(sociodem['variables'])
+    ['sex', 'raceG', 'educ_mom', 'educ_a2', 'income', 'family_size']
+
+    >>> print(sociodem['mice_method']['educ_mom'])
+    'rf'
+    """
+    config = get_imputation_config()
+    if 'sociodemographic' not in config:
+        raise ValueError(
+            "Sociodemographic configuration not found in config file. "
+            "Please ensure config/imputation/imputation_config.yaml includes "
+            "a 'sociodemographic' section."
+        )
+    return config['sociodemographic']
+
+
+def get_sociodem_variables() -> list:
+    """
+    Get list of sociodemographic variables to impute
+
+    Returns
+    -------
+    list
+        Variable names to impute (e.g., sex, raceG, educ_mom, etc.)
+
+    Examples
+    --------
+    >>> vars_to_impute = get_sociodem_variables()
+    >>> print(len(vars_to_impute))
+    6
+    """
+    sociodem = get_sociodem_config()
+    return sociodem['variables']
+
+
+def get_auxiliary_variables() -> list:
+    """
+    Get list of auxiliary predictor variables for sociodem imputation
+
+    Returns
+    -------
+    list
+        Auxiliary variable names (e.g., puma, county, age_in_days, etc.)
+
+    Examples
+    --------
+    >>> aux_vars = get_auxiliary_variables()
+    >>> print('puma' in aux_vars)
+    True
+    """
+    sociodem = get_sociodem_config()
+    return sociodem['auxiliary_variables']
+
+
 if __name__ == "__main__":
     # Test configuration loading
     config = get_imputation_config()
@@ -107,4 +181,8 @@ if __name__ == "__main__":
     print(f"  Number of imputations (M): {config['n_imputations']}")
     print(f"  Random seed: {config['random_seed']}")
     print(f"  Geography variables: {', '.join(config['geography']['variables'])}")
+    print(f"  Sociodem variables: {', '.join(config['sociodemographic']['variables'])}")
+    print(f"  Auxiliary variables: {', '.join(config['sociodemographic']['auxiliary_variables'])}")
+    print(f"  Eligible only: {config['sociodemographic']['eligible_only']}")
+    print(f"  Chained imputation: {config['sociodemographic']['chained']}")
     print(f"  Database path: {config['database']['db_path']}")

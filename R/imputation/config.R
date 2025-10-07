@@ -1,7 +1,7 @@
 # Configuration loader for imputation pipeline (R)
 # Provides single source of truth by calling Python functions via reticulate
 
-#' Get Python imputation module
+#' Get Python imputation config module
 #'
 #' @keywords internal
 .get_python_imputation <- function() {
@@ -9,12 +9,12 @@
     stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
   }
 
-  # Import Python imputation module
+  # Import Python imputation.config module
   tryCatch({
-    reticulate::import("python.imputation")
+    reticulate::import("python.imputation.config")
   }, error = function(e) {
     stop(
-      "Failed to import python.imputation module.\n",
+      "Failed to import python.imputation.config module.\n",
       "Make sure you are in the project root directory.\n",
       "Error: ", e$message
     )
@@ -84,6 +84,68 @@ get_random_seed <- function() {
 }
 
 
+#' Get Sociodemographic Imputation Configuration
+#'
+#' Get sociodemographic imputation settings from config via Python
+#'
+#' @return List with sociodemographic imputation parameters including:
+#'   \itemize{
+#'     \item variables: Character vector of variables to impute
+#'     \item auxiliary_variables: Character vector of predictor variables
+#'     \item eligible_only: Logical, filter to eligible records
+#'     \item mice_method: Named list mapping variables to imputation methods
+#'     \item rf_package: Character, Random Forest package name
+#'     \item remove_collinear: Logical, whether to remove collinear predictors
+#'     \item maxit: Integer, maximum iterations for mice
+#'     \item chained: Logical, whether to use chained imputation
+#'   }
+#'
+#' @examples
+#' sociodem <- get_sociodem_config()
+#' cat("Variables to impute:", paste(sociodem$variables, collapse = ", "), "\n")
+#' cat("Chained imputation:", sociodem$chained, "\n")
+#'
+#' @export
+get_sociodem_config <- function() {
+  py_imputation <- .get_python_imputation()
+  return(py_imputation$get_sociodem_config())
+}
+
+
+#' Get Sociodemographic Variables to Impute
+#'
+#' Get list of sociodemographic variables to impute via Python
+#'
+#' @return Character vector of variable names
+#'
+#' @examples
+#' vars_to_impute <- get_sociodem_variables()
+#' cat("Imputing", length(vars_to_impute), "variables\n")
+#'
+#' @export
+get_sociodem_variables <- function() {
+  py_imputation <- .get_python_imputation()
+  return(py_imputation$get_sociodem_variables())
+}
+
+
+#' Get Auxiliary Predictor Variables
+#'
+#' Get list of auxiliary predictor variables for sociodem imputation via Python
+#'
+#' @return Character vector of auxiliary variable names
+#'
+#' @examples
+#' aux_vars <- get_auxiliary_variables()
+#' cat("Using", length(aux_vars), "auxiliary predictors\n")
+#'
+#' @export
+get_auxiliary_variables <- function() {
+  py_imputation <- .get_python_imputation()
+  return(py_imputation$get_auxiliary_variables())
+}
+
+
 # Test if run directly
 if (interactive()) {
   config <- get_imputation_config()
@@ -91,5 +153,9 @@ if (interactive()) {
   cat("  Number of imputations (M):", config$n_imputations, "\n")
   cat("  Random seed:", config$random_seed, "\n")
   cat("  Geography variables:", paste(config$geography$variables, collapse = ", "), "\n")
+  cat("  Sociodem variables:", paste(config$sociodemographic$variables, collapse = ", "), "\n")
+  cat("  Auxiliary variables:", paste(config$sociodemographic$auxiliary_variables, collapse = ", "), "\n")
+  cat("  Eligible only:", config$sociodemographic$eligible_only, "\n")
+  cat("  Chained imputation:", config$sociodemographic$chained, "\n")
   cat("  Database path:", config$database$db_path, "\n")
 }
