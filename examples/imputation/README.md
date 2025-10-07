@@ -103,6 +103,22 @@ This demonstrates:
 
 **Output:** Cross-study summaries and validation results
 
+---
+
+### 04_advanced_multistudy_queries.py
+
+**Purpose:** Advanced cross-study analysis patterns
+
+**Key Topics:**
+- Comparing sample sizes and variable availability
+- Pooling data across studies
+- Comparing imputation uncertainty across studies
+- Study-specific analysis with common framework
+- Meta-analysis setup with Rubin's rules
+- Cross-study validation
+
+**Output:** Advanced multi-study comparisons, pooled datasets, meta-analysis prep
+
 ## Multi-Study Architecture
 
 The imputation system supports multiple independent studies (e.g., ne25, ia26, co27) using:
