@@ -1,0 +1,46 @@
+# Imputation Configuration
+# Single source of truth for imputation parameters across all scripts
+
+# Number of imputations to generate (M)
+# Start small (M=5) for testing, scale up to M=20+ for production
+n_imputations: 5
+
+# Random seed for reproducibility
+# Set to null for different imputations each run
+random_seed: 42
+
+# Geography imputation settings
+geography:
+  # Geographic variables to impute
+  variables:
+    - puma
+    - county
+    - census_tract
+
+  # Method for sampling geography assignments
+  method: "probabilistic_allocation"  # Uses afact as sampling weights
+
+  # Minimum afact threshold to include a geography candidate
+  # Set to 0 to include all possible assignments
+  min_afact: 0.0
+
+# Future: Substantive imputation settings
+substantive:
+  # Variables requiring substantive imputation (placeholder)
+  variables: []
+
+  # Imputation method (placeholder)
+  method: null  # Options: "mice", "amelia", "missForest"
+
+# Database settings
+database:
+  # Path to DuckDB database (relative to project root)
+  db_path: "data/duckdb/kidsights_local.duckdb"
+
+  # Schema for imputation tables
+  schema: "main"  # DuckDB default schema
+
+# Logging settings
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  format: "[%(levelname)s] %(message)s"

@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** October 2025 | **Version:** 3.2.0
+**Last Updated:** October 2025 | **Version:** 3.3.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -8,13 +8,14 @@ This is a quick reference guide for AI assistants working with the Kidsights Dat
 
 ## Quick Start
 
-The Kidsights Data Platform is a multi-source ETL system for childhood development research with **five independent pipelines**:
+The Kidsights Data Platform is a multi-source ETL system for childhood development research with **six independent pipelines**:
 
 1. **NE25 Pipeline** - REDCap survey data processing (Nebraska 2025 study)
 2. **ACS Pipeline** - IPUMS USA census data extraction
 3. **NHIS Pipeline** - IPUMS Health Surveys data extraction
 4. **NSCH Pipeline** - National Survey of Children's Health data integration
 5. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
+6. **Imputation Pipeline** - Multiple imputation for geographic uncertainty
 
 ### Running Pipelines
 
@@ -49,6 +50,18 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 
 # Verify results
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
+```
+
+**Imputation Pipeline:**
+```bash
+# Setup database schema (one-time)
+python scripts/imputation/00_setup_imputation_schema.py
+
+# Generate M=5 geography imputations
+python scripts/imputation/01_impute_geography.py
+
+# Validate results
+python -m python.imputation.helpers
 ```
 
 ### Key Requirements
@@ -232,7 +245,7 @@ print(f"Total records: {result[0][0]}")
 ## Documentation Directory
 
 ### Architecture & Pipeline Guides
-- **[PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)** - Comprehensive architecture for all 4 pipelines, design rationales, ACS metadata system
+- **[PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)** - Comprehensive architecture for all 6 pipelines, design rationales, ACS metadata system
 - **[PIPELINE_STEPS.md](docs/architecture/PIPELINE_STEPS.md)** - Step-by-step execution instructions, timing expectations, troubleshooting
 - **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** - Complete directory structure for all pipelines, data storage locations
 
@@ -256,6 +269,7 @@ print(f"Total records: {result[0][0]}")
 - **NHIS Pipeline:** [docs/nhis/](docs/nhis/) - NHIS variables reference, pipeline usage, testing guide, transformation mappings
 - **NSCH Pipeline:** [docs/nsch/](docs/nsch/) - Database schema, example queries, troubleshooting, variables reference
 - **Raking Targets:** [docs/raking/](docs/raking/) - Raking targets pipeline, statistical methods, implementation plan
+- **Imputation Pipeline:** [docs/imputation/](docs/imputation/) - Multiple imputation architecture, helper functions, usage examples
 
 ---
 
@@ -325,12 +339,22 @@ pip install pyreadstat
 - **Data Sources:** ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
 - **Database Integration:** `raking_targets_ne25` table with 4 indexes for efficient querying
 - **Execution:** Streamlined pipeline (~2-3 minutes), automated verification
+- **Bootstrap Variance:** 614,400 bootstrap replicates for ACS estimands (4096 replicates × 150 targets)
+- **Method:** Rao-Wu-Yue-Beaumont bootstrap with shared design across all 25 ACS estimands
+- **Execution Time:** ~15-20 minutes (4096 replicates, 16 parallel workers)
+
+### ✅ Imputation Pipeline - Production Ready (October 2025)
+- **Multiple Imputations:** M=5 imputations for geographic uncertainty (easily scalable to M=20+)
+- **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations
+- **Storage Efficiency:** Variable-specific tables (50% smaller than naive approach)
+- **Language Support:** Python native + R via reticulate (single source of truth)
+- **Database:** 25,483 imputation rows across 4 tables
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
 - **Feather Format:** 3x faster R/Python data exchange, perfect type preservation
-- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting)
-- **Statistical Integration:** Raking targets ready for post-stratification weighting implementation
+- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting) + Imputation (uncertainty)
+- **Statistical Integration:** Raking targets + Multiple imputation ready for post-stratification weighting
 
 **📖 Complete status and architecture:** [PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)
 
@@ -338,4 +362,4 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: October 2025 | Version: 3.2.0*
+*Updated: October 2025 | Version: 3.3.0*

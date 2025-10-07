@@ -2,7 +2,7 @@
 
 **Last Updated:** October 2025
 
-This document provides detailed architecture documentation for all four data pipelines in the Kidsights Data Platform. Each pipeline is designed as an independent, standalone system with specific data sources and use cases.
+This document provides detailed architecture documentation for all six data pipelines in the Kidsights Data Platform. Each pipeline is designed as an independent, standalone system with specific data sources and use cases.
 
 ---
 
@@ -12,8 +12,10 @@ This document provides detailed architecture documentation for all four data pip
 2. [ACS Pipeline](#acs-pipeline) - Census data extraction for statistical raking
 3. [NHIS Pipeline](#nhis-pipeline) - National health surveys for benchmarking
 4. [NSCH Pipeline](#nsch-pipeline) - Children's health survey integration
-5. [ACS Metadata System](#acs-metadata-system) - IPUMS DDI metadata integration
-6. [Pipeline Integration](#pipeline-integration-and-relationship) - How pipelines work together
+5. [Raking Targets Pipeline](#raking-targets-pipeline) - Population-representative targets for post-stratification
+6. [Imputation Pipeline](#imputation-pipeline) - Multiple imputation for geographic uncertainty
+7. [ACS Metadata System](#acs-metadata-system) - IPUMS DDI metadata integration
+8. [Pipeline Integration](#pipeline-integration-and-relationship) - How pipelines work together
 
 ---
 
@@ -180,6 +182,103 @@ NSCH is the gold standard for child health surveillance in the US. Unlike NHIS (
 
 ---
 
+## Raking Targets Pipeline: Population-Representative Targets (October 2025)
+
+### Purpose
+Generate population-representative raking targets for post-stratification weighting of NE25 survey data
+
+### Architecture Diagram
+
+```
+ACS Estimates + NHIS Estimates + NSCH Estimates → R: Consolidate & Structure → DuckDB: raking_targets_ne25
+25 estimands      1 estimand        4 estimands         30 estimands × 6 ages    180 targets with indexes
+```
+
+### Key Features
+
+- **Multi-Source Integration:** Combines ACS (census), NHIS (health), NSCH (child health)
+- **Age Stratification:** 6 age groups (0-1, 2-3, 4-5, 6-8, 9-11, 12-17)
+- **Streamlined Pipeline:** Single R script executes all phases (~2-3 minutes)
+- **Database Integration:** Optimized table with 4 indexes for efficient querying
+- **Bootstrap Variance:** 614,400 bootstrap replicates for ACS estimands
+
+### Design Rationale
+
+Post-stratification (raking) requires population-representative targets from multiple data sources. Rather than manually compiling these, the pipeline automatically generates 180 raking targets by combining survey-weighted estimates from ACS, NHIS, and NSCH. The targets are structured for direct use with the `survey` package in R.
+
+### Technical Components
+
+- **R Scripts:** `scripts/raking/ne25/` - Estimation and consolidation
+- **Data Sources:** ACS (demographics), NHIS (maternal depression), NSCH (ACEs, health, childcare)
+- **Output:** `raking_targets_ne25` table with 180 rows
+- **Documentation:** [docs/raking/NE25_RAKING_TARGETS_PIPELINE.md](../raking/NE25_RAKING_TARGETS_PIPELINE.md)
+
+---
+
+## Imputation Pipeline: Multiple Imputation for Geographic Uncertainty (October 2025)
+
+### Purpose
+Generate M=5 imputations for records with geographic ambiguity using allocation factor probabilities
+
+### Architecture Diagram
+
+```
+ne25_transformed → Python: Parse afact → Sample M values → imputed_* tables → Helper functions → Completed datasets
+Semicolon-delimited   Weighted random      Store only         Python/R (reticulate)    Ready for analysis
+                       selection           ambiguous records
+```
+
+### Key Features
+
+- **Variable-Specific Storage:** Normalized schema (one table per imputed variable)
+- **Selective Storage:** Only stores ambiguous records (50%+ storage efficiency)
+- **Single Source of Truth:** R functions via reticulate call Python directly
+- **Configuration-Driven:** M, random seed, and variables in YAML config
+- **Statistical Validity:** Proper propagation of geographic uncertainty into variance estimates
+
+### Results
+
+- **878 PUMA** imputations (26% of records have ambiguity)
+- **1,054 county** imputations (31% of records)
+- **3,164 census tract** imputations (94% of records!)
+- **25,483 total rows** across 4 database tables
+
+### Design Rationale
+
+Rather than storing full M datasets or raw probabilities, we store pre-computed realized values in separate tables per variable. This ensures internal consistency for downstream analyses (geography in imputation #5 is consistent across all uses) while maintaining storage efficiency. The reticulate-based R interface eliminates code duplication.
+
+### Technical Components
+
+- **Python Modules:** `python/imputation/` - Configuration, helper functions for data retrieval
+- **R Wrappers:** `R/imputation/` - Single source of truth via reticulate
+- **Scripts:** `scripts/imputation/` - Schema setup, geography imputation
+- **Configuration:** `config/imputation/imputation_config.yaml` - M=5, random seed=42
+- **Storage:** 4 tables (`imputed_puma`, `imputed_county`, `imputed_census_tract`, `imputation_metadata`)
+- **Documentation:** [docs/imputation/IMPUTATION_SETUP_COMPLETE.md](../imputation/IMPUTATION_SETUP_COMPLETE.md)
+
+### Usage Example
+
+**Python:**
+```python
+from python.imputation import get_completed_dataset
+df3 = get_completed_dataset(3, variables=['puma', 'county'])
+```
+
+**R (via reticulate):**
+```r
+source("R/imputation/helpers.R")
+imp_list <- get_imputation_list()  # Returns list of M=5 datasets
+
+# Survey analysis with multiple imputations
+library(survey); library(mitools)
+results <- lapply(imp_list, function(df) {
+  svydesign(ids=~1, weights=~weight, data=df) %>% svymean(~outcome, .)
+})
+MIcombine(results)
+```
+
+---
+
 ## ACS Metadata System (October 2025)
 
 ### Purpose
@@ -286,9 +385,9 @@ educ_vars <- acs_search_variables("education")
 
 ## Pipeline Integration and Relationship
 
-### Four Independent Pipelines
+### Six Independent Pipelines
 
-The Kidsights Data Platform operates **four independent, standalone pipelines**:
+The Kidsights Data Platform operates **six independent, standalone pipelines**:
 
 #### 1. NE25 Pipeline (Primary)
 - **Purpose:** Process REDCap survey data from Nebraska 2025 study
@@ -318,38 +417,67 @@ The Kidsights Data Platform operates **four independent, standalone pipelines**:
 - **Status:** Production ready (7/8 years loaded)
 - **Tables:** `nsch_{year}_raw` (year-specific tables)
 
+#### 5. Raking Targets Pipeline (Utility)
+- **Purpose:** Generate population-representative raking targets for post-stratification weighting
+- **Data Source:** ACS, NHIS, NSCH databases
+- **Architecture:** R statistical estimation → DuckDB
+- **Status:** Production ready (180 targets generated)
+- **Tables:** `raking_targets_ne25`
+
+#### 6. Imputation Pipeline (Utility)
+- **Purpose:** Multiple imputation for geographic uncertainty in survey responses
+- **Data Source:** `ne25_transformed` table
+- **Architecture:** Python probabilistic sampling → Variable-specific tables
+- **Status:** Production ready (M=5 imputations, 25,483 rows)
+- **Tables:** `imputed_puma`, `imputed_county`, `imputed_census_tract`, `imputation_metadata`
+
 ### Design Decision: Why Separate?
 
 **No automatic integration** - Pipelines do NOT run as part of each other.
 
 **Rationale:**
-1. **Different cadences:** NE25 runs frequently (new survey data), ACS/NHIS/NSCH run rarely (annual updates)
-2. **Different dependencies:** NE25 requires REDCap API, ACS/NHIS require IPUMS API, NSCH requires SPSS files
-3. **Future use case:** Supporting data needed for post-stratification raking (Phase 12+) and benchmarking
+1. **Different cadences:** NE25 runs frequently (new survey data), ACS/NHIS/NSCH run rarely (annual updates), Raking/Imputation run on-demand
+2. **Different dependencies:** NE25 requires REDCap API, ACS/NHIS require IPUMS API, NSCH requires SPSS files, Imputation requires completed NE25 data
+3. **Future use case:** Supporting data needed for post-stratification raking and benchmarking
 4. **Modular design:** Each pipeline can be maintained/tested independently
+5. **Reusability:** Raking Targets and Imputation pipelines are reusable utilities for multiple studies
 
-### How They Work Together (Future Vision)
+### How They Work Together
 
 ```
 NE25 Pipeline          ACS Pipeline       NHIS Pipeline      NSCH Pipeline
      ↓                      ↓                   ↓                  ↓
 ne25_raw                acs_raw            nhis_raw          nsch_2023_raw
 ne25_transformed            ↓                   ↓                  ↓
-     ↓                  (future)           (future)           (future)
      ↓                      ↓                   ↓                  ↓
-     └──────────────────────┴───────────────────┴──────────────────┘
-                                    ↓
-                          INTEGRATION MODULE
-                             (Phase 12+)
-                                    ↓
-                    ┌───────────────┴───────────────┐
-                    ↓                               ↓
-            RAKING MODULE                  BENCHMARKING MODULE
-         (ACS for weights)              (NHIS/NSCH for comparison)
-                    ↓                               ↓
-        Harmonizes geography               Compare ACE prevalence
-        Applies sampling weights           Extract PHQ-2/GAD-2 scores
-        Generates raked estimates          Population benchmarking
+     ↓                      └───────────────────┴──────────────────┘
+     ↓                                      ↓
+     ↓                          RAKING TARGETS PIPELINE
+     ↓                             (Phase 5 complete)
+     ↓                                      ↓
+     ↓                            raking_targets_ne25
+     ↓                          (180 population targets)
+     ↓                                      ↓
+     └──────────────────────────────────────┘
+                           ↓
+              IMPUTATION PIPELINE (Production)
+                           ↓
+        ┌──────────────────┼──────────────────┐
+        ↓                  ↓                   ↓
+  imputed_puma     imputed_county    imputed_census_tract
+    (M=5)              (M=5)                (M=5)
+        ↓                  ↓                   ↓
+        └──────────────────┴───────────────────┘
+                           ↓
+                  RAKING IMPLEMENTATION
+                      (Future Phase)
+                           ↓
+              Apply raking targets across M=5
+              completed imputation datasets
+                           ↓
+              Generate raked population estimates
+              with uncertainty from geographic
+              imputation and survey sampling
 ```
 
 ### Raking Targets Pipeline (October 2025)
@@ -421,6 +549,16 @@ python scripts/nsch/process_all_years.py --years all
 
 # Verify results
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
+```
+
+**Imputation Pipeline:**
+```bash
+# Run once after NE25 pipeline completes to handle geographic uncertainty
+python scripts/imputation/00_setup_imputation_schema.py  # One-time setup
+python scripts/imputation/01_impute_geography.py          # Generate M=5 imputations
+
+# Validate results
+python -m python.imputation.helpers
 ```
 
 ---

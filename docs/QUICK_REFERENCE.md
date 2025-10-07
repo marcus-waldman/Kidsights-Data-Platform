@@ -144,6 +144,58 @@ python scripts/nsch/process_all_years.py --years 2020-2023
 
 ---
 
+### Imputation Pipeline
+
+**Purpose:** Generate and retrieve multiple imputations for geographic uncertainty
+
+```bash
+# Setup database schema (one-time)
+python scripts/imputation/00_setup_imputation_schema.py
+
+# Generate M=5 geography imputations
+python scripts/imputation/01_impute_geography.py
+
+# Validate results
+python -m python.imputation.helpers
+```
+
+**What it does:**
+- Parses semicolon-delimited geography values and afact probabilities
+- Samples M=5 geography assignments using weighted random selection
+- Stores only ambiguous records (afact < 1) in variable-specific tables
+- Provides helper functions to retrieve completed datasets
+
+**Timing:** ~5-10 seconds for M=5 imputations
+
+**Output:** 25,483 imputation rows across 4 tables (imputed_puma, imputed_county, imputed_census_tract, imputation_metadata)
+
+**Python usage:**
+```python
+from python.imputation import get_completed_dataset
+
+# Get imputation 3 with geography
+df3 = get_completed_dataset(3, variables=['puma', 'county'])
+
+# Get all 5 imputations in long format
+from python.imputation import get_all_imputations
+df_long = get_all_imputations(variables=['puma'])
+```
+
+**R usage (via reticulate):**
+```r
+source("R/imputation/helpers.R")
+
+# Get imputation 3
+df3 <- get_completed_dataset(3, variables = c("puma", "county"))
+
+# Get list for mitools
+imp_list <- get_imputation_list()
+```
+
+**Documentation:** [docs/imputation/IMPUTATION_SETUP_COMPLETE.md](imputation/IMPUTATION_SETUP_COMPLETE.md)
+
+---
+
 ## ACS Utility Scripts
 
 ### Test API Connection

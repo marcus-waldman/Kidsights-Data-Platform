@@ -13,6 +13,8 @@ This document provides comprehensive documentation for Python utility modules in
 3. [Data Refresh Strategy](#data-refresh-strategy)
 4. [Logging Utilities](#logging-utilities)
 5. [Configuration Management](#configuration-management)
+6. [Imputation Utilities](#imputation-utilities)
+7. [Common Patterns](#common-patterns)
 
 ---
 
@@ -512,6 +514,306 @@ env = os.getenv("ENVIRONMENT", "dev")
 config_path = f"config/sources/ne25.{env}.yaml"
 config = load_config(config_path)
 ```
+
+---
+
+## Imputation Utilities
+
+**Module:** `python/imputation/`
+**Purpose:** Multiple imputation system for handling geographic uncertainty in survey responses
+
+### Overview
+
+The imputation utilities provide a complete framework for generating, storing, and retrieving multiple imputations (M=5) of geographic variables with allocation factors (afact) < 1. The system uses a **variable-specific storage approach** with **single source of truth** configuration.
+
+### Key Design Principles
+
+1. **Store Realized Values:** Sampled geography assignments (not probabilities) for consistency across analyses
+2. **Variable-Specific Tables:** Normalized storage (one table per imputed variable)
+3. **Selective Storage:** Only ambiguous records stored (afact < 1), deterministic records use base table values
+4. **Composite Primary Key:** `(study_id, pid, record_id, imputation_m)` for multi-study support
+5. **Single Source of Truth:** R calls Python via reticulate (no code duplication)
+
+### Quick Start
+
+```python
+from python.imputation import get_completed_dataset, get_all_imputations
+
+# Get imputation 3 with geography variables
+df3 = get_completed_dataset(3, variables=['puma', 'county'])
+
+# Get all 5 imputations in long format
+df_long = get_all_imputations(variables=['puma', 'county', 'census_tract'])
+
+# Analyze distribution across imputations
+df_long.groupby(['imputation_m', 'puma']).size()
+```
+
+### Configuration
+
+**File:** `config/imputation/imputation_config.yaml`
+
+```yaml
+n_imputations: 5        # M = 5 (easily scalable to M=20+)
+random_seed: 42         # For reproducibility
+geography:
+  variables:
+    - puma
+    - county
+    - census_tract
+  method: "probabilistic_allocation"
+```
+
+**Access in Python:**
+```python
+from python.imputation import get_n_imputations, get_random_seed
+
+M = get_n_imputations()  # Returns 5
+seed = get_random_seed()  # Returns 42
+```
+
+### Core Functions
+
+#### `get_completed_dataset()`
+
+Retrieve a single completed dataset for imputation m by combining observed data with imputed values.
+
+```python
+from python.imputation import get_completed_dataset
+
+# Get imputation 3 with specific variables
+df3 = get_completed_dataset(
+    imputation_m=3,
+    variables=['puma', 'county'],
+    base_table='ne25_transformed',
+    study_id='ne25'
+)
+
+# All imputed variables
+df5 = get_completed_dataset(5)  # variables=None → all variables
+```
+
+**How it works:**
+- LEFT JOIN imputed tables to base table
+- COALESCE: Use imputed value if available, otherwise use base table value
+- Only ambiguous records (afact < 1) have entries in imputation tables
+
+#### `get_all_imputations()`
+
+Get all M imputations in long format with `imputation_m` column.
+
+```python
+from python.imputation import get_all_imputations
+
+# Long format across all M=5 imputations
+df_long = get_all_imputations(variables=['puma', 'county'])
+
+# Analyze variance across imputations
+variance_by_record = df_long.groupby('record_id')['puma'].nunique()
+high_variance = variance_by_record[variance_by_record > 1]
+```
+
+#### `get_imputation_metadata()`
+
+Get metadata about imputed variables.
+
+```python
+from python.imputation import get_imputation_metadata
+
+meta = get_imputation_metadata()
+# Returns DataFrame:
+#   variable_name  n_imputations  imputation_method  created_date
+#   puma           5              probabilistic...   2025-10-06
+#   county         5              probabilistic...   2025-10-06
+```
+
+#### `validate_imputations()`
+
+Validate imputation tables for completeness and consistency.
+
+```python
+from python.imputation import validate_imputations
+
+results = validate_imputations()
+if results['all_valid']:
+    print(f"[OK] All {results['variables_checked']} variables validated")
+else:
+    for issue in results['issues']:
+        print(f"[WARN] {issue}")
+```
+
+### R Integration (via reticulate)
+
+**File:** `R/imputation/helpers.R`
+
+R functions call Python directly for single source of truth:
+
+```r
+library(reticulate)
+source("R/imputation/helpers.R")
+
+# Get imputation 3
+df3 <- get_completed_dataset(3, variables = c("puma", "county"))
+
+# Get list for mitools/survey package
+imp_list <- get_imputation_list()
+
+# Survey analysis
+library(survey)
+library(mitools)
+results <- lapply(imp_list, function(df) {
+  design <- svydesign(ids = ~1, weights = ~weight, data = df)
+  svymean(~outcome, design)
+})
+combined <- mitools::MIcombine(results)
+summary(combined)
+```
+
+### Database Schema
+
+**Imputation Tables:**
+
+```sql
+CREATE TABLE imputed_puma (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  puma VARCHAR NOT NULL,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE imputation_metadata (
+  variable_name VARCHAR PRIMARY KEY,
+  n_imputations INTEGER NOT NULL,
+  imputation_method VARCHAR,
+  created_date TIMESTAMP,
+  notes TEXT
+);
+```
+
+**Current Status (NE25):**
+- `imputed_puma`: 4,390 rows (878 records × 5 imputations)
+- `imputed_county`: 5,270 rows (1,054 records × 5 imputations)
+- `imputed_census_tract`: 15,820 rows (3,164 records × 5 imputations)
+- `imputation_metadata`: 3 rows
+
+**Total:** 25,483 rows (50%+ storage reduction vs storing all records)
+
+### Usage Examples
+
+#### Example 1: Compare PUMA Distribution Across Imputations
+
+```python
+from python.imputation import get_all_imputations
+import pandas as pd
+
+df = get_all_imputations(variables=['puma'])
+
+# PUMA distribution by imputation
+puma_dist = df.groupby(['imputation_m', 'puma']).size().unstack(fill_value=0)
+print(puma_dist)
+
+# Check variance for specific record
+record_6 = df[df['record_id'] == 6][['imputation_m', 'puma']]
+print(f"Record 6 PUMA assignments:\n{record_6}")
+```
+
+#### Example 2: Survey Analysis with Multiple Imputations
+
+```python
+from python.imputation import get_n_imputations, get_completed_dataset
+import numpy as np
+
+M = get_n_imputations()
+estimates = []
+
+for m in range(1, M+1):
+    df_m = get_completed_dataset(m, variables=['puma', 'county'])
+
+    # Analyze outcome by PUMA
+    puma_means = df_m.groupby('puma')['outcome'].mean()
+    estimates.append(puma_means)
+
+# Combine estimates (Rubin's rules)
+combined_mean = np.mean([est.mean() for est in estimates])
+between_var = np.var([est.mean() for est in estimates], ddof=1)
+within_var = np.mean([est.var() for est in estimates])
+
+total_var = within_var + (1 + 1/M) * between_var
+```
+
+#### Example 3: Generate New Imputations
+
+```python
+from python.imputation import get_n_imputations
+from python.db.connection import DatabaseManager
+import pandas as pd
+import numpy as np
+
+# Load configuration
+M = get_n_imputations()
+random_state = np.random.RandomState(42)
+
+# Get base data with ambiguous geography
+db = DatabaseManager()
+with db.get_connection(read_only=True) as conn:
+    query = """
+        SELECT study_id, pid, record_id, puma, puma_afact
+        FROM ne25_transformed
+        WHERE puma LIKE '%;%'  -- Multiple values
+    """
+    df = pd.read_sql(query, conn)
+
+# Parse semicolon-delimited values
+def sample_geography(values_str, probs_str, M, random_state):
+    values = [v.strip() for v in values_str.split(';')]
+    probs = [float(p.strip()) for p in probs_str.split(';')]
+    probs = np.array(probs) / sum(probs)  # Normalize
+    return random_state.choice(values, size=M, p=probs).tolist()
+
+# Generate M imputations per record
+imputation_data = []
+for _, row in df.iterrows():
+    samples = sample_geography(row['puma'], row['puma_afact'], M, random_state)
+    for m, puma_value in enumerate(samples, start=1):
+        imputation_data.append({
+            'study_id': row['study_id'],
+            'pid': row['pid'],
+            'record_id': row['record_id'],
+            'imputation_m': m,
+            'puma': puma_value
+        })
+
+# Insert into database
+imputed_df = pd.DataFrame(imputation_data)
+with db.get_connection() as conn:
+    conn.execute("DELETE FROM imputed_puma WHERE study_id = 'ne25'")
+    conn.execute("INSERT INTO imputed_puma SELECT * FROM imputed_df")
+```
+
+### Pipeline Integration
+
+**Setup (one-time):**
+```bash
+python scripts/imputation/00_setup_imputation_schema.py
+```
+
+**Generate imputations:**
+```bash
+python scripts/imputation/01_impute_geography.py
+```
+
+**Validate:**
+```bash
+python -m python.imputation.helpers
+```
+
+### Documentation
+
+- **Architecture:** [docs/imputation/IMPUTATION_PIPELINE.md](../imputation/IMPUTATION_PIPELINE.md)
+- **Usage Guide:** [docs/imputation/IMPUTATION_SETUP_COMPLETE.md](../imputation/IMPUTATION_SETUP_COMPLETE.md)
+- **Quick Reference:** [docs/QUICK_REFERENCE.md](../QUICK_REFERENCE.md#imputation-pipeline)
 
 ---
 

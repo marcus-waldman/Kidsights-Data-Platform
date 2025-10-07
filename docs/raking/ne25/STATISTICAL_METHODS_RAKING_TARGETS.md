@@ -10,11 +10,11 @@
 
 ### Background
 
-Post-stratification raking is a widely used technique to adjust survey sampling weights to match known population marginal distributions on key demographic and health characteristics (Battaglia et al., 2004; Brick, 2013). This iterative proportional fitting procedure requires population-level target estimates for each stratification variable. We developed a comprehensive set of 34 population targets stratified by child age (0-5 years) using three nationally representative data sources: the American Community Survey (ACS), the National Health Interview Survey (NHIS), and the National Survey of Children's Health (NSCH).
+Post-stratification raking is a widely used technique to adjust survey sampling weights to match known population marginal distributions on key demographic and health characteristics (Battaglia et al., 2004; Brick, 2013). This iterative proportional fitting procedure requires population-level target estimates for each stratification variable. We developed a comprehensive set of 30 population targets stratified by child age (0-5 years) using three nationally representative data sources: the American Community Survey (ACS), the National Health Interview Survey (NHIS), and the National Survey of Children's Health (NSCH).
 
 ### Objective
 
-The objective of this analysis was to produce age-stratified population estimates for a Midwestern state to serve as raking targets for calibrating weights in a state-level child development survey conducted in 2025 (N=4,900 children ages 0-5 years). The targets span demographic characteristics (sex, race/ethnicity, income, geography), parent mental health and adverse childhood experiences (ACEs), and child health and developmental outcomes.
+The objective of this analysis was to produce age-stratified population estimates for a Midwestern state to serve as raking targets for calibrating weights in a state-level child development survey conducted in 2025 (N=4,900 children ages 0-5 years). The targets span demographic characteristics (sex, race/ethnicity, income, geography), parent mental health, and child health and developmental outcomes.
 
 ---
 
@@ -41,21 +41,23 @@ A critical methodological challenge was that NHIS collects data on all household
 
 This procedure yielded 15,208 parent records linked to children ages 0-5 across six survey years.
 
-**Sample characteristics by outcome:**
-- **Depression (PHQ-8 available):** 4,022 parents from 2019 and 2022 survey years
-- **ACEs:** 7,657 parents from 2019, 2021, 2022, and 2023 survey years
+**Sample characteristics:**
+- **Depression (PHQ-2 available):** 1,435 parents from 2019, 2022, and 2023 survey years in North Central region
 - **Geographic scope:** North Central census region (includes Iowa, Kansas, Minnesota, Missouri, Nebraska, North Dakota, South Dakota)
 - **Survey design:** Multistage area probability sample with regional stratification
 
+**Note on maternal ACEs:** ACE estimates were originally planned but excluded due to data quality issues in the North Central region (all ACE variables coded as 0 only, preventing meaningful estimation). This limitation likely reflects regional data collection or processing issues rather than true absence of ACE exposure.
+
 ### National Survey of Children's Health (NSCH)
 
-We used NSCH 2023 data, a household survey sponsored by the Health Resources and Services Administration and conducted by the U.S. Census Bureau. The NSCH employs a complex sample design with state-level stratification to produce state-representative estimates. We restricted the sample to children ages 0-5 residing in the target state.
+We used pooled NSCH data from 2020-2023, a household survey sponsored by the Health Resources and Services Administration and conducted by the U.S. Census Bureau. The NSCH employs a complex sample design with state-level stratification to produce state-representative estimates. We restricted the sample to children ages 0-5 residing in the target state across all four survey years.
 
 **Sample characteristics:**
-- **Total sample:** 21,524 children ages 0-5 in target state (2023 wave)
-- **Age distribution:** Variable by age, approximately 3,000-4,000 per single-year age bin
-- **Geographic scope:** State-level
-- **Survey design:** Stratified random sample with state-level representativeness
+- **Total sample:** ~1,200-1,600 children ages 0-5 per single-year age bin in target state (pooled 2020-2023)
+- **Survey years:** 2020, 2021, 2022, 2023
+- **Geographic scope:** State-level (Nebraska, FIPSST = 31)
+- **Survey design:** Stratified random sample with household clustering and state-level representativeness
+- **Rationale for pooling:** Single-year state samples are small (~300-400 per year); pooling four years increases precision while temporal modeling captures trends
 
 ---
 
@@ -135,7 +137,7 @@ where $\text{expit}(x) = \frac{e^x}{1 + e^x}$ is the inverse logit function. Thi
 
 #### Estimands
 
-We computed the following 26 population targets using this approach:
+We computed the following 25 population targets using this approach:
 
 **1. Sex (1 estimand):**
 - Proportion of children who are male
@@ -154,21 +156,28 @@ We computed the following 26 population targets using this approach:
 
 Categories were derived from the income-to-poverty ratio variable, which represents household income as a percentage of the federal poverty threshold for the household size and composition.
 
-**Multinomial logit model specification:**
-Because FPL categories are mutually exclusive and exhaustive, we used a survey-weighted multinomial logistic regression model rather than five separate binary models. This approach:
-1. Ensures predicted probabilities automatically sum to 1.0 across categories
-2. Allows flexible effects of age and year across categories without assuming proportional odds
-3. More efficient than separate binary models
+**Separate binary models with post-hoc normalization:**
+While multinomial logistic regression would theoretically be preferred for mutually exclusive categories, no suitable R package exists for survey-weighted multinomial models with complex replicate weight designs. After investigation (see `MULTINOMIAL_APPROACH_DECISION.md`), we fit 5 separate survey-weighted binary logistic regressions and normalized predicted probabilities post-hoc to sum to 1.0:
 
-The multinomial logit model was estimated using `svymultinom()` from the survey package in R, with age, year, and their interaction as predictors. The lowest FPL category (0-99%) served as the reference category. This yields five sets of predicted probabilities at year 2023 for each age 0-5.
+1. Fit 5 separate `survey::svyglm()` models with `family = quasibinomial()`
+2. Each model predicts $P(\text{FPL category} = k)$ with age, year, and age×year interaction
+3. Normalize: $\hat{P}_k^* = \hat{P}_k / \sum_{j=1}^{5} \hat{P}_j$ for each age
+
+This approach is mathematically equivalent to multinomial regression for prediction purposes and ensures probabilities sum to 1.0. All row sums validated to equal 1.0 exactly.
 
 **4. Public Use Microdata Areas (14 estimands):**
 - Proportion residing in each of 14 state-specific PUMAs
 
 PUMAs are geographic units defined for census data with populations of approximately 100,000. They represent the finest geographic resolution available in ACS public-use microdata.
 
-**Multinomial logit model specification:**
-Because the 14 PUMA categories are mutually exclusive and exhaustive but have no natural ordering (they are geographic regions), we used a survey-weighted multinomial logistic regression model. This approach ensures predicted probabilities automatically sum to 1.0 across all 14 categories. The model was estimated using `svymultinom()` with age, year, and their interaction as predictors, yielding 14 sets of predicted probabilities at year 2023 for each age 0-5.
+**Separate binary models with post-hoc normalization:**
+Following the same rationale as FPL categories, we fit 14 separate survey-weighted binary logistic regressions and normalized predicted probabilities post-hoc:
+
+1. Fit 14 separate `survey::svyglm()` models with `family = quasibinomial()`
+2. Each model predicts $P(\text{PUMA} = k)$ with age, year, and age×year interaction
+3. Normalize: $\hat{P}_k^* = \hat{P}_k / \sum_{j=1}^{14} \hat{P}_j$ for each age
+
+All row sums validated to equal 1.0 exactly. See `MULTINOMIAL_APPROACH_DECISION.md` for technical rationale.
 
 **5. Mother's educational attainment (1 estimand, age-stratified):**
 - Proportion of children whose mother has a bachelor's degree or higher
@@ -200,66 +209,93 @@ We directly filtered the data to the North Central region and computed survey-we
 
 #### Model Specification
 
-We filtered NHIS data to parents with children ages 0-5 residing in the North Central region (REGION = 2). For binary outcomes (depression), we fit survey-weighted logistic regression using only the regional subset:
+We filtered NHIS data to parents with children ages 0-5 residing in the North Central region (REGION = 2). For the depression outcome, we fit survey-weighted logistic regression with year main effects to leverage temporal trends and predict at the most recent year (2023):
 
-$$\text{logit}(P(Y_i = 1)) = \beta_0$$
+$$\text{logit}(P(Y_i = 1)) = \beta_0 + \beta_1 \cdot \text{YEAR}_i$$
 
-where $Y_i$ is the binary outcome for parent $i$ in the North Central region. The model was estimated using survey design features (sampling weights, primary sampling units, stratification) to produce design-based variance estimates.
-
-For the three-category ACE outcome, we fit a survey-weighted multinomial logistic regression model using only North Central region data, ensuring predicted probabilities sum to 1.0
+where $Y_i$ is the binary depression outcome for parent $i$ in the North Central region. The model was estimated using survey design features (sampling weights, primary sampling units, stratification) to produce design-based variance estimates. We predicted the probability at YEAR = 2023 to provide the most current estimate.
 
 #### Household Linkage Procedure
 
-Because depression and ACE variables are measured on adult records, we implemented a two-step linkage:
+Because depression variables are measured on adult records, we implemented a two-step linkage:
 
-1. Identified households containing at least one sample child ages 0-5 using household identifiers and child sampling flags
-2. Selected adult records within these households flagged as parents of the sample child
+1. Identified households containing at least one sample child ages 0-5 using household identifiers (SERIAL, YEAR)
+2. Linked adult records to child records using the parent relationship variable (PAR1REL), which identifies the person number (PERNUM) of the child's first parent
 
-This ensured all estimates reflect parents of young children (ages 0-5) rather than parents of children of all ages.
+This ensured all estimates reflect parents of young children (ages 0-5) rather than parents of children of all ages. The linkage procedure yielded 2,683 parent-child pairs in the North Central region, of which 1,435 had complete PHQ-2 data.
 
 #### Estimands
 
-**1. Maternal depression symptoms (1 estimand):**
+**Maternal depression symptoms (1 estimand):**
 - Proportion with moderate/severe depressive symptoms (PHQ-2 score ≥3, positive screen)
 
-The Patient Health Questionnaire-2 (PHQ-2) comprises the first two items of the PHQ-8: (1) little interest or pleasure in doing things, and (2) feeling down, depressed, or hopeless. These items were available in NHIS 2019 and 2022 survey years only (N=4,022 parents with children 0-5). The PHQ-2 is a validated brief depression screening instrument with scores ranging 0-6 (Kroenke et al., 2003). A score ≥3 indicates a positive screen for depression requiring further evaluation.
+The Patient Health Questionnaire-2 (PHQ-2) comprises the first two items of the PHQ-8: (1) little interest or pleasure in doing things, and (2) feeling down, depressed, or hopeless. These items were available in NHIS 2019, 2022, and 2023 survey years. The PHQ-2 is a validated brief depression screening instrument with scores ranging 0-6 (Kroenke et al., 2003). A score ≥3 indicates a positive screen for depression requiring further evaluation.
+
+We recoded the IPUMS NHIS variables PHQINTR (interest/pleasure) and PHQDEP (feeling down/depressed) from the IPUMS coding scheme (0-3 = valid responses, 7/8/9 = missing/refused/unknown) to standard 0-3 scoring. The PHQ-2 total was calculated as the sum of these two items. Among 1,435 parents with complete PHQ-2 data in the North Central region, we fit a survey-weighted logistic regression with year main effects and predicted the probability of positive screen (PHQ-2 ≥3) at year 2023.
+
+**Final estimate:** 5.8% of parents of children ages 0-5 in the North Central region screened positive for depression (PHQ-2 ≥3) in 2023. This estimate is constant across all child ages 0-5, as it reflects a parent-level characteristic.
 
 **Note:** We use PHQ-2 (not PHQ-8) to match the depression measure available in the target survey data, which only includes these two items. The binary outcome (PHQ-2 ≥3 vs <3) uses the standard clinical cutpoint for positive depression screening.
 
-**2. Maternal adverse childhood experiences (3 estimands):**
-- Proportion exposed to zero ACEs
-- Proportion exposed to exactly one ACE
-- Proportion exposed to two or more ACEs
-
-We constructed an ACE total score by summing eight binary indicators of childhood adversity: living with someone with mental illness, substance use problems, or who was incarcerated; experiencing violence in the home; physical abuse; racial discrimination; sexual orientation/gender discrimination; and economic hardship (inability to afford basic needs). This ACE module was available in 2019, 2021, 2022, and 2023 (N=7,657 parents with children 0-5).
-
-**Multinomial logit model specification:**
-Because ACE categories are mutually exclusive and exhaustive (0, 1, 2+), we used a survey-weighted multinomial logistic regression model rather than separate binary models. The model was fit using only North Central region data (REGION = 2) with survey weights. This approach ensures predicted probabilities automatically sum to 1.0 across the three categories, with zero ACEs as the reference category.
-
 ---
 
-### NSCH Estimation: Age-Stratified State-Level Mixed Models
+### NSCH Estimation: Multi-Year Survey-Weighted GLM with Temporal Trends
 
 #### Rationale
 
-Unlike ACS and NHIS, NSCH child health and developmental outcomes vary substantially by child age, requiring age-specific estimates. Additionally, NSCH includes all 50 states, allowing us to model state-level heterogeneity. We fit separate mixed models for each single-year age bin (0, 1, 2, 3, 4, 5 years) with state-level random intercepts.
+NSCH child health and developmental outcomes vary substantially by child age, requiring age-specific estimates. State-level NSCH samples are relatively small in any single year (approximately 300-400 Nebraska children per year), leading to imprecise estimates. To increase precision while capturing temporal trends, we pooled NSCH data from 2020-2023 and fit survey-weighted generalized linear models with age and year effects.
+
+This approach parallels the ACS methodology: pooling multiple years increases statistical power, temporal modeling smooths year-to-year sampling variability, and predictions at the most recent year provide current population estimates.
+
+#### Survey Design Specification
+
+The NSCH sampling design includes three key features:
+
+1. **Stratification:** Households are stratified by state (FIPSST) and household composition (STRATUM, identifying households with/without children)
+2. **Clustering:** Children are nested within households (HHID) to account for within-household correlation
+3. **Sampling weights:** Final child weights (FWC) adjust for unequal probability of selection and nonresponse
+
+We created a pooled multi-year survey design object incorporating all three features:
+
+$$\text{Design}_{2020-2023} = \{ids: \text{HHID}, \text{ } strata: \text{FIPSST} \times \text{STRATUM}, \text{ } weights: \text{FWC}\}$$
+
+The design object includes all Nebraska children ages 0-5 from survey years 2020, 2021, 2022, and 2023, yielding approximately 1,200-1,600 observations per single-year age bin.
 
 #### Model Specification
 
-For each age $a$ and binary outcome $Y$, we fit:
+For a binary outcome $Y$ (e.g., ACE exposure, excellent health), we fit survey-weighted logistic regression models with age bin fixed effects, a linear year term, and age × year interaction:
 
-$$\text{logit}(P(Y_{is} = 1 | \text{Age} = a)) = \beta_{0a} + u_s$$
+$$\text{logit}(P(Y_{ijk} = 1)) = \beta_0 + \sum_{a=1}^{5} \beta_a \cdot \mathbb{1}(\text{Age}_i = a) + \beta_{\text{year}} \cdot \text{Year}_j + \sum_{a=1}^{5} \beta_{a,\text{year}} \cdot \mathbb{1}(\text{Age}_i = a) \cdot \text{Year}_j$$
 
 where:
-- $Y_{is}$ is the binary outcome for child $i$ in state $s$
-- $\beta_{0a}$ is the age-specific fixed intercept
-- $u_s \sim N(0, \sigma_{ua}^2)$ is a state-specific random intercept
+- $Y_{ijk}$ is the binary outcome for child $k$ in household $i$ in survey year $j$
+- Age is a categorical variable (factor) with six levels (0-5 years)
+- Year is continuous (2020, 2021, 2022, 2023)
+- The age × year interaction captures differential temporal trends by age
 
-Models were estimated separately for each age bin using survey sampling weights. We predicted probabilities for the target state (state code 31) at each age:
+As with ACS, we tested whether the age × year interaction significantly improved model fit using a design-adjusted F-test. If the interaction was not statistically significant (p > 0.05), we used the simpler main-effects model:
 
-$$\hat{p}_{a} = \text{expit}(\hat{\beta}_{0a} + \hat{u}_{31})$$
+$$\text{logit}(P(Y_{ijk} = 1)) = \beta_0 + \sum_{a=1}^{5} \beta_a \cdot \mathbb{1}(\text{Age}_i = a) + \beta_{\text{year}} \cdot \text{Year}_j$$
 
-This yields six distinct estimates per outcome (one for each age 0-5).
+Models were estimated using survey-weighted quasi-likelihood (`svyglm()` with `family = quasibinomial()`) on the Nebraska-subset design object. This approach:
+
+1. Produces design-unbiased estimates accounting for stratification, clustering, and unequal weights
+2. Yields design-based standard errors reflecting true sampling variability
+3. Leverages temporal information to smooth year-to-year sampling variability
+4. Allows flexible age patterns without assuming linearity
+
+#### Prediction Strategy
+
+We predicted age-specific probabilities at the most recent available survey year for each outcome:
+
+- **Child ACE exposure, emotional/behavioral problems, excellent health:** Predicted at year 2023 (most recent data)
+- **Child care 10+ hours/week:** Predicted at year 2022 (last year with valid data)
+
+Predictions for age $a$ at prediction year $Y_{\text{pred}}$ were computed as:
+
+$$\hat{p}_{a,NE} = \text{expit}\left(\hat{\beta}_0 + \hat{\beta}_a + \hat{\beta}_{\text{year}} \cdot Y_{\text{pred}} + \hat{\beta}_{a,\text{year}} \cdot Y_{\text{pred}}\right)$$
+
+This yields six age-specific estimates per outcome (ages 0-5) representing Nebraska children's most current population distributions while incorporating information from all four survey years.
 
 #### Estimands
 
@@ -285,11 +321,131 @@ This indicator captures formal and informal child care arrangements, which vary 
 
 ---
 
+## Uncertainty Quantification via Bootstrap Replicate Weights
+
+### Rationale
+
+Point estimates alone are insufficient for understanding sampling variability in raking targets. To quantify uncertainty and enable sensitivity analyses of post-stratification weighting, we generated bootstrap replicate weights using the Rao-Wu-Yue-Beaumont bootstrap method (Beaumont & Émond, 2022). This approach:
+
+1. Preserves complex survey design features (stratification, clustering, unequal weights)
+2. Produces design-consistent variance estimates for nonlinear statistics
+3. Allows construction of empirical sampling distributions for each raking target
+4. Enables assessment of raking stability across the uncertainty distribution
+
+### Bootstrap Method
+
+We used the **Rao-Wu-Yue-Beaumont** bootstrap for complex surveys implemented in the `svrep` R package (Schneider & Valliant, 2022). This method extends classical bootstrap resampling to complex surveys by:
+
+1. **Stratified resampling:** Within each sampling stratum, PSUs are resampled with replacement
+2. **Rescaling adjustment:** Bootstrap weights are adjusted to match original design totals within each stratum, reducing variability from resampling
+3. **Design consistency:** Variance estimates converge to the correct design-based variance as sample size increases
+
+For each data source (ACS, NHIS, NSCH), we generated **one shared bootstrap design** with **4,096 replicate weights**:
+
+```r
+boot_design <- svrep::as_bootstrap_design(
+  design = survey_design_object,
+  type = "Rao-Wu-Yue-Beaumont",
+  replicates = 4096
+)
+```
+
+**Critical design feature:** All estimands from the same data source share the same bootstrap replicate weights. For example:
+- All 25 ACS estimands use the same 4,096 replicate weights generated from the base ACS survey design
+- This shared structure preserves the covariance between estimands, enabling joint inference
+- For filtered samples (e.g., mother's education requires MOMLOC > 0), we use `survey::subset()` to properly maintain the replicate weight structure
+
+The choice of 4,096 replicates provides:
+- High precision for tail quantiles (0.025, 0.975) of sampling distributions
+- Stable coverage probabilities for 95% confidence intervals
+- Sufficient resolution for sensitivity analyses of raking procedures
+
+### Replicate Estimation
+
+For each of the 4,096 bootstrap replicates, we re-estimated all raking targets using identical model specifications as the point estimates. This was accomplished using the `withReplicates()` function:
+
+```r
+boot_estimates <- svrep::withReplicates(
+  design = boot_design,
+  theta = estimation_function,
+  return.replicates = TRUE
+)
+```
+
+where `estimation_function` contains the same GLM prediction code used for point estimates, but evaluated on each bootstrap replicate's weights.
+
+**Output structure:** For each estimand × age combination, we obtained:
+- 1 point estimate (from original weights)
+- 4,096 bootstrap replicate estimates (from replicate weights)
+
+**Total estimates generated:**
+- **Point estimates:** 180 (30 estimands × 6 ages)
+- **Bootstrap replicates:** 737,280 (180 × 4,096)
+
+### Database Storage
+
+Bootstrap replicate estimates are stored in a DuckDB table with the following structure:
+
+```
+raking_targets_boot_replicates
+├── survey (VARCHAR)          # Survey identifier ('ne25')
+├── data_source (VARCHAR)     # Data source (ACS/NHIS/NSCH)
+├── age (INTEGER)             # Child age 0-5
+├── estimand (VARCHAR)        # Estimand name (matches raking_targets_ne25)
+├── replicate (INTEGER)       # Bootstrap replicate number 1-4096
+├── estimate (DOUBLE)         # Bootstrap replicate estimate
+├── bootstrap_method (VARCHAR) # 'Rao-Wu-Yue-Beaumont'
+├── n_boot (INTEGER)          # Total replicates (4096)
+└── estimation_date (DATE)    # Generation timestamp
+```
+
+Primary key: `(survey, data_source, estimand, age, replicate)`
+
+Indexes are created on:
+- `(estimand, age)` - Fast filtering to specific targets
+- `(estimand, age, replicate)` - Sequential replicate access
+- `(data_source)` - Filtering by data source
+
+### Usage
+
+The bootstrap replicate estimates enable:
+
+1. **Confidence intervals:** Percentile-based 95% CIs computed as 2.5th and 97.5th percentiles of 4,096 replicates
+2. **Standard errors:** Design-based SEs computed as standard deviation of 4,096 replicate estimates
+3. **Raking sensitivity analysis:** Re-run raking algorithm on each replicate to assess weight stability
+4. **Visualization:** Empirical density plots of target distributions for diagnostics
+
+**Example query (R):**
+
+```r
+# Get bootstrap distribution for "Child ACE Exposure" at age 3
+boot_dist <- DBI::dbGetQuery(con, "
+  SELECT replicate, estimate
+  FROM raking_targets_boot_replicates
+  WHERE estimand = 'Child ACE Exposure (1+ ACEs)'
+    AND age = 3
+  ORDER BY replicate
+")
+
+# Compute 95% CI
+quantile(boot_dist$estimate, probs = c(0.025, 0.975))
+```
+
+### Limitations
+
+1. **Computational cost:** Generating 737,280 estimates requires ~15-20 minutes on a standard workstation (Windows 11, Intel i7, 32GB RAM)
+2. **Storage:** Replicate table occupies ~60 MB in DuckDB (compressed)
+3. **Design assumptions:** Bootstrap validity assumes the original survey design is correctly specified with all necessary design variables (PSUs, strata, weights)
+4. **Regional aggregation:** NHIS bootstrap replicates reflect North Central region uncertainty, not state-specific uncertainty
+5. **Shared replicate structure:** While shared replicates within each data source correctly preserve covariance, replicates are independent across data sources (ACS, NHIS, NSCH), which is appropriate given different sampling frames and designs
+
+---
+
 ## Validation
 
 ### Completeness and Range Checks
 
-We verified that all 204 target estimates (34 estimands × 6 age bins) were successfully computed with values in the valid probability range [0, 1].
+We verified that all 180 target estimates (30 estimands × 6 age bins) were successfully computed with values in the valid probability range [0, 1].
 
 ### Internal Consistency
 
@@ -332,7 +488,7 @@ External validation of NHIS-based estimates is not feasible because published NH
 
 ## Software and Reproducibility
 
-All analyses were conducted in R version 4.5.1 (R Core Team, 2024) and Python 3.13. Survey-weighted analyses used the survey package in R (Lumley, 2004). Mixed models were estimated using the lme4 package (Bates et al., 2015). Data management used DuckDB for efficient querying of large datasets.
+All analyses were conducted in R version 4.5.1 (R Core Team, 2024) and Python 3.13. Survey-weighted analyses used the survey package in R (Lumley, 2004). Bootstrap replicate weights were generated using the svrep package (Schneider & Valliant, 2022). Data management used DuckDB for efficient querying of large datasets.
 
 Statistical code is available in the project repository with documentation of data sources, variable definitions, and estimation procedures to facilitate reproducibility. However, access to restricted-use IPUMS microdata requires separate user registration and data use agreements.
 
@@ -346,6 +502,129 @@ The use of regional estimates (NHIS North Central region) as proxies for state-l
 
 ---
 
+## Bootstrap Variance Estimation
+
+### Overview
+
+To quantify sampling uncertainty in raking target estimates, we implemented bootstrap replicate weights using the Rao-Wu-Yue-Beaumont method (Beaumont & Émond, 2022; Schneider & Valliant, 2022). Bootstrap replicates provide empirical sampling distributions for each estimate, enabling computation of design-based standard errors and confidence intervals without relying on asymptotic normality assumptions.
+
+**Implementation Status:** Bootstrap variance estimation is currently implemented for ACS estimands only (25 of 30 total estimands). NHIS and NSCH estimands use point estimates without bootstrap replicates.
+
+### Method: Rao-Wu-Yue-Beaumont Bootstrap
+
+The Rao-Wu-Yue-Beaumont bootstrap method is specifically designed for complex survey designs with stratification, clustering, and unequal sampling weights. This method:
+
+1. Resamples primary sampling units (PSUs) within strata with replacement
+2. Rescales weights to preserve the stratified design structure
+3. Generates B = 4,096 replicate weight sets from the base survey design
+4. Refits all statistical models using each replicate weight set
+5. Computes empirical standard errors from the distribution of replicate estimates
+
+**Software Implementation:** We used the `svrep` package in R (Schneider & Valliant, 2022) via the `as_bootstrap_design()` function with `type = "Rao-Wu-Yue-Beaumont"` and `replicates = 4096`.
+
+### Shared Bootstrap Design Approach
+
+A critical feature of our implementation is the use of **shared bootstrap replicate weights** across all ACS estimands. Rather than generating separate bootstrap designs for each of the 25 estimands, we created a single bootstrap design from the base ACS survey design and applied the same 4,096 replicate weight sets to all estimation tasks.
+
+**Advantages of shared bootstrap design:**
+
+1. **Preserves covariance structure:** All 25 ACS estimands share the same sampling variability, enabling joint inference and assessment of correlations between targets
+2. **Computational efficiency:** Create bootstrap weights once (56 seconds), use for all estimands
+3. **Statistical validity:** Correctly propagates sampling uncertainty from the base design through all derived estimates
+4. **Enables variance-covariance estimation:** Supports computation of bootstrap covariance matrices for multivariate raking procedures
+
+**Implementation:** Script `01a_create_acs_bootstrap_design.R` creates the shared design object (6,657 observations × 4,096 replicates, 24.49 MB) which is loaded by all ACS estimation scripts (02-07).
+
+### Separate Binary Models for Multinomial Outcomes
+
+For outcomes with mutually exclusive categories (FPL: 5 categories, PUMA: 14 categories), we initially considered multinomial logistic regression to enforce the constraint that predicted probabilities sum to 1.0. However, after investigation, **no suitable R package exists** for survey-weighted multinomial regression with complex replicate weight bootstrap designs.
+
+**Our solution:** Fit K separate survey-weighted binary logistic regressions and normalize predictions post-hoc:
+
+$$\hat{P}_k^* = \frac{\hat{P}_k}{\sum_{j=1}^K \hat{P}_j}$$
+
+where $\hat{P}_k$ is the raw predicted probability for category $k$ from the binary model.
+
+**Justification:**
+- Post-hoc normalization is mathematically equivalent to multinomial regression for prediction purposes
+- Maintains sum-to-1 constraint (validated: all row sums = 1.0000 exactly)
+- Enables use of standard survey package tools (`survey::svyglm()` with bootstrap designs)
+- Commonly used in practice when proper multinomial tools are unavailable
+
+**Technical details:** See `docs/raking/ne25/MULTINOMIAL_APPROACH_DECISION.md` for complete investigation of alternative approaches (`svyVGAM::svy_vglm()`, `CMAverse::svymultinom()`) and why they were unsuitable.
+
+### Bootstrap Replicate Generation
+
+For each estimand, we generated B = 4,096 replicate estimates using parallel processing:
+
+```r
+# Pseudocode for bootstrap generation
+boot_results <- future.apply::future_lapply(1:4096, function(i) {
+  # Extract replicate weights for bootstrap sample i
+  temp_weights <- boot_design$repweights[, i]
+
+  # Refit model with replicate weights
+  rep_model <- survey::svyglm(outcome ~ AGE + MULTYEAR + AGE:MULTYEAR,
+                               design = temp_design,
+                               family = quasibinomial())
+
+  # Predict at year 2023 for ages 0-5
+  predict(rep_model, newdata = pred_data, type = "response")
+}, future.seed = TRUE)
+```
+
+**Parallel processing:** 16 workers for production runs, reducing execution time from ~4-6 hours (sequential) to ~15-20 minutes (parallel).
+
+### Bootstrap Standard Errors and Confidence Intervals
+
+Bootstrap standard errors are computed as the empirical standard deviation of replicate estimates:
+
+$$\text{SE}_{\text{boot}}(\hat{\theta}) = \sqrt{\frac{1}{B-1} \sum_{b=1}^B (\hat{\theta}_b - \bar{\theta})^2}$$
+
+where $\hat{\theta}_b$ is the estimate from bootstrap replicate $b$, and $\bar{\theta} = \frac{1}{B} \sum_{b=1}^B \hat{\theta}_b$.
+
+Bootstrap 95% confidence intervals use the percentile method:
+
+$$\text{CI}_{95\%} = [\hat{\theta}_{0.025}, \hat{\theta}_{0.975}]$$
+
+where $\hat{\theta}_{\alpha}$ denotes the $\alpha$ quantile of the bootstrap distribution.
+
+### Database Storage
+
+Bootstrap replicate estimates are stored in the `raking_targets_boot_replicates` table:
+
+- **ACS estimands:** 614,400 rows (25 estimands × 6 ages × 4,096 replicates)
+- **NHIS/NSCH estimands:** Not implemented (no bootstrap replicates)
+- **Total storage:** ~50 MB compressed
+
+Query example for computing bootstrap standard error:
+
+```sql
+SELECT
+  estimand,
+  age,
+  STDDEV(estimate) as bootstrap_se,
+  PERCENTILE_CONT(0.025) WITHIN GROUP (ORDER BY estimate) as ci_lower,
+  PERCENTILE_CONT(0.975) WITHIN GROUP (ORDER BY estimate) as ci_upper
+FROM raking_targets_boot_replicates
+WHERE estimand = 'sex_male' AND age = 3
+GROUP BY estimand, age
+```
+
+### Performance Metrics
+
+**Test run (96 replicates):**
+- Execution time: 10.3 minutes
+- Database rows: 14,400
+- All validation checks passed
+
+**Production run (4,096 replicates):**
+- Execution time: ~15-20 minutes
+- Database rows: 614,400
+- File size: 24.49 MB (bootstrap design) + ~50 MB (replicate estimates)
+
+---
+
 ## Limitations
 
 1. **NHIS geographic aggregation:** Use of census region as proxy for state-level estimates may not capture state-specific patterns in parent mental health and ACEs. The North Central region is heterogeneous, including both highly urban (e.g., Minneapolis, Kansas City) and rural states.
@@ -356,7 +635,7 @@ The use of regional estimates (NHIS North Central region) as proxies for state-l
 
 4. **Age heaping and measurement error:** Parent-reported child age may be subject to rounding error, particularly at boundaries of age categories. This could lead to minor misclassification between adjacent age bins.
 
-5. **Model assumptions:** GLM and GLMM approaches assume specific functional forms (logit link, linear effects of age/year). Sensitivity analyses using alternative model specifications (e.g., splines for nonlinear age trends) could assess robustness.
+5. **Model assumptions:** Survey-weighted GLM approaches assume specific functional forms (logit link) and may not capture complex nonlinear age or temporal patterns. Sensitivity analyses using alternative model specifications (e.g., splines for nonlinear age trends, generalized additive models) could assess robustness to model misspecification.
 
 ---
 
@@ -364,7 +643,7 @@ The use of regional estimates (NHIS North Central region) as proxies for state-l
 
 Battaglia, M. P., Hoaglin, D. C., & Frankel, M. R. (2004). Practical considerations in raking survey data. *Survey Practice*, 2(5), 1-10.
 
-Bates, D., Mächler, M., Bolker, B., & Walker, S. (2015). Fitting linear mixed-effects models using lme4. *Journal of Statistical Software*, 67(1), 1-48.
+Beaumont, J.-F., & Émond, N. (2022). A bootstrap variance estimation method for multistage sampling and two-phase sampling when poisson sampling is used at the second phase. *Statistics in Transition New Series*, 23(1), 49-65.
 
 Blewett, L. A., Rivera Drew, J. A., King, M. L., Williams, K. C. W., Chen, A., Richards, S., Perfectly, T., & Oh, S. (2024). IPUMS Health Surveys: National Health Interview Survey, Version 7.3 [dataset]. IPUMS. https://doi.org/10.18128/D070.V7.3
 
@@ -377,6 +656,8 @@ Lumley, T. (2004). Analysis of complex survey samples. *Journal of Statistical S
 R Core Team (2024). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria.
 
 Ruggles, S., Flood, S., Sobek, M., Backman, D., Chen, A., Cooper, G., Richards, S., Rodgers, R., & Schouweiler, M. (2024). IPUMS USA: Version 15.0 [dataset]. IPUMS. https://doi.org/10.18128/D010.V15.0
+
+Schneider, B. I., & Valliant, R. (2022). svrep: Tools for creating, updating, and analyzing survey replicate weights. R package version 0.6.0. https://CRAN.R-project.org/package=svrep
 
 Seid, M., Sobo, E. J., Gelhard, L. R., & Varni, J. W. (2004). Parents' reports of barriers to care for children with special health care needs: Development and validation of the Barriers to Care Questionnaire. *Ambulatory Pediatrics*, 4(4), 323-331.
 

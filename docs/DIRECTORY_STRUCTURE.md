@@ -13,9 +13,10 @@ This document provides a comprehensive guide to the Kidsights Data Platform dire
 3. [ACS Pipeline Directories](#acs-pipeline-directories)
 4. [NHIS Pipeline Directories](#nhis-pipeline-directories)
 5. [NSCH Pipeline Directories](#nsch-pipeline-directories)
-6. [Shared Directories](#shared-directories)
-7. [Data Storage](#data-storage)
-8. [Quick Navigation](#quick-navigation)
+6. [Imputation Pipeline Directories](#imputation-pipeline-directories)
+7. [Shared Directories](#shared-directories)
+8. [Data Storage](#data-storage)
+9. [Quick Navigation](#quick-navigation)
 
 ---
 
@@ -48,8 +49,23 @@ The NE25 pipeline processes REDCap survey data from the Nebraska 2025 study.
 - `db/query_geo_crosswalk.py` - Geographic crosswalk queries
 - `utils/r_executor.py` - Safe R script execution (avoids segfaults)
 - `utils/logging.py` - Structured logging utilities
+- `imputation/config.py` - Imputation configuration loader
+- `imputation/helpers.py` - Helper functions for multiple imputation workflows
 
 **Why Python?** Eliminates R DuckDB segmentation faults by handling all database I/O in Python.
+
+### `/python/imputation/`
+**Purpose:** Multiple imputation system for geographic uncertainty
+
+**Key Files:**
+- `config.py` - Load imputation configuration from YAML (M, random seed, variables)
+- `helpers.py` - Helper functions for retrieving completed datasets
+  - `get_completed_dataset(m)` - Retrieve single imputation with LEFT JOIN + COALESCE
+  - `get_all_imputations()` - Long format across all M imputations
+  - `get_imputation_metadata()` - Variable metadata
+  - `validate_imputations()` - Validation checks
+
+**Design Philosophy:** Single source of truth - R calls Python via reticulate to avoid code duplication.
 
 ### `/pipelines/python/`
 **Purpose:** Executable Python scripts that orchestrate pipeline steps
@@ -72,8 +88,37 @@ The NE25 pipeline processes REDCap survey data from the Nebraska 2025 study.
 - `utils/` - Utility functions (validation, helpers)
 - `codebook/` - Codebook querying functions
 - `load/` - Data loading from various sources
+- `imputation/` - Multiple imputation helper functions (via reticulate)
 
 **Why R?** Strengths in statistical computing, data transformation, and REDCap integration.
+
+### `/R/imputation/`
+**Purpose:** R interface to imputation system via reticulate
+
+**Key Files:**
+- `config.R` - Get configuration (calls Python)
+- `helpers.R` - Wrapper functions for imputation helpers
+  - `get_completed_dataset(m)` - Retrieve single imputation in R
+  - `get_imputation_list()` - Get list of M datasets for mitools/survey package
+  - `get_all_imputations()` - Long format in R
+  - `validate_imputations()` - Validation via Python
+
+**Usage Example:**
+```r
+library(reticulate)
+source("R/imputation/helpers.R")
+
+# Get imputation 3 with geography
+df3 <- get_completed_dataset(3, variables = c("puma", "county"))
+
+# Survey analysis with mitools
+imp_list <- get_imputation_list()
+results <- lapply(imp_list, function(df) {
+  design <- svydesign(ids = ~1, weights = ~weight, data = df)
+  svymean(~outcome, design)
+})
+combined <- mitools::MIcombine(results)
+```
 
 ### `/pipelines/orchestration/`
 **Purpose:** Main pipeline controller scripts
@@ -104,6 +149,7 @@ The NE25 pipeline processes REDCap survey data from the Nebraska 2025 study.
 - `audit/` - Data validation scripts
 - `documentation/` - Documentation generation scripts
 - `validation/` - Validation utilities
+- `imputation/` - Imputation pipeline scripts
 
 **Pattern:** Scripts are for maintenance/debugging, not production pipeline.
 
@@ -335,6 +381,46 @@ python scripts/nsch/process_all_years.py --years all
 
 ---
 
+## Imputation Pipeline Directories
+
+The Imputation Pipeline handles geographic uncertainty through multiple imputation (M=5).
+
+### `/scripts/imputation/`
+**Purpose:** Imputation pipeline execution scripts
+
+**Key Files:**
+- `00_setup_imputation_schema.py` - One-time database setup (4 tables)
+- `01_impute_geography.py` - Generate M=5 geography imputations
+
+**Usage:**
+```bash
+# Setup (one-time)
+python scripts/imputation/00_setup_imputation_schema.py
+
+# Generate imputations
+python scripts/imputation/01_impute_geography.py
+
+# Validate
+python -m python.imputation.helpers
+```
+
+### `/config/imputation/`
+**Purpose:** Imputation configuration
+
+**Files:**
+- `imputation_config.yaml` - Configuration (M=5, random seed, variables)
+
+**Single Source of Truth:** Accessed by both Python and R (via reticulate)
+
+### `/docs/imputation/`
+**Purpose:** Imputation pipeline documentation
+
+**Key Files:**
+- `IMPUTATION_PIPELINE.md` - Architecture and design rationale
+- `IMPUTATION_SETUP_COMPLETE.md` - Usage guide and validation results
+
+---
+
 ## Shared Directories
 
 ### `/docs/`
@@ -376,8 +462,8 @@ python scripts/nsch/process_all_years.py --years all
 
 **Local DuckDB:** `data/duckdb/kidsights_local.duckdb`
 - **Size:** ~47 MB
-- **Tables:** 11 tables (ne25_raw, ne25_transformed, acs_raw, nhis_raw, nsch_{year}_raw, etc.)
-- **Records:** 7,812+ records (varies by pipeline runs)
+- **Tables:** 15+ tables (ne25_raw, ne25_transformed, acs_raw, nhis_raw, nsch_{year}_raw, imputed_puma, imputed_county, imputed_census_tract, etc.)
+- **Records:** 7,812+ records (NE25) + 25,483 rows (imputations) + varies by pipeline runs
 
 ### Temporary Files
 
@@ -430,6 +516,32 @@ python scripts/nsch/process_all_years.py --years all
 
 **Validation Reports:** `data/nsch/{year}/validation_report.txt`
 - **Contains:** 7 QC check results
+
+#### Imputation Pipeline
+
+**Database Tables:** In `data/duckdb/kidsights_local.duckdb`
+
+**Imputation Tables:**
+- `imputed_puma` - 4,390 rows (878 records × 5 imputations)
+- `imputed_county` - 5,270 rows (1,054 records × 5 imputations)
+- `imputed_census_tract` - 15,820 rows (3,164 records × 5 imputations)
+- `imputation_metadata` - 3 rows (1 per variable)
+
+**Total:** 25,483 rows
+
+**Storage Philosophy:** Variable-specific tables (normalized design) + Only ambiguous records stored (afact < 1)
+
+**Composite Primary Key:** `(study_id, pid, record_id, imputation_m)`
+
+**Usage:**
+```python
+from python.imputation import get_completed_dataset
+
+# Get imputation 3 with LEFT JOIN + COALESCE
+df3 = get_completed_dataset(3, variables=['puma', 'county'])
+```
+
+**Storage Efficiency:** 50%+ reduction vs storing all records × all imputations
 
 ### API Keys
 

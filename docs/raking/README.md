@@ -17,6 +17,16 @@ This directory contains comprehensive documentation for the NE25 raking targets 
 **Execution time:** ~2-3 minutes
 **Output:** 180 raking targets in `raking_targets_ne25` database table
 
+### Run Bootstrap Replicates (ACS Only)
+
+```bash
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_bootstrap_pipeline.R
+```
+
+**Execution time:** ~15-20 minutes (4096 replicates, 16 workers)
+**Output:** 614,400 bootstrap replicates in `raking_targets_boot_replicates` table
+**Note:** Bootstrap currently implemented for ACS estimands only (25 of 30)
+
 ### Verify Results
 
 ```bash
@@ -42,7 +52,10 @@ Located in `ne25/` subdirectory:
 
 - **[IMPLEMENTATION_TODO.md](ne25/IMPLEMENTATION_TODO.md)** - Task tracking (Phases 1-5 complete)
 - **[RAKING_TARGETS_ESTIMATION_PLAN.md](ne25/RAKING_TARGETS_ESTIMATION_PLAN.md)** - Detailed estimation plan
-- **[STATISTICAL_METHODS_RAKING_TARGETS.md](ne25/STATISTICAL_METHODS_RAKING_TARGETS.md)** - Statistical methodology
+- **[STATISTICAL_METHODS_RAKING_TARGETS.md](ne25/STATISTICAL_METHODS_RAKING_TARGETS.md)** - Statistical methodology + bootstrap variance estimation
+- **[BOOTSTRAP_IMPLEMENTATION_PLAN.md](ne25/BOOTSTRAP_IMPLEMENTATION_PLAN.md)** - Bootstrap replicate weights implementation (complete)
+- **[BOOTSTRAP_TASK_LIST.md](ne25/BOOTSTRAP_TASK_LIST.md)** - Phase-by-phase task tracking for bootstrap
+- **[MULTINOMIAL_APPROACH_DECISION.md](ne25/MULTINOMIAL_APPROACH_DECISION.md)** - Why separate binary models for FPL/PUMA
 - **[MOTHER_EDUCATION_ADDITION.md](ne25/MOTHER_EDUCATION_ADDITION.md)** - Mother's education implementation
 - **[MOTHER_MARITAL_STATUS_ADDITION.md](ne25/MOTHER_MARITAL_STATUS_ADDITION.md)** - Marital status implementation
 

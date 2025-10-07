@@ -39,6 +39,16 @@ The NE25 Raking Targets Pipeline generates population-representative targets for
 **Execution time:** ~2-3 minutes
 **Output:** `raking_targets_ne25` table with 180 rows
 
+### Run Bootstrap Replicates (ACS Estimands Only)
+
+```r
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_bootstrap_pipeline.R
+```
+
+**Execution time:** ~15-20 minutes (4096 replicates, 16 workers)
+**Output:** `raking_targets_boot_replicates` table with 614,400 rows (ACS only)
+**Note:** Bootstrap currently implemented for ACS estimands only (25 of 30 estimands)
+
 ### Prerequisites
 
 1. **ACS estimates** must exist from Phase 1:
@@ -155,6 +165,92 @@ CREATE TABLE raking_targets_ne25 (
 - `idx_data_source` - Index on data_source for filtering by source
 - `idx_age_years` - Index on age_years for filtering by age
 - `idx_estimand_age` - Composite index on (estimand, age_years) for combined queries
+
+### Table: `raking_targets_boot_replicates`
+
+**Purpose:** Stores bootstrap replicate estimates for variance estimation via Rao-Wu-Yue-Beaumont method.
+
+```sql
+CREATE TABLE raking_targets_boot_replicates (
+    survey VARCHAR NOT NULL,              -- Always 'ne25'
+    data_source VARCHAR NOT NULL,         -- 'ACS', 'NHIS', or 'NSCH'
+    age INTEGER NOT NULL,                 -- 0-5 (CHECK constraint)
+    estimand VARCHAR NOT NULL,            -- Estimand name (e.g., 'sex_male')
+    replicate INTEGER NOT NULL,           -- Bootstrap replicate number (1-4096)
+    estimate DOUBLE,                      -- Replicate estimate (NULL for emot_behav ages 0-2)
+    bootstrap_method VARCHAR NOT NULL,    -- Always 'Rao-Wu-Yue-Beaumont'
+    n_boot INTEGER NOT NULL,              -- Total number of replicates (4 or 4096)
+    estimation_date DATE NOT NULL,        -- Date estimates were generated
+    created_at TIMESTAMP DEFAULT NOW(),   -- Database insertion timestamp
+    PRIMARY KEY (survey, data_source, estimand, age, replicate)
+)
+```
+
+### Bootstrap Indexes
+
+- `idx_boot_estimand_age` - Composite (estimand, age) for fast replicate retrieval
+- `idx_boot_estimand_age_rep` - Composite (estimand, age, replicate) for point lookups
+- `idx_boot_data_source` - Single column (data_source) for source filtering
+
+### Bootstrap Table Counts
+
+**IMPLEMENTATION NOTE:** Bootstrap currently implemented for ACS estimands only (25 of 30 total).
+
+**Test Mode (n_boot = 96):**
+
+| Data Source | Estimands | Rows | Ages | Replicates | Status |
+|------------|-----------|------|------|------------|--------|
+| ACS | 25 | 14,400 | 0-5 | 96 | ✅ Implemented |
+| NHIS | 1 | - | - | - | Not Implemented |
+| NSCH | 4 | - | - | - | Not Implemented |
+| **Total** | **25** | **14,400** | **0-5** | **96** | **Test Complete** |
+
+**Production Mode (n_boot = 4096):**
+
+| Data Source | Estimands | Rows | Ages | Replicates | Status |
+|------------|-----------|------|------|------------|--------|
+| ACS | 25 | 614,400 | 0-5 | 4096 | ✅ Implemented |
+| NHIS | 1 | - | - | - | Not Implemented |
+| NSCH | 4 | - | - | - | Not Implemented |
+| **Total** | **25** | **614,400** | **0-5** | **4096** | **Production** |
+
+### Shared Bootstrap Design
+
+**Implementation:** All 25 ACS estimands share the same 4096 bootstrap replicate weights from a single survey design object created by `01a_create_acs_bootstrap_design.R`.
+
+**Method:** Rao-Wu-Yue-Beaumont bootstrap via `svrep::as_bootstrap_design()`
+
+**Key Features:**
+- **Shared Weights:** All estimands use identical replicate weights from base ACS design
+- **Correct Correlation:** Preserves covariance structure across estimands
+- **Computational Efficiency:** Create once, use for all 25 estimands
+- **Statistical Validity:** Enables joint inference across multiple targets
+
+**Separate Binary Models:** FPL (5 categories) and PUMA (14 categories) use separate binary logistic regressions + post-hoc normalization rather than multinomial models. See `docs/raking/ne25/MULTINOMIAL_APPROACH_DECISION.md` for rationale.
+
+### Bootstrap Validation
+
+```python
+# Example: Compute bootstrap standard error
+from python.db.connection import DatabaseManager
+import numpy as np
+
+db = DatabaseManager()
+with db.get_connection() as conn:
+    # Get replicates for one estimand-age combination
+    result = conn.execute("""
+        SELECT estimate
+        FROM raking_targets_boot_replicates
+        WHERE estimand = 'sex_male' AND age = 0
+    """).fetchall()
+
+    replicates = [row[0] for row in result]
+    boot_se = np.std(replicates, ddof=1)
+    boot_ci = np.percentile(replicates, [2.5, 97.5])
+
+    print(f"Bootstrap SE: {boot_se:.6f}")
+    print(f"Bootstrap 95% CI: [{boot_ci[0]:.6f}, {boot_ci[1]:.6f}]")
+```
 
 ---
 
