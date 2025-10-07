@@ -5,8 +5,11 @@
 # Load environment configuration utilities
 source("R/utils/environment_config.R")
 
-# Configuration
-n_boot <- 4096  # Production run with full bootstrap replicates
+# Load bootstrap configuration
+source("config/bootstrap_config.R")
+
+# Configuration (n_boot now comes from BOOTSTRAP_CONFIG)
+n_boot <- BOOTSTRAP_CONFIG$n_boot
 log_file <- "logs/bootstrap_pipeline_production.log"
 
 # Get Python path from environment
@@ -82,12 +85,12 @@ phase2_start <- Sys.time()
 
 acs_scripts <- c(
   "scripts/raking/ne25/01a_create_acs_bootstrap_design.R",
-  "scripts/raking/ne25/02_estimate_sex_final.R",
-  "scripts/raking/ne25/03_estimate_race_ethnicity.R",
-  "scripts/raking/ne25/04_estimate_fpl.R",
-  "scripts/raking/ne25/05_estimate_puma.R",
-  "scripts/raking/ne25/06_estimate_mother_education.R",
-  "scripts/raking/ne25/07_estimate_mother_marital_status.R",
+  "scripts/raking/ne25/02_estimate_sex_glm2.R",           # GLM2 refactored
+  "scripts/raking/ne25/03_estimate_race_ethnicity_glm2.R", # GLM2 refactored
+  "scripts/raking/ne25/04_estimate_fpl_glm2.R",           # GLM2 refactored (multinomial)
+  "scripts/raking/ne25/05_estimate_puma_glm2.R",          # GLM2 refactored (multinomial)
+  "scripts/raking/ne25/06_estimate_mother_education_glm2.R", # GLM2 refactored
+  "scripts/raking/ne25/07_estimate_mother_marital_status_glm2.R", # GLM2 refactored
   "scripts/raking/ne25/21a_consolidate_acs_bootstrap.R"
 )
 
@@ -124,7 +127,7 @@ phase3_start <- Sys.time()
 
 nhis_scripts <- c(
   "scripts/raking/ne25/12a_create_nhis_bootstrap_design.R",
-  "scripts/raking/ne25/13_estimate_phq2.R"
+  "scripts/raking/ne25/13_estimate_phq2_glm2.R"  # GLM2 refactored
 )
 
 phase3_results <- list()
@@ -160,7 +163,7 @@ phase4_start <- Sys.time()
 
 nsch_scripts <- c(
   "scripts/raking/ne25/17a_create_nsch_bootstrap_design.R",
-  "scripts/raking/ne25/18_estimate_nsch_outcomes.R",
+  "scripts/raking/ne25/18_estimate_nsch_outcomes_glm2.R",  # GLM2 refactored
   "scripts/raking/ne25/20_estimate_childcare_2022.R",
   "scripts/raking/ne25/21b_consolidate_nsch_boot.R"
 )
