@@ -383,41 +383,112 @@ python scripts/nsch/process_all_years.py --years all
 
 ## Imputation Pipeline Directories
 
-The Imputation Pipeline handles geographic uncertainty through multiple imputation (M=5).
+The Imputation Pipeline handles geographic, sociodemographic, and childcare uncertainty through 7-stage sequential multiple imputation (M=5).
 
 ### `/scripts/imputation/`
-**Purpose:** Imputation pipeline execution scripts
+**Purpose:** Imputation pipeline execution scripts (study-specific subdirectories)
 
-**Key Files:**
-- `00_setup_imputation_schema.py` - One-time database setup (4 tables)
-- `01_impute_geography.py` - Generate M=5 geography imputations
+**Study-Specific Structure:**
+```
+scripts/imputation/
+├── 00_setup_imputation_schema.py         # One-time setup (all studies)
+├── create_new_study.py                   # Automated study onboarding
+└── {study_id}/                           # Study-specific pipeline (e.g., ne25/)
+    ├── run_full_imputation_pipeline.R    # 7-stage orchestrator
+    ├── 01_impute_geography.py            # Stage 1-3: Geography
+    ├── 02_impute_sociodemographic.R      # Stage 4: Sociodem (MICE)
+    ├── 02b_insert_sociodem_imputations.py# Stage 4: DB insertion
+    ├── 03a_impute_cc_receives_care.R     # Stage 5: Childcare access
+    ├── 03b_impute_cc_type_hours.R        # Stage 6: Childcare type/hours
+    ├── 03c_derive_childcare_10hrs.R      # Stage 7: Derived outcome
+    ├── 04_insert_childcare_imputations.py# Stage 7: DB insertion
+    └── test_childcare_diagnostics.R      # Statistical validation
+```
 
 **Usage:**
 ```bash
-# Setup (one-time)
-python scripts/imputation/00_setup_imputation_schema.py
+# Setup (one-time, study-specific)
+python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Generate imputations
-python scripts/imputation/01_impute_geography.py
+# Run full 7-stage pipeline
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate
 python -m python.imputation.helpers
 ```
 
+**Multi-Study Architecture:**
+- Each study (ne25, ia26, co27) has independent subdirectory
+- Shared setup script and helper module
+- Study-specific configurations and pipeline scripts
+
+### `/python/imputation/`
+**Purpose:** Python imputation helper module
+
+**Key Files:**
+- `config.py` - Configuration loader (reads study-specific YAML)
+- `helpers.py` - Helper functions for retrieving completed datasets
+  - `get_complete_dataset()` - Get single imputation with all 14 variables
+  - `get_geography_imputations()` - Get geography only (3 variables)
+  - `get_sociodem_imputations()` - Get sociodem only (7 variables)
+  - `get_childcare_imputations()` - Get childcare only (4 variables)
+  - `get_all_imputations()` - Long format across all M
+  - `validate_imputations()` - Validation checks
+
+**Design:** Single source of truth - R calls Python via reticulate
+
+### `/R/imputation/`
+**Purpose:** R interface to imputation system via reticulate
+
+**Key Files:**
+- `config.R` - Get configuration (calls Python)
+- `helpers.R` - Wrapper functions for imputation helpers
+  - `get_completed_dataset()` - Retrieve single imputation in R
+  - `get_imputation_list()` - Get list of M datasets for mitools/survey
+  - `get_all_imputations()` - Long format in R
+  - `validate_imputations()` - Validation via Python
+
 ### `/config/imputation/`
-**Purpose:** Imputation configuration
+**Purpose:** Study-specific imputation configurations
 
 **Files:**
-- `imputation_config.yaml` - Configuration (M=5, random seed, variables)
+- `{study_id}_config.yaml` - Study-specific configuration (M, seed, variables)
+  - Example: `ne25_config.yaml` - Nebraska 2025 configuration
 
-**Single Source of Truth:** Accessed by both Python and R (via reticulate)
+**Multi-Study Support:** Independent configs for each study
+
+### `/data/imputation/{study_id}/`
+**Purpose:** Intermediate data storage (study-specific)
+
+**Structure:**
+```
+data/imputation/ne25/
+├── geography_feather/         # Geography imputations (Stages 1-3)
+│   ├── puma_m1.feather
+│   └── ... (15 files: 3 vars × 5 imputations)
+├── sociodem_feather/          # Sociodem imputations (Stage 4)
+│   ├── female_m1.feather
+│   └── ... (35 files: 7 vars × 5 imputations)
+└── childcare_feather/         # Childcare imputations (Stages 5-7)
+    ├── cc_receives_care_m1.feather
+    └── ... (20 files: 4 vars × 5 imputations)
+```
+
+**Total:** 70 Feather files per study (14 variables × 5 imputations)
 
 ### `/docs/imputation/`
-**Purpose:** Imputation pipeline documentation
+**Purpose:** Imputation pipeline documentation (comprehensive)
 
 **Key Files:**
 - `IMPUTATION_PIPELINE.md` - Architecture and design rationale
-- `IMPUTATION_SETUP_COMPLETE.md` - Usage guide and validation results
+- `USING_IMPUTATION_AGENT.md` - User guide with 3 use cases + troubleshooting
+- `CHILDCARE_IMPUTATION_IMPLEMENTATION.md` - 8-phase implementation plan (complete)
+- `PIPELINE_TEST_REPORT.md` - Clean run verification from fresh database
+- `CHILDCARE_DIAGNOSTICS_REPORT.md` - Statistical validation results
+- `ADDING_NEW_STUDY.md` - Complete onboarding guide for new studies
+- `STUDY_SPECIFIC_MIGRATION_PLAN.md` - Multi-study architecture guide
+
+**Total:** 7 comprehensive documentation files
 
 ---
 
@@ -521,27 +592,51 @@ python -m python.imputation.helpers
 
 **Database Tables:** In `data/duckdb/kidsights_local.duckdb`
 
-**Imputation Tables:**
-- `imputed_puma` - 4,390 rows (878 records × 5 imputations)
-- `imputed_county` - 5,270 rows (1,054 records × 5 imputations)
-- `imputed_census_tract` - 15,820 rows (3,164 records × 5 imputations)
-- `imputation_metadata` - 3 rows (1 per variable)
+**Study-Specific Tables (Example: ne25):**
 
-**Total:** 25,483 rows
+*Geographic Imputations (3 variables):*
+- `ne25_imputed_puma` - 4,390 rows (878 records × 5 imputations)
+- `ne25_imputed_county` - 5,270 rows (1,054 records × 5 imputations)
+- `ne25_imputed_census_tract` - 15,820 rows (3,164 records × 5 imputations)
+- Subtotal: 25,480 rows
 
-**Storage Philosophy:** Variable-specific tables (normalized design) + Only ambiguous records stored (afact < 1)
+*Sociodemographic Imputations (7 variables):*
+- `ne25_imputed_female` - 880 rows
+- `ne25_imputed_raceG` - 1,095 rows
+- `ne25_imputed_educ_mom` - 4,560 rows
+- `ne25_imputed_educ_a2` - 3,720 rows
+- `ne25_imputed_income` - 45 rows
+- `ne25_imputed_family_size` - 580 rows
+- `ne25_imputed_fplcat` - 15,558 rows
+- Subtotal: 26,438 rows
+
+*Childcare Imputations (4 variables):*
+- `ne25_imputed_cc_receives_care` - 805 rows
+- `ne25_imputed_cc_primary_type` - 7,934 rows
+- `ne25_imputed_cc_hours_per_week` - 6,329 rows
+- `ne25_imputed_childcare_10hrs_nonfamily` - 15,590 rows
+- Subtotal: 24,718 rows
+
+**Total:** 76,636 rows across 14 tables (for study ne25)
+
+**Storage Philosophy:**
+- Variable-specific tables (normalized design)
+- Study-specific tables (`{study_id}_imputed_{variable}`)
+- Only imputed values stored (not observed)
+- 50%+ storage efficiency
 
 **Composite Primary Key:** `(study_id, pid, record_id, imputation_m)`
 
 **Usage:**
 ```python
-from python.imputation import get_completed_dataset
+from python.imputation.helpers import get_complete_dataset, get_childcare_imputations
 
-# Get imputation 3 with LEFT JOIN + COALESCE
-df3 = get_completed_dataset(3, variables=['puma', 'county'])
+# Get imputation m=1 with all 14 variables
+df = get_complete_dataset(study_id='ne25', imputation_number=1)
+
+# Get just childcare variables (4 variables)
+childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 ```
-
-**Storage Efficiency:** 50%+ reduction vs storing all records × all imputations
 
 ### API Keys
 
@@ -565,6 +660,7 @@ df3 = get_completed_dataset(3, variables=['puma', 'county'])
 - ACS: `pipelines/python/acs/extract_acs_data.py`
 - NHIS: `pipelines/python/nhis/extract_nhis_data.py`
 - NSCH: `scripts/nsch/process_all_years.py`
+- Imputation: `scripts/imputation/ne25/run_full_imputation_pipeline.R`
 
 **Understand pipeline architecture:**
 - `docs/architecture/PIPELINE_OVERVIEW.md`

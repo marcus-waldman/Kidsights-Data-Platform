@@ -146,53 +146,79 @@ python scripts/nsch/process_all_years.py --years 2020-2023
 
 ### Imputation Pipeline
 
-**Purpose:** Generate and retrieve multiple imputations for geographic uncertainty
+**Purpose:** Generate M=5 imputations for geographic, sociodemographic, and childcare uncertainty
 
 ```bash
-# Setup database schema (one-time)
-python scripts/imputation/00_setup_imputation_schema.py
+# Setup database schema (one-time, study-specific)
+python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Generate M=5 geography imputations
-python scripts/imputation/01_impute_geography.py
+# Run full 7-stage pipeline (Geography → Sociodem → Childcare)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
 python -m python.imputation.helpers
 ```
 
 **What it does:**
-- Parses semicolon-delimited geography values and afact probabilities
-- Samples M=5 geography assignments using weighted random selection
-- Stores only ambiguous records (afact < 1) in variable-specific tables
+- **Stage 1-3:** Geography imputation (PUMA, county, census_tract)
+- **Stage 4:** Sociodemographic imputation via MICE (7 variables)
+- **Stage 5-7:** Childcare 3-stage sequential imputation (4 variables)
+- Stores only imputed values in variable-specific tables
 - Provides helper functions to retrieve completed datasets
 
-**Timing:** ~5-10 seconds for M=5 imputations
+**Timing:** ~2 minutes for complete 7-stage pipeline
 
-**Output:** 25,483 imputation rows across 4 tables (imputed_puma, imputed_county, imputed_census_tract, imputation_metadata)
+**Output:** 76,636 imputation rows across 14 tables
 
-**Python usage:**
+**Python usage - Get Complete Dataset (All 14 Variables):**
 ```python
-from python.imputation import get_completed_dataset
+from python.imputation.helpers import get_complete_dataset, get_childcare_imputations
 
-# Get imputation 3 with geography
-df3 = get_completed_dataset(3, variables=['puma', 'county'])
+# Get imputation m=1 with all 14 variables
+df = get_complete_dataset(study_id='ne25', imputation_number=1)
+# Returns: puma, county, census_tract, female, raceG, educ_mom, educ_a2,
+#          income, family_size, fplcat, cc_receives_care, cc_primary_type,
+#          cc_hours_per_week, childcare_10hrs_nonfamily
+
+# Get just childcare variables (4 variables)
+childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 
 # Get all 5 imputations in long format
-from python.imputation import get_all_imputations
-df_long = get_all_imputations(variables=['puma'])
+from python.imputation.helpers import get_all_imputations
+df_long = get_all_imputations(study_id='ne25', variables=['puma', 'childcare_10hrs_nonfamily'])
 ```
 
-**R usage (via reticulate):**
+**R usage - Survey Analysis with MI (via reticulate):**
 ```r
 source("R/imputation/helpers.R")
+library(survey); library(mitools)
 
-# Get imputation 3
-df3 <- get_completed_dataset(3, variables = c("puma", "county"))
+# Get all M=5 imputations for mitools
+imp_list <- get_imputation_list(study_id = 'ne25')
 
-# Get list for mitools
-imp_list <- get_imputation_list()
+# Create survey designs
+designs <- lapply(imp_list, function(df) {
+  svydesign(ids=~1, weights=~weight, data=df)
+})
+
+# Estimate with Rubin's rules
+results <- lapply(designs, function(d) svymean(~childcare_10hrs_nonfamily, d))
+combined <- MIcombine(results)
+summary(combined)  # Proper MI variance
 ```
 
-**Documentation:** [docs/imputation/IMPUTATION_SETUP_COMPLETE.md](imputation/IMPUTATION_SETUP_COMPLETE.md)
+**Multi-Study Support:**
+```bash
+# Add new study (automated)
+python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa 2026"
+
+# Run study-specific pipeline
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ia26/run_full_imputation_pipeline.R
+```
+
+**Documentation:**
+- [USING_IMPUTATION_AGENT.md](imputation/USING_IMPUTATION_AGENT.md) - User guide with 3 use cases
+- [ADDING_NEW_STUDY.md](imputation/ADDING_NEW_STUDY.md) - Multi-study onboarding
 
 ---
 
@@ -555,6 +581,12 @@ county_data %>%
 
 ### NSCH Pipeline
 ✅ **Production Ready** | 284,496 records | 3,780 variables | 7 years (2017-2023)
+
+### Raking Targets Pipeline
+✅ **Production Ready** | 180 raking targets | 614,400 bootstrap replicates | ~2-3 min runtime
+
+### Imputation Pipeline
+✅ **Production Ready** | 14 variables | 76,636 rows | M=5 imputations | 7-stage sequential | 2 min runtime
 
 ---
 

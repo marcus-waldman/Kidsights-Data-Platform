@@ -1,19 +1,21 @@
 # Imputation Pipeline Architecture
 
-**Last Updated:** October 2025 | **Version:** 1.0.0
+**Last Updated:** October 2025 | **Version:** 2.0.0
 
 ## Overview
 
-The Kidsights Data Platform implements a **variable-specific multiple imputation storage system** that separates imputed values into dedicated database tables. This design provides flexibility, transparency, and consistency across the imputation workflow.
+The Kidsights Data Platform implements a **7-stage sequential multiple imputation pipeline** that handles geographic, sociodemographic, and childcare uncertainty through variable-specific database storage. The system supports multiple independent studies (ne25, ia26, co27) with M=5 imputations per study, storing 14 variables per study in normalized tables for flexibility, transparency, and consistency across the imputation workflow.
 
 ## Design Philosophy
 
 ### Core Principles
 
-1. **Normalized Storage:** Each imputed variable gets its own table with (record_id, imputation_m, value) structure
-2. **Pre-Computed Imputations:** All M imputations are generated during the pipeline and stored in the database
-3. **On-Demand Assembly:** Helper functions join imputed variable tables to construct completed datasets for analysis
-4. **Internal Consistency:** Geographic assignments are sampled first, then used as predictors in subsequent imputation models
+1. **Normalized Storage:** Each imputed variable gets its own study-specific table: `{study_id}_imputed_{variable}`
+2. **Pre-Computed Imputations:** All M imputations are generated during the 7-stage pipeline and stored in the database
+3. **Sequential Chained Imputation:** Geography → Sociodem → Childcare ensures proper uncertainty propagation
+4. **On-Demand Assembly:** Helper functions join imputed variable tables to construct completed datasets for analysis
+5. **Internal Consistency:** Each imputation number (m=1 to M) maintains consistent values across all 14 variables
+6. **Multi-Study Architecture:** Independent pipelines for each study with shared helper functions
 
 ### Why This Architecture?
 
@@ -92,27 +94,86 @@ CREATE TABLE imputed_census_tract (
 - Records with deterministic geography use values from `ne25_derived` directly
 - Sampling uses afact variables (allocation factors) as probabilities
 
-### Substantive Imputation Tables
+### Sociodemographic Imputation Tables
 
-**Placeholder examples for future demographic/outcome imputation:**
+**Study-specific sociodemographic variables (7 variables):**
 
 ```sql
--- Income (if needed)
-CREATE TABLE imputed_income (
+-- Sociodemographic variables (Study: ne25)
+CREATE TABLE ne25_imputed_female (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
   record_id INTEGER NOT NULL,
   imputation_m INTEGER NOT NULL,
-  income DOUBLE,
-  PRIMARY KEY (record_id, imputation_m)
+  female BOOLEAN,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
 );
 
--- Education (if needed)
-CREATE TABLE imputed_education (
+CREATE TABLE ne25_imputed_raceG (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
   record_id INTEGER NOT NULL,
   imputation_m INTEGER NOT NULL,
-  education VARCHAR,
-  PRIMARY KEY (record_id, imputation_m)
+  raceG VARCHAR,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+-- Additional tables: educ_mom, educ_a2, income, family_size, fplcat
+-- (Same structure, different variable names and types)
+```
+
+**Notes:**
+- Imputed via MICE (Multivariate Imputation by Chained Equations)
+- Uses geography imputations as predictors
+- Only stores imputed values (observed values remain in base table)
+
+### Childcare Imputation Tables
+
+**Study-specific childcare variables (4 variables):**
+
+```sql
+-- Childcare variables (Study: ne25)
+CREATE TABLE ne25_imputed_cc_receives_care (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  cc_receives_care BOOLEAN,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_cc_primary_type (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  cc_primary_type VARCHAR,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_cc_hours_per_week (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  cc_hours_per_week DOUBLE,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_childcare_10hrs_nonfamily (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  childcare_10hrs_nonfamily BOOLEAN,
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
 );
 ```
+
+**Notes:**
+- 3-stage sequential: receives_care → type/hours → derived 10hrs indicator
+- Conditional logic: type/hours only imputed when receives_care = "Yes"
+- Data cleaning: hours capped at 168/week before imputation
 
 ### Metadata Table
 
@@ -498,30 +559,64 @@ FROM imputation_metadata;
 
 ---
 
-## Implementation Roadmap
+## Implementation Status
 
-### Phase 1: Geography Imputation (Current Priority)
+### Phase 1: Geography Imputation ✅ COMPLETE
 
 - [x] Design database schema
 - [x] Document architecture
-- [ ] Implement `impute_geography.py` script
-- [ ] Create helper functions (Python + R)
-- [ ] Generate M=20 geography imputations
-- [ ] Validate against afact distributions
+- [x] Implement `01_impute_geography.py` script
+- [x] Create helper functions (Python + R)
+- [x] Generate M=5 geography imputations
+- [x] Validate against afact distributions
 
-### Phase 2: Helper Function Integration
+### Phase 2: Helper Function Integration ✅ COMPLETE
 
-- [ ] Add to `python/imputation/helpers.py` module
-- [ ] Add to `R/imputation/helpers.R` module
-- [ ] Write unit tests
-- [ ] Update CLAUDE.md with usage examples
+- [x] Add to `python/imputation/helpers.py` module
+- [x] Add to `R/imputation/helpers.R` module
+- [x] Write validation functions
+- [x] Update CLAUDE.md with usage examples
 
-### Phase 3: Substantive Imputation (Future)
+### Phase 3: Sociodemographic Imputation ✅ COMPLETE
 
-- [ ] Identify variables requiring imputation
-- [ ] Design imputation models (predictors, method)
-- [ ] Implement imputation pipeline
-- [ ] Validate against known distributions
+- [x] Identify variables requiring imputation (7 variables)
+- [x] Design MICE imputation models with geography predictors
+- [x] Implement `02_impute_sociodemographic.R` script
+- [x] Implement `02b_insert_sociodem_imputations.py` script
+- [x] Validate against known distributions
+
+### Phase 4: Childcare Imputation ✅ COMPLETE
+
+- [x] Design 3-stage sequential architecture
+- [x] Implement Stage 1: `03a_impute_cc_receives_care.R`
+- [x] Implement Stage 2: `03b_impute_cc_type_hours.R`
+- [x] Implement Stage 3: `03c_derive_childcare_10hrs.R`
+- [x] Implement database insertion: `04_insert_childcare_imputations.py`
+- [x] Data quality safeguards (NULL filtering, outlier cleaning)
+- [x] Statistical validation and diagnostics
+
+### Phase 5: Multi-Study Architecture ✅ COMPLETE
+
+- [x] Refactor to study-specific tables
+- [x] Create automated setup script (`create_new_study.py`)
+- [x] Update helper functions with `study_id` parameter
+- [x] Document onboarding process (ADDING_NEW_STUDY.md)
+
+### Current Production Status (October 2025)
+
+**✅ Production Ready:**
+- 7-stage sequential pipeline operational
+- 14 variables imputed per study (3 geography + 7 sociodem + 4 childcare)
+- M=5 imputations, 76,636 rows for study ne25
+- 2-minute runtime, 0% error rate
+- Complete validation and diagnostics
+- Multi-study support ready (ne25, ia26, co27)
+
+**📖 Documentation:**
+- [USING_IMPUTATION_AGENT.md](USING_IMPUTATION_AGENT.md) - User guide
+- [CHILDCARE_IMPUTATION_IMPLEMENTATION.md](CHILDCARE_IMPUTATION_IMPLEMENTATION.md) - Implementation plan
+- [PIPELINE_TEST_REPORT.md](PIPELINE_TEST_REPORT.md) - Validation results
+- [ADDING_NEW_STUDY.md](ADDING_NEW_STUDY.md) - Multi-study onboarding
 
 ---
 
@@ -569,4 +664,4 @@ FROM imputation_metadata;
 
 ---
 
-**Next Steps:** Implement geography imputation script (`scripts/imputation/01_impute_geography.py`)
+**Status:** ✅ Production Ready | **Last Updated:** October 2025 | **Version:** 2.0.0

@@ -1,18 +1,30 @@
 # Kidsights Data Platform
 
-A multi-source ETL architecture for the Kidsights longitudinal childhood development study in Nebraska, extracting data from REDCap projects and storing in DuckDB for analysis.
+A comprehensive multi-pipeline data platform for childhood development research, integrating local survey data with national datasets through six independent ETL pipelines for statistical analysis and population-representative weighting.
 
 ## Overview
 
-The Kidsights Data Platform provides automated data extraction, validation, and storage for the Nebraska 2025 (NE25) childhood development study. The platform:
+The Kidsights Data Platform is a **6-pipeline data integration system** that combines:
 
-- Extracts data from multiple REDCap projects via API
-- Validates participant eligibility using 9 criteria (CID1-CID9)
-- Harmonizes data types across different project sources
-- Applies dashboard-style transformations for standardized variables
-- Stores processed data in DuckDB on OneDrive for analysis
-- Generates comprehensive metadata and documentation
-- Maintains audit logs of all pipeline executions
+**Local Survey Data:**
+- **NE25 Pipeline:** Nebraska 2025 childhood development study (REDCap → DuckDB)
+
+**National Benchmarking Data:**
+- **ACS Pipeline:** American Community Survey (IPUMS USA API → DuckDB)
+- **NHIS Pipeline:** National Health Interview Survey (IPUMS NHIS API → DuckDB)
+- **NSCH Pipeline:** National Survey of Children's Health (SPSS → DuckDB)
+
+**Statistical Infrastructure:**
+- **Raking Targets Pipeline:** Population-representative targets for post-stratification weighting
+- **Imputation Pipeline:** Multiple imputation for geographic, sociodemographic, and childcare uncertainty
+
+**Platform Capabilities:**
+- Automated data extraction from REDCap, IPUMS APIs, and SPSS files
+- Hybrid R-Python architecture for statistical computing and database operations
+- Multiple imputation with M=5 imputations (14 variables: geography + sociodem + childcare)
+- 180 raking targets with 614,400 bootstrap replicates for variance estimation
+- DuckDB storage with comprehensive metadata and documentation
+- Independent pipelines with shared utilities and consistent patterns
 
 ## Architecture
 
@@ -33,6 +45,56 @@ REDCap Projects (4) → R: API Extraction → R: Type Harmonization → R: Deriv
                                                                 - educ_max, educ4_max      - ne25_metadata
                                                                 - Reference levels set     - Interactive docs
 ```
+
+## Six Pipeline Architecture
+
+### 1. NE25 Pipeline (Local Survey Data)
+**Purpose:** Extract and transform Nebraska 2025 childhood development survey data
+**Data Source:** 4 REDCap projects via API
+**Output:** 3,908 records, 609 variables with 99 derived variables
+**Status:** ✅ Production Ready | 100% reliability
+**Documentation:** [docs/architecture/PIPELINE_STEPS.md](docs/architecture/PIPELINE_STEPS.md#ne25-pipeline-steps)
+
+### 2. ACS Pipeline (Census Data)
+**Purpose:** Extract census demographics for raking targets
+**Data Source:** IPUMS USA API (American Community Survey)
+**Output:** State-specific multi-year datasets with metadata
+**Status:** ✅ Complete | Smart caching (90+ days)
+**Documentation:** [docs/acs/README.md](docs/acs/README.md)
+
+### 3. NHIS Pipeline (National Health Data)
+**Purpose:** Benchmarking for maternal mental health and ACEs
+**Data Source:** IPUMS Health Surveys API
+**Output:** 229,609 records, 66 variables (2019-2024)
+**Status:** ✅ Production Ready | PHQ-2, GAD-7, 8 ACE variables
+**Documentation:** [docs/nhis/README.md](docs/nhis/README.md)
+
+### 4. NSCH Pipeline (Child Health Data)
+**Purpose:** Benchmarking for child health outcomes and ACEs
+**Data Source:** National Survey of Children's Health (SPSS files)
+**Output:** 284,496 records, 3,780 variables (2017-2023)
+**Status:** ✅ Production Ready | 7 years integrated
+**Documentation:** [docs/nsch/README.md](docs/nsch/README.md)
+
+### 5. Raking Targets Pipeline (Weighting Infrastructure)
+**Purpose:** Generate population-representative targets for post-stratification
+**Data Sources:** ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
+**Output:** 180 raking targets (30 estimands × 6 age groups)
+**Bootstrap:** 614,400 replicates for variance estimation
+**Status:** ✅ Production Ready | ~2-3 minute runtime
+**Documentation:** [docs/raking/NE25_RAKING_TARGETS_PIPELINE.md](docs/raking/NE25_RAKING_TARGETS_PIPELINE.md)
+
+### 6. Imputation Pipeline (Statistical Utility)
+**Purpose:** Multiple imputation for geographic, sociodemographic, and childcare uncertainty
+**Data Source:** NE25 transformed data
+**Output:** 14 variables, 76,636 rows, M=5 imputations
+**Architecture:** 7-stage sequential (Geography → Sociodem → Childcare)
+**Status:** ✅ Production Ready | 2-minute runtime, 0% error rate
+**Documentation:** [docs/imputation/USING_IMPUTATION_AGENT.md](docs/imputation/USING_IMPUTATION_AGENT.md)
+
+**🔗 Complete Architecture Guide:** [docs/architecture/PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)
+
+---
 
 ## Database Location
 
@@ -263,6 +325,81 @@ model <- glm(include ~ raceG + educ4_max,
 tidy(model)  # Reference levels: "White, non-Hisp." and "College Degree"
 ```
 
+## Imputation Pipeline: Multiple Imputation for Uncertainty
+
+The platform includes a **7-stage sequential imputation pipeline** that generates M=5 imputations for 14 variables, handling uncertainty from geographic ambiguity, missing sociodemographic data, and childcare variables.
+
+### Architecture
+
+**7-Stage Sequential Flow:**
+```
+Stage 1-3: Geography Imputation (Python)
+├── PUMA, County, Census Tract
+├── Allocation factor (afact) weighted sampling
+└── 25,480 rows across 3 tables
+
+Stage 4: Sociodemographic Imputation (R + Python)
+├── MICE imputation using geography as predictors
+├── 7 variables: female, raceG, educ_mom, educ_a2, income, family_size, fplcat
+└── 26,438 rows across 7 tables
+
+Stage 5-7: Childcare Imputation (R + Python)
+├── 3-stage sequential: receives_care → type/hours → derived 10hrs indicator
+├── Conditional logic: type/hours only for "Yes" responses
+├── Data cleaning: hours capped at 168/week
+├── 4 variables: cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily
+└── 24,718 rows across 4 tables
+
+Total: 76,636 rows across 14 tables | Runtime: 2.0 minutes | Error Rate: 0%
+```
+
+### Usage Examples
+
+**Python - Get Complete Dataset:**
+```python
+from python.imputation.helpers import get_complete_dataset, get_childcare_imputations
+
+# Get imputation m=1 with all 14 variables
+df = get_complete_dataset(study_id='ne25', imputation_number=1)
+
+# Get just childcare variables (4 variables)
+childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
+```
+
+**R - Survey Analysis with Multiple Imputation:**
+```r
+source("R/imputation/helpers.R")
+library(survey); library(mitools)
+
+# Get all M=5 imputations for mitools
+imp_list <- get_imputation_list(study_id = 'ne25')
+
+# Create survey designs
+designs <- lapply(imp_list, function(df) {
+  svydesign(ids=~1, weights=~weight, data=df)
+})
+
+# Estimate with Rubin's rules
+results <- lapply(designs, function(d) svymean(~childcare_10hrs_nonfamily, d))
+combined <- MIcombine(results)
+summary(combined)  # Proper MI variance from geographic + substantive uncertainty
+```
+
+### Key Features
+
+- **Sequential Chained Imputation:** Geography → Sociodem → Childcare ensures proper uncertainty propagation
+- **Multi-Study Support:** Independent pipelines for ne25, ia26, co27 with shared helpers
+- **Variable-Specific Storage:** Normalized tables (`{study_id}_imputed_{variable}`)
+- **Defensive Programming:** NULL filtering, outlier cleaning, conditional logic
+- **Statistical Validation:** Complete diagnostics (variance checks, predictor relationships, plausibility)
+
+**📖 Documentation:**
+- [USING_IMPUTATION_AGENT.md](docs/imputation/USING_IMPUTATION_AGENT.md) - User guide with 3 use cases
+- [PIPELINE_TEST_REPORT.md](docs/imputation/PIPELINE_TEST_REPORT.md) - Production validation
+- [ADDING_NEW_STUDY.md](docs/imputation/ADDING_NEW_STUDY.md) - Multi-study onboarding
+
+---
+
 ## Codebook System
 
 The platform includes a comprehensive JSON-based codebook system for managing item metadata across multiple studies:
@@ -307,50 +444,98 @@ See `codebook/README.md` for detailed documentation.
 
 ```
 Kidsights-Data-Platform/
-├── run_ne25_pipeline.R           # Main execution script
-├── config/
+├── run_ne25_pipeline.R                   # NE25 pipeline orchestrator
+│
+├── config/                               # Configuration files
 │   ├── sources/
-│   │   └── ne25.yaml             # Pipeline configuration
-│   └── codebook_config.yaml      # Codebook validation rules
-├── codebook/
-│   ├── data/
-│   │   └── codebook.json         # JSON codebook (305 items)
-│   └── dashboard/                # Quarto dashboard files
+│   │   ├── ne25.yaml                     # NE25 pipeline config
+│   │   ├── acs/                          # ACS state-specific configs
+│   │   ├── nhis/                         # NHIS year-specific configs
+│   │   └── nsch/                         # NSCH config
+│   ├── imputation/                       # Imputation configs per study
+│   │   └── ne25_config.yaml
+│   └── codebook_config.yaml              # Codebook validation
+│
 ├── pipelines/
-│   └── orchestration/
-│       └── ne25_pipeline.R       # Core pipeline orchestration
-├── R/
-│   ├── extract/
-│   │   └── ne25.R               # REDCap extraction functions
-│   ├── harmonize/
-│   │   └── ne25_eligibility.R   # Eligibility validation logic
-│   ├── transform/
-│   │   ├── ne25_transforms.R    # Dashboard-style transformations
-│   │   └── ne25_metadata.R      # Metadata generation
-│   ├── codebook/                # Codebook R functions
-│   │   ├── load_codebook.R      # Loading and initialization
-│   │   ├── query_codebook.R     # Filtering and searching
-│   │   ├── validate_codebook.R  # Validation functions
-│   │   └── visualize_codebook.R # Plotting functions
-│   ├── duckdb/
-│   │   ├── connection.R         # Database operations
-│   │   └── data_dictionary.R    # Dictionary storage functions
+│   ├── orchestration/                    # Pipeline orchestrators
+│   │   ├── run_ne25_pipeline.R
+│   │   ├── run_acs_pipeline.R
+│   │   └── run_nhis_pipeline.R
+│   └── python/                           # Python pipeline scripts
+│       ├── acs/                          # ACS extraction & loading
+│       ├── nhis/                         # NHIS extraction & loading
+│       └── nsch/                         # NSCH SPSS processing
+│
+├── scripts/                              # Utilities and maintenance
+│   ├── imputation/                       # Imputation pipeline
+│   │   ├── 00_setup_imputation_schema.py
+│   │   └── ne25/                         # Study-specific (7 stages)
+│   │       ├── run_full_imputation_pipeline.R
+│   │       ├── 01_impute_geography.py
+│   │       ├── 02_impute_sociodemographic.R
+│   │       ├── 03a_impute_cc_receives_care.R
+│   │       └── ... (4 more childcare scripts)
+│   ├── raking/ne25/                      # Raking targets pipeline
+│   │   ├── run_raking_targets_pipeline.R
+│   │   └── ... (21 estimation scripts)
+│   ├── nsch/                             # NSCH utilities
+│   │   └── process_all_years.py
 │   └── documentation/
-│       └── generate_data_dictionary.R  # R wrapper for docs
-├── scripts/
-│   ├── documentation/
-│   │   └── generate_data_dictionary.py # Python doc generator
-│   └── codebook/
-│       └── initial_conversion.R      # CSV to JSON conversion
-├── schemas/
-│   └── landing/
-│       └── ne25.sql            # DuckDB table definitions
-└── docs/                       # Auto-generated documentation
-    └── data_dictionary/
-        ├── ne25_data_dictionary_full.md    # Complete data dictionary
-        ├── ne25_data_dictionary_full.html  # Web-viewable version
-        └── ne25_metadata_export.json       # Machine-readable metadata
+│       └── generate_data_dictionary.py
+│
+├── python/                               # Python modules
+│   ├── db/                               # Database operations
+│   │   ├── connection.py
+│   │   └── operations.py
+│   ├── imputation/                       # Imputation helpers
+│   │   ├── config.py
+│   │   └── helpers.py                    # get_completed_dataset(), etc.
+│   ├── acs/                              # ACS-specific modules
+│   ├── nhis/                             # NHIS-specific modules
+│   └── nsch/                             # NSCH-specific modules
+│
+├── R/                                    # R functions
+│   ├── extract/                          # Data extraction
+│   │   └── ne25.R
+│   ├── transform/                        # Transformations
+│   │   └── ne25_transforms.R
+│   ├── imputation/                       # Imputation helpers (R)
+│   │   └── helpers.R                     # Via reticulate
+│   ├── load/                             # Data loading
+│   │   ├── acs/
+│   │   ├── nhis/
+│   │   └── nsch/
+│   ├── codebook/                         # Codebook R functions
+│   └── utils/                            # Utilities
+│       ├── acs/
+│       ├── nhis/
+│       └── nsch/
+│
+├── codebook/                             # Codebook system
+│   ├── data/codebook.json                # 306 items, 8 studies
+│   └── dashboard/                        # Quarto dashboard
+│
+├── data/                                 # Data storage (gitignored)
+│   ├── duckdb/
+│   │   └── kidsights_local.duckdb        # Main database
+│   ├── acs/{state}/{year_range}/         # ACS raw data
+│   ├── nhis/{year_range}/                # NHIS raw data
+│   ├── nsch/{year}/                      # NSCH raw data
+│   └── imputation/{study_id}/            # Imputation feather files
+│
+└── docs/                                 # Documentation
+    ├── architecture/                     # Architecture guides
+    │   ├── PIPELINE_OVERVIEW.md          # Complete 6-pipeline overview
+    │   └── PIPELINE_STEPS.md             # Execution instructions
+    ├── imputation/                       # Imputation docs (7 files)
+    ├── raking/                           # Raking targets docs
+    ├── acs/                              # ACS pipeline docs
+    ├── nhis/                             # NHIS pipeline docs
+    ├── nsch/                             # NSCH pipeline docs
+    └── guides/                           # User guides
 ```
+
+**📖 Complete Structure:** [docs/DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)
 
 ## Key Features
 
@@ -419,43 +604,55 @@ redcap:
     # ... additional projects
 ```
 
-## Recent Updates (September 2025)
+## Platform Status (October 2025)
 
-✅ **FULLY IMPLEMENTED AND TESTED**
+✅ **ALL 6 PIPELINES PRODUCTION READY**
 
-The NE25 pipeline is now production-ready with all major components working:
+The Kidsights Data Platform is fully operational with complete data integration infrastructure:
 
-- **3,903 records** successfully extracted from 4 REDCap projects
-- **Dashboard-style transformations** applied (588 variables created)
-- **PID-based storage** implemented for project-specific data tables
-- **1,884 data dictionary fields** stored with project references
-- **28 comprehensive metadata records** with value labels and statistics
-- **Multi-format documentation** auto-generated (Markdown, HTML, JSON)
-- **Eligibility validation** working (2,868 eligible participants identified)
+### NE25 Pipeline (Local Survey)
+- **3,908 records** from 4 REDCap projects with 609 variables (99 derived)
+- **100% reliability** after Python migration (eliminated R DuckDB segfaults)
+- Dashboard-style transformations with complete missing data handling
+- Comprehensive documentation auto-generated (Markdown, HTML, JSON)
 
-### Database Tables Created
+### ACS Pipeline (Census Data)
+- **State-specific extracts** via IPUMS USA API with metadata integration
+- **Smart caching** with SHA256 validation (90+ day retention)
+- 3 metadata tables for DDI documentation and transformation tracking
+- Ready for raking targets estimation
 
-| Table | Records | Purpose |
-|-------|---------|---------|
-| ne25_raw | 3,903 | Combined raw data |
-| ne25_raw_pid7679/7943/7999/8014 | 322/737/716/2128 | Project-specific raw data |
-| ne25_eligibility | 3,903 | Eligibility validation results |
-| ne25_transformed | 3,903 | Dashboard-style transformed data |
-| ne25_data_dictionary | 1,884 | REDCap field definitions with PID |
-| ne25_metadata | 28 | Comprehensive variable metadata |
+### NHIS Pipeline (National Health)
+- **229,609 records** across 6 annual samples (2019-2024), 66 variables
+- Mental health measures: **PHQ-2** (depression), **GAD-7** (anxiety)
+- **8 ACE variables** with direct overlap to NE25 for benchmarking
+- Production-ready for maternal mental health estimation
 
-### Auto-Generated Documentation
+### NSCH Pipeline (Child Health)
+- **284,496 records** across 7 years (2017-2023), **3,780 unique variables**
+- Automated SPSS → Feather → Database pipeline (20 sec per year)
+- 36,164 value label mappings for categorical variables
+- Ready for child health and ACEs benchmarking
 
-The pipeline automatically creates:
-- `docs/data_dictionary/ne25_data_dictionary_full.md` - Complete data dictionary
-- `docs/data_dictionary/ne25_data_dictionary_full.html` - Web-viewable version
-- `docs/data_dictionary/ne25_metadata_export.json` - Machine-readable metadata
+### Raking Targets Pipeline (Weighting)
+- **180 raking targets** (30 estimands × 6 age groups)
+- **614,400 bootstrap replicates** for ACS variance (Rao-Wu-Yue-Beaumont method)
+- Complete database integration with 4 indexes for efficient querying
+- ~2-3 minute runtime for full pipeline
 
-### Future Enhancements
-- Automated scheduling capabilities
-- Additional data quality checks
-- Graph API integration for OneDrive sync
-- Census data integration
+### Imputation Pipeline (Statistical Utility)
+- **7-stage sequential** imputation: Geography → Sociodem → Childcare
+- **14 variables** imputed (3 geography + 7 sociodem + 4 childcare)
+- **76,636 rows** across 14 tables, M=5 imputations
+- **2-minute runtime**, 0% error rate from fresh database
+- Multi-study architecture ready (ne25, ia26, co27)
+- Complete statistical validation and diagnostics
+
+### Integration Achievements
+- **Unified DuckDB storage** with consistent patterns across pipelines
+- **Hybrid R-Python architecture** for statistical computing + database reliability
+- **Comprehensive documentation** with architecture guides and user examples
+- **Production-ready** for post-stratification weighting implementation
 
 ## Troubleshooting
 
@@ -485,10 +682,38 @@ This pipeline extracts the transformation logic from the existing Kidsights Dash
 - **Metadata Generation**: Creates comprehensive variable documentation with value labels
 - **Documentation Pipeline**: Python-R integration for multi-format output generation
 
+## Documentation
+
+### Primary Reference
+**[CLAUDE.md](CLAUDE.md)** - Comprehensive platform guide with quick start, coding standards, and all pipeline commands
+
+### Architecture Documentation
+- **[PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)** - Complete 6-pipeline architecture, design rationales, integration patterns
+- **[PIPELINE_STEPS.md](docs/architecture/PIPELINE_STEPS.md)** - Step-by-step execution instructions for all pipelines
+- **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** - Complete directory structure and navigation guide
+- **[QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)** - Command cheatsheet for all pipelines
+
+### Pipeline-Specific Documentation
+- **[docs/acs/](docs/acs/)** - ACS pipeline (IPUMS USA API, metadata system, caching)
+- **[docs/nhis/](docs/nhis/)** - NHIS pipeline (mental health, ACEs, multi-year)
+- **[docs/nsch/](docs/nsch/)** - NSCH pipeline (SPSS processing, 7 years, 3,780 variables)
+- **[docs/raking/](docs/raking/)** - Raking targets pipeline (180 targets, bootstrap variance)
+- **[docs/imputation/](docs/imputation/)** - Imputation pipeline (7 stages, 14 variables, M=5)
+  - [USING_IMPUTATION_AGENT.md](docs/imputation/USING_IMPUTATION_AGENT.md) - User guide with examples
+  - [ADDING_NEW_STUDY.md](docs/imputation/ADDING_NEW_STUDY.md) - Multi-study onboarding
+
+### Developer Guides
+- **[CODING_STANDARDS.md](docs/guides/CODING_STANDARDS.md)** - R namespacing, Windows console output, file naming
+- **[MISSING_DATA_GUIDE.md](docs/guides/MISSING_DATA_GUIDE.md)** - Composite variables, missing data handling
+- **[PYTHON_UTILITIES.md](docs/guides/PYTHON_UTILITIES.md)** - DatabaseManager, R Executor, utilities
+- **[DERIVED_VARIABLES_SYSTEM.md](docs/guides/DERIVED_VARIABLES_SYSTEM.md)** - 99 derived variables breakdown
+
+---
+
 ## Contributing
 
 1. Follow existing code patterns and documentation standards
-2. Test changes against all 4 REDCap projects
+2. Test changes against all pipelines
 3. Update documentation for any configuration changes
 4. Ensure API credentials remain secure
 
@@ -498,7 +723,9 @@ This pipeline extracts the transformation logic from the existing Kidsights Dash
 
 ---
 
-**Last Updated**: September 15, 2025
-**Pipeline Version**: 1.0.0
-**R Version**: 4.4.3
-**Status**: ✅ Production Ready
+**Last Updated**: October 7, 2025
+**Platform Version**: 2.0.0 (6 pipelines)
+**R Version**: 4.5.1 | **Python Version**: 3.13+
+**Status**: ✅ All Pipelines Production Ready
+
+**📖 Complete Documentation**: [CLAUDE.md](CLAUDE.md) | [docs/architecture/PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)

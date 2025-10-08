@@ -14,7 +14,8 @@ This document provides step-by-step execution instructions for all four data pip
 4. [ACS Pipeline](#acs-pipeline-steps)
 5. [NHIS Pipeline](#nhis-pipeline-steps)
 6. [NSCH Pipeline](#nsch-pipeline-steps)
-7. [Troubleshooting](#troubleshooting)
+7. [Imputation Pipeline](#imputation-pipeline-steps)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -402,6 +403,238 @@ python scripts/nsch/generate_variable_reference.py
 - **Tables:** `nsch_2017_raw`, `nsch_2018_raw`, ..., `nsch_2023_raw` (7 tables, 284,496 total records)
 - **Files:** Feather files, metadata JSON, variable reference, validation reports
 - **Status:** "Successfully processed 7 years" message
+
+---
+
+## Imputation Pipeline Steps
+
+**Purpose:** Generate M=5 imputations for geographic, sociodemographic, and childcare uncertainty
+**Run Time:** ~2 minutes for complete 7-stage pipeline
+**Frequency:** Run after NE25 pipeline completes
+
+### Quick Command
+
+```bash
+# Full 7-stage pipeline (Geography → Sociodem → Childcare)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
+```
+
+### Detailed Steps
+
+The imputation pipeline uses a **7-stage sequential architecture** that propagates uncertainty from geography through sociodemographics to childcare variables.
+
+#### Prerequisites
+
+**One-Time Setup:**
+```bash
+# Create database schema for study (run once per study)
+python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
+```
+
+**What it does:**
+- Creates 14 imputation tables: `ne25_imputed_{variable}`
+- Adds imputation_metadata table
+- Sets up indexes for efficient querying
+
+#### Stage 1-3: Geography Imputation (Python)
+
+**Executed by:** `scripts/imputation/ne25/01_impute_geography.py`
+
+**What it does:**
+- Parses semicolon-delimited geography values from `ne25_transformed`
+- Extracts allocation factor (afact) probabilities
+- Samples M=5 values using weighted random selection
+- Stores only ambiguous records (afact < 1) in variable-specific tables
+
+**Output:**
+- `ne25_imputed_puma`: 4,390 rows (878 records × 5 imputations)
+- `ne25_imputed_county`: 5,270 rows (1,054 records × 5 imputations)
+- `ne25_imputed_census_tract`: 15,820 rows (3,164 records × 5 imputations)
+- **Subtotal:** 25,480 rows across 3 tables
+
+**Timing:** ~3-5 seconds
+
+#### Stage 4: Sociodemographic Imputation (R + Python)
+
+**Executed by:**
+1. `scripts/imputation/ne25/02_impute_sociodemographic.R` - MICE imputation
+2. `scripts/imputation/ne25/02b_insert_sociodem_imputations.py` - Database insertion
+
+**What it does:**
+- Loads geography imputations (M=5) from Stage 1-3
+- Uses MICE (Multivariate Imputation by Chained Equations)
+- Imputes 7 sociodemographic variables using geography as predictors
+- Defensive NULL filtering before database insertion
+
+**Variables Imputed:**
+- `female` - Child sex
+- `raceG` - Combined race/ethnicity
+- `educ_mom`, `educ_a2` - Mother/second caregiver education
+- `income` - Household income
+- `family_size` - Household size
+- `fplcat` - Federal Poverty Level categories
+
+**Output:**
+- 7 tables: `ne25_imputed_female`, `ne25_imputed_raceG`, etc.
+- **Subtotal:** 26,438 rows across 7 tables
+
+**Timing:** ~100 seconds (MICE convergence + database insertion)
+
+#### Stage 5: Childcare Receives Care (R)
+
+**Executed by:** `scripts/imputation/ne25/03a_impute_cc_receives_care.R`
+
+**What it does:**
+- Loads geography (M=5) + sociodem (M=5) from Stages 1-4
+- Uses CART method to impute `cc_receives_care` (Yes/No)
+- Saves to Feather: `data/imputation/ne25/childcare_feather/cc_receives_care_m{m}.feather`
+
+**Output:**
+- 5 Feather files (one per imputation)
+- Imputes missing childcare access indicator
+
+**Timing:** ~5 seconds
+
+#### Stage 6: Childcare Type & Hours (R)
+
+**Executed by:** `scripts/imputation/ne25/03b_impute_cc_type_hours.R`
+
+**What it does:**
+- **Conditional logic:** Filters to records with `cc_receives_care = "Yes"`
+- **Data cleaning:** Caps `cc_hours_per_week` at 168 (prevents outlier propagation)
+- Uses CART to impute `cc_primary_type` and `cc_hours_per_week`
+- Saves to Feather files
+
+**Variables Imputed:**
+- `cc_primary_type` - Type of childcare arrangement (6 categories)
+- `cc_hours_per_week` - Hours per week in childcare (0-168)
+
+**Output:**
+- 10 Feather files (2 variables × 5 imputations)
+
+**Timing:** ~7 seconds
+
+#### Stage 7: Childcare Derived Variable (R) + Database Insertion (Python)
+
+**Executed by:**
+1. `scripts/imputation/ne25/03c_derive_childcare_10hrs.R` - Derivation
+2. `scripts/imputation/ne25/04_insert_childcare_imputations.py` - Database insertion
+
+**What it does:**
+- Derives `childcare_10hrs_nonfamily` from completed type + hours
+- **Logic:** TRUE if hours ≥10 AND type ≠ "Relative care"
+- Inserts all 4 childcare variables into database with defensive NULL filtering
+
+**Output:**
+- `ne25_imputed_cc_receives_care`: 805 rows
+- `ne25_imputed_cc_primary_type`: 7,934 rows
+- `ne25_imputed_cc_hours_per_week`: 6,329 rows
+- `ne25_imputed_childcare_10hrs_nonfamily`: 15,590 rows
+- **Subtotal:** 24,718 rows across 4 tables
+
+**Timing:** ~4 seconds (derivation + database insertion)
+
+### Expected Output
+
+**Database Tables:**
+- **Geography:** 3 tables, 25,480 rows
+- **Sociodemographic:** 7 tables, 26,438 rows
+- **Childcare:** 4 tables, 24,718 rows
+- **Total:** 14 tables, 76,636 rows
+
+**Console Output:**
+```
+=======================================================================
+IMPUTATION PIPELINE SUMMARY
+=======================================================================
+
+Stages Completed:
+  Stage 1-3: Geography Imputation         [OK] 3.2 sec
+  Stage 4:   Sociodemographic Imputation  [OK] 96.9 sec
+  Stage 5:   Childcare Receives Care      [OK] 5.3 sec
+  Stage 6:   Childcare Type & Hours       [OK] 7.3 sec
+  Stage 7:   Childcare Derivation & DB    [OK] 4.0 sec
+
+Total Runtime: 122.6 seconds (2.0 minutes)
+Total Rows Inserted: 76,636 across 14 tables
+
+=======================================================================
+VALIDATION CHECKS - ALL PASSED
+=======================================================================
+```
+
+### Validation
+
+**Quick Validation:**
+```bash
+python -m python.imputation.helpers
+```
+
+**What it checks:**
+- All 14 variables have metadata entries
+- No NULL values in imputation tables
+- No duplicate records
+- Childcare values within valid ranges
+- Row counts match expectations
+
+**Detailed Diagnostics:**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/test_childcare_diagnostics.R
+```
+
+**What it checks:**
+- Imputed vs observed proportions (stability across M)
+- Variance across imputations (50% variation expected)
+- Predictor relationships (geographic/income gradients)
+- Plausibility checks (range validation, logical consistency)
+
+### Usage After Pipeline Completion
+
+**Python - Get Complete Dataset:**
+```python
+from python.imputation.helpers import get_complete_dataset
+
+# Get imputation m=1 with all 14 variables
+df = get_complete_dataset(study_id='ne25', imputation_number=1)
+# Returns: puma, county, census_tract, female, raceG, educ_mom, educ_a2,
+#          income, family_size, fplcat, cc_receives_care, cc_primary_type,
+#          cc_hours_per_week, childcare_10hrs_nonfamily
+```
+
+**R - Survey Analysis with MI:**
+```r
+source("R/imputation/helpers.R")
+library(survey); library(mitools)
+
+# Get all M=5 imputations for mitools
+imp_list <- get_imputation_list(study_id = 'ne25')
+
+# Create survey designs
+designs <- lapply(imp_list, function(df) {
+  svydesign(ids=~1, weights=~weight, data=df)
+})
+
+# Estimate with Rubin's rules
+results <- lapply(designs, function(d) svymean(~childcare_10hrs_nonfamily, d))
+combined <- MIcombine(results)
+summary(combined)  # Proper MI variance
+```
+
+### Multi-Study Usage
+
+**Adding a New Study:**
+```bash
+# Automated setup script
+python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa 2026"
+
+# Customize config
+# Edit: config/imputation/ia26_config.yaml
+
+# Run pipeline
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ia26/run_full_imputation_pipeline.R
+```
+
+**Documentation:** [docs/imputation/ADDING_NEW_STUDY.md](../imputation/ADDING_NEW_STUDY.md)
 
 ---
 

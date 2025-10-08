@@ -215,67 +215,141 @@ Post-stratification (raking) requires population-representative targets from mul
 
 ---
 
-## Imputation Pipeline: Multiple Imputation for Geographic Uncertainty (October 2025)
+## Imputation Pipeline: Multiple Imputation for Uncertainty (October 2025)
 
 ### Purpose
-Generate M=5 imputations for records with geographic ambiguity using allocation factor probabilities
+Generate M=5 imputations for geographic, sociodemographic, and childcare variables using sequential chained imputation
 
 ### Architecture Diagram
 
 ```
-ne25_transformed → Python: Parse afact → Sample M values → imputed_* tables → Helper functions → Completed datasets
-Semicolon-delimited   Weighted random      Store only         Python/R (reticulate)    Ready for analysis
-                       selection           ambiguous records
+7-Stage Sequential Imputation Pipeline (Study-Specific: ne25, ia26, co27)
+
+Stage 1-3: Geography Imputation
+ne25_transformed → Parse afact → Sample M values → imputed_puma/county/census_tract
+                   (allocation     (weighted         (3 tables: 25,480 rows)
+                    factors)        random)
+
+Stage 4: Sociodemographic Imputation
+Geography (M) → MICE imputation → imputed_female/raceG/educ_mom/educ_a2/income/family_size/fplcat
+                (7 variables)      (7 tables: 26,438 rows)
+
+Stage 5-7: Childcare Imputation (3-Stage Sequential)
+Geo + Sociodem (M) → CART Stage 1 → imputed_cc_receives_care (805 rows)
+                   → CART Stage 2 → imputed_cc_primary_type (7,934 rows)
+                                  → imputed_cc_hours_per_week (6,329 rows)
+                   → Derivation   → imputed_childcare_10hrs_nonfamily (15,590 rows)
+
+Helper Functions → Completed Datasets (14 variables joined)
+Python/R           Ready for analysis with proper MI variance
 ```
 
 ### Key Features
 
-- **Variable-Specific Storage:** Normalized schema (one table per imputed variable)
-- **Selective Storage:** Only stores ambiguous records (50%+ storage efficiency)
+- **7-Stage Sequential Pipeline:** Geography → Sociodem → Childcare (3-stage conditional)
+- **14 Total Variables:** 3 geography + 7 sociodem + 4 childcare
+- **Multi-Study Architecture:** Independent studies (ne25, ia26, co27) with shared codebase
+- **Variable-Specific Storage:** Normalized schema (one table per imputed variable per study)
+- **Selective Storage:** Only stores imputed values (not observed), 50%+ storage efficiency
 - **Single Source of Truth:** R functions via reticulate call Python directly
-- **Configuration-Driven:** M, random seed, and variables in YAML config
-- **Statistical Validity:** Proper propagation of geographic uncertainty into variance estimates
+- **Configuration-Driven:** M, random seed, variables in study-specific YAML configs
+- **Statistical Validity:** Proper propagation of uncertainty from multiple sources
 
-### Results
+### Production Metrics (Study: ne25)
 
-- **878 PUMA** imputations (26% of records have ambiguity)
-- **1,054 county** imputations (31% of records)
-- **3,164 census tract** imputations (94% of records!)
-- **25,483 total rows** across 4 database tables
+**Geographic Variables (3):**
+- 878 PUMA imputations (26% of records have ambiguity)
+- 1,054 county imputations (31% of records)
+- 3,164 census tract imputations (94% of records!)
+- Subtotal: 25,480 rows across 3 tables
+
+**Sociodemographic Variables (7):**
+- female, raceG, educ_mom, educ_a2, income, family_size, fplcat
+- MICE imputation with geography as predictors
+- Subtotal: 26,438 rows across 7 tables
+
+**Childcare Variables (4):**
+- 3-stage sequential: receives_care → type/hours → derived 10hrs indicator
+- Defensive programming: NULL filtering, outlier cleaning (hours ≤168)
+- Subtotal: 24,718 rows across 4 tables
+
+**Total:** 76,636 rows across 14 tables | **Runtime:** 2.0 minutes | **Error Rate:** 0%
 
 ### Design Rationale
 
-Rather than storing full M datasets or raw probabilities, we store pre-computed realized values in separate tables per variable. This ensures internal consistency for downstream analyses (geography in imputation #5 is consistent across all uses) while maintaining storage efficiency. The reticulate-based R interface eliminates code duplication.
+**Sequential Chained Imputation:**
+Rather than imputing all variables simultaneously, we use a **3-phase sequential approach**:
+1. **Geography first** - Provides spatial context for downstream models
+2. **Sociodemographics second** - Uses geography as predictors in MICE
+3. **Childcare last** - Conditional 3-stage process uses all upstream variables
+
+This ensures geographic uncertainty propagates through all substantive imputations while maintaining logical consistency (e.g., childcare type only imputed when receives_care = "Yes").
+
+**Variable-Specific Tables:**
+Pre-computed realized values stored in separate tables ensure internal consistency (geography in imputation #5 is the same across all uses) while maintaining storage efficiency. The reticulate-based R interface eliminates code duplication.
 
 ### Technical Components
 
 - **Python Modules:** `python/imputation/` - Configuration, helper functions for data retrieval
+- **R Scripts:** `scripts/imputation/{study_id}/` - Study-specific 7-stage pipeline
 - **R Wrappers:** `R/imputation/` - Single source of truth via reticulate
-- **Scripts:** `scripts/imputation/` - Schema setup, geography imputation
-- **Configuration:** `config/imputation/imputation_config.yaml` - M=5, random seed=42
-- **Storage:** 4 tables (`imputed_puma`, `imputed_county`, `imputed_census_tract`, `imputation_metadata`)
-- **Documentation:** [docs/imputation/IMPUTATION_SETUP_COMPLETE.md](../imputation/IMPUTATION_SETUP_COMPLETE.md)
+- **Configuration:** `config/imputation/{study_id}_config.yaml` - Study-specific M, seed, variables
+- **Storage:** 14 tables per study: `{study_id}_imputed_{variable}`
+- **Documentation:**
+  - [USING_IMPUTATION_AGENT.md](../imputation/USING_IMPUTATION_AGENT.md) - User guide with examples
+  - [CHILDCARE_IMPUTATION_IMPLEMENTATION.md](../imputation/CHILDCARE_IMPUTATION_IMPLEMENTATION.md) - Implementation plan
+  - [PIPELINE_TEST_REPORT.md](../imputation/PIPELINE_TEST_REPORT.md) - Production validation
 
-### Usage Example
+### Usage Examples
 
-**Python:**
+**Python - Get Complete Dataset (All 14 Variables):**
 ```python
-from python.imputation import get_completed_dataset
-df3 = get_completed_dataset(3, variables=['puma', 'county'])
+from python.imputation.helpers import get_complete_dataset, get_childcare_imputations
+
+# Get imputation m=1 with all 14 variables
+df = get_complete_dataset(study_id='ne25', imputation_number=1)
+# Returns: puma, county, census_tract, female, raceG, educ_mom, educ_a2,
+#          income, family_size, fplcat, cc_receives_care, cc_primary_type,
+#          cc_hours_per_week, childcare_10hrs_nonfamily
+
+# Get just childcare variables (4 variables)
+childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 ```
 
-**R (via reticulate):**
+**R - Survey Analysis with MI (via reticulate):**
 ```r
 source("R/imputation/helpers.R")
-imp_list <- get_imputation_list()  # Returns list of M=5 datasets
 
-# Survey analysis with multiple imputations
+# Get list of all M=5 imputations for mitools
+imp_list <- get_imputation_list(study_id = 'ne25')
+
+# Survey analysis with Rubin's rules
 library(survey); library(mitools)
-results <- lapply(imp_list, function(df) {
-  svydesign(ids=~1, weights=~weight, data=df) %>% svymean(~outcome, .)
+designs <- lapply(imp_list, function(df) {
+  svydesign(ids=~1, weights=~weight, data=df)
 })
-MIcombine(results)
+results <- lapply(designs, function(d) svymean(~childcare_10hrs_nonfamily, d))
+combined <- MIcombine(results)
+summary(combined)  # Proper MI variance from geographic + substantive uncertainty
 ```
+
+### Multi-Study Support
+
+The imputation pipeline supports **independent studies** with shared infrastructure:
+
+- **Study-Specific Tables:** `{study_id}_imputed_{variable}` (e.g., `ne25_imputed_puma`)
+- **Study-Specific Configs:** `config/imputation/{study_id}_config.yaml`
+- **Study-Specific Scripts:** `scripts/imputation/{study_id}/run_full_imputation_pipeline.R`
+- **Shared Helpers:** Python/R helper functions accept `study_id` parameter
+
+**Adding a New Study (e.g., ia26):**
+```bash
+python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa 2026"
+# Creates: config, scripts, database schema
+# Customize variables, then run full pipeline
+```
+
+See [ADDING_NEW_STUDY.md](../imputation/ADDING_NEW_STUDY.md) for complete onboarding guide.
 
 ---
 
@@ -425,11 +499,11 @@ The Kidsights Data Platform operates **six independent, standalone pipelines**:
 - **Tables:** `raking_targets_ne25`
 
 #### 6. Imputation Pipeline (Utility)
-- **Purpose:** Multiple imputation for geographic uncertainty in survey responses
+- **Purpose:** Multiple imputation for geographic, sociodemographic, and childcare uncertainty
 - **Data Source:** `ne25_transformed` table
-- **Architecture:** Python probabilistic sampling → Variable-specific tables
-- **Status:** Production ready (M=5 imputations, 25,483 rows)
-- **Tables:** `imputed_puma`, `imputed_county`, `imputed_census_tract`, `imputation_metadata`
+- **Architecture:** 7-stage sequential (Geography → Sociodem → Childcare) → Variable-specific tables
+- **Status:** Production ready (M=5 imputations, 76,636 rows, 14 variables)
+- **Tables:** 14 tables per study: `{study_id}_imputed_{variable}` (3 geography + 7 sociodem + 4 childcare)
 
 ### Design Decision: Why Separate?
 
@@ -460,14 +534,25 @@ ne25_transformed            ↓                   ↓                  ↓
      ↓                                      ↓
      └──────────────────────────────────────┘
                            ↓
-              IMPUTATION PIPELINE (Production)
+              IMPUTATION PIPELINE (7-Stage Sequential)
                            ↓
-        ┌──────────────────┼──────────────────┐
-        ↓                  ↓                   ↓
-  imputed_puma     imputed_county    imputed_census_tract
-    (M=5)              (M=5)                (M=5)
-        ↓                  ↓                   ↓
-        └──────────────────┴───────────────────┘
+        ┌──────────────────┼──────────────────────────┐
+        ↓                  ↓                           ↓
+   Geography (3)      Sociodem (7)              Childcare (4)
+   imputed_puma       imputed_female            imputed_cc_receives_care
+   imputed_county     imputed_raceG             imputed_cc_primary_type
+imputed_census_tract  imputed_educ_mom          imputed_cc_hours_per_week
+     (M=5)            imputed_educ_a2     imputed_childcare_10hrs_nonfamily
+   25,480 rows        imputed_income                 (M=5)
+                      imputed_family_size          24,718 rows
+                      imputed_fplcat
+                           (M=5)
+                        26,438 rows
+        ↓                  ↓                           ↓
+        └──────────────────┴───────────────────────────┘
+                           ↓
+              Helper Functions: get_complete_dataset()
+                 (14 variables joined, M=5)
                            ↓
                   RAKING IMPLEMENTATION
                       (Future Phase)
@@ -476,8 +561,9 @@ ne25_transformed            ↓                   ↓                  ↓
               completed imputation datasets
                            ↓
               Generate raked population estimates
-              with uncertainty from geographic
-              imputation and survey sampling
+              with uncertainty from geographic,
+              sociodemographic, and childcare
+              imputation plus survey sampling
 ```
 
 ### Raking Targets Pipeline (October 2025)
@@ -553,9 +639,11 @@ python scripts/nsch/process_all_years.py --years all
 
 **Imputation Pipeline:**
 ```bash
-# Run once after NE25 pipeline completes to handle geographic uncertainty
-python scripts/imputation/00_setup_imputation_schema.py  # One-time setup
-python scripts/imputation/01_impute_geography.py          # Generate M=5 imputations
+# Setup database schema (one-time, study-specific)
+python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
+
+# Run full 7-stage pipeline (geography + sociodem + childcare)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
 python -m python.imputation.helpers
