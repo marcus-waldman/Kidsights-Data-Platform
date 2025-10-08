@@ -73,48 +73,6 @@ sociodemographic:
   # If false: run mice once with m=5
   chained: true
 
-# Adult mental health & parenting self-efficacy imputation settings (CART via mice)
-adult_mental_health:
-  # Variables to impute
-  variables:
-    - phq2_interest   # PHQ-2 item 1: Little interest or pleasure (0-3 scale) - ~1% missing
-    - phq2_depressed  # PHQ-2 item 2: Feeling down/depressed (0-3 scale) - ~1% missing
-    - gad2_nervous    # GAD-2 item 1: Feeling nervous/anxious (0-3 scale) - ~1% missing
-    - gad2_worry      # GAD-2 item 2: Unable to stop worrying (0-3 scale) - ~1% missing
-    - q1502           # Parenting self-efficacy: handling day-to-day demands (0-3 scale) - ~1% missing
-    # phq2_positive and gad2_positive are DERIVED from item sums after imputation
-
-  # Auxiliary predictor variables (from base data, geography, and sociodem imputations)
-  auxiliary_variables:
-    - puma           # Geographic PUMA from geography imputation m
-    - a1_raceG       # Adult 1 race/ethnicity from sociodem imputation m (if imputed, else base)
-    - educ_a1        # Adult 1 education from sociodem imputation m (if imputed, else base)
-    - income         # Family income from sociodem imputation m
-    - authentic.x    # Authenticity flag (complete, also used as defensive filter)
-    - female_a1      # Adult 1 sex/gender (logical: TRUE=female)
-    - a1_years_old   # Adult 1 age in years (numeric, mean ~32.5)
-
-  # Filter to eligible AND authentic records only (eligible.x == TRUE AND authentic.x == TRUE, n=2,676)
-  eligible_only: true
-
-  # mice imputation methods by variable
-  mice_method:
-    phq2_interest: "cart"   # CART for ordinal 0-3 scale
-    phq2_depressed: "cart"  # CART for ordinal 0-3 scale
-    gad2_nervous: "cart"    # CART for ordinal 0-3 scale
-    gad2_worry: "cart"      # CART for ordinal 0-3 scale
-    q1502: "cart"           # CART for ordinal 0-3 scale
-
-  # Keep collinear predictors (CART handles multicollinearity)
-  remove_collinear: false
-
-  # Maximum iterations for mice algorithm (fewer than sociodem due to simpler relationships)
-  maxit: 5
-
-  # Chained imputation (run mice once per geography + sociodem imputation)
-  # Must use same m for geography, sociodem, and mental health
-  chained: true
-
 # Future: Additional substantive imputation settings
 substantive:
   # Variables requiring other substantive imputation methods (placeholder)

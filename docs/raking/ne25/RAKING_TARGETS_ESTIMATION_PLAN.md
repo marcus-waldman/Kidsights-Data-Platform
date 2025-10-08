@@ -2,8 +2,8 @@
 
 **Purpose:** Compute population-level estimates to fill the `est` column in `raking_targets.csv` for post-stratification raking of Nebraska NE25 survey data.
 
-**Date:** 2025-10-03
-**Status:** Planning Phase
+**Date:** 2025-10-05
+**Status:** Phase 3 Complete
 
 ---
 
@@ -12,13 +12,15 @@
 ### File Structure
 
 The `raking_targets.csv` file contains:
-- **192 total rows** = 32 unique estimands × 6 age bins (0-5 years)
+- **186 total rows** = 31 unique estimands × 6 age bins (0-5 years)
 - **Columns:**
   - `age_years (floor)`: Child age in years (0, 1, 2, 3, 4, 5)
   - `estimand`: Description of the population estimate
   - `dataset`: Data source (ACS NE 5-year, NHIS, NSCH)
   - `estimator`: Statistical method (GLM, Mixed model)
-  - `est`: **TARGET COLUMN TO FILL** (currently empty)
+  - `est`: **TARGET COLUMN TO FILL**
+
+**Note:** Original plan included 34 estimands (204 rows), but maternal ACE estimates (3 estimands, 18 rows) were removed due to data quality issues in NHIS North Central region.
 
 ### Data Sources
 
@@ -543,7 +545,11 @@ anova(model_main, model_mom_married, test = "F")
 
 ---
 
-## Phase 2: NHIS Estimates (4 estimands)
+## Phase 2: NHIS Estimates (2 estimands)
+
+**Estimands:** PHQ-2 Positive (depression) and GAD-2 Positive (anxiety)
+
+**Note:** Originally planned for 4 estimands (PHQ-2 + 3 ACE categories), but maternal ACE estimates removed due to data quality issues in North Central region. GAD-2 anxiety added in October 2025 as complementary mental health indicator.
 
 ### Data Source
 - **Table:** `nhis_raw`
@@ -649,13 +655,19 @@ nc_estimate <- predict(model, type = "response")
 **Estimand:**
 - "Proportion of mothers with moderate/severe depressive symptoms (PHQ-2: 3-6)" [positive screen]
 
-**Data Source:** NHIS 2019, 2022 (PHQ-2 items available, N=4,022 parents with children 0-5)
+**Data Source:** NHIS 2019, 2022, 2023 (PHQ-2 items available, N=1,435 North Central parents with children 0-5 after household linkage)
 
 **Variables:**
-- `PHQINTR`: Little interest or pleasure in doing things (0-3 scale)
-- `PHQDEP`: Feeling down, depressed, or hopeless (0-3 scale)
+- `PHQINTR`: Little interest or pleasure in doing things (IPUMS coding: 0-3 valid, 7/8/9 missing)
+- `PHQDEP`: Feeling down, depressed, or hopeless (IPUMS coding: 0-3 valid, 7/8/9 missing)
 
 **Rationale:** NE25 survey only includes PHQ-2 (2 items), not full PHQ-8. Raking targets must match the measure used in the target survey. Binary categorization uses standard PHQ-2 clinical cutpoint (≥3 = positive depression screen).
+
+**Implementation Notes:**
+- Used PAR1REL variable for parent-child household linkage (2,683 parent-child pairs)
+- Filtered to North Central region (REGION = 2) as proxy for Nebraska
+- Fit survey-weighted logistic regression with year main effects, predicted at 2023
+- Final estimate: 5.8% PHQ-2 positive
 
 **Calculation (Survey-Weighted Binary Logistic Regression):**
 ```r
@@ -711,16 +723,25 @@ prop_phq2_positive <- predict(model_phq2, type = "response")[1]
 
 **Fills rows:** Age 0-5 (same value × 6)
 
+**Scripts:**
+- `scripts/raking/ne25/12_filter_nhis_parents.R` - Household linkage
+- `scripts/raking/ne25/13_estimate_phq2.R` - PHQ-2 estimation with year effects
+- `scripts/raking/ne25/14_compile_nhis_estimates.R` - Format as 6 rows
+- `scripts/raking/ne25/15_validate_nhis_estimates.R` - Range and consistency checks
+- `scripts/raking/ne25/16_save_nhis_estimates.R` - Save to data/raking/ne25/nhis_estimates.rds
+
 ---
 
-#### 3. Maternal ACE Exposure (3 estimands)
+#### ~~3. Maternal ACE Exposure (3 estimands)~~ **[REMOVED]**
 
-**Estimands:**
+**Status:** Excluded due to data quality issues in NHIS North Central region
+
+**Planned estimands:**
 - "Proportion of mothers exposed to zero adverse childhood experiences"
 - "Proportion of mothers exposed to one adverse childhood experience"
 - "Proportion of mothers exposed to 2 or more adverse childhood experiences"
 
-**Data Source:** NHIS 2019, 2021, 2022, 2023 (ACE variables available, N=7,657 parents with children 0-5)
+**Reason for exclusion:** All ACE variables (VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV, ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED) showed only 0 values in North Central region, preventing meaningful estimation. This appears to be a regional data collection or processing issue rather than true absence of ACE exposure
 
 **Variables (8 ACE items):**
 - `VIOLENEV`: Lived with violent person

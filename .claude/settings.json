@@ -1,11 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Update(*)",
-      "Write(*)"
+      "Update"
     ],
     "deny": [],
     "ask": []
-  },
-  "outputStyle": "Explanatory"
+  }
 }

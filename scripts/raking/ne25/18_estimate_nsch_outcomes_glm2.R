@@ -81,12 +81,9 @@ cat("    Sample size:", nrow(ace_data), "\n")
 ace_indicator <- !is.na(nsch_data$ace_1plus)
 replicate_weights_ace <- replicate_weights_full[ace_indicator, ]
 
-# Respect bootstrap config
-n_boot <- BOOTSTRAP_CONFIG$n_boot
-if (ncol(replicate_weights_ace) > n_boot) {
-  cat("    [INFO] Using first", n_boot, "replicates (from", ncol(replicate_weights_ace), "available)\n")
-  replicate_weights_ace <- replicate_weights_ace[, 1:n_boot]
-}
+# Detect n_boot from replicate weights
+n_boot <- ncol(replicate_weights_ace)
+cat("    Bootstrap replicates:", n_boot, "\n")
 
 # Prediction data: year 2023 for ages 0-5
 pred_data_ace <- data.frame(

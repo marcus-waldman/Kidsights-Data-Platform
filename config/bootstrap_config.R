@@ -12,7 +12,7 @@ BOOTSTRAP_CONFIG <- list(
   # Production: 4096 (stable variance, precise CI)
   # Testing: 96 (fast iteration, ~2 minutes)
   # Development: 8 (very fast prototyping, <30 seconds)
-  n_boot = 96,  # ← CHANGE THIS to 96 for testing or 8 for development
+  n_boot = 4096,  # ← PRODUCTION MODE
 
   # Bootstrap method (Rao-Wu-Yue-Beaumont preserves complex survey design)
   method = "Rao-Wu-Yue-Beaumont",
@@ -64,9 +64,9 @@ get_expected_replicates <- function() {
   n <- BOOTSTRAP_CONFIG$n_boot
   list(
     acs = 25 * 6 * n,      # 25 estimands × 6 ages × n_boot
-    nhis = 1 * 6 * n,      # 1 estimand × 6 ages × n_boot
+    nhis = 2 * 6 * n,      # 2 estimands × 6 ages × n_boot (PHQ-2, GAD-2)
     nsch = 4 * 6 * n,      # 4 estimands × 6 ages × n_boot
-    total = 30 * 6 * n     # 30 total estimands × 6 ages × n_boot
+    total = 31 * 6 * n     # 31 total estimands × 6 ages × n_boot
   )
 }
 

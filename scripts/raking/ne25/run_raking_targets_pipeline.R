@@ -3,12 +3,12 @@
 #
 # This pipeline:
 # - Phase 1: Loads and processes ACS data (25 estimands)
-# - Phase 2: Filters and estimates NHIS data (1 estimand)
+# - Phase 2: Filters and estimates NHIS data (2 estimands: PHQ-2, GAD-2)
 # - Phase 3: (Deprecated - replaced by Phase 4)
 # - Phase 4: Filters and estimates NSCH data (4 estimands)
 # - Phase 5: Consolidates, validates, and loads to database
 #
-# Output: raking_targets_ne25 table with 180 rows (30 estimands × 6 ages)
+# Output: raking_targets_ne25 table with 186 rows (31 estimands × 6 ages)
 
 library(dplyr)
 
@@ -30,8 +30,8 @@ if (!file.exists("data/raking/ne25/acs_estimates.rds")) {
   cat("  ✓ Loaded ACS estimates:", nrow(acs_est), "rows\n\n")
 }
 
-# PHASE 2: NHIS Estimates (1 estimand)
-cat("[PHASE 2] NHIS Estimates (1 estimand)\n")
+# PHASE 2: NHIS Estimates (2 estimands: PHQ-2, GAD-2)
+cat("[PHASE 2] NHIS Estimates (2 estimands: PHQ-2, GAD-2)\n")
 
 # Check if NHIS data needs to be filtered
 if (!file.exists("data/raking/ne25/nhis_parents_ne.rds")) {
@@ -41,20 +41,23 @@ if (!file.exists("data/raking/ne25/nhis_parents_ne.rds")) {
   cat("  ✓ NHIS parents data exists\n")
 }
 
-# Check if NHIS estimates need to be calculated
-if (!file.exists("data/raking/ne25/nhis_estimates_raw.rds")) {
-  cat("  [2.2] Estimating PHQ-2 outcomes...\n")
-  source("scripts/raking/ne25/13_estimate_phq2.R")
+# Check if PHQ-2 estimates need to be calculated
+if (!file.exists("data/raking/ne25/phq2_estimate_glm2.rds")) {
+  cat("  [2.2] Estimating PHQ-2 outcomes (depression)...\n")
+  source("scripts/raking/ne25/13_estimate_phq2_glm2.R")
 } else {
-  cat("  ✓ NHIS raw estimates exist\n")
+  cat("  ✓ PHQ-2 estimates exist\n")
 }
 
-# Validate and save NHIS estimates
-cat("  [2.3] Validating NHIS estimates...\n")
-source("scripts/raking/ne25/14_validate_save_nhis.R")
+# Check if GAD-2 estimates need to be calculated
+if (!file.exists("data/raking/ne25/gad2_estimate_glm2.rds")) {
+  cat("  [2.3] Estimating GAD-2 outcomes (anxiety)...\n")
+  source("scripts/raking/ne25/13b_estimate_gad2_glm2.R")
+} else {
+  cat("  ✓ GAD-2 estimates exist\n")
+}
 
-nhis_est <- readRDS("data/raking/ne25/nhis_estimates.rds")
-cat("  ✓ NHIS estimates validated:", nrow(nhis_est), "rows\n\n")
+cat("  ✓ NHIS mental health estimates complete\n\n")
 
 # PHASE 4: NSCH Estimates (4 estimands)
 cat("[PHASE 4] NSCH Estimates (4 estimands)\n")
@@ -124,15 +127,14 @@ cat("========================================\n\n")
 end_time <- Sys.time()
 elapsed <- difftime(end_time, start_time, units = "mins")
 
+all_est <- readRDS("data/raking/ne25/raking_targets_consolidated.rds")
+
 cat("Summary:\n")
-cat("  ACS estimands:", length(unique(acs_est$estimand)), "\n")
-cat("  NHIS estimands:", length(unique(nhis_est$estimand)), "\n")
-cat("  NSCH estimands:", length(unique(nsch_est$estimand)), "\n")
-cat("  Total estimands:",
-    length(unique(acs_est$estimand)) +
-    length(unique(nhis_est$estimand)) +
-    length(unique(nsch_est$estimand)), "\n")
-cat("  Total rows:", nrow(acs_est) + nrow(nhis_est) + nrow(nsch_est), "\n")
+cat("  ACS estimands: 25\n")
+cat("  NHIS estimands: 2 (PHQ-2, GAD-2)\n")
+cat("  NSCH estimands: 4\n")
+cat("  Total estimands:", length(unique(all_est$estimand)), "\n")
+cat("  Total rows:", nrow(all_est), "(31 estimands × 6 ages)\n")
 cat("  Database table: raking_targets_ne25\n")
 cat("  Execution time:", round(elapsed, 2), "minutes\n\n")
 
