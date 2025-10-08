@@ -146,13 +146,13 @@ python scripts/nsch/process_all_years.py --years 2020-2023
 
 ### Imputation Pipeline
 
-**Purpose:** Generate M=5 imputations for geographic, sociodemographic, and childcare uncertainty
+**Purpose:** Generate M=5 imputations for geographic, sociodemographic, childcare, and mental health uncertainty
 
 ```bash
 # Setup database schema (one-time, study-specific)
 python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Run full 7-stage pipeline (Geography → Sociodem → Childcare)
+# Run full 9-stage pipeline (Geography → Sociodem → Childcare → Mental Health)
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
@@ -163,29 +163,38 @@ python -m python.imputation.helpers
 - **Stage 1-3:** Geography imputation (PUMA, county, census_tract)
 - **Stage 4:** Sociodemographic imputation via MICE (7 variables)
 - **Stage 5-7:** Childcare 3-stage sequential imputation (4 variables)
-- Stores only imputed values in variable-specific tables
+- **Stage 8-9:** Mental health & parenting imputation via CART (7 variables: 5 items + 2 derived screens)
+- Stores only imputed/derived values in variable-specific tables
 - Provides helper functions to retrieve completed datasets
 
-**Timing:** ~2 minutes for complete 7-stage pipeline
+**Timing:** ~2.3 minutes for complete 9-stage pipeline
 
-**Output:** 76,636 imputation rows across 14 tables
+**Output:** 83,401 imputation rows across 21 tables
 
-**Python usage - Get Complete Dataset (All 14 Variables):**
+**Python usage - Get Complete Dataset (All 21 Variables):**
 ```python
-from python.imputation.helpers import get_complete_dataset, get_childcare_imputations
+from python.imputation.helpers import (
+    get_complete_dataset,
+    get_childcare_imputations,
+    get_mental_health_imputations
+)
 
-# Get imputation m=1 with all 14 variables
+# Get imputation m=1 with all 21 variables
 df = get_complete_dataset(study_id='ne25', imputation_number=1)
 # Returns: puma, county, census_tract, female, raceG, educ_mom, educ_a2,
 #          income, family_size, fplcat, cc_receives_care, cc_primary_type,
-#          cc_hours_per_week, childcare_10hrs_nonfamily
+#          cc_hours_per_week, childcare_10hrs_nonfamily, phq2_interest,
+#          phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive
 
 # Get just childcare variables (4 variables)
 childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 
+# Get just mental health variables (7 variables: 5 items + 2 derived screens)
+mental_health = get_mental_health_imputations(study_id='ne25', imputation_number=1)
+
 # Get all 5 imputations in long format
 from python.imputation.helpers import get_all_imputations
-df_long = get_all_imputations(study_id='ne25', variables=['puma', 'childcare_10hrs_nonfamily'])
+df_long = get_all_imputations(study_id='ne25', variables=['puma', 'childcare_10hrs_nonfamily', 'phq2_positive'])
 ```
 
 **R usage - Survey Analysis with MI (via reticulate):**
@@ -586,7 +595,7 @@ county_data %>%
 ✅ **Production Ready** | 180 raking targets | 614,400 bootstrap replicates | ~2-3 min runtime
 
 ### Imputation Pipeline
-✅ **Production Ready** | 14 variables | 76,636 rows | M=5 imputations | 7-stage sequential | 2 min runtime
+✅ **Production Ready** | 21 variables | 83,401 rows | M=5 imputations | 9-stage sequential | 2.3 min runtime
 
 ---
 
