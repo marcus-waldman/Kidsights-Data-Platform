@@ -57,7 +57,7 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 # Setup database schema (one-time, study-specific)
 python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Run full pipeline (geography + sociodem + childcare + mental health + database insertion)
+# Run full pipeline (geography + sociodem + childcare + mental health + child ACEs + database insertion)
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
@@ -350,10 +350,11 @@ pip install pyreadstat
 - **Sociodemographic Variables:** 7 variables imputed via mice (female, raceG, educ_mom, educ_a2, income, family_size, fplcat)
 - **Childcare Variables:** 4 variables via 3-stage sequential imputation (cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily)
 - **Mental Health & Parenting:** 7 variables via CART imputation (phq2_interest, phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive)
+- **Child ACEs:** 9 variables via random forest imputation (8 ACE items + child_ace_total)
 - **Storage Efficiency:** Study-specific variable tables (`{study_id}_imputed_{variable}`) with **storage convention:** only imputed/derived values stored
 - **Language Support:** Python native + R via reticulate (single source of truth)
-- **Database:** 83,401 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health) for ne25
-- **Execution Time:** ~2.3 minutes for complete pipeline (9 stages)
+- **Database:** 85,746 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health + 2,345 child ACEs) for ne25
+- **Execution Time:** ~3 minutes for complete pipeline (11 stages)
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations

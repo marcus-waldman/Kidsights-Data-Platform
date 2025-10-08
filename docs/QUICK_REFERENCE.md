@@ -164,27 +164,33 @@ python -m python.imputation.helpers
 - **Stage 4:** Sociodemographic imputation via MICE (7 variables)
 - **Stage 5-7:** Childcare 3-stage sequential imputation (4 variables)
 - **Stage 8-9:** Mental health & parenting imputation via CART (7 variables: 5 items + 2 derived screens)
+- **Stage 10-11:** Child ACEs imputation via random forest (9 variables: 8 items + derived total)
 - Stores only imputed/derived values in variable-specific tables
 - Provides helper functions to retrieve completed datasets
 
-**Timing:** ~2.3 minutes for complete 9-stage pipeline
+**Timing:** ~3 minutes for complete 11-stage pipeline
 
-**Output:** 83,401 imputation rows across 21 tables
+**Output:** 85,746 imputation rows across 30 tables
 
-**Python usage - Get Complete Dataset (All 21 Variables):**
+**Python usage - Get Complete Dataset (All 30 Variables):**
 ```python
 from python.imputation.helpers import (
     get_complete_dataset,
     get_childcare_imputations,
-    get_mental_health_imputations
+    get_mental_health_imputations,
+    get_child_aces_imputations
 )
 
-# Get imputation m=1 with all 21 variables
+# Get imputation m=1 with all 30 variables
 df = get_complete_dataset(study_id='ne25', imputation_number=1)
 # Returns: puma, county, census_tract, female, raceG, educ_mom, educ_a2,
 #          income, family_size, fplcat, cc_receives_care, cc_primary_type,
 #          cc_hours_per_week, childcare_10hrs_nonfamily, phq2_interest,
-#          phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive
+#          phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive,
+#          child_ace_parent_divorce, child_ace_parent_death, child_ace_parent_jail,
+#          child_ace_domestic_violence, child_ace_neighborhood_violence,
+#          child_ace_mental_illness, child_ace_substance_use,
+#          child_ace_discrimination, child_ace_total
 
 # Get just childcare variables (4 variables)
 childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
@@ -192,9 +198,14 @@ childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 # Get just mental health variables (7 variables: 5 items + 2 derived screens)
 mental_health = get_mental_health_imputations(study_id='ne25', imputation_number=1)
 
+# Get just child ACEs variables (9 variables: 8 items + derived total)
+aces = get_child_aces_imputations(study_id='ne25', imputation_number=1)
+# Check 4+ ACEs prevalence
+pct_4plus = (aces['child_ace_total'] >= 4).mean() * 100
+
 # Get all 5 imputations in long format
 from python.imputation.helpers import get_all_imputations
-df_long = get_all_imputations(study_id='ne25', variables=['puma', 'childcare_10hrs_nonfamily', 'phq2_positive'])
+df_long = get_all_imputations(study_id='ne25', variables=['puma', 'childcare_10hrs_nonfamily', 'phq2_positive', 'child_ace_total'])
 ```
 
 **R usage - Survey Analysis with MI (via reticulate):**
@@ -595,7 +606,7 @@ county_data %>%
 ✅ **Production Ready** | 180 raking targets | 614,400 bootstrap replicates | ~2-3 min runtime
 
 ### Imputation Pipeline
-✅ **Production Ready** | 21 variables | 83,401 rows | M=5 imputations | 9-stage sequential | 2.3 min runtime
+✅ **Production Ready** | 30 variables | 85,746 rows | M=5 imputations | 11-stage sequential | ~3 min runtime
 
 ---
 
