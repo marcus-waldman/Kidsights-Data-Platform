@@ -188,15 +188,15 @@ if (acs_check$n_estimands != 25) {
   stop("Validation failed: ACS estimand count")
 }
 
-# NHIS: Should have 1 estimand
+# NHIS: Should have 2 estimands (PHQ-2, GAD-2)
 nhis_check <- all_estimates %>%
   dplyr::filter(data_source == "NHIS") %>%
   dplyr::summarise(n_estimands = length(unique(estimand)))
 
-cat("    NHIS estimands:", nhis_check$n_estimands, "(expected: 1)\n")
+cat("    NHIS estimands:", nhis_check$n_estimands, "(expected: 2)\n")
 
-if (nhis_check$n_estimands != 1) {
-  cat("    [ERROR] NHIS should have 1 estimand\n")
+if (nhis_check$n_estimands != 2) {
+  cat("    [ERROR] NHIS should have 2 estimands (PHQ-2, GAD-2)\n")
   stop("Validation failed: NHIS estimand count")
 }
 

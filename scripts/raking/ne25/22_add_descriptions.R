@@ -1,5 +1,5 @@
 # Phase 5, Task 5.3: Add Estimand Descriptions
-# Populate standardized descriptions for all 30 estimands
+# Populate standardized descriptions for all 31 estimands
 
 library(dplyr)
 
@@ -54,9 +54,10 @@ acs_descriptions <- c(
   "PUMA_904" = "PUMA 904: Lancaster County (Lincoln - Southeast)"
 )
 
-# NHIS Estimands (1)
+# NHIS Estimands (2)
 nhis_descriptions <- c(
-  "PHQ-2 Positive" = "Parent PHQ-2 positive screen for depression (score >= 3)"
+  "PHQ-2 Positive" = "Parent PHQ-2 positive screen for depression (score >= 3)",
+  "GAD-2 Positive" = "Parent GAD-2 positive screen for anxiety (score >= 3)"
 )
 
 # NSCH Estimands (4)

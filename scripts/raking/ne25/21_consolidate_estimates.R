@@ -1,6 +1,6 @@
 # Phase 5, Tasks 5.1-5.3: Load and Consolidate All Estimates
-# Combine ACS (150) + NHIS (6) + NSCH (24) = 180 rows
-# 30 estimands total (25 ACS + 1 NHIS + 4 NSCH)
+# Combine ACS (150) + NHIS (12) + NSCH (24) = 186 rows
+# 31 estimands total (25 ACS + 2 NHIS + 4 NSCH)
 
 library(dplyr)
 
@@ -12,20 +12,28 @@ cat("========================================\n\n")
 cat("[1] Loading estimate files...\n")
 
 acs_est <- readRDS("data/raking/ne25/acs_estimates.rds")
-nhis_est <- readRDS("data/raking/ne25/nhis_estimates.rds")
-nsch_est <- readRDS("data/raking/ne25/nsch_estimates.rds")
+phq2_est <- readRDS("data/raking/ne25/phq2_estimate_glm2.rds")
+gad2_est <- readRDS("data/raking/ne25/gad2_estimate_glm2.rds")
+nsch_main_est <- readRDS("data/raking/ne25/nsch_estimates_raw_glm2.rds")  # 3 outcomes
+childcare_est <- readRDS("data/raking/ne25/childcare_2022_estimates.rds")  # 1 outcome
+
+# Combine NHIS mental health outcomes
+nhis_est <- dplyr::bind_rows(phq2_est, gad2_est)
+
+# Combine NSCH outcomes
+nsch_est <- dplyr::bind_rows(nsch_main_est, childcare_est)
 
 cat("    ACS estimates:", nrow(acs_est), "rows\n")
 cat("    NHIS estimates:", nrow(nhis_est), "rows\n")
 cat("    NSCH estimates:", nrow(nsch_est), "rows\n")
-cat("    Expected total: 180 rows\n\n")
+cat("    Expected total: 186 rows\n\n")
 
 # Verify row counts
 if (nrow(acs_est) != 150) {
   stop("ERROR: ACS should have 150 rows (25 estimands × 6 ages), got ", nrow(acs_est))
 }
-if (nrow(nhis_est) != 6) {
-  stop("ERROR: NHIS should have 6 rows (1 estimand × 6 ages), got ", nrow(nhis_est))
+if (nrow(nhis_est) != 12) {
+  stop("ERROR: NHIS should have 12 rows (2 estimands × 6 ages), got ", nrow(nhis_est))
 }
 if (nrow(nsch_est) != 24) {
   stop("ERROR: NSCH should have 24 rows (4 estimands × 6 ages), got ", nrow(nsch_est))
@@ -64,8 +72,8 @@ cat("    Total rows:", nrow(all_estimates), "\n")
 cat("    Total estimands:", length(unique(all_estimates$estimand)), "\n\n")
 
 # Verify total
-if (nrow(all_estimates) != 180) {
-  stop("ERROR: Expected 180 total rows, got ", nrow(all_estimates))
+if (nrow(all_estimates) != 186) {
+  stop("ERROR: Expected 186 total rows, got ", nrow(all_estimates))
 }
 
 cat("    [OK] Total row count verified\n\n")
@@ -81,12 +89,8 @@ all_estimates <- all_estimates %>%
     # Survey identifier
     survey = "ne25",
 
-    # Estimator type (we'll refine this below)
-    estimator = dplyr::case_when(
-      data_source == "ACS" ~ "GLM",
-      data_source == "NHIS" ~ "GLM",
-      data_source == "NSCH" ~ "GLMM"
-    ),
+    # Estimator type (all use survey-weighted GLM now)
+    estimator = "Survey GLM",
 
     # Estimation date
     estimation_date = as.Date(Sys.Date()),
@@ -100,7 +104,7 @@ all_estimates <- all_estimates %>%
   )
 
 cat("    Columns added:\n")
-cat("      - target_id (1-180)\n")
+cat("      - target_id (1-186)\n")
 cat("      - survey ('ne25')\n")
 cat("      - estimator (GLM/GLMM)\n")
 cat("      - estimation_date\n")

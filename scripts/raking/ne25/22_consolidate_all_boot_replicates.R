@@ -1,8 +1,12 @@
 # Phase 5, Task 5.2: Consolidate ALL Bootstrap Replicates
 # Combine bootstrap replicates from ACS, NHIS, and NSCH sources
-# Expected: 720 rows (600 ACS + 24 NHIS + 96 NSCH with n_boot = 4)
+# Uses bootstrap_config.R as single source of truth for n_boot
+# Production: 761,856 rows (614,400 ACS + 49,152 NHIS + 98,304 NSCH with n_boot = 4096)
 
 library(dplyr)
+
+# Source bootstrap configuration (single source of truth)
+source("config/bootstrap_config.R")
 
 cat("\n========================================\n")
 cat("Consolidate ALL Bootstrap Replicates\n")
@@ -14,31 +18,57 @@ cat("[1] Loading bootstrap files from all sources...\n")
 # ACS bootstrap (consolidated)
 acs_boot <- readRDS("data/raking/ne25/acs_bootstrap_consolidated.rds")
 
-# NHIS bootstrap (glm2 version)
-nhis_boot <- readRDS("data/raking/ne25/phq2_estimate_boot_glm2.rds")
+# NHIS bootstrap (glm2 versions - PHQ-2 and GAD-2)
+phq2_boot <- readRDS("data/raking/ne25/phq2_estimate_boot_glm2.rds")
+gad2_boot <- readRDS("data/raking/ne25/gad2_estimate_boot_glm2.rds")
+
+# Combine NHIS mental health bootstrap replicates
+nhis_boot <- dplyr::bind_rows(phq2_boot, gad2_boot)
 
 # NSCH bootstrap (consolidated)
 nsch_boot <- readRDS("data/raking/ne25/nsch_bootstrap_consolidated.rds")
 
 cat("    ACS bootstrap:", nrow(acs_boot), "rows\n")
-cat("    NHIS bootstrap:", nrow(nhis_boot), "rows\n")
+cat("    NHIS bootstrap:", nrow(nhis_boot), "rows (PHQ-2 + GAD-2)\n")
 cat("    NSCH bootstrap:", nrow(nsch_boot), "rows\n\n")
 
-# 2. Detect n_boot from data
-cat("[2] Detecting n_boot from data...\n")
+# 2. Validate n_boot consistency with config
+cat("[2] Validating n_boot from config...\n")
 
-n_boot_detected <- length(unique(acs_boot$replicate))
-cat("    Detected n_boot:", n_boot_detected, "\n")
+# Get expected n_boot from configuration
+n_boot_expected <- BOOTSTRAP_CONFIG$n_boot
+cat("    Config n_boot:", n_boot_expected, "\n")
 
-# Calculate expected row counts dynamically
+# Detect n_boot from actual consolidated files
+n_boot_acs <- length(unique(acs_boot$replicate))
+n_boot_nhis <- length(unique(nhis_boot$replicate))
+n_boot_nsch <- length(unique(nsch_boot$replicate))
+
+cat("    ACS n_boot:", n_boot_acs, "\n")
+cat("    NHIS n_boot:", n_boot_nhis, "\n")
+cat("    NSCH n_boot:", n_boot_nsch, "\n")
+
+# Validate all match config
+if (!all(c(n_boot_acs, n_boot_nhis, n_boot_nsch) == n_boot_expected)) {
+  stop("ERROR: Consolidated files have inconsistent n_boot:\n",
+       "       ACS: ", n_boot_acs, ", NHIS: ", n_boot_nhis, ", NSCH: ", n_boot_nsch, "\n",
+       "       Config expects: ", n_boot_expected, "\n",
+       "       Solution: Delete ALL consolidated files and regenerate:\n",
+       "       rm data/raking/ne25/*bootstrap_consolidated.rds\n",
+       "       Then re-run consolidation scripts in order (21a, 21b, 22).")
+}
+
+cat("    [OK] All sources match config (n_boot =", n_boot_expected, ")\n")
+
+# Calculate expected row counts using config n_boot
 expected_counts <- c(
-  ACS = 25 * 6 * n_boot_detected,  # 25 estimands × 6 ages × n_boot
-  NHIS = 1 * 6 * n_boot_detected,  # 1 estimand × 6 ages × n_boot
-  NSCH = 4 * 6 * n_boot_detected   # 4 estimands × 6 ages × n_boot
+  ACS = 25 * 6 * n_boot_expected,  # 25 estimands × 6 ages × n_boot
+  NHIS = 2 * 6 * n_boot_expected,  # 2 estimands × 6 ages × n_boot (PHQ-2 + GAD-2)
+  NSCH = 4 * 6 * n_boot_expected   # 4 estimands × 6 ages × n_boot
 )
 
-expected_total <- 30 * 6 * n_boot_detected  # 30 total estimands
-cat("    Expected total:", expected_total, "rows (30 estimands × 6 ages ×", n_boot_detected, "replicates)\n\n")
+expected_total <- 31 * 6 * n_boot_expected  # 31 total estimands
+cat("    Expected total:", expected_total, "rows (31 estimands × 6 ages ×", n_boot_expected, "replicates)\n\n")
 
 # 3. Verify row counts
 cat("[3] Verifying row counts by source...\n")
@@ -127,8 +157,8 @@ cat("    Sources:", paste(unique(all_boot_replicates$data_source), collapse = ",
 
 # Verify total
 if (nrow(all_boot_replicates) != expected_total) {
-  stop("ERROR: Expected ", expected_total, " total rows (30 estimands × 6 ages × ",
-       n_boot_detected, " replicates), got ", nrow(all_boot_replicates))
+  stop("ERROR: Expected ", expected_total, " total rows (31 estimands × 6 ages × ",
+       n_boot_expected, " replicates), got ", nrow(all_boot_replicates))
 }
 
 cat("    [OK] Total row count verified:", expected_total, "rows\n\n")
@@ -190,8 +220,8 @@ replicates_by_source <- all_boot_replicates %>%
   dplyr::group_by(data_source) %>%
   dplyr::summarise(n_replicates = length(unique(replicate)), .groups = "drop")
 
-if (all(replicates_by_source$n_replicates == n_boot_detected)) {
-  cat("    [OK] All sources have", n_boot_detected, "replicates\n")
+if (all(replicates_by_source$n_replicates == n_boot_expected)) {
+  cat("    [OK] All sources have", n_boot_expected, "replicates\n")
 } else {
   cat("    [WARN] Inconsistent replicate counts:\n")
   print(replicates_by_source)
@@ -260,8 +290,8 @@ if (length(surveys) == 1 && surveys[1] == "ne25") {
 
 # Check n_boot consistency
 n_boots <- unique(all_boot_replicates$n_boot)
-if (length(n_boots) == 1 && n_boots[1] == n_boot_detected) {
-  cat("    [OK] All sources have n_boot =", n_boot_detected, "\n")
+if (length(n_boots) == 1 && n_boots[1] == n_boot_expected) {
+  cat("    [OK] All sources have n_boot =", n_boot_expected, "\n")
 } else {
   cat("    [WARN] Inconsistent n_boot values:\n")
   print(n_boots)
@@ -301,24 +331,24 @@ cat("========================================\n\n")
 cat("Final Summary:\n")
 cat("  Total bootstrap replicates:", nrow(all_boot_replicates), "rows\n")
 cat("  Data sources: 3 (ACS, NHIS, NSCH)\n")
-cat("  Total estimands: 30 (25 ACS + 1 NHIS + 4 NSCH)\n")
+cat("  Total estimands: 31 (25 ACS + 2 NHIS + 4 NSCH)\n")
 cat("  Age groups: 6 (ages 0-5)\n")
-cat("  Bootstrap replicates per estimand:", n_boot_detected, "\n")
+cat("  Bootstrap replicates per estimand:", n_boot_expected, "\n")
 cat("  Bootstrap method: Rao-Wu-Yue-Beaumont (shared within source)\n")
 cat("  Survey: ne25\n\n")
 
 cat("Breakdown by source:\n")
-cat("  ACS: ", 25 * 6 * n_boot_detected, " rows = 25 estimands × 6 ages ×", n_boot_detected, "replicates\n")
-cat("  NHIS: ", 1 * 6 * n_boot_detected, " rows =  1 estimand  × 6 ages ×", n_boot_detected, "replicates\n")
-cat("  NSCH: ", 4 * 6 * n_boot_detected, " rows =  4 estimands × 6 ages ×", n_boot_detected, "replicates\n\n")
+cat("  ACS: ", 25 * 6 * n_boot_expected, " rows = 25 estimands × 6 ages ×", n_boot_expected, "replicates\n")
+cat("  NHIS: ", 2 * 6 * n_boot_expected, " rows =  2 estimands × 6 ages ×", n_boot_expected, "replicates (PHQ-2, GAD-2)\n")
+cat("  NSCH: ", 4 * 6 * n_boot_expected, " rows =  4 estimands × 6 ages ×", n_boot_expected, "replicates\n\n")
 
-if (n_boot_detected < 4096) {
-  cat("Current configuration: n_boot =", n_boot_detected, "\n")
+if (n_boot_expected < 4096) {
+  cat("Current configuration: n_boot =", n_boot_expected, "\n")
   cat("Production mode (n_boot = 4096) will have:\n")
-  cat("  - ACS:  614,400 rows\n")
-  cat("  - NHIS:  24,576 rows\n")
-  cat("  - NSCH:  98,304 rows\n")
-  cat("  - TOTAL: 737,280 rows\n\n")
+  cat("  - ACS:  614,400 rows (25 estimands)\n")
+  cat("  - NHIS:  49,152 rows ( 2 estimands: PHQ-2, GAD-2)\n")
+  cat("  - NSCH:  98,304 rows ( 4 estimands)\n")
+  cat("  - TOTAL: 761,856 rows (31 estimands)\n\n")
 }
 
 cat("Next step: Run 23_insert_boot_replicates.py to insert into DuckDB\n\n")

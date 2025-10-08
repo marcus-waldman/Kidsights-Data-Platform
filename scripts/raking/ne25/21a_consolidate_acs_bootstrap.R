@@ -1,8 +1,11 @@
 # Phase 2, Task 2.10: Consolidate ACS Bootstrap Estimates
 # Combine bootstrap replicates from all 6 ACS estimation scripts
-# Dynamically detects n_boot from actual data
+# Uses bootstrap_config.R as single source of truth for n_boot
 
 library(dplyr)
+
+# Source bootstrap configuration (single source of truth)
+source("config/bootstrap_config.R")
 
 cat("\n========================================\n")
 cat("Consolidate ACS Bootstrap Estimates\n")
@@ -25,24 +28,40 @@ cat("    PUMA bootstrap:", nrow(boot_puma), "rows\n")
 cat("    Mother education bootstrap:", nrow(boot_mom_educ), "rows\n")
 cat("    Mother marital status bootstrap:", nrow(boot_mom_married), "rows\n")
 
-# 2. Detect n_boot from data
-cat("\n[2] Detecting n_boot from data...\n")
+# 2. Validate n_boot consistency with config
+cat("\n[2] Validating n_boot from config...\n")
 
-n_boot_detected <- length(unique(boot_sex$replicate))
-cat("    Detected n_boot:", n_boot_detected, "\n")
+# Get expected n_boot from configuration
+n_boot_expected <- BOOTSTRAP_CONFIG$n_boot
+cat("    Config n_boot:", n_boot_expected, "\n")
 
-# Calculate expected row counts dynamically
+# Detect n_boot from actual files
+n_boot_in_files <- length(unique(boot_sex$replicate))
+cat("    Files n_boot:", n_boot_in_files, "\n")
+
+# Validate consistency
+if (n_boot_in_files != n_boot_expected) {
+  stop("ERROR: Bootstrap files have n_boot = ", n_boot_in_files,
+       " but config expects ", n_boot_expected, ".\n",
+       "       Solution: Delete consolidated files and regenerate:\n",
+       "       rm data/raking/ne25/*bootstrap_consolidated.rds\n",
+       "       Then re-run this script.")
+}
+
+cat("    [OK] Files match config (n_boot =", n_boot_expected, ")\n")
+
+# Calculate expected row counts using config n_boot
 expected_counts <- c(
-  1 * 6 * n_boot_detected,   # Sex: 1 estimand × 6 ages × n_boot
-  3 * 6 * n_boot_detected,   # Race: 3 estimands × 6 ages × n_boot
-  5 * 6 * n_boot_detected,   # FPL: 5 estimands × 6 ages × n_boot
-  14 * 6 * n_boot_detected,  # PUMA: 14 estimands × 6 ages × n_boot
-  1 * 6 * n_boot_detected,   # Mother edu: 1 estimand × 6 ages × n_boot
-  1 * 6 * n_boot_detected    # Mother married: 1 estimand × 6 ages × n_boot
+  1 * 6 * n_boot_expected,   # Sex: 1 estimand × 6 ages × n_boot
+  3 * 6 * n_boot_expected,   # Race: 3 estimands × 6 ages × n_boot
+  5 * 6 * n_boot_expected,   # FPL: 5 estimands × 6 ages × n_boot
+  14 * 6 * n_boot_expected,  # PUMA: 14 estimands × 6 ages × n_boot
+  1 * 6 * n_boot_expected,   # Mother edu: 1 estimand × 6 ages × n_boot
+  1 * 6 * n_boot_expected    # Mother married: 1 estimand × 6 ages × n_boot
 )
 
-expected_total <- 25 * 6 * n_boot_detected  # 25 total ACS estimands
-cat("    Expected total:", expected_total, "rows (25 estimands × 6 ages ×", n_boot_detected, "replicates)\n\n")
+expected_total <- 25 * 6 * n_boot_expected  # 25 total ACS estimands
+cat("    Expected total:", expected_total, "rows (25 estimands × 6 ages ×", n_boot_expected, "replicates)\n\n")
 
 # 3. Verify row counts
 cat("[3] Verifying row counts...\n")
@@ -82,7 +101,7 @@ cat("    Total replicates:", length(unique(acs_boot_consolidated$replicate)), "\
 # Verify total
 if (nrow(acs_boot_consolidated) != expected_total) {
   stop("ERROR: Expected ", expected_total, " total rows (25 estimands × 6 ages × ",
-       n_boot_detected, " replicates), got ", nrow(acs_boot_consolidated))
+       n_boot_expected, " replicates), got ", nrow(acs_boot_consolidated))
 }
 
 cat("    [OK] Total row count verified\n\n")
@@ -187,8 +206,8 @@ replicates_by_estimand <- acs_boot_consolidated %>%
   dplyr::group_by(estimand) %>%
   dplyr::summarise(n_replicates = length(unique(replicate)), .groups = "drop")
 
-if (all(replicates_by_estimand$n_replicates == n_boot_detected)) {
-  cat("    [OK] All estimands have", n_boot_detected, "replicates\n")
+if (all(replicates_by_estimand$n_replicates == n_boot_expected)) {
+  cat("    [OK] All estimands have", n_boot_expected, "replicates\n")
 } else {
   cat("    [WARN] Inconsistent replicate counts across estimands\n")
 }
@@ -258,16 +277,17 @@ cat("ACS Bootstrap Consolidation Complete\n")
 cat("========================================\n\n")
 
 cat("Current configuration:\n")
-cat("  n_boot:", n_boot_detected, "\n")
+cat("  n_boot:", n_boot_expected, "(from bootstrap_config.R)\n")
 cat("  Total rows:", nrow(acs_boot_consolidated), "\n")
 cat("  Estimands: 25 (ACS)\n")
 cat("  Age groups: 6 (0-5)\n\n")
 
-if (n_boot_detected < 4096) {
+if (n_boot_expected < 4096) {
   cat("NOTE: To generate production bootstrap (n_boot = 4096):\n")
-  cat("  1. Change n_boot in all 3 bootstrap design creation scripts (01a, 12a, 17a)\n")
-  cat("  2. Re-run full pipeline (estimated time: 6-7 hours with 2-core parallel processing)\n")
-  cat("  3. Expected production size: 25 estimands × 6 ages × 4096 replicates = 614,400 rows (ACS only)\n\n")
+  cat("  1. Change n_boot in config/bootstrap_config.R to 4096\n")
+  cat("  2. Delete all bootstrap files and regenerate\n")
+  cat("  3. Re-run full pipeline (estimated time: 6-7 hours with 2-core parallel processing)\n")
+  cat("  4. Expected production size: 25 estimands × 6 ages × 4096 replicates = 614,400 rows (ACS only)\n\n")
 }
 
 # Return for inspection
