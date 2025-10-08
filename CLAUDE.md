@@ -15,7 +15,7 @@ The Kidsights Data Platform is a multi-source ETL system for childhood developme
 3. **NHIS Pipeline** - IPUMS Health Surveys data extraction
 4. **NSCH Pipeline** - National Survey of Children's Health data integration
 5. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
-6. **Imputation Pipeline** - Multiple imputation for geographic uncertainty
+6. **Imputation Pipeline** - Multiple imputation for geographic, sociodemographic, childcare, and mental health uncertainty
 
 ### Running Pipelines
 
@@ -57,7 +57,7 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 # Setup database schema (one-time, study-specific)
 python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
-# Run full pipeline (geography + sociodem + childcare + database insertion)
+# Run full pipeline (geography + sociodem + childcare + mental health + database insertion)
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/imputation/ne25/run_full_imputation_pipeline.R
 
 # Validate results
@@ -348,11 +348,12 @@ pip install pyreadstat
 - **Multiple Imputations:** M=5 imputations (easily scalable to M=20+)
 - **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations (ne25)
 - **Sociodemographic Variables:** 7 variables imputed via mice (female, raceG, educ_mom, educ_a2, income, family_size, fplcat)
-- **Childcare Variables (NEW):** 4 variables via 3-stage sequential imputation (cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily)
-- **Storage Efficiency:** Study-specific variable tables (`{study_id}_imputed_{variable}`)
+- **Childcare Variables:** 4 variables via 3-stage sequential imputation (cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily)
+- **Mental Health & Parenting:** 7 variables via CART imputation (phq2_interest, phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive)
+- **Storage Efficiency:** Study-specific variable tables (`{study_id}_imputed_{variable}`) with **storage convention:** only imputed/derived values stored
 - **Language Support:** Python native + R via reticulate (single source of truth)
-- **Database:** 76,636 total imputation rows (25,480 geography + 26,438 sociodem + 24,718 childcare) for ne25
-- **Execution Time:** ~2 minutes for complete pipeline (7 stages)
+- **Database:** 83,401 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health) for ne25
+- **Execution Time:** ~2.3 minutes for complete pipeline (9 stages)
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations

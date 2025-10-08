@@ -1,21 +1,22 @@
 # Imputation Pipeline Architecture
 
-**Last Updated:** October 2025 | **Version:** 2.0.0
+**Last Updated:** October 2025 | **Version:** 2.1.0
 
 ## Overview
 
-The Kidsights Data Platform implements a **7-stage sequential multiple imputation pipeline** that handles geographic, sociodemographic, and childcare uncertainty through variable-specific database storage. The system supports multiple independent studies (ne25, ia26, co27) with M=5 imputations per study, storing 14 variables per study in normalized tables for flexibility, transparency, and consistency across the imputation workflow.
+The Kidsights Data Platform implements a **9-stage sequential multiple imputation pipeline** that handles geographic, sociodemographic, childcare, and mental health uncertainty through variable-specific database storage. The system supports multiple independent studies (ne25, ia26, co27) with M=5 imputations per study, storing 21 variables per study in normalized tables for flexibility, transparency, and consistency across the imputation workflow.
 
 ## Design Philosophy
 
 ### Core Principles
 
 1. **Normalized Storage:** Each imputed variable gets its own study-specific table: `{study_id}_imputed_{variable}`
-2. **Pre-Computed Imputations:** All M imputations are generated during the 7-stage pipeline and stored in the database
-3. **Sequential Chained Imputation:** Geography → Sociodem → Childcare ensures proper uncertainty propagation
+2. **Pre-Computed Imputations:** All M imputations are generated during the 9-stage pipeline and stored in the database
+3. **Sequential Chained Imputation:** Geography → Sociodem → Childcare → Mental Health ensures proper uncertainty propagation
 4. **On-Demand Assembly:** Helper functions join imputed variable tables to construct completed datasets for analysis
-5. **Internal Consistency:** Each imputation number (m=1 to M) maintains consistent values across all 14 variables
+5. **Internal Consistency:** Each imputation number (m=1 to M) maintains consistent values across all 21 variables
 6. **Multi-Study Architecture:** Independent pipelines for each study with shared helper functions
+7. **Storage Convention:** Only imputed/derived values stored (not observed values from base table)
 
 ### Why This Architecture?
 
@@ -174,6 +175,89 @@ CREATE TABLE ne25_imputed_childcare_10hrs_nonfamily (
 - 3-stage sequential: receives_care → type/hours → derived 10hrs indicator
 - Conditional logic: type/hours only imputed when receives_care = "Yes"
 - Data cleaning: hours capped at 168/week before imputation
+
+### Mental Health & Parenting Imputation Tables
+
+**Study-specific mental health and parenting variables (7 variables):**
+
+```sql
+-- PHQ-2 items (depression screening)
+CREATE TABLE ne25_imputed_phq2_interest (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  phq2_interest INTEGER,  -- 0-3 scale
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_phq2_depressed (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  phq2_depressed INTEGER,  -- 0-3 scale
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+-- GAD-2 items (anxiety screening)
+CREATE TABLE ne25_imputed_gad2_nervous (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  gad2_nervous INTEGER,  -- 0-3 scale
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_gad2_worry (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  gad2_worry INTEGER,  -- 0-3 scale
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+-- Parenting self-efficacy
+CREATE TABLE ne25_imputed_q1502 (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  q1502 INTEGER,  -- 0-3 scale (handling day-to-day demands)
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+-- Derived positive screening indicators
+CREATE TABLE ne25_imputed_phq2_positive (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  phq2_positive BOOLEAN,  -- TRUE if phq2_interest + phq2_depressed >= 3
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+
+CREATE TABLE ne25_imputed_gad2_positive (
+  study_id VARCHAR NOT NULL,
+  pid INTEGER NOT NULL,
+  record_id INTEGER NOT NULL,
+  imputation_m INTEGER NOT NULL,
+  gad2_positive BOOLEAN,  -- TRUE if gad2_nervous + gad2_worry >= 3
+  PRIMARY KEY (study_id, pid, record_id, imputation_m)
+);
+```
+
+**Notes:**
+- Imputed via MICE with CART method (ordinal 0-3 scale)
+- Uses geography + sociodem imputations as predictors
+- **Storage convention:** Only stores imputed item values and derived screen values (not all eligible records)
+- Positive screens derived from imputed items: PHQ-2+ (≥3), GAD-2+ (≥3)
+- Production metrics (NE25, M=5):
+  - Items: 545 rows total (phq2_interest: 85, phq2_depressed: 130, gad2_nervous: 125, gad2_worry: 95, q1502: 110)
+  - Derived screens: 280 rows total (phq2_positive: 135, gad2_positive: 145)
+  - Prevalence: PHQ-2+ 13.7%, GAD-2+ 17.0%
 
 ### Metadata Table
 

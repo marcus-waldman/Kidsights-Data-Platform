@@ -499,11 +499,11 @@ The Kidsights Data Platform operates **six independent, standalone pipelines**:
 - **Tables:** `raking_targets_ne25`
 
 #### 6. Imputation Pipeline (Utility)
-- **Purpose:** Multiple imputation for geographic, sociodemographic, and childcare uncertainty
+- **Purpose:** Multiple imputation for geographic, sociodemographic, childcare, and mental health uncertainty
 - **Data Source:** `ne25_transformed` table
-- **Architecture:** 7-stage sequential (Geography → Sociodem → Childcare) → Variable-specific tables
-- **Status:** Production ready (M=5 imputations, 76,636 rows, 14 variables)
-- **Tables:** 14 tables per study: `{study_id}_imputed_{variable}` (3 geography + 7 sociodem + 4 childcare)
+- **Architecture:** 9-stage sequential (Geography → Sociodem → Childcare → Mental Health) → Variable-specific tables
+- **Status:** Production ready (M=5 imputations, 83,401 rows, 21 variables)
+- **Tables:** 21 tables per study: `{study_id}_imputed_{variable}` (3 geography + 7 sociodem + 4 childcare + 7 mental health/parenting)
 
 ### Design Decision: Why Separate?
 
