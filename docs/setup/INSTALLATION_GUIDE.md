@@ -193,6 +193,78 @@ Priority 2: ~/.kidsights/IPUMS.txt (cross-platform home directory)
 Priority 3: C:/Users/waldmanm/my-APIs/IPUMS.txt (legacy hardcoded path)
 ```
 
+### PYTHON_EXECUTABLE Configuration
+
+**Windows users often need to explicitly configure the Python executable path.**
+
+#### Why This Matters
+
+Windows uses the `py` launcher instead of adding `python.exe` directly to PATH. When R scripts call Python using `system2("python", ...)`, the command fails with:
+
+```
+Error: '"python"' not found
+```
+
+#### Solution: Configure in `.env`
+
+Add the `PYTHON_EXECUTABLE` variable to your `.env` file:
+
+```bash
+# Windows - Find your Python installation
+PYTHON_EXECUTABLE=C:/Users/YOUR_USERNAME/AppData/Local/Programs/Python/Python313/python.exe
+
+# Mac (usually works without explicit config)
+PYTHON_EXECUTABLE=/usr/local/bin/python3
+
+# Linux (usually works without explicit config)
+PYTHON_EXECUTABLE=/usr/bin/python3
+```
+
+#### How to Find Your Python Path
+
+**Windows:**
+```bash
+# Method 1: Using py launcher
+py -c "import sys; print(sys.executable)"
+
+# Method 2: Using where command
+where python
+where py
+```
+
+**Mac/Linux:**
+```bash
+which python3
+# Output: /usr/local/bin/python3
+```
+
+#### Verification
+
+Test that Python is accessible:
+
+```r
+# In R console
+source("R/utils/environment_config.R")
+python_path <- get_python_path()
+print(python_path)
+
+# Should print something like:
+# C:/Users/marcu/AppData/Local/Programs/Python/Python313/python.exe
+```
+
+#### Path Resolution Order
+
+The `get_python_path()` function checks paths in this order:
+
+1. **`.env` file** - `PYTHON_EXECUTABLE` variable (highest priority)
+2. **Common installation paths**:
+   - Windows: `C:/Users/USERNAME/AppData/Local/Programs/Python/Python313/python.exe`
+   - Mac: `/usr/local/bin/python3`, `/opt/homebrew/bin/python3`
+   - Linux: `/usr/bin/python3`
+3. **System PATH** - `py` (Windows), `python3` (Mac/Linux)
+
+**💡 Tip:** On a new Windows machine, always configure `PYTHON_EXECUTABLE` in `.env` to avoid path resolution issues.
+
 ---
 
 ## API Key Setup
@@ -317,6 +389,26 @@ python test_redcap_connection.py
 ---
 
 ## Troubleshooting
+
+### Issue: "'python' not found" Error
+
+**Symptom:**
+```
+Error: '"python"' not found
+Pipeline execution failed
+```
+
+**Solution:** Configure `PYTHON_EXECUTABLE` in `.env` file
+
+```bash
+# Add to .env file
+PYTHON_EXECUTABLE=C:/Users/YOUR_USERNAME/AppData/Local/Programs/Python/Python313/python.exe
+
+# Find your Python path
+py -c "import sys; print(sys.executable)"
+```
+
+**Details:** See [PYTHON_EXECUTABLE Configuration](#python_executable-configuration) and [troubleshooting.md - Windows Python Path Issues](../troubleshooting.md#windows-python-path-issues)
 
 ### Issue: "API key file not found"
 

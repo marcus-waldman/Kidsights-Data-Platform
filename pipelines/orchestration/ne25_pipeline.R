@@ -19,6 +19,7 @@ source("R/harmonize/ne25_eligibility.R")
 source("R/transform/ne25_transforms.R")
 source("R/documentation/generate_data_dictionary.R")
 source("R/documentation/generate_interactive_dictionary.R")
+source("R/utils/environment_config.R")
 
 #' Convert REDCap dictionary list to data frame
 #'
@@ -112,13 +113,31 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
   message("Configuration loaded successfully")
 
+  # Override REDCap API credentials path from .env if specified
+  env_file <- ".env"
+  if (file.exists(env_file)) {
+    env_lines <- readLines(env_file, warn = FALSE)
+    env_lines <- env_lines[!grepl("^\\s*#", env_lines)]
+    env_lines <- env_lines[nzchar(trimws(env_lines))]
+    redcap_line <- env_lines[grepl("^REDCAP_API_CREDENTIALS_PATH=", env_lines)]
+    if (length(redcap_line) > 0) {
+      redcap_path <- sub("^REDCAP_API_CREDENTIALS_PATH=", "", redcap_line[1])
+      redcap_path <- trimws(gsub("^['\"]|['\"]$", "", redcap_path))
+      if (file.exists(redcap_path)) {
+        config$redcap$api_credentials_file <- redcap_path
+        message("Using REDCap credentials from .env: ", redcap_path)
+      }
+    }
+  }
+
   # Codebook no longer needed - CID8 (KMT quality analysis) removed
   message("DEBUG: Codebook loading skipped - CID8 KMT quality analysis removed from pipeline")
 
   # Initialize database using Python
   message("Initializing database schema using Python...")
+  python_path <- get_python_path()
   init_result <- system2(
-    "python",
+    python_path,
     args = c(
       "pipelines/python/init_database.py",
       "--config", config_path,
@@ -330,7 +349,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     message("DEBUG: Calling Python insert script...")
     raw_result <- system2(
-      "python",
+      python_path,
       args = c(
         "pipelines/python/insert_raw_data.py",
         "--data-file", raw_feather,
@@ -355,7 +374,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     arrow::write_feather(eligibility_results, elig_feather)
 
     elig_result <- system2(
-      "python",
+      python_path,
       args = c(
         "pipelines/python/insert_raw_data.py",
         "--data-file", elig_feather,
@@ -432,7 +451,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
             arrow::write_feather(project_dict_df, dict_feather)
 
             dict_result <- system2(
-              "python",
+              python_path,
               args = c(
                 "pipelines/python/insert_raw_data.py",
                 "--data-file", dict_feather,
@@ -473,7 +492,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     arrow::write_feather(transformed_data, transformed_feather)
 
     transformed_result <- system2(
-      "python",
+      python_path,
       args = c(
         "pipelines/python/insert_raw_data.py",
         "--data-file", transformed_feather,
@@ -504,7 +523,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     # Generate metadata using Python script
     message("Creating variable metadata using Python...")
     metadata_result <- system2(
-      "python",
+      python_path,
       args = c(
         "pipelines/python/generate_metadata.py",
         "--source-table", "ne25_transformed",

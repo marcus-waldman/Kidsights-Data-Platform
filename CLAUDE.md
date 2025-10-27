@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** October 2025 | **Version:** 3.3.0
+**Last Updated:** October 2025 | **Version:** 3.3.1
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -198,7 +198,44 @@ echo 'library(dplyr); cat("Success\n")' > scripts/temp/temp_script.R
 "C:\Program Files\R\R-4.5.1\bin\R.exe" -e "library(dplyr)"
 ```
 
+### 5. Python Execution from R (REQUIRED)
+
+⚠️ **Never hardcode `"python"` in system2() calls - use `get_python_path()`**
+
+**All R scripts that call Python MUST use the `get_python_path()` function:**
+
+```r
+# ✅ CORRECT - Uses environment-aware path resolution
+source("R/utils/environment_config.R")
+python_path <- get_python_path()
+system2(python_path, args = c("script.py", "--arg", "value"))
+
+# ❌ INCORRECT - Hardcoded "python" fails on Windows
+system2("python", args = c("script.py", "--arg", "value"))
+```
+
+**Why This Matters:**
+- Windows uses the `py` launcher instead of `python.exe` in PATH
+- Hardcoded `"python"` causes `'"python"' not found` errors on new machines
+- `get_python_path()` resolves the correct executable by checking:
+  1. `PYTHON_EXECUTABLE` environment variable from `.env` (highest priority)
+  2. Common Windows installation paths (`AppData/Local/Programs/Python/`)
+  3. System PATH fallbacks (`py`, `python3`, `python`)
+
+**Cross-Platform Compatibility:**
+```r
+# This pattern works on Windows, Mac, and Linux:
+source("R/utils/environment_config.R")
+python_path <- get_python_path()
+
+# Use python_path in all system2() calls
+system2(python_path, args = c("pipelines/python/init_database.py"))
+system2(python_path, args = c("pipelines/python/insert_raw_data.py", "--table", "ne25_raw"))
+```
+
 **📖 Complete coding standards:** [CODING_STANDARDS.md](docs/guides/CODING_STANDARDS.md)
+
+**📖 Environment configuration:** [INSTALLATION_GUIDE.md - PYTHON_EXECUTABLE](docs/setup/INSTALLATION_GUIDE.md#python_executable-configuration)
 
 ---
 
@@ -368,4 +405,4 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: October 2025 | Version: 3.3.0*
+*Updated: October 2025 | Version: 3.3.1*

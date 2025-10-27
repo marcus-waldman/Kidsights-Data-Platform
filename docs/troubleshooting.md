@@ -30,6 +30,57 @@ cd /path/to/Kidsights-Data-Platform
 python pipelines/python/init_database.py
 ```
 
+### Windows Python Path Issues
+
+#### "'python' not found" Error
+
+**Symptom**:
+```bash
+Error: '"python"' not found
+Pipeline execution failed
+```
+
+**Root Cause**:
+Windows uses the `py` launcher instead of adding `python.exe` directly to PATH. When R scripts use `system2("python", ...)`, the command fails because "python" isn't found.
+
+**Solution**:
+The platform uses `get_python_path()` function (in `R/utils/environment_config.R`) which automatically resolves the correct Python executable by checking:
+
+1. **`.env` file** - `PYTHON_EXECUTABLE` variable (highest priority)
+2. **Common Windows paths** - `C:/Users/USERNAME/AppData/Local/Programs/Python/Python313/python.exe`
+3. **System PATH fallback** - `py` launcher (Windows), `python3` (Mac/Linux)
+
+**Verification**:
+```r
+# In R console
+source("R/utils/environment_config.R")
+python_path <- get_python_path()
+print(python_path)
+# Should show: C:/Users/YOUR_USERNAME/AppData/Local/Programs/Python/Python313/python.exe
+```
+
+**Configure `.env` file** (recommended for new machines):
+```bash
+# Add to .env file
+PYTHON_EXECUTABLE=C:/Users/YOUR_USERNAME/AppData/Local/Programs/Python/Python313/python.exe
+```
+
+**For Developers - Fix Hardcoded Python Calls**:
+
+If you're writing R code that calls Python, NEVER hardcode `"python"`:
+
+```r
+# ❌ INCORRECT - Will fail on Windows
+system2("python", args = c("script.py"))
+
+# ✅ CORRECT - Works cross-platform
+source("R/utils/environment_config.R")
+python_path <- get_python_path()
+system2(python_path, args = c("script.py"))
+```
+
+**Related**: See [INSTALLATION_GUIDE.md - PYTHON_EXECUTABLE Configuration](setup/INSTALLATION_GUIDE.md#python_executable-configuration)
+
 ### Database Connection Issues
 
 #### Database File Not Found
