@@ -116,3 +116,9 @@ codebook/data/*_backup_*.json
 # Temp scripts directory (but keep README)
 scripts/temp/*.R
 !scripts/temp/README.md
+
+# Exports directory - contains sensitive SPSS/Stata files
+exports/
+
+# Goodsync metadata
+_gsdata_/
