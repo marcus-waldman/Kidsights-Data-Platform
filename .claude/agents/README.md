@@ -100,6 +100,32 @@ Example: "I want to add adult depression (PHQ-9) imputation using CART"
 
 ---
 
+### 4. Psychometric Specialist (`psychometric-specialist.yaml`)
+
+**Purpose:** Expert in IRT scoring with MAP estimation, codebook maintenance, and Mplus calibration workflows
+
+**Use for:**
+- IRT score construction (MAP with latent regression via IRTScoring)
+- Updating codebook with new IRT parameters
+- Preparing datasets and Mplus syntax for recalibration
+- Validating IRT scores and comparing with classical scores
+- Drafting GitHub issues for IRTScoring feature requests
+
+**Key Documentation:**
+- `docs/irt_scoring/USING_PSYCHOMETRIC_AGENT.md`
+- `docs/irt_scoring/CONFIGURATION_GUIDE.md`
+- `docs/codebook/UPDATING_IRT_PARAMETERS.md`
+- `docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md`
+
+**Priority Scales:**
+- Kidsights developmental scores (203 items, unidimensional)
+- Psychosocial bifactor scores (44 items, 6 factors)
+
+**Created:** January 2025
+**Status:** In development (Phase 1 of 5 complete)
+
+---
+
 ## How to Use Agents
 
 ### From Command Line
@@ -136,6 +162,12 @@ If you're an AI assistant, you can invoke specialist agents for domain-specific 
 | Helper function usage (Python/R) | imputation-specialist |
 | Multiple imputation theory | imputation-specialist |
 | Querying imputed data | imputation-specialist |
+| **IRT Scoring & Psychometrics** | |
+| Calculate IRT scores (MAP with latent regression) | psychometric-specialist |
+| Update codebook with new IRT parameters | psychometric-specialist |
+| Prepare data/syntax for Mplus recalibration | psychometric-specialist |
+| Validate IRT scores vs classical scores | psychometric-specialist |
+| Draft IRTScoring package feature requests | psychometric-specialist |
 | **General Tasks** | |
 | NE25 pipeline (REDCap → DuckDB) | general agent |
 | ACS/NHIS/NSCH data extraction | general agent |
@@ -146,7 +178,7 @@ If you're an AI assistant, you can invoke specialist agents for domain-specific 
 
 ## Agent Capabilities
 
-Both specialist agents have access to:
+All specialist agents have access to:
 
 - **Read** - Read scripts, configs, documentation
 - **Glob** - Find files by pattern
@@ -175,5 +207,5 @@ Both specialist agents have access to:
 
 ---
 
-**Last Updated:** October 8, 2025
-**Total Agents:** 3 (raking-specialist, imputation-specialist, imputation-stage-builder)
+**Last Updated:** January 4, 2025
+**Total Agents:** 4 (raking-specialist, imputation-specialist, imputation-stage-builder, psychometric-specialist)

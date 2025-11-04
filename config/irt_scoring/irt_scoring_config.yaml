@@ -1,0 +1,307 @@
+# IRT Scoring Configuration for Kidsights Data Platform
+# Version: 1.0
+# Last Updated: January 4, 2025
+#
+# This configuration file defines scoring parameters for IRT-based score
+# construction using MAP estimation with latent regression.
+
+# =============================================================================
+# STUDY CONFIGURATION
+# =============================================================================
+
+study_id: ne25
+n_imputations: 5  # Must match imputation pipeline configuration
+
+# =============================================================================
+# STANDARD COVARIATE SET FOR LATENT REGRESSION
+# =============================================================================
+# These covariates are used as predictors in the latent regression model
+# for MAP estimation. The formula is: θ = covariates + individual fixed effect
+
+standard_covariates:
+  # Main effects (direct predictors of latent trait)
+  main_effects:
+    - age_years          # Derived from age_in_days / 365.25
+    - female             # Binary (0/1)
+    - educ_mom           # Maternal education (from imputation m)
+    - fpl                # Federal poverty level (continuous)
+    - primary_ruca       # Rural-Urban Commuting Area code (continuous 1-10)
+
+  # Age interactions (automatically crossed with age_years)
+  # These allow the relationship between covariates and latent trait to vary by age
+  age_interactions:
+    - female
+    - educ_mom
+    - fpl
+    - primary_ruca
+
+  # Note: Interaction terms are constructed automatically as:
+  # age_years:female, age_years:educ_mom, age_years:fpl, age_years:primary_ruca
+
+# =============================================================================
+# SCALE-SPECIFIC CONFIGURATIONS
+# =============================================================================
+
+scales:
+  # ---------------------------------------------------------------------------
+  # KIDSIGHTS DEVELOPMENTAL SCALE
+  # ---------------------------------------------------------------------------
+  kidsights:
+    enabled: true
+
+    description: "Kidsights developmental scale - unidimensional GRM model"
+
+    # Item selection
+    items_source: "codebook"      # Extract items from codebook.json
+    lexicon: "equate"              # Use lex_equate naming (cross-study harmonization)
+    study_filter: "NE22"           # Items present in NE22 (203 items with IRT parameters)
+
+    # Model specification
+    model_type: "unidimensional"   # Single latent trait
+    item_response_model: "graded"  # Graded response model (ordinal items)
+    calibration_study: "NE22"      # Use NE22 calibration parameters
+
+    # Scoring configuration
+    scoring_method: "MAP_latent_regression"
+    developmental_scale: true      # Adds log(age_years + 1) fixed effect for nonlinear age trends
+
+    # Covariate specification
+    use_standard_covariates: true  # Use covariates from standard_covariates section
+    custom_covariates: []          # Additional covariates beyond standard set (if any)
+
+    # Output configuration
+    output_table: "ne25_irt_scores_kidsights"
+    output_variables:
+      - theta_kidsights            # MAP estimate of latent trait
+      - se_kidsights               # Standard error of MAP estimate
+
+    # Validation thresholds
+    validation:
+      theta_min: -4.0              # Minimum plausible theta value
+      theta_max: 4.0               # Maximum plausible theta value
+      se_min: 0.01                 # Minimum plausible SE (SE must be positive)
+      se_max: 3.0                  # Maximum plausible SE
+      classical_correlation_min: 0.70  # Minimum correlation with classical sum score
+
+  # ---------------------------------------------------------------------------
+  # PSYCHOSOCIAL BIFACTOR SCALE
+  # ---------------------------------------------------------------------------
+  psychosocial:
+    enabled: true
+
+    description: "Psychosocial bifactor model - 6 factors (general + 5 specific)"
+
+    # Item selection
+    items_source: "explicit"       # Explicitly list items (not from codebook)
+    items:
+      - ps001
+      - ps002
+      - ps003
+      - ps004
+      - ps005
+      - ps006
+      - ps007
+      - ps008
+      - ps009
+      - ps010
+      - ps011
+      - ps012
+      - ps013
+      - ps014
+      - ps015
+      - ps016
+      - ps017
+      - ps018
+      - ps019
+      - ps020
+      - ps021
+      - ps022
+      - ps023
+      - ps024
+      - ps025
+      - ps026
+      - ps027
+      - ps028
+      - ps029
+      - ps030
+      # ps031 excluded - special handling in NE25
+      - ps032
+      # ps033 excluded - not in NE25
+      - ps034
+      - ps035
+      - ps036
+      - ps037
+      - ps038
+      - ps039
+      - ps040
+      - ps041
+      - ps042
+      - ps043
+      - ps044
+      - ps045
+      - ps046
+      - ps047
+      - ps048
+      - ps049
+
+    # Model specification
+    model_type: "bifactor"         # General factor + specific factors
+    item_response_model: "graded"  # Graded response model (ordinal items)
+    calibration_study: "NE22"      # Use NE22 bifactor calibration parameters
+
+    # Factor structure
+    factors:
+      - gen   # General psychosocial problems (all items load on this)
+      - eat   # Feeding/eating problems (4 items)
+      - sle   # Sleep problems (5 items)
+      - soc   # Social-emotional problems (7 items)
+      - int   # Internalizing problems (8 items)
+      - ext   # Externalizing problems (17 items)
+
+    # Scoring configuration
+    scoring_method: "MAP_latent_regression"
+    developmental_scale: false     # No log(age+1) term for psychosocial
+
+    # Covariate specification
+    use_standard_covariates: true  # Use covariates from standard_covariates section
+    custom_covariates: []          # Additional covariates beyond standard set (if any)
+
+    # Output configuration
+    output_table: "ne25_irt_scores_psychosocial"
+    output_variables:
+      - theta_gen                  # General factor score
+      - se_gen
+      - theta_eat                  # Eating problems score
+      - se_eat
+      - theta_sle                  # Sleep problems score
+      - se_sle
+      - theta_soc                  # Social-emotional score
+      - se_soc
+      - theta_int                  # Internalizing score
+      - se_int
+      - theta_ext                  # Externalizing score
+      - se_ext
+
+    # Validation thresholds
+    validation:
+      theta_min: -4.0              # Minimum plausible theta value (all factors)
+      theta_max: 4.0               # Maximum plausible theta value (all factors)
+      se_min: 0.01                 # Minimum plausible SE
+      se_max: 3.0                  # Maximum plausible SE
+      classical_correlation_min: 0.60  # Minimum correlation with classical sum score
+
+# =============================================================================
+# MPLUS DATASET PREPARATION DEFAULTS
+# =============================================================================
+# Default settings for preparing datasets for Mplus recalibration
+
+mplus_dataset_prep:
+  # Missing data coding
+  missing_code: "."                # Mplus standard missing value indicator
+
+  # Output format
+  output_format: "dat"             # Mplus free format data file
+  delimiter: "whitespace"          # Free format (whitespace delimited, not comma)
+  include_column_headers: false    # Mplus .dat files don't include headers
+
+  # Variable ordering
+  variable_ordering: "alphabetical"  # Sort items alphabetically for consistency
+
+  # Default output directory
+  output_directory: "data/mplus_calibration"
+
+  # Syntax template directory
+  template_directory: "temp/mplus_templates"
+
+# =============================================================================
+# PIPELINE EXECUTION SETTINGS
+# =============================================================================
+
+pipeline:
+  # Execution mode
+  mode: "selective"                # "selective" (development) or "automatic" (production)
+
+  # Automatic integration (future goal)
+  auto_score_after_imputation: false  # Set to true when ready for production integration
+
+  # Parallel execution (if supported)
+  parallel: false                  # Set to true to score scales in parallel
+
+  # Logging
+  log_level: "INFO"                # DEBUG, INFO, WARN, ERROR
+  log_directory: "logs/irt_scoring"
+
+  # Timing
+  report_timing: true              # Report execution time for each scale
+
+# =============================================================================
+# DATA SOURCES
+# =============================================================================
+# Where to find required data for scoring
+
+data_sources:
+  # Base data (transformed variables)
+  base_table: "ne25_transformed"
+
+  # Imputed data tables
+  imputation_table_prefix: "ne25_imputed_"
+
+  # Codebook
+  codebook_path: "codebook/data/codebook.json"
+
+  # Database
+  database_path: "data/duckdb/kidsights_local.duckdb"
+
+# =============================================================================
+# DERIVED VARIABLE CONSTRUCTION
+# =============================================================================
+# How to construct variables needed for scoring but not in base data
+
+derived_variables:
+  age_years:
+    formula: "age_in_days / 365.25"
+    description: "Child age in years (derived from age_in_days)"
+
+  log_age_plus_1:
+    formula: "log(age_years + 1)"
+    description: "Nonlinear age term for developmental scales"
+    applies_to: ["kidsights"]  # Only for developmental scales
+
+# =============================================================================
+# VALIDATION SETTINGS
+# =============================================================================
+
+validation:
+  # Row count checks
+  check_row_counts: true           # Verify row counts match expected
+  expected_rows_per_imputation: 3460  # Eligible participants in NE25
+
+  # Score validation
+  check_score_ranges: true         # Verify theta and SE within plausible ranges
+  check_missing_values: true       # Flag records with missing scores (shouldn't happen)
+
+  # Classical score comparison
+  compute_classical_scores: true   # Calculate sum scores for comparison
+  compare_with_classical: true     # Report correlation between IRT and classical
+
+  # Person fit (if supported by IRTScoring)
+  compute_person_fit: false        # Set to true when IRTScoring supports this
+
+# =============================================================================
+# NOTES
+# =============================================================================
+
+# Development Status (January 2025):
+# - Phase 1: Foundation & Configuration (IN PROGRESS)
+# - Phase 2: Core Scoring Infrastructure (PENDING)
+# - Phase 3: Codebook Maintenance System (PENDING)
+# - Phase 4: Mplus Integration (PENDING)
+# - Phase 5: Documentation & Production Integration (PENDING)
+
+# Future Scales (To Be Added):
+# - PHQ-2 depression screening
+# - GAD-2 anxiety screening
+# - Child ACEs (bifactor model)
+# - Caregiver ACEs (bifactor model)
+# - CREDI developmental scores (short form + long form)
+# - GSED developmental scores (Rasch model via dscore package)
