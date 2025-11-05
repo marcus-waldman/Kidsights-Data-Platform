@@ -146,12 +146,17 @@ create_calibration_tables <- function(
 
       cat(sprintf("      Loaded %d eligible records\n", nrow(ne25_data)))
 
-      # Create composite ID from pid + record_id (for longitudinal data)
+      # Create integer IDs following convention: YYFFFSNNNNNN
+      # YY=25, FFF=031 (Nebraska FIPS), S=1 (non-NSCH), N=sequential (6 digits)
       ne25_calibration <- ne25_data %>%
-        dplyr::mutate(id = paste0(pid, "_", record_id)) %>%
+        dplyr::mutate(
+          row_num = dplyr::row_number(),
+          id = 250311000000 + row_num  # 250311000001, 250311000002, etc.
+        ) %>%
+        dplyr::select(-row_num) %>%
         dplyr::rename(years = years_old)
 
-      cat(sprintf("      Created composite ID: pid_record_id\n"))
+      cat(sprintf("      Created integer IDs: 250311000001 to 250311%06d\n", nrow(ne25_data)))
 
       # Remove metadata columns
       metadata_cols <- c("pid", "record_id", "redcap_event_name", "eligible",

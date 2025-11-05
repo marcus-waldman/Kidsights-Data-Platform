@@ -199,12 +199,9 @@ export_calibration_dat <- function(
       cat(sprintf("      Loaded %d records\n", nrow(study_data)))
     }
 
-    # Add study_num column and ensure id is character for consistency
+    # Add study_num column (all IDs are numeric following YYFFFS.RRRRRRRRRRRR convention)
     study_data <- study_data %>%
-      dplyr::mutate(
-        study_num = study_num,
-        id = as.character(id)  # Convert to character (handles both numeric and composite IDs)
-      ) %>%
+      dplyr::mutate(study_num = study_num) %>%
       dplyr::relocate(study_num, id, years)
 
     combined_data[[study]] <- study_data

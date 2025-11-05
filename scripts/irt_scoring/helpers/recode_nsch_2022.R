@@ -252,9 +252,15 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
 
   cat(sprintf("      Mapping %d variables to lex_equate names\n", length(rename_mapping)))
 
-  # Rename columns using !!! to splice named vector, and HHID to id
+  # Create integer IDs following convention: YYFFFSNNNNNN
+  # YY=22, FFF=999 (national), S=0 (NSCH), N=sequential (6 digits)
   nsch22_final <- nsch22_filtered %>%
-    dplyr::rename(!!!rename_mapping, id = HHID) %>%
+    dplyr::mutate(
+      row_num = dplyr::row_number(),
+      id = 229990000000 + row_num  # 229990000001, 229990000002, etc.
+    ) %>%
+    dplyr::select(-row_num, -HHID) %>%
+    dplyr::rename(!!!rename_mapping) %>%
     dplyr::relocate(id, years) %>%
     dplyr::select(-SC_AGE_YEARS)
 

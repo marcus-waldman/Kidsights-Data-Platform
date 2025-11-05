@@ -97,20 +97,37 @@ cat("\n")
 
 cat("[4/8] Splitting data by study\n")
 
-# Split into separate data frames (remove study column, not needed in study-specific tables)
+# Split into separate data frames and create integer IDs following convention: YYFFFSNNNNNN
+# YY=year, FFF=031 (Nebraska) or 999 (USA), S=1 (non-NSCH), N=sequential (6 digits)
+
+# NE20: 200311NNNNNN
 ne20_data <- calibdat %>%
   dplyr::filter(study == "NE20") %>%
-  dplyr::select(-study) %>%
-  dplyr::relocate(id, years)  # Ensure id, years are first
-
-ne22_data <- calibdat %>%
-  dplyr::filter(study == "NE22") %>%
-  dplyr::select(-study) %>%
+  dplyr::mutate(
+    row_num = dplyr::row_number(),
+    id = 200311000000 + row_num  # 200311000001, 200311000002, etc.
+  ) %>%
+  dplyr::select(-row_num, -study) %>%
   dplyr::relocate(id, years)
 
+# NE22: 220311NNNNNN
+ne22_data <- calibdat %>%
+  dplyr::filter(study == "NE22") %>%
+  dplyr::mutate(
+    row_num = dplyr::row_number(),
+    id = 220311000000 + row_num  # 220311000001, 220311000002, etc.
+  ) %>%
+  dplyr::select(-row_num, -study) %>%
+  dplyr::relocate(id, years)
+
+# USA24: 249991NNNNNN
 usa24_data <- calibdat %>%
   dplyr::filter(study == "USA24") %>%
-  dplyr::select(-study) %>%
+  dplyr::mutate(
+    row_num = dplyr::row_number(),
+    id = 249991000000 + row_num  # 249991000001, 249991000002, etc.
+  ) %>%
+  dplyr::select(-row_num, -study) %>%
   dplyr::relocate(id, years)
 
 cat(sprintf("      NE20: %d records, %d columns\n", nrow(ne20_data), ncol(ne20_data)))
