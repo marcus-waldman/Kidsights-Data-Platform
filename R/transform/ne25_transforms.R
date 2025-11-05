@@ -138,7 +138,16 @@ value_labels <- function(lex, dict, varname = "lex_ne25") {
 }
 
 # CPI adjustment function - downloads CPI data from FRED and calculates 1999 adjustment ratios
-cpi_ratio_1999 <- function(date_vector, api_key_file = "C:/Users/waldmanm/my-APIs/FRED.txt") {
+cpi_ratio_1999 <- function(date_vector, api_key_file = NULL) {
+  # Get API key file path from .env if not provided
+  if (is.null(api_key_file)) {
+    # Source environment config if not already loaded
+    if (!exists("get_fred_api_key_path", mode = "function")) {
+      source("R/utils/environment_config.R")
+    }
+    api_key_file <- get_fred_api_key_path()
+  }
+
   # Read FRED API key and set it for fredr
   fred_api_key <- readLines(api_key_file, warn = FALSE)[1]
   fredr::fredr_set_key(fred_api_key)
@@ -169,8 +178,8 @@ cpi_ratio_1999 <- function(date_vector, api_key_file = "C:/Users/waldmanm/my-API
 
   # Join CPI data
   final_df <- input_df %>%
-    dplyr::left_join(cpi_data, by = c("month", "year")) %>%
-    dplyr::left_join(cpi_1999, by = "month") %>%
+    safe_left_join(cpi_data, by_vars = c("month", "year")) %>%
+    safe_left_join(cpi_1999, by_vars = "month") %>%
     dplyr::mutate(ratio = cpi_1999/cpi)
 
   # For dates where the fed has not released a CPI number, simply take the latest value
@@ -242,8 +251,8 @@ get_poverty_threshold <- function(dates, family_size, return_flag = FALSE) {
         TRUE ~ year
       )
     ) %>%
-    dplyr::left_join(poverty_guidelines, by = c("year_lookup" = "year", "family_size_lookup" = "family_size")) %>%
-    dplyr::left_join(additional_amounts, by = c("year_lookup" = "year")) %>%
+    safe_left_join(poverty_guidelines, by_vars = c("year_lookup" = "year", "family_size_lookup" = "family_size")) %>%
+    safe_left_join(additional_amounts, by_vars = c("year_lookup" = "year")) %>%
     dplyr::mutate(
       threshold = threshold + additional * above9,
       fpl_derivation_flag = dplyr::case_when(
@@ -314,11 +323,11 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     raceth_df <- dat %>%
       dplyr::select(pid, record_id, dplyr::starts_with("cqr011"), dplyr::starts_with("cqr010_")) %>%
       tidyr::pivot_longer(dplyr::starts_with("cqr010"), names_to = "var", values_to = "response") %>%
-      dplyr::left_join(
+      safe_left_join(
         value_labels("cqr010", dict = dict) %>%
           dplyr::mutate(var = paste(lex_ne25, value, sep = "___")) %>%
           dplyr::select(var, label),
-        by = "var"
+        by_vars = "var"
       ) %>%
       dplyr::mutate(
         label = ifelse(label %in% c("Asian Indian", "Chinese", "Filipino", "Japanese", "Korean", "Vietnamese", "Native Hawaiian", "Guamanian or Chamorro", "Samoan", "Other Pacific Islander"), "Asian or Pacific Islander", label),
@@ -349,11 +358,11 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     a1_raceth_df <- dat %>%
       dplyr::select(pid, record_id, dplyr::starts_with("sq003"), dplyr::starts_with("sq002_")) %>%
       tidyr::pivot_longer(dplyr::starts_with("sq002_"), names_to = "var", values_to = "response") %>%
-      dplyr::left_join(
+      safe_left_join(
         value_labels("sq002", dict = dict) %>%
           dplyr::mutate(var = paste(lex_ne25, value, sep = "___")) %>%
           dplyr::select(var, label),
-        by = "var"
+        by_vars = "var"
       ) %>%
       dplyr::mutate(
         label = ifelse(label %in% c("Asian Indian", "Chinese", "Filipino", "Japanese", "Korean", "Vietnamese", "Native Hawaiian", "Guamanian or Chamorro", "Samoan", "Other Pacific Islander"), "Asian or Pacific Islander", label),
@@ -378,7 +387,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       a1_raceth_df$a1_raceG <- relevel(a1_raceth_df$a1_raceG, ref = "White, non-Hisp.")
     }
 
-    recodes_df <- raceth_df %>% dplyr::left_join(a1_raceth_df, by = c("pid", "record_id"))
+    recodes_df <- raceth_df %>% safe_left_join(a1_raceth_df, by_vars = c("pid", "record_id"))
 
     # Add labels after creating variables
     if(add_labels && requireNamespace("labelled", quietly = TRUE)) {
@@ -593,7 +602,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
     educ_df <- dat %>%
       dplyr::select(-dplyr::any_of(c("relation1", "relation2", "mom_a1"))) %>%
-      dplyr::left_join(relate_vars, by = c("pid", "record_id")) %>%
+      safe_left_join(relate_vars, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(
         ## Maximum education of caregivers (8 categories)
         educ_max =
@@ -799,7 +808,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         urban_rural_afact = paste(ur_afact, collapse = "; "),
         .groups = "drop"
       ) %>%
-      dplyr::left_join(zip_urban_pct, by = "zip") %>%
+      safe_left_join(zip_urban_pct, by_vars = "zip") %>%
       dplyr::mutate(
         # If no urban rows exist for this ZIP, urban_pct should be 0
         urban_pct = dplyr::if_else(is.na(urban_pct), 0, urban_pct)
@@ -883,16 +892,16 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         zip_clean = stringr::str_trim(as.character(sq001)),
         zip_clean = stringr::str_pad(zip_clean, width = 5, side = "left", pad = "0")
       ) %>%
-      dplyr::left_join(zip_puma_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_county_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_tract_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_cbsa_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_ur_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_school_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_sldl_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_sldu_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_congress_crosswalk, by = c("zip_clean" = "zip")) %>%
-      dplyr::left_join(zip_aiannh_crosswalk, by = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_puma_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_county_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_tract_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_cbsa_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_ur_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_school_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_sldl_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_sldu_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_congress_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
+      safe_left_join(zip_aiannh_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
       dplyr::select(pid, record_id,
                    puma, puma_afact,
                    county, county_name, county_afact,
@@ -1344,6 +1353,11 @@ recode_it <- function(dat, dict, my_API = NULL, what = "all") {
     vars <- what
   }
 
+  # Apply reverse coding to items marked in codebook BEFORE any transformations
+  message("Applying reverse coding from codebook...")
+  source("R/transform/reverse_code_items.R")
+  dat <- reverse_code_items(dat, lexicon_name = "ne25", verbose = TRUE)
+
   recoded_dat <- dat
   for(v in vars) {
     message(paste("Processing transformation:", v))
@@ -1352,7 +1366,7 @@ recode_it <- function(dat, dict, my_API = NULL, what = "all") {
       recode_result <- recode__(dat = dat, dict = dict, my_API = my_API, what = v)
       if(!is.null(recode_result)) {
         recoded_dat <- recoded_dat %>%
-          dplyr::left_join(recode_result, by = c("pid", "record_id"))
+          safe_left_join(recode_result, by_vars = c("pid", "record_id"))
       }
     }, error = function(e) {
       message(paste("Warning: Failed to process", v, ":", e$message))
