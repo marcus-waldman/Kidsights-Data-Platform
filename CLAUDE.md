@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** October 2025 | **Version:** 3.3.1
+**Last Updated:** January 2025 | **Version:** 3.4.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -8,7 +8,7 @@ This is a quick reference guide for AI assistants working with the Kidsights Dat
 
 ## Quick Start
 
-The Kidsights Data Platform is a multi-source ETL system for childhood development research with **six independent pipelines**:
+The Kidsights Data Platform is a multi-source ETL system for childhood development research with **seven independent pipelines**:
 
 1. **NE25 Pipeline** - REDCap survey data processing (Nebraska 2025 study)
 2. **ACS Pipeline** - IPUMS USA census data extraction
@@ -16,6 +16,7 @@ The Kidsights Data Platform is a multi-source ETL system for childhood developme
 4. **NSCH Pipeline** - National Survey of Children's Health data integration
 5. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
 6. **Imputation Pipeline** - Multiple imputation for geographic, sociodemographic, childcare, and mental health uncertainty
+7. **IRT Calibration Pipeline** - Mplus calibration dataset creation for psychometric scale recalibration
 
 ### Running Pipelines
 
@@ -62,6 +63,16 @@ python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
 # Validate results
 python -m python.imputation.helpers
+```
+
+**IRT Calibration Pipeline:**
+```bash
+# Interactive workflow (prompts for NSCH sample size and output path)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+
+# Or source in R session
+source("scripts/irt_scoring/prepare_calibration_dataset.R")
+prepare_calibration_dataset()
 ```
 
 ### Key Requirements
@@ -198,7 +209,37 @@ echo 'library(dplyr); cat("Success\n")' > scripts/temp/temp_script.R
 "C:\Program Files\R\R-4.5.1\bin\R.exe" -e "library(dplyr)"
 ```
 
-### 5. Python Execution from R (REQUIRED)
+### 5. Safe Joins (REQUIRED)
+
+**All `dplyr::left_join()` calls MUST use `safe_left_join()` wrapper to prevent column collisions.**
+
+```r
+# ✅ CORRECT - Uses safe_left_join wrapper
+source("R/utils/safe_joins.R")
+data %>%
+  safe_left_join(eligibility_data, by_vars = c("pid", "record_id"))
+
+# ❌ INCORRECT - Direct dplyr::left_join (causes collisions)
+data %>%
+  dplyr::left_join(eligibility_data, by = c("pid", "record_id"))
+```
+
+**Why This Matters:**
+- Detects overlapping column names (like `eligible`, `authentic`) before joining
+- Auto-fixes collisions by removing duplicate columns from right table with warnings
+- Validates row count doesn't change (catches many-to-many joins)
+- Prevents `.x`/`.y` suffix confusion (e.g., `eligible.x` vs `eligible.y`)
+
+**Function Location:** `R/utils/safe_joins.R`
+
+**Parameters:**
+- `by_vars`: Join key column names (required, replaces `by`)
+- `allow_collision`: If TRUE, allows `.x`/`.y` suffixes (default: FALSE)
+- `auto_fix`: If TRUE, automatically removes colliding columns from right table (default: TRUE)
+
+**📖 Complete documentation:** [CODING_STANDARDS.md - Safe Joins](docs/guides/CODING_STANDARDS.md#safe-joins-critical)
+
+### 6. Python Execution from R (REQUIRED)
 
 ⚠️ **Never hardcode `"python"` in system2() calls - use `get_python_path()`**
 
@@ -267,6 +308,16 @@ db = DatabaseManager()
 # Get record count
 result = db.execute_query("SELECT COUNT(*) FROM ne25_raw")
 print(f"Total records: {result[0][0]}")
+```
+
+### Create IRT Calibration Dataset
+```bash
+# Prepare calibration dataset for Mplus (interactive)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+
+# Outputs:
+#   - mplus/calibdat.dat (38.71 MB, 47,084 records, 419 columns)
+#   - DuckDB table: calibration_dataset_2020_2025
 ```
 
 ### Quick Debugging
@@ -393,11 +444,22 @@ pip install pyreadstat
 - **Database:** 85,746 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health + 2,345 child ACEs) for ne25
 - **Execution Time:** ~3 minutes for complete pipeline (11 stages)
 
+### ✅ IRT Calibration Pipeline - Production Ready (January 2025)
+- **Multi-Study Dataset:** 47,084 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+- **Item Coverage:** 416 developmental/behavioral items with lexicon-based harmonization
+- **NSCH Integration:** National benchmarking samples (1,000 per year, ages 0-6)
+- **Historical Data:** 41,577 records from KidsightsPublic package (NE20, NE22, USA24)
+- **Validation:** 100% data integrity match with original, appropriate missingness patterns
+- **Mplus Compatibility:** Space-delimited .dat format, 38.71 MB output file
+- **Performance:** 28 seconds execution time (production scale)
+- **Database:** `calibration_dataset_2020_2025` table with 4 indexes
+- **Output:** `mplus/calibdat.dat` ready for graded response model IRT calibration
+
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
 - **Feather Format:** 3x faster R/Python data exchange, perfect type preservation
-- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting) + Imputation (uncertainty)
-- **Statistical Integration:** Raking targets + Multiple imputation ready for post-stratification weighting
+- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting) + Imputation (uncertainty) + IRT Calibration (psychometrics)
+- **Statistical Integration:** Raking targets + Multiple imputation ready for post-stratification weighting + IRT scoring
 
 **📖 Complete status and architecture:** [PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)
 
@@ -405,4 +467,4 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: October 2025 | Version: 3.3.1*
+*Updated: January 2025 | Version: 3.4.0*

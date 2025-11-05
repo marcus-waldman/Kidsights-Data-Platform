@@ -1,8 +1,8 @@
 # Pipeline Architecture Overview
 
-**Last Updated:** October 2025
+**Last Updated:** January 2025
 
-This document provides detailed architecture documentation for all six data pipelines in the Kidsights Data Platform. Each pipeline is designed as an independent, standalone system with specific data sources and use cases.
+This document provides detailed architecture documentation for all seven data pipelines in the Kidsights Data Platform. Each pipeline is designed as an independent, standalone system with specific data sources and use cases.
 
 ---
 
@@ -14,8 +14,9 @@ This document provides detailed architecture documentation for all six data pipe
 4. [NSCH Pipeline](#nsch-pipeline) - Children's health survey integration
 5. [Raking Targets Pipeline](#raking-targets-pipeline) - Population-representative targets for post-stratification
 6. [Imputation Pipeline](#imputation-pipeline) - Multiple imputation for geographic uncertainty
-7. [ACS Metadata System](#acs-metadata-system) - IPUMS DDI metadata integration
-8. [Pipeline Integration](#pipeline-integration-and-relationship) - How pipelines work together
+7. [IRT Calibration Pipeline](#irt-calibration-pipeline) - Mplus calibration dataset for psychometric recalibration
+8. [ACS Metadata System](#acs-metadata-system) - IPUMS DDI metadata integration
+9. [Pipeline Integration](#pipeline-integration-and-relationship) - How pipelines work together
 
 ---
 
@@ -350,6 +351,169 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 ```
 
 See [ADDING_NEW_STUDY.md](../imputation/ADDING_NEW_STUDY.md) for complete onboarding guide.
+
+---
+
+## IRT Calibration Pipeline: Multi-Study Psychometric Recalibration (January 2025)
+
+### Purpose
+Create Mplus-compatible calibration dataset combining historical studies and national benchmarks for Item Response Theory recalibration of Kidsights developmental/behavioral scales
+
+### Architecture Diagram
+
+```
+Multi-Study Data Integration → Lexicon Harmonization → Mplus Calibration → IRT Scoring
+
+Historical (NE20/22/USA24)  ┐
+KidsightsPublic Package     │
+41,577 records              │
+241 items                   ├─→ R: Lexicon Mapping ──→ Mplus .dat ──→ IRT Parameters ──→ NE25 Scoring
+                           │    Codebook-driven         47,084 records    Graded response    Theta scores
+NE25 Current Study          │    416 items aligned      38.71 MB          model calibration   Domain scores
+ne25_transformed table      │                           28s execution
+3,507 records (eligible)    │
+276 items                   │
+                           │
+NSCH National Benchmarks   │
+2021: 20,719 → sample 1000 │
+2022: 19,741 → sample 1000 │
+30-37 items                ┘
+```
+
+### Key Features
+
+- **Multi-Study Integration:** 6 studies (NE20, NE22, NE25, USA24, NSCH21, NSCH22) with 47,084 total records
+- **Lexicon-Based Harmonization:** Automatic item name mapping via codebook (ne25/cahmi21/cahmi22 → lex_equate)
+- **Historical Data Import:** One-time import from KidsightsPublic R package to DuckDB
+- **National Benchmarking:** Configurable NSCH sampling (default: 1,000 per year, ages 0-6)
+- **Mplus Compatibility:** Space-delimited .dat format with missing as ".", no headers
+- **Production Performance:** 28 seconds execution time for full workflow
+- **Comprehensive Validation:** 100% data integrity match with original historical data
+- **Interactive Workflow:** User prompts for NSCH sample size and output paths
+
+### Production Metrics
+
+**Dataset Composition:**
+- **Historical Studies:** NE20 (37,546) + NE22 (2,431) + USA24 (1,600) = 41,577 records
+- **Current Study:** NE25 (3,507 eligible records)
+- **National Benchmarks:** NSCH21 (1,000) + NSCH22 (1,000) = 2,000 records
+- **Total:** 47,084 records across 416 developmental/behavioral items
+- **File Size:** 38.71 MB Mplus .dat file
+- **Execution Time:** 28 seconds (17x faster than target)
+- **Missingness:** 92.9% overall (expected - different studies measure different items)
+
+**NE25 Item Coverage:**
+- 66 items with <50% missing (sufficient for IRT calibration)
+- 20 social-emotional items (PS*) with ~26% missing (excellent coverage)
+- 3 items with <20% missing (demographic/structural variables)
+
+### Design Rationale
+
+**Multi-Study Calibration Approach:**
+Rather than calibrating on NE25 alone (n=3,507), we combine **historical Nebraska studies** (larger sample, established parameters) with **national NSCH benchmarks** (population diversity) to create robust, generalizable item parameters. This approach:
+
+1. **Increases Statistical Power:** 47K records vs 3.5K for stable parameter estimation
+2. **Tests Cross-Study Invariance:** Detects differential item functioning (DIF) across studies
+3. **Enables National Norming:** NSCH provides nationally representative benchmarks
+4. **Preserves Continuity:** Historical parameters anchor the recalibration
+
+**Lexicon System Integration:**
+The codebook's lexicon system provides automatic item harmonization across studies:
+- **NE25:** Database columns (lowercase: c020, ps001)
+- **NSCH:** CAHMI variables (uppercase: SIMPLEINST, ONEWORD)
+- **Equate:** Universal IDs (uppercase: DD103, PS001)
+
+This eliminates manual crosswalks and ensures single source of truth.
+
+### Technical Components
+
+**R Scripts:**
+- `scripts/irt_scoring/prepare_calibration_dataset.R` (586 lines) - Main interactive workflow
+- `scripts/irt_scoring/import_historical_calibration.R` (273 lines) - One-time historical data import
+- `scripts/irt_scoring/helpers/recode_nsch_2021.R` (264 lines) - NSCH 2021 harmonization
+- `scripts/irt_scoring/helpers/recode_nsch_2022.R` (268 lines) - NSCH 2022 harmonization
+- `scripts/irt_scoring/helpers/mplus_dataset_prep.R` (modified) - Age filter utilities
+
+**Validation Scripts:**
+- `scripts/irt_scoring/validate_calibration_dataset.R` - Compare with KidsightsPublic original
+- `scripts/irt_scoring/validate_item_missingness.R` - Analyze missingness patterns
+- `scripts/irt_scoring/test_mplus_compatibility.R` - Verify .dat file format
+- `scripts/irt_scoring/run_full_scale_test.R` - Production performance benchmarking
+
+**Database Tables:**
+- `historical_calibration_2020_2024` - Historical studies (NE20, NE22, USA24)
+- `calibration_dataset_2020_2025` - Complete calibration dataset (all 6 studies)
+- Indexes: study, study_num, id, (study, id)
+
+**Documentation:**
+- [MPLUS_CALIBRATION_WORKFLOW.md](../irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md) - Complete 4-stage workflow guide
+- `todo/calibration_dataset_validation_summary.md` - Comprehensive validation results
+
+### Usage Example
+
+**Prepare Calibration Dataset (Interactive):**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+
+# Prompts:
+#   NSCH sample size per year: 1000  (recommended)
+#   Output .dat file path: [Enter] for default (mplus/calibdat.dat)
+```
+
+**Or in R Session:**
+```r
+source("scripts/irt_scoring/prepare_calibration_dataset.R")
+prepare_calibration_dataset()
+```
+
+**Outputs:**
+1. **Mplus .dat file:** `mplus/calibdat.dat` (38.71 MB, ready for graded response model)
+2. **DuckDB table:** `calibration_dataset_2020_2025` (47,084 records, 420 columns)
+
+**Validation:**
+```bash
+# Test Mplus compatibility
+"C:\Program Files\R\R-4.5.1\bin\R.exe" -f scripts/irt_scoring/test_mplus_compatibility.R
+
+# Validate missingness patterns
+"C:\Program Files\R\R-4.5.1\bin\R.exe" -f scripts/irt_scoring/validate_item_missingness.R
+```
+
+### Study Indicator Codes
+
+Mplus dataset uses numeric `study_num` for grouping/DIF analysis:
+
+| Study  | study_num | Records | Description |
+|--------|-----------|---------|-------------|
+| NE20   | 1         | 37,546  | Nebraska 2020 (historical) |
+| NE22   | 2         | 2,431   | Nebraska 2022 (historical) |
+| NE25   | 3         | 3,507   | Nebraska 2025 (current) |
+| NSCH21 | 5         | 1,000   | National Survey 2021 (benchmark) |
+| NSCH22 | 6         | 1,000   | National Survey 2022 (benchmark) |
+| USA24  | 7         | 1,600   | USA national sample 2024 |
+
+**Note:** study_num=4 is intentionally skipped to maintain consistency with KidsightsPublic numbering.
+
+### Known Limitations
+
+1. **Authentic Column Issue:** All NE25 records have `authentic=FALSE`, currently using `eligible=TRUE` only
+   - GitHub Issue: `.github/ISSUE_TEMPLATE/authentic_column_all_false.md`
+   - Workaround: Active (filters by eligible only)
+   - Priority: Medium (investigate authenticity validation process)
+
+2. **High Overall Missingness:** 92.9% missing expected (different studies measure different item subsets)
+
+3. **Age-Specific Items:** Developmental items show 70-80% missingness (age-appropriate administration)
+
+### Next Steps for IRT Calibration
+
+After dataset preparation, follow [MPLUS_CALIBRATION_WORKFLOW.md](../irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md):
+
+1. **Create Mplus .inp file** with graded response model specification
+2. **Run Mplus calibration** (10-120 minutes depending on model complexity)
+3. **Extract item parameters** (discrimination, thresholds)
+4. **Store parameters in codebook** (`irt_params` section)
+5. **Apply IRT scoring to NE25 data** (generate theta scores)
 
 ---
 

@@ -231,18 +231,18 @@ apply_sample_filters <- function(data, filters = NULL, age_range = NULL) {
 
   # Apply age range filter
   if (!is.null(age_range)) {
-    if ("age_in_months" %in% names(data_filtered)) {
+    if ("months_old" %in% names(data_filtered)) {
       before_n <- nrow(data_filtered)
       data_filtered <- data_filtered[
-        data_filtered$age_in_months >= age_range[1] &
-        data_filtered$age_in_months <= age_range[2],
+        data_filtered$months_old >= age_range[1] &
+        data_filtered$months_old <= age_range[2],
       ]
       after_n <- nrow(data_filtered)
 
-      cat(sprintf("  age_in_months in [%d, %d]: %d -> %d records (removed %d)\n",
+      cat(sprintf("  months_old in [%d, %d]: %d -> %d records (removed %d)\n",
                   age_range[1], age_range[2], before_n, after_n, before_n - after_n))
     } else {
-      cat("[WARN] age_in_months column not found, skipping age filter\n")
+      cat("[WARN] months_old column not found, skipping age filter\n")
     }
   }
 
