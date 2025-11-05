@@ -11,9 +11,8 @@
 #'   NSCH calibration typically uses children < 6 years old.
 #'
 #' @return Data frame with columns:
-#'   - id: Numeric composite ID (format: 77220XXXXXX for NSCH 2022)
+#'   - id: Numeric HHID (original NSCH household ID)
 #'   - years: Child age in years (calculated from birth date)
-#'   - study: Character "NSCH22"
 #'   - {lex_equate items}: All Kidsights items with CAHMI22 mappings (uppercase)
 #'
 #' @details
@@ -23,7 +22,7 @@
 #' 3. Calculates child age in years from birth month/year
 #' 4. Handles reverse-coded items (scales items so higher = more developed)
 #' 5. Filters to children < age_filter_years and with at least 2 item responses
-#' 6. Creates composite ID with study indicator (7722)
+#' 6. Returns ALL filtered records (no sampling - use for calibration table creation)
 #'
 #' Reverse coding logic:
 #' - Most items are reverse-coded (e.g., Yes=1, No=2 → Yes=0, No=1)
@@ -137,8 +136,8 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
     stop("No cahmi22 variables found in NSCH 2022 data")
   }
 
-  # Build query with specific columns
-  select_cols <- c("YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_cahmi22_vars)
+  # Build query with specific columns (include HHID for unique identifier)
+  select_cols <- c("HHID", "YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_cahmi22_vars)
   query <- sprintf("SELECT %s FROM nsch_2022_raw", paste(select_cols, collapse = ", "))
 
   nsch22 <- DBI::dbGetQuery(conn, query)
@@ -180,8 +179,7 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
 
   nsch22_filtered <- nsch22 %>%
     dplyr::filter(SC_AGE_YEARS < age_filter_years) %>%
-    dplyr::select(years, SC_AGE_YEARS, dplyr::any_of(available_cahmi22_vars)) %>%
-    dplyr::mutate(rid = dplyr::row_number())
+    dplyr::select(HHID, years, SC_AGE_YEARS, dplyr::any_of(available_cahmi22_vars))
 
   cat(sprintf("      %d records remain after age filter\n", nrow(nsch22_filtered)))
 
@@ -254,18 +252,11 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
 
   cat(sprintf("      Mapping %d variables to lex_equate names\n", length(rename_mapping)))
 
-  # Rename columns using !!! to splice named vector
+  # Rename columns using !!! to splice named vector, and HHID to id
   nsch22_final <- nsch22_filtered %>%
-    dplyr::rename(!!!rename_mapping)
-
-  # Create composite ID (format: 77 + 22 + 6-digit row number)
-  nsch22_final <- nsch22_final %>%
-    dplyr::mutate(
-      id = as.numeric(paste0("7722", stringr::str_pad(rid, 6, side = "left", pad = "0"))),
-      study = "NSCH22"
-    ) %>%
-    dplyr::relocate(id, study, years) %>%
-    dplyr::select(-SC_AGE_YEARS, -rid)
+    dplyr::rename(!!!rename_mapping, id = HHID) %>%
+    dplyr::relocate(id, years) %>%
+    dplyr::select(-SC_AGE_YEARS)
 
   # ============================================================================
   # Summary and Return
@@ -276,13 +267,13 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
   cat("NSCH 2022 Recoding Complete\n")
   cat(strrep("-", 80), "\n")
   cat(sprintf("Final records:    %d\n", nrow(nsch22_final)))
-  cat(sprintf("Kidsights items:  %d\n", ncol(nsch22_final) - 3))
+  cat(sprintf("Kidsights items:  %d\n", ncol(nsch22_final) - 2))  # id, years
   cat(sprintf("Age range:        %.2f - %.2f years\n",
               min(nsch22_final$years, na.rm = TRUE),
               max(nsch22_final$years, na.rm = TRUE)))
 
   # Calculate missingness per item
-  item_cols <- setdiff(names(nsch22_final), c("id", "study", "years"))
+  item_cols <- setdiff(names(nsch22_final), c("id", "years"))
   missingness <- sapply(nsch22_final[, item_cols], function(x) sum(is.na(x)) / length(x) * 100)
 
   cat(sprintf("Item missingness: %.1f%% - %.1f%% (median: %.1f%%)\n",
