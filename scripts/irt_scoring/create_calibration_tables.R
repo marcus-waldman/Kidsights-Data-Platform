@@ -146,20 +146,21 @@ create_calibration_tables <- function(
 
       cat(sprintf("      Loaded %d eligible records\n", nrow(ne25_data)))
 
-      # Select only calibration-relevant columns (id, years, items)
+      # Create composite ID from pid + record_id (for longitudinal data)
+      ne25_calibration <- ne25_data %>%
+        dplyr::mutate(id = paste0(pid, "_", record_id)) %>%
+        dplyr::rename(years = years_old)
+
+      cat(sprintf("      Created composite ID: pid_record_id\n"))
+
       # Remove metadata columns
       metadata_cols <- c("pid", "record_id", "redcap_event_name", "eligible",
                          "authentic", "survey_date", "child_dob")
-      ne25_calibration <- ne25_data %>%
-        dplyr::select(-dplyr::any_of(metadata_cols))
+      ne25_calibration <- ne25_calibration %>%
+        dplyr::select(-dplyr::any_of(metadata_cols)) %>%
+        dplyr::relocate(id, years)
 
       cat(sprintf("      Selected %d columns for calibration\n", ncol(ne25_calibration)))
-
-      # Ensure id and years are first
-      if ("id" %in% names(ne25_calibration)) {
-        ne25_calibration <- ne25_calibration %>%
-          dplyr::relocate(id, years)
-      }
 
       cat("\n[2/5] Creating ne25_calibration table\n")
 
