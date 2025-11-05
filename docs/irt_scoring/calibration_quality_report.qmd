@@ -1,0 +1,447 @@
+---
+title: "Calibration Data Quality Assessment"
+subtitle: "IRT Item Response Validation Report"
+date: today
+format:
+  html:
+    page-layout: full
+    code-fold: true
+    code-tools: true
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    theme: cosmo
+    embed-resources: true
+    self-contained: true
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r setup}
+#| label: setup
+#| include: false
+
+# Load required packages
+library(duckdb)
+library(DBI)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(DT)
+library(jsonlite)
+library(mgcv)
+library(scales)
+
+# Set ggplot theme
+theme_set(theme_minimal(base_size = 12))
+
+# Define color palette for 6 studies
+study_colors <- c(
+  "NE20" = "#1f77b4",   # Blue
+  "NE22" = "#ff7f0e",   # Orange
+  "NE25" = "#2ca02c",   # Green
+  "NSCH21" = "#d62728", # Red
+  "NSCH22" = "#9467bd", # Purple
+  "USA24" = "#8c564b"   # Brown
+)
+```
+
+# Executive Summary
+
+This report provides a comprehensive quality assessment of the IRT calibration dataset, which combines data from 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24) for psychometric modeling.
+
+## Data Quality Flags Detected
+
+The validation system detected **3 types of data quality issues**:
+
+1. **Category Mismatch**: Observed response categories differ from codebook expectations
+   - **Invalid values**: Response values not defined in codebook (e.g., value=9 when only {0,1,2} expected)
+   - **Fewer categories**: Missing response categories (ceiling/floor effects)
+
+2. **Negative Age-Response Correlation**: Items where older children score lower than younger children (developmentally unexpected)
+
+3. **Non-Sequential Response Values**: Response values with gaps (e.g., {0,1,9} instead of {0,1,2}), suggesting undocumented missing codes
+
+---
+
+```{r load_data}
+#| label: load-data
+
+# Load calibration data
+conn <- dbConnect(duckdb(), "../../data/duckdb/kidsights_local.duckdb", read_only = TRUE)
+
+calibration_data <- dbGetQuery(conn, "
+  SELECT *
+  FROM calibration_dataset_2020_2025
+")
+
+dbDisconnect(conn)
+
+# Load quality flags
+quality_flags <- read.csv("quality_flags.csv", stringsAsFactors = FALSE)
+
+# Load codebook
+codebook <- fromJSON("../../codebook/data/codebook.json", simplifyVector = FALSE)
+
+# Extract item columns
+metadata_cols <- c("study_num", "id", "years", "study")
+item_cols <- setdiff(names(calibration_data), metadata_cols)
+```
+
+## Overall Dataset Summary
+
+```{r summary_table}
+#| label: summary-table
+
+summary_df <- calibration_data %>%
+  group_by(study) %>%
+  summarise(
+    Records = n(),
+    `Age Range` = sprintf("%.1f - %.1f years", min(years, na.rm=TRUE), max(years, na.rm=TRUE)),
+    `Mean Age` = sprintf("%.2f years", mean(years, na.rm=TRUE)),
+    .groups = "drop"
+  )
+
+# Add total row
+total_row <- data.frame(
+  study = "**TOTAL**",
+  Records = sum(summary_df$Records),
+  `Age Range` = sprintf("%.1f - %.1f years",
+                        min(calibration_data$years, na.rm=TRUE),
+                        max(calibration_data$years, na.rm=TRUE)),
+  `Mean Age` = sprintf("%.2f years", mean(calibration_data$years, na.rm=TRUE)),
+  check.names = FALSE
+)
+
+summary_df <- rbind(summary_df, total_row)
+
+datatable(
+  summary_df,
+  options = list(
+    pageLength = 10,
+    dom = 't',
+    ordering = FALSE
+  ),
+  rownames = FALSE,
+  escape = FALSE,
+  caption = "Table 1: Calibration Dataset Summary by Study"
+)
+```
+
+---
+
+## Flag Summary Statistics
+
+```{r flag_summary}
+#| label: flag-summary
+
+flag_summary <- quality_flags %>%
+  group_by(flag_type, flag_severity) %>%
+  summarise(
+    Count = n(),
+    `Unique Items` = n_distinct(item_id),
+    `Studies Affected` = n_distinct(study),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(Count))
+
+datatable(
+  flag_summary,
+  options = list(
+    pageLength = 10,
+    dom = 't',
+    order = list(list(2, 'desc'))
+  ),
+  rownames = FALSE,
+  caption = "Table 2: Quality Flags by Type and Severity"
+) %>%
+  formatStyle(
+    'flag_severity',
+    backgroundColor = styleEqual(c('ERROR', 'WARNING'), c('#ffcccc', '#fff3cd'))
+  )
+```
+
+---
+
+## Flag Distribution by Type
+
+```{r flag_barchart}
+#| label: flag-barchart
+#| fig-width: 10
+#| fig-height: 5
+
+flag_counts <- quality_flags %>%
+  count(flag_type, flag_severity) %>%
+  mutate(
+    flag_type_label = case_when(
+      flag_type == "CATEGORY_MISMATCH_INVALID" ~ "Invalid Values",
+      flag_type == "CATEGORY_MISMATCH_FEWER" ~ "Fewer Categories",
+      flag_type == "NEGATIVE_CORRELATION" ~ "Negative Correlation",
+      flag_type == "NON_SEQUENTIAL" ~ "Non-Sequential Values",
+      TRUE ~ flag_type
+    )
+  )
+
+p <- ggplot(flag_counts, aes(x = reorder(flag_type_label, -n), y = n, fill = flag_severity)) +
+  geom_col() +
+  geom_text(aes(label = n), position = position_stack(vjust = 0.5), color = "white", size = 5, fontface = "bold") +
+  scale_fill_manual(values = c("ERROR" = "#d9534f", "WARNING" = "#f0ad4e")) +
+  labs(
+    title = "Quality Flags by Type",
+    subtitle = sprintf("Total: %d flags across %d items and %d studies",
+                       nrow(quality_flags),
+                       n_distinct(quality_flags$item_id),
+                       n_distinct(quality_flags$study)),
+    x = NULL,
+    y = "Number of Flags",
+    fill = "Severity"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 15, hjust = 1),
+    legend.position = "top",
+    plot.title = element_text(face = "bold", size = 16),
+    plot.subtitle = element_text(size = 12)
+  )
+
+ggplotly(p, tooltip = c("x", "y", "fill")) %>%
+  layout(hovermode = "x unified")
+```
+
+---
+
+# Detailed Flag Report
+
+This section provides a comprehensive, filterable table of all detected quality flags.
+
+```{r detailed_flags}
+#| label: detailed-flags-table
+
+# Prepare detailed flags table
+detailed_flags <- quality_flags %>%
+  select(
+    Item = item_id,
+    Study = study,
+    `Flag Type` = flag_type,
+    Severity = flag_severity,
+    `Observed Categories` = observed_categories,
+    `Expected Categories` = expected_categories,
+    `Correlation (r)` = correlation_value,
+    `N Responses` = n_responses,
+    `% Missing` = pct_missing,
+    Description = description
+  ) %>%
+  mutate(
+    `% Missing` = round(`% Missing`, 1),
+    `Correlation (r)` = round(`Correlation (r)`, 3)
+  )
+
+datatable(
+  detailed_flags,
+  filter = 'top',
+  extensions = 'Buttons',
+  options = list(
+    pageLength = 25,
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel'),
+    scrollX = TRUE,
+    order = list(list(3, 'asc'), list(1, 'asc'))
+  ),
+  rownames = FALSE,
+  caption = "Table 3: Detailed Quality Flags (Filterable and Exportable)"
+) %>%
+  formatStyle(
+    'Severity',
+    backgroundColor = styleEqual(c('ERROR', 'WARNING'), c('#ffcccc', '#fff3cd')),
+    fontWeight = 'bold'
+  ) %>%
+  formatStyle(
+    'Item',
+    fontFamily = 'monospace'
+  ) %>%
+  formatStyle(
+    '% Missing',
+    background = styleColorBar(range(detailed_flags$`% Missing`, na.rm = TRUE), '#e6f2ff'),
+    backgroundSize = '100% 90%',
+    backgroundRepeat = 'no-repeat',
+    backgroundPosition = 'center'
+  )
+```
+
+::: {.callout-tip}
+## Interpretation Guide
+
+- **ERROR flags** (red): Require immediate attention - invalid data values detected
+- **WARNING flags** (yellow): Noteworthy patterns that may affect modeling
+- Use column filters to focus on specific studies, flag types, or severities
+- Click "CSV" or "Excel" buttons to export data for further analysis
+:::
+
+---
+
+# Item Explorer: Top Flagged Items
+
+This section shows age-response relationships for the most frequently flagged items.
+
+::: {.callout-note}
+## Interactive Version
+
+For a fully interactive item explorer with dropdown selection, run this report as a Shiny app:
+
+```r
+library(quarto)
+quarto::quarto_preview("docs/irt_scoring/calibration_quality_report.qmd")
+```
+
+This static version shows the top 10 flagged items for quick review.
+:::
+
+```{r top_flagged_items}
+#| label: top-flagged-items
+
+# Get top 10 flagged items
+top_items <- quality_flags %>%
+  group_by(item_id) %>%
+  summarise(
+    flag_count = n(),
+    studies_affected = paste(unique(study), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(flag_count)) %>%
+  slice(1:10) %>%
+  pull(item_id)
+```
+
+```{r plot_item_function}
+#| label: plot-item-function
+
+# Function to create age-response plot for an item
+plot_item_age_response <- function(item_name, data) {
+  # Filter data
+  plot_data <- data %>%
+    select(study, years, response = !!item_name) %>%
+    filter(!is.na(response))
+
+  if (nrow(plot_data) == 0) {
+    return(NULL)
+  }
+
+  # Determine item type
+  unique_vals <- sort(unique(plot_data$response))
+  is_binary <- all(unique_vals %in% c(0, 1))
+
+  # Fit models per study
+  study_predictions <- list()
+
+  for (study_name in unique(plot_data$study)) {
+    study_data <- plot_data %>% filter(study == study_name)
+
+    if (nrow(study_data) < 10) next
+
+    age_grid <- data.frame(years = seq(min(study_data$years), max(study_data$years), length.out = 100))
+
+    tryCatch({
+      if (is_binary) {
+        model <- glm(response ~ years, data = study_data, family = binomial())
+        predictions <- predict(model, newdata = age_grid, type = "response")
+      } else {
+        model <- mgcv::gam(response ~ s(years, k = 4), data = study_data)
+        predictions <- predict(model, newdata = age_grid, type = "response")
+      }
+
+      study_predictions[[study_name]] <- data.frame(
+        study = study_name,
+        years = age_grid$years,
+        predicted = predictions
+      )
+    }, error = function(e) {
+      NULL
+    })
+  }
+
+  # Combine predictions
+  all_predictions <- if (length(study_predictions) > 0) bind_rows(study_predictions) else NULL
+
+  # Create plot
+  p <- ggplot() +
+    geom_jitter(
+      data = plot_data,
+      aes(x = years, y = response, color = study,
+          text = sprintf("Study: %s<br>Age: %.2f<br>Response: %d", study, years, response)),
+      alpha = 0.3,
+      width = 0.05,
+      height = 0.05,
+      size = 1.5
+    )
+
+  if (!is.null(all_predictions)) {
+    p <- p + geom_line(
+      data = all_predictions,
+      aes(x = years, y = predicted, color = study),
+      size = 1.2
+    )
+  }
+
+  p <- p +
+    scale_color_manual(values = study_colors) +
+    labs(
+      title = sprintf("Item: %s", item_name),
+      subtitle = sprintf("Model: %s | N = %d",
+                        ifelse(is_binary, "Logistic Regression", "GAM (k=4)"),
+                        nrow(plot_data)),
+      x = "Child Age (years)",
+      y = "Item Response",
+      color = "Study"
+    ) +
+    theme(
+      legend.position = "right",
+      plot.title = element_text(face = "bold", size = 12),
+      plot.subtitle = element_text(size = 10)
+    )
+
+  ggplotly(p, tooltip = "text") %>%
+    layout(hovermode = "closest")
+}
+```
+
+```{r plot_all_top_items}
+#| label: plot-all-top-items
+#| results: asis
+
+for (item in top_items) {
+  cat(sprintf("\n\n## %s\n\n", item))
+
+  # Get flags for this item
+  item_flags <- quality_flags %>%
+    filter(item_id == item) %>%
+    select(Study = study, `Flag Type` = flag_type, Severity = flag_severity, Description = description)
+
+  cat("**Flags for this item:**\n\n")
+  print(knitr::kable(item_flags, format = "markdown"))
+  cat("\n\n")
+
+  # Plot age-response relationship
+  p <- plot_item_age_response(item, calibration_data)
+  if (!is.null(p)) {
+    print(p)
+  } else {
+    cat("*No data available for plotting*\n\n")
+  }
+
+  cat("\n\n---\n\n")
+}
+
+---
+
+::: {.callout-note}
+## About This Report
+
+- **Data Source:** `calibration_dataset_2020_2025` table (harmonized lex_equate names)
+- **Validation Function:** `scripts/irt_scoring/validate_calibration_quality.R`
+- **Generated:** `r Sys.time()`
+- **Studies:** NE20 (n=37,546), NE22 (n=2,431), NE25 (n=3,507), NSCH21 (n=1,000 sampled), NSCH22 (n=1,000 sampled), USA24 (n=1,600)
+
+For questions or to report data quality concerns, contact the Calibration Pipeline Team.
+:::

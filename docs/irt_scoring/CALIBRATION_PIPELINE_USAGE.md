@@ -81,14 +81,16 @@ If you want to create/update tables but skip the export step:
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| *(no args)* | Full pipeline: create tables + validate + export | - |
-| `--export-only` | Skip table creation, only export to .dat file | Off |
-| `--tables-only` | Create/update tables, skip export | Off |
+| *(no args)* | Full pipeline: create tables + validate + quality check + export | - |
+| `--export-only` | Skip table creation and quality check, only export to .dat file | Off |
+| `--tables-only` | Create/update tables, skip quality check and export | Off |
+| `--skip-quality-check` | Skip data quality assessment (faster execution) | Off |
 | `--nsch-sample N` | Set NSCH sample size (per year) | 1000 |
 
 **Notes:**
 - `--export-only` and `--tables-only` are mutually exclusive
 - `--nsch-sample` is ignored if `--tables-only` is used
+- Quality check runs automatically unless `--skip-quality-check`, `--export-only`, or `--tables-only` is specified
 
 ---
 
@@ -142,6 +144,48 @@ Runs 6 validation tests via `validate_calibration_tables.R`:
 **If validation fails:**
 - Pipeline continues but prints warnings
 - Check `data/duckdb/kidsights_local.duckdb` for table issues
+
+### Step 2.5: Data Quality Assessment (Optional)
+
+**What happens:**
+
+Runs automated quality checks on the combined calibration dataset to detect data quality issues.
+
+**Three types of flags detected:**
+
+1. **Category Mismatch**
+   - **Invalid values:** Response values not defined in codebook (e.g., value=9 when only {0,1,2} expected)
+   - **Fewer categories:** Missing response categories suggesting ceiling/floor effects
+
+2. **Negative Age-Response Correlation**
+   - Items where older children score lower than younger children
+   - Developmentally unexpected pattern
+
+3. **Non-Sequential Response Values**
+   - Response values with gaps (e.g., {0,1,9} instead of {0,1,2})
+   - Suggests undocumented missing codes
+
+**Outputs:**
+
+- `docs/irt_scoring/quality_flags.csv` - Machine-readable flag details (605 flags detected in current data)
+- `docs/irt_scoring/calibration_quality_report.html` - Interactive HTML report with:
+  - Executive summary (flag counts, affected studies)
+  - Detailed flag table (filterable, exportable)
+  - Item explorer (age-response plots for top 10 flagged items)
+
+**To skip quality check:**
+```bash
+# Faster execution, skip quality assessment
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/run_calibration_pipeline.R --skip-quality-check
+```
+
+**To regenerate HTML report:**
+```bash
+cd docs/irt_scoring
+quarto render calibration_quality_report.qmd
+```
+
+**Execution time:** +2-3 minutes for quality check
 
 ### Step 3: Export Calibration Dataset
 

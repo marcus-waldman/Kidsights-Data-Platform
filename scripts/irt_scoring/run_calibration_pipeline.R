@@ -37,6 +37,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # Default parameters
 export_only <- "--export-only" %in% args
 tables_only <- "--tables-only" %in% args
+skip_quality_check <- "--skip-quality-check" %in% args
 nsch_sample_size <- 1000  # Default sample size
 
 # Parse NSCH sample size
@@ -46,10 +47,11 @@ if (length(nsch_arg_idx) > 0 && length(args) >= nsch_arg_idx + 1) {
 }
 
 cat("Pipeline Configuration:\n")
-cat(sprintf("  Mode: %s\n", 
+cat(sprintf("  Mode: %s\n",
             ifelse(export_only, "EXPORT ONLY",
                    ifelse(tables_only, "TABLES ONLY", "FULL PIPELINE"))))
 cat(sprintf("  NSCH sample size: %d per year\n", nsch_sample_size))
+cat(sprintf("  Quality check: %s\n", ifelse(skip_quality_check, "SKIPPED", "ENABLED")))
 cat(sprintf("  Database: data/duckdb/kidsights_local.duckdb\n"))
 cat(sprintf("  Output: mplus/calibdat.dat\n\n"))
 
@@ -102,10 +104,35 @@ if (!export_only && !tables_only) {
   cat(strrep("=", 80), "\n")
   cat("STEP 2: VALIDATE CALIBRATION TABLES\n")
   cat(strrep("=", 80), "\n\n")
-  
+
   cat("Running validation checks...\n\n")
   source("scripts/irt_scoring/validate_calibration_tables.R")
   cat("\n")
+}
+
+# =============================================================================
+# Step 2.5: Quality Assessment (Optional)
+# =============================================================================
+
+if (!export_only && !tables_only && !skip_quality_check) {
+  cat(strrep("=", 80), "\n")
+  cat("STEP 2.5: DATA QUALITY ASSESSMENT\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("Running quality checks on calibration data...\n\n")
+  source("scripts/irt_scoring/validate_calibration_quality.R")
+
+  validate_calibration_quality(
+    db_path = "data/duckdb/kidsights_local.duckdb",
+    codebook_path = "codebook/data/codebook.json",
+    output_path = "docs/irt_scoring/quality_flags.csv",
+    verbose = TRUE
+  )
+
+  cat("\n[INFO] Quality assessment complete. Review flags at:\n")
+  cat("       - CSV: docs/irt_scoring/quality_flags.csv\n")
+  cat("       - HTML Report: docs/irt_scoring/calibration_quality_report.html\n")
+  cat("       (Render report with: quarto render docs/irt_scoring/calibration_quality_report.qmd)\n\n")
 }
 
 # =============================================================================
