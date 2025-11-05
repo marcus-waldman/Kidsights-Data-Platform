@@ -19,16 +19,74 @@
 #   - Output file path specification
 # =============================================================================
 
-#' Prepare Calibration Dataset
+#' Prepare Calibration Dataset for Mplus IRT Recalibration
 #'
-#' Interactive workflow to create complete Mplus calibration dataset
+#' Interactive workflow to create complete Mplus calibration dataset combining
+#' historical Nebraska studies (NE20, NE22, USA24), current NE25 data, and
+#' national NSCH benchmarking samples (2021, 2022).
 #'
 #' @param codebook_path Character. Path to codebook.json file.
 #'   Default: "codebook/data/codebook.json"
 #' @param db_path Character. Path to DuckDB database file.
 #'   Default: "data/duckdb/kidsights_local.duckdb"
 #'
-#' @return Invisible NULL. Creates files and database tables as side effects.
+#' @return Invisible NULL. Creates files and database tables as side effects:
+#'   - Mplus .dat file (space-delimited, missing as ".")
+#'   - DuckDB table: calibration_dataset_2020_2025
+#'
+#' @details
+#' This interactive workflow performs the following operations:
+#'
+#' 1. **Load Historical Data**: Import NE20, NE22, USA24 from
+#'    historical_calibration_2020_2024 table (41,577 records)
+#' 2. **Load NE25 Data**: Extract current study data from ne25_transformed table,
+#'    filtered by eligible=TRUE (3,507 records)
+#' 3. **Load NSCH Data**: Sample national benchmarking data from NSCH 2021/2022
+#'    (user-specified sample size, default 1000 per year)
+#' 4. **Harmonize Variables**: Map all items to lex_equate naming convention
+#'    using codebook.json lexicon system
+#' 5. **Create Study Indicators**: Assign numeric codes (1=NE20, 2=NE22, 3=NE25,
+#'    5=NSCH21, 6=NSCH22, 7=USA24)
+#' 6. **Combine Data**: Stack all 6 studies with consistent structure
+#' 7. **Export to Mplus**: Write space-delimited .dat file with missing as "."
+#' 8. **Store in DuckDB**: Create calibration_dataset_2020_2025 table with indexes
+#'
+#' Interactive prompts guide through:
+#' - NSCH sample size selection (default: 1000 per year)
+#' - Output file path specification (default: mplus/calibdat.dat)
+#'
+#' Expected output dimensions:
+#' - Records: ~47,000 (varies by NSCH sample size)
+#' - Columns: 419 (study_num, id, years, 416 items)
+#' - File size: ~38-40 MB
+#' - Execution time: ~30 seconds
+#'
+#' @examples
+#' \dontrun{
+#' # Interactive mode (recommended)
+#' source("scripts/irt_scoring/prepare_calibration_dataset.R")
+#' prepare_calibration_dataset()
+#'
+#' # Non-interactive mode (command line)
+#' "C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+#'   --file=scripts/irt_scoring/prepare_calibration_dataset.R
+#'
+#' # Query resulting database table
+#' library(duckdb)
+#' conn <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
+#' DBI::dbGetQuery(conn, "
+#'   SELECT study_num, COUNT(*) as n
+#'   FROM calibration_dataset_2020_2025
+#'   GROUP BY study_num
+#' ")
+#' DBI::dbDisconnect(conn)
+#' }
+#'
+#' @seealso
+#' - \code{\link{recode_nsch_2021}} for NSCH 2021 harmonization
+#' - \code{\link{recode_nsch_2022}} for NSCH 2022 harmonization
+#' - \code{scripts/irt_scoring/import_historical_calibration.R} for one-time
+#'   historical data import
 #'
 #' @export
 prepare_calibration_dataset <- function(

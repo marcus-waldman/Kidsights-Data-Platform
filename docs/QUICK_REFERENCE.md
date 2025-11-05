@@ -242,6 +242,105 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 
 ---
 
+### IRT Calibration Pipeline
+
+**Purpose:** Create Mplus-compatible calibration dataset for psychometric recalibration of developmental/behavioral items
+
+```bash
+# One-time: Import historical data (NE20, NE22, USA24)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/import_historical_calibration.R
+
+# Interactive: Prepare calibration dataset
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/prepare_calibration_dataset.R
+```
+
+**What it does:**
+- Combines 6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24
+- Harmonizes 416 items via lexicon mappings (ne25/cahmi21/cahmi22 → lex_equate)
+- Creates Mplus .dat file (space-delimited, missing as ".")
+- Stores in `calibration_dataset_2020_2025` table with indexes
+
+**Timing:** ~30 seconds
+
+**Output:** 47,084 records × 419 columns (~38 MB)
+
+**Validation Commands:**
+```bash
+# Test Mplus format compatibility
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/test_mplus_compatibility.R
+
+# Validate item missingness patterns
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/validate_item_missingness.R
+
+# Full-scale performance test
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/run_full_scale_test.R
+```
+
+**Database Query Examples:**
+
+```r
+library(duckdb)
+conn <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
+
+# Study distribution
+DBI::dbGetQuery(conn, "
+  SELECT study_num, COUNT(*) as n
+  FROM calibration_dataset_2020_2025
+  GROUP BY study_num
+")
+
+# Item coverage by study (top 5 items)
+DBI::dbGetQuery(conn, "
+  SELECT
+    study_num,
+    COUNT(CASE WHEN NOM046X IS NOT NULL THEN 1 END) as NOM046X_n,
+    COUNT(CASE WHEN PS001 IS NOT NULL THEN 1 END) as PS001_n,
+    COUNT(CASE WHEN PS020 IS NOT NULL THEN 1 END) as PS020_n
+  FROM calibration_dataset_2020_2025
+  GROUP BY study_num
+")
+
+# Age distribution by study
+DBI::dbGetQuery(conn, "
+  SELECT
+    study_num,
+    MIN(years) as min_age,
+    AVG(years) as mean_age,
+    MAX(years) as max_age
+  FROM calibration_dataset_2020_2025
+  GROUP BY study_num
+")
+
+DBI::dbDisconnect(conn)
+```
+
+**R Function Usage:**
+```r
+# Source function directly
+source("scripts/irt_scoring/prepare_calibration_dataset.R")
+
+# Run with defaults (NSCH n=1000, output: mplus/calibdat.dat)
+prepare_calibration_dataset()
+
+# Or with custom paths
+prepare_calibration_dataset(
+  codebook_path = "codebook/data/codebook.json",
+  db_path = "data/duckdb/kidsights_local.duckdb"
+)
+```
+
+**Documentation:**
+- [MPLUS_CALIBRATION_WORKFLOW.md](irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md) - Complete 4-stage workflow
+- [CALIBRATION_DATASET_EXAMPLE.md](irt_scoring/CALIBRATION_DATASET_EXAMPLE.md) - Step-by-step walkthrough with FAQ
+- [Validation Summary](../todo/calibration_dataset_validation_summary.md) - Test results and production approval
+
+---
+
 ## ACS Utility Scripts
 
 ### Test API Connection
