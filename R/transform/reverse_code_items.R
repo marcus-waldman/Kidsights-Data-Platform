@@ -104,8 +104,24 @@ reverse_code_items <- function(dat,
     cat(sprintf("[3/4] Mapped %d items to dataset variables\n", length(var_mapping)))
   }
 
-  # Find which variables actually exist in the dataset
-  vars_to_reverse <- intersect(var_mapping, names(dat))
+  # Find which variables actually exist in the dataset (case-insensitive matching)
+  # Match codebook variable names (potentially uppercase) to dataset names (potentially lowercase)
+  dataset_names <- names(dat)
+  vars_to_reverse <- character(0)
+
+  for (var_expected in var_mapping) {
+    # Try exact match first
+    if (var_expected %in% dataset_names) {
+      vars_to_reverse <- c(vars_to_reverse, var_expected)
+    } else {
+      # Try case-insensitive match
+      match_idx <- which(tolower(dataset_names) == tolower(var_expected))
+      if (length(match_idx) > 0) {
+        # Use the actual dataset variable name (correct case)
+        vars_to_reverse <- c(vars_to_reverse, dataset_names[match_idx[1]])
+      }
+    }
+  }
 
   if (length(vars_to_reverse) == 0) {
     if (verbose) {
