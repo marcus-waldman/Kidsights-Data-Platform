@@ -461,51 +461,33 @@ extract_value_labels <- function(field_name, dictionary) {
 
 #' Get Nebraska ZIP code to county crosswalk
 #'
+#' Queries the database for ZIP/county mapping data
+#'
 #' @return Data frame mapping ZIP codes to acceptable counties
 get_nebraska_zip_county_crosswalk <- function() {
-  # Load the actual ZIP code data from Excel file
-  zip_file <- "data/Zip_County_Code_UPDATED10.18.xlsx"
-
-  if (!file.exists(zip_file)) {
-    warning("ZIP code data file not found at: ", zip_file)
-    # Return minimal fallback data
-    return(data.frame(
-      zip_code = character(),
-      acceptable_counties = character(),
-      stringsAsFactors = FALSE
-    ))
-  }
-
-  # Load the Excel file
-  if (!requireNamespace("readxl", quietly = TRUE)) {
-    stop("readxl package required to load ZIP code data")
-  }
-
+  # Query from database instead of loading Excel file
   tryCatch({
-    # Read the ZIP code data
-    zip_data <- readxl::read_excel(zip_file, sheet = "Master")
+    conn <- DBI::dbConnect(duckdb::duckdb(), "data/duckdb/kidsights_local.duckdb", read_only = TRUE)
 
-    # Process the data to match expected format
-    # Group by ZIP code and concatenate all acceptable counties
-    result <- zip_data %>%
-      dplyr::mutate(
-        # Ensure ZIP is character
-        zip_code = as.character(ZipCode),
-        # Remove "County" suffix from county names
-        County = stringr::str_remove_all(County, " County")
-      ) %>%
-      dplyr::group_by(zip_code) %>%
-      dplyr::reframe(
-        # Concatenate all counties for this ZIP with semicolon separator
-        acceptable_counties = paste(unique(County), collapse = "; ")
-      )
+    result <- DBI::dbGetQuery(conn, "SELECT zip_code, acceptable_counties FROM ne_zip_county_crosswalk")
 
-    message("Loaded ", nrow(result), " ZIP codes from ", zip_file)
+    DBI::dbDisconnect(conn, shutdown = TRUE)
 
-    return(result)
+    if (nrow(result) > 0) {
+      message("Loaded ", nrow(result), " ZIP codes from database")
+      return(result)
+    } else {
+      warning("ne_zip_county_crosswalk table is empty")
+      return(data.frame(
+        zip_code = character(),
+        acceptable_counties = character(),
+        stringsAsFactors = FALSE
+      ))
+    }
 
   }, error = function(e) {
-    warning("Error loading ZIP code data: ", e$message)
+    warning("Error loading ZIP code data from database: ", e$message)
+    warning("Run scripts/setup/load_zip_crosswalk.R to load crosswalk data")
     return(data.frame(
       zip_code = character(),
       acceptable_counties = character(),

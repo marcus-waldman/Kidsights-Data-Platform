@@ -82,6 +82,7 @@ temp/
 # Data files - protect participant data
 data/
 !data/credi-mest_df.csv
+!data/Zip_County_Code_UPDATED10.18.xlsx
 *.rds
 *.parquet
 
