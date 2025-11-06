@@ -1358,6 +1358,11 @@ recode_it <- function(dat, dict, my_API = NULL, what = "all") {
   source("R/transform/reverse_code_items.R")
   dat <- reverse_code_items(dat, lexicon_name = "ne25", verbose = TRUE)
 
+  # Validate item responses against codebook (set invalid values to NA)
+  message("Validating item responses against codebook...")
+  source("R/transform/validate_item_responses.R")
+  dat <- validate_item_responses(dat, lexicon_name = "ne25", verbose = TRUE)
+
   recoded_dat <- dat
   for(v in vars) {
     message(paste("Processing transformation:", v))

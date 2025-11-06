@@ -138,13 +138,64 @@ create_calibration_tables <- function(
       cat("[WARN] ne25_transformed table not found. Skipping NE25.\n")
       cat("       Run NE25 pipeline first: run_ne25_pipeline.R\n\n")
     } else {
-      cat("[1/5] Loading NE25 data from ne25_transformed (eligible=TRUE)\n")
+      cat("[1/6] Loading NE25 data from ne25_transformed (eligible=TRUE)\n")
 
       # Query NE25 data
       ne25_query <- "SELECT * FROM ne25_transformed WHERE eligible = TRUE"
       ne25_data <- DBI::dbGetQuery(conn, ne25_query)
 
       cat(sprintf("      Loaded %d eligible records\n", nrow(ne25_data)))
+
+      cat("\n[2/6] Mapping NE25 variable names to lex_equate\n")
+
+      # Build lexicon mapping: ne25 -> equate
+      cb <- jsonlite::fromJSON(codebook_path, simplifyVector = FALSE)
+
+      ne25_to_equate <- list()
+
+      for (item_id in names(cb$items)) {
+        item <- cb$items[[item_id]]
+
+        # Check if item has both ne25 and equate lexicons
+        if (!is.null(item$lexicons)) {
+          ne25_name <- item$lexicons$ne25
+          equate_name <- item$lexicons$equate
+
+          # Handle simplifyVector=FALSE (values might be lists)
+          if (is.list(ne25_name)) ne25_name <- unlist(ne25_name)
+          if (is.list(equate_name)) equate_name <- unlist(equate_name)
+
+          # If both exist and are non-empty, create mapping
+          if (!is.null(ne25_name) && !is.null(equate_name) &&
+              length(ne25_name) > 0 && length(equate_name) > 0 &&
+              ne25_name != "" && equate_name != "") {
+            ne25_to_equate[[ne25_name]] <- equate_name
+          }
+        }
+      }
+
+      cat(sprintf("      Found %d variables to map from ne25 to equate\n", length(ne25_to_equate)))
+
+      # Rename columns that exist in dataset
+      dataset_cols <- names(ne25_data)
+      renamed_count <- 0
+
+      for (ne25_name in names(ne25_to_equate)) {
+        equate_name <- ne25_to_equate[[ne25_name]]
+
+        # Check if NE25 column exists in dataset (case-insensitive)
+        match_idx <- which(tolower(dataset_cols) == tolower(ne25_name))
+
+        if (length(match_idx) > 0) {
+          actual_col <- dataset_cols[match_idx[1]]
+          names(ne25_data)[match_idx[1]] <- equate_name
+          renamed_count <- renamed_count + 1
+        }
+      }
+
+      cat(sprintf("      Renamed %d columns to lex_equate format\n", renamed_count))
+
+      cat("\n[3/6] Creating integer IDs and selecting columns\n")
 
       # Create integer IDs following convention: YYFFFSNNNNNN
       # YY=25, FFF=031 (Nebraska FIPS), S=1 (non-NSCH), N=sequential (6 digits)
@@ -167,7 +218,7 @@ create_calibration_tables <- function(
 
       cat(sprintf("      Selected %d columns for calibration\n", ncol(ne25_calibration)))
 
-      cat("\n[2/5] Creating ne25_calibration table\n")
+      cat("\n[4/6] Creating ne25_calibration table\n")
 
       # Drop table if exists
       table_name <- "ne25_calibration"
@@ -180,7 +231,7 @@ create_calibration_tables <- function(
       cat(sprintf("      Inserting %d records\n", nrow(ne25_calibration)))
       DBI::dbWriteTable(conn, table_name, ne25_calibration, overwrite = TRUE)
 
-      cat("\n[3/5] Creating indexes\n")
+      cat("\n[5/6] Creating indexes\n")
 
       # Create indexes
       index_queries <- c(
@@ -198,7 +249,7 @@ create_calibration_tables <- function(
         })
       }
 
-      cat("\n[4/5] Verifying table\n")
+      cat("\n[6/6] Verifying table\n")
 
       # Verify
       ne25_count <- DBI::dbGetQuery(conn,
@@ -212,7 +263,7 @@ create_calibration_tables <- function(
       cat(sprintf("      Age range: %.2f - %.2f years (mean: %.2f)\n",
                   age_summary$min, age_summary$max, age_summary$mean))
 
-      cat("\n[5/5] NE25 calibration table complete\n\n")
+      cat("\n[OK] NE25 calibration table complete\n\n")
     }
   }
 
