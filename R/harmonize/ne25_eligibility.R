@@ -177,16 +177,16 @@ check_cid6_zip_county <- function(data, data_dictionary) {
       fq001 = as.character(fq001)   # County code as character
     ) %>%
     # Map county codes to labels
-    dplyr::left_join(
+    safe_left_join(
       county_labels %>%
         dplyr::rename(fq001 = value, county_name = label) %>%
         dplyr::mutate(fq001 = as.character(fq001)),  # Ensure same type
-      by = "fq001"
+      by_vars = "fq001"
     ) %>%
     # Get acceptable ZIP codes for each county
-    dplyr::left_join(
+    safe_left_join(
       get_nebraska_zip_county_crosswalk(),
-      by = c("sq001" = "zip_code")
+      by_vars = c("sq001" = "zip_code")
     ) %>%
     dplyr::mutate(
       # Check if reported county is in the acceptable counties for this ZIP
@@ -203,16 +203,16 @@ check_cid6_zip_county <- function(data, data_dictionary) {
 #'
 #' Validates that child's birthday was confirmed
 #'
-#' @param data Data frame with date_complete_check field
+#' @param data Data frame with dob_match field
 #' @return Data frame with CID7 pass/fail status
 check_cid7_birthday <- function(data) {
 
   cid7_result <- data %>%
-    select(pid, record_id, date_complete_check) %>%
-    mutate(
-      pass_cid7 = (date_complete_check == 1) & !is.na(date_complete_check)
+    dplyr::select(pid, record_id, dob_match) %>%
+    dplyr::mutate(
+      pass_cid7 = (dob_match == 1) & !is.na(dob_match)
     ) %>%
-    select(pid, record_id, pass_cid7)
+    dplyr::select(pid, record_id, pass_cid7)
 
   return(cid7_result)
 }
@@ -286,14 +286,14 @@ check_ne25_eligibility <- function(data, data_dictionary) {
   # Apply all eligibility checks (excluding CID8)
   cid_results <- data %>%
     dplyr::select(pid, record_id, retrieved_date) %>%
-    dplyr::left_join(check_cid1_compensation(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid2_consent(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid3_caregiver(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid4_child_age(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid5_nebraska(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid6_zip_county(data, data_dictionary), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid7_birthday(data), by = c("pid", "record_id")) %>%
-    dplyr::left_join(check_cid8_completion(data), by = c("pid", "record_id"))
+    safe_left_join(check_cid1_compensation(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid2_consent(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid3_caregiver(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid4_child_age(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid5_nebraska(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid6_zip_county(data, data_dictionary), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid7_birthday(data), by_vars = c("pid", "record_id")) %>%
+    safe_left_join(check_cid8_completion(data), by_vars = c("pid", "record_id"))
 
   message("DEBUG: CID results computed, dimensions: ", nrow(cid_results), " x ", ncol(cid_results))
 
@@ -307,9 +307,9 @@ check_ne25_eligibility <- function(data, data_dictionary) {
     dplyr::mutate(
       cid_number = as.integer(stringr::str_extract(cid, "\\d+"))
     ) %>%
-    dplyr::left_join(
+    safe_left_join(
       get_eligibility_criteria_definitions(),
-      by = c("cid_number" = "cid")
+      by_vars = c("cid_number" = "cid")
     )
 
   # Create summary by category
@@ -363,9 +363,9 @@ apply_ne25_eligibility <- function(data, eligibility_results) {
   cat("Attempting left join...\n")
   data_with_eligibility <- tryCatch({
     data %>%
-      dplyr::left_join(
+      safe_left_join(
         eligibility_results$summary,
-        by = c("retrieved_date", "pid", "record_id")
+        by_vars = c("retrieved_date", "pid", "record_id")
       ) %>%
       dplyr::mutate(
         # Overall inclusion flag

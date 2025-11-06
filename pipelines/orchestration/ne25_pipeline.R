@@ -266,52 +266,9 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     saveRDS(combined_dictionary, file.path(cache_dir, "step2_combined_dictionary.rds"))
     message("DEBUG: Cached validated data (", nrow(validated_data), " records)")
 
-    # STEP 4: ELIGIBILITY VALIDATION
-    message("\n--- Step 4: Eligibility Validation ---")
-    message("DEBUG: Starting eligibility validation with 8 criteria (CID8 KMT quality removed)")
+    # STEP 4: STORE RAW DATA IN DUCKDB USING PYTHON
+    message("\n--- Step 4: Storing Raw Data in DuckDB ---")
     message("DEBUG: Validated data dimensions: ", nrow(validated_data), " x ", ncol(validated_data))
-    message("DEBUG: Dictionary entries: ", length(combined_dictionary))
-
-    # Check eligibility for all records (simplified - no codebook needed)
-    eligibility_checks <- check_ne25_eligibility(validated_data, combined_dictionary)
-
-    message("DEBUG: Eligibility checks completed")
-    message("DEBUG: Eligibility summary records: ", nrow(eligibility_checks$summary))
-
-    # Cache eligibility checks for debugging
-    message("DEBUG: Caching eligibility checks...")
-    saveRDS(eligibility_checks, file.path(cache_dir, "step3_eligibility_checks.rds"))
-    message("DEBUG: Cached eligibility checks with ", nrow(eligibility_checks$summary), " records")
-
-    # Apply eligibility flags to the dataset
-    message("DEBUG: Applying eligibility flags to dataset...")
-    eligibility_results <- apply_ne25_eligibility(validated_data, eligibility_checks)
-
-    # Cache eligibility results for debugging
-    message("DEBUG: Caching eligibility results...")
-    saveRDS(eligibility_results, file.path(cache_dir, "step4_eligibility_results.rds"))
-    message("DEBUG: Cached eligibility results (", nrow(eligibility_results), " records)")
-
-    # Count eligibility metrics
-    metrics$records_eligible <- sum(eligibility_results$eligible, na.rm = TRUE)
-    metrics$records_authentic <- sum(eligibility_results$authentic, na.rm = TRUE)
-    metrics$records_included <- sum(eligibility_results$include, na.rm = TRUE)
-
-    message(paste("Eligibility validation completed:"))
-    message(paste("  - Eligible participants:", metrics$records_eligible))
-    message(paste("  - Authentic participants:", metrics$records_authentic))
-    message(paste("  - Included participants:", metrics$records_included))
-
-    processing_time <- as.numeric(Sys.time() - processing_start)
-    metrics$processing_duration <- processing_time
-
-    # STEP 5: STORE RAW DATA IN DUCKDB USING PYTHON
-    message("\n--- Step 5: Storing Raw Data in DuckDB ---")
-    message("DEBUG: Final eligibility results dimensions: ", nrow(eligibility_results), " x ", ncol(eligibility_results))
-    message("DEBUG: Eligibility summary:")
-    message("DEBUG:   - Records eligible: ", metrics$records_eligible)
-    message("DEBUG:   - Records authentic: ", metrics$records_authentic)
-    message("DEBUG:   - Records included: ", metrics$records_included)
 
     # Create temporary directory for CSV exports
     temp_dir <- file.path(tempdir(), "ne25_pipeline")
@@ -366,30 +323,6 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       warning(paste("Raw data insertion had issues:", paste(raw_result, collapse = "\n")))
     } else {
       message("Raw data stored successfully")
-    }
-
-    # Insert eligibility results
-    message("Storing eligibility results...")
-    elig_feather <- file.path(temp_dir, "ne25_eligibility.feather")
-    arrow::write_feather(eligibility_results, elig_feather)
-
-    elig_result <- system2(
-      python_path,
-      args = c(
-        "pipelines/python/insert_raw_data.py",
-        "--data-file", elig_feather,
-        "--table-name", "ne25_eligibility",
-        "--data-type", "eligibility",
-        "--config", config_path
-      ),
-      stdout = TRUE,
-      stderr = TRUE
-    )
-
-    if (attr(elig_result, "status") != 0 && !is.null(attr(elig_result, "status"))) {
-      warning(paste("Eligibility data insertion had issues:", paste(elig_result, collapse = "\n")))
-    } else {
-      message("Eligibility data stored successfully")
     }
 
     # DISABLED: Project-specific table storage (redundant with university server)
@@ -475,21 +408,95 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     }
     message(paste("Stored", total_dict_fields, "total dictionary fields from", length(all_dictionaries), "projects"))
 
-    # STEP 6: DATA TRANSFORMATION (Including Geographic Variables)
-    message("\n--- Step 6: Data Transformation ---")
+    # STEP 5: DATA TRANSFORMATION (Including Geographic Variables)
+    message("\n--- Step 5: Data Transformation ---")
     transformation_start <- Sys.time()
 
-    # Apply all transformations including geographic crosswalks (48 derived variables)
-    message("Applying all transformations (eligibility, race, education, geographic, etc.)...")
-    transformed_data <- recode_it(dat = eligibility_results, dict = combined_dictionary, what = "all")
+    # Apply all transformations including geographic crosswalks (creates dob_match and other derived variables)
+    message("Applying all transformations (race, education, geographic, age, etc.)...")
+    transformed_data <- recode_it(dat = validated_data, dict = combined_dictionary, what = "all")
 
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
 
-    # Store transformed data using Python
-    message("Storing transformed data...")
+    # Cache transformed data for debugging
+    message("DEBUG: Caching transformed data...")
+    saveRDS(transformed_data, file.path(cache_dir, "step5_transformed_data.rds"))
+    message("DEBUG: Cached transformed data (", nrow(transformed_data), " records)")
+
+    transformation_time <- as.numeric(Sys.time() - transformation_start)
+    metrics$transformation_duration <- transformation_time
+    message(paste("Data transformation completed in", round(transformation_time, 2), "seconds"))
+
+    # STEP 6: ELIGIBILITY VALIDATION (now runs after transformation, so dob_match exists)
+    message("\n--- Step 6: Eligibility Validation ---")
+    processing_start <- Sys.time()
+    message("DEBUG: Starting eligibility validation with 8 criteria (CID8 KMT quality removed)")
+    message("DEBUG: Transformed data dimensions: ", nrow(transformed_data), " x ", ncol(transformed_data))
+    message("DEBUG: Dictionary entries: ", length(combined_dictionary))
+
+    # Check eligibility for all records (now includes dob_match from transformation)
+    eligibility_checks <- check_ne25_eligibility(transformed_data, combined_dictionary)
+
+    message("DEBUG: Eligibility checks completed")
+    message("DEBUG: Eligibility summary records: ", nrow(eligibility_checks$summary))
+
+    # Cache eligibility checks for debugging
+    message("DEBUG: Caching eligibility checks...")
+    saveRDS(eligibility_checks, file.path(cache_dir, "step6_eligibility_checks.rds"))
+    message("DEBUG: Cached eligibility checks with ", nrow(eligibility_checks$summary), " records")
+
+    # Apply eligibility flags to the transformed dataset
+    message("DEBUG: Applying eligibility flags to transformed dataset...")
+    final_data <- apply_ne25_eligibility(transformed_data, eligibility_checks)
+
+    # Cache final data for debugging
+    message("DEBUG: Caching final data...")
+    saveRDS(final_data, file.path(cache_dir, "step6_final_data.rds"))
+    message("DEBUG: Cached final data (", nrow(final_data), " records)")
+
+    # Count eligibility metrics
+    metrics$records_eligible <- sum(final_data$eligible, na.rm = TRUE)
+    metrics$records_authentic <- sum(final_data$authentic, na.rm = TRUE)
+    metrics$records_included <- sum(final_data$include, na.rm = TRUE)
+
+    message(paste("Eligibility validation completed:"))
+    message(paste("  - Eligible participants:", metrics$records_eligible))
+    message(paste("  - Authentic participants:", metrics$records_authentic))
+    message(paste("  - Included participants:", metrics$records_included))
+
+    processing_time <- as.numeric(Sys.time() - processing_start)
+    metrics$processing_duration <- processing_time
+
+    # Store eligibility summary table
+    message("Storing eligibility summary...")
+    elig_feather <- file.path(temp_dir, "ne25_eligibility.feather")
+    arrow::write_feather(eligibility_checks$summary, elig_feather)
+
+    elig_result <- system2(
+      python_path,
+      args = c(
+        "pipelines/python/insert_raw_data.py",
+        "--data-file", elig_feather,
+        "--table-name", "ne25_eligibility",
+        "--data-type", "eligibility",
+        "--config", config_path
+      ),
+      stdout = TRUE,
+      stderr = TRUE
+    )
+
+    if (attr(elig_result, "status") != 0 && !is.null(attr(elig_result, "status"))) {
+      warning(paste("Eligibility data insertion had issues:", paste(elig_result, collapse = "\n")))
+    } else {
+      message("Eligibility summary stored successfully")
+    }
+
+    # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS
+    message("\n--- Step 7: Storing Transformed Data ---")
+    message("Storing transformed data with eligibility flags...")
     transformed_feather <- file.path(temp_dir, "ne25_transformed.feather")
-    arrow::write_feather(transformed_data, transformed_feather)
+    arrow::write_feather(final_data, transformed_feather)
 
     transformed_result <- system2(
       python_path,
@@ -509,15 +516,10 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     } else {
       message("Transformed data stored successfully")
     }
+    metrics$records_transformed <- nrow(final_data)
 
-    transformation_time <- as.numeric(Sys.time() - transformation_start)
-    metrics$transformation_duration <- transformation_time
-    metrics$records_transformed <- nrow(transformed_data)
-
-    message(paste("Data transformation completed in", round(transformation_time, 2), "seconds"))
-
-    # STEP 7: METADATA GENERATION USING PYTHON
-    message("\n--- Step 7: Generating Variable Metadata ---")
+    # STEP 8: METADATA GENERATION USING PYTHON
+    message("\n--- Step 8: Generating Variable Metadata ---")
     metadata_start <- Sys.time()
 
     # Generate metadata using Python script
@@ -548,8 +550,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     message(paste("Metadata generation completed in", round(metadata_time, 2), "seconds"))
 
-    # STEP 8: DATA DICTIONARY GENERATION
-    message("\n--- Step 8: Generating Data Dictionary ---")
+    # STEP 9: DATA DICTIONARY GENERATION
+    message("\n--- Step 9: Generating Data Dictionary ---")
 
     # Generate data dictionary without database connection
     dict_path <- generate_pipeline_data_dictionary(format = "full")
@@ -560,8 +562,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("Data dictionary generation skipped or failed")
     }
 
-    # STEP 9: INTERACTIVE DICTIONARY GENERATION
-    message("\n--- Step 9: Generating Interactive Dictionary ---")
+    # STEP 10: INTERACTIVE DICTIONARY GENERATION
+    message("\n--- Step 10: Generating Interactive Dictionary ---")
     interactive_dict_start <- Sys.time()
 
     # Generate interactive Quarto-based data dictionary
