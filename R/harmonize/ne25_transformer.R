@@ -43,7 +43,7 @@ transform_ne25_data <- function(data, data_dictionary, config, categories = "all
     # Join the transformed variables
     if (!is.null(category_data) && nrow(category_data) > 0) {
       transformed_data <- transformed_data %>%
-        left_join(category_data, by = c("pid", "record_id"))
+        safe_left_join(category_data, by_vars = c("pid", "record_id"))
     }
   }
 
@@ -114,11 +114,11 @@ transform_race_ethnicity <- function(data, dictionary) {
       values_to = "response"
     ) %>%
     # Get race labels from dictionary
-    left_join(
+    safe_left_join(
       extract_value_labels("cqr010", dictionary) %>%
         mutate(var = paste0("cqr010_", value, "___1")) %>%
         select(var, label),
-      by = "var"
+      by_vars = "var"
     ) %>%
     # Collapse Asian/Pacific Islander categories
     mutate(
@@ -162,11 +162,11 @@ transform_race_ethnicity <- function(data, dictionary) {
       names_to = "var",
       values_to = "response"
     ) %>%
-    left_join(
+    safe_left_join(
       extract_value_labels("sq002", dictionary) %>%
         mutate(var = paste0("sq002_", value, "___1")) %>%
         select(var, label),
-      by = "var"
+      by_vars = "var"
     ) %>%
     mutate(
       label = case_when(
@@ -203,7 +203,7 @@ transform_race_ethnicity <- function(data, dictionary) {
 
   # Combine child and caregiver race
   race_data <- child_race %>%
-    left_join(caregiver_race, by = c("pid", "record_id"))
+    safe_left_join(caregiver_race, by_vars = c("pid", "record_id"))
 
   # Add variable labels
   var_label(race_data$hisp) <- "Child Hispanic/Latino ethnicity"

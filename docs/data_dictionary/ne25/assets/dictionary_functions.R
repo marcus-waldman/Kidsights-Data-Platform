@@ -683,7 +683,7 @@ format_transformed_variables_table <- function(transformed_vars_data, transforma
         TRUE ~ category
       )
     ) %>%
-    left_join(mapping_lookup, by = "variable_name") %>%
+    safe_left_join(mapping_lookup, by_vars = "variable_name") %>%
     mutate(
       source_vars = ifelse(is.na(source_vars), "Direct transformation", source_vars),
       # Use transformation_type if available, otherwise use mapped category

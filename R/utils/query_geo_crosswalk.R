@@ -5,7 +5,7 @@
 #'
 #' @param table_name Name of the crosswalk table to query (e.g., "geo_zip_to_puma")
 #' @param temp_dir Directory for temporary Feather files (default: tempdir())
-#' @param python_path Path to Python executable (default: python)
+#' @param python_path Path to Python executable (default: NULL, uses get_python_path() from .env)
 #'
 #' @return Data frame with crosswalk data, or NULL on error
 #'
@@ -19,12 +19,21 @@
 query_geo_crosswalk <- function(
   table_name,
   temp_dir = NULL,
-  python_path = "python"
+  python_path = NULL
 ) {
 
   # Use default temp dir if not specified
   if (is.null(temp_dir)) {
     temp_dir <- tempdir()
+  }
+
+  # Use environment-configured Python path if not provided
+  if (is.null(python_path)) {
+    # Source environment config if not already loaded
+    if (!exists("get_python_path", mode = "function")) {
+      source("R/utils/environment_config.R")
+    }
+    python_path <- get_python_path()
   }
 
   # Create unique temp file path

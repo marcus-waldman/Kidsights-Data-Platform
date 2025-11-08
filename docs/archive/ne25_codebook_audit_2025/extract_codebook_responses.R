@@ -89,7 +89,7 @@ extract_codebook_audit_responses <- function(codebook_path = "codebook/data/code
   cat("\n=== Joining Response Sets with Lexicon Mapping ===\n")
 
   codebook_with_mapping <- ne25_responses %>%
-    dplyr::left_join(ne25_crosswalk, by = "lex_equate") %>%
+    safe_left_join(ne25_crosswalk, by_vars = "lex_equate") %>%
     dplyr::mutate(
       # Handle case differences - convert to lowercase for matching
       ne25_var = tolower(ne25),
@@ -160,7 +160,7 @@ extract_codebook_audit_responses <- function(codebook_path = "codebook/data/code
   cat("\n=== Checking for Missing NE25 Mappings ===\n")
 
   items_without_mapping <- ne25_responses %>%
-    dplyr::left_join(ne25_crosswalk, by = "lex_equate") %>%
+    safe_left_join(ne25_crosswalk, by_vars = "lex_equate") %>%
     dplyr::filter(is.na(ne25)) %>%
     dplyr::distinct(lex_equate) %>%
     nrow()

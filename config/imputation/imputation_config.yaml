@@ -41,13 +41,13 @@ sociodemographic:
     - puma           # Geographic PUMA from geography imputation m
     - county         # County FIPS from geography imputation m
     - source_project # REDCap project ID (complete)
-    - authentic.x    # Authenticity flag (complete)
+    - authentic      # Authenticity flag (complete) - no .x suffix after safe_left_join migration
     - age_in_days    # Child age in days (complete)
     - consent_date   # Survey completion date (complete)
     - mom_a1         # Is Adult 1 the mother? (TRUE/FALSE)
     - relation1      # Adult 1's relationship to child (6 levels)
 
-  # Filter to eligible records only (eligible.x == TRUE, n=3,460)
+  # Filter to eligible records only (eligible == TRUE, n=3,460)
   eligible_only: true
 
   # mice imputation methods by variable
@@ -90,11 +90,11 @@ adult_mental_health:
     - a1_raceG       # Adult 1 race/ethnicity from sociodem imputation m (if imputed, else base)
     - educ_a1        # Adult 1 education from sociodem imputation m (if imputed, else base)
     - income         # Family income from sociodem imputation m
-    - authentic.x    # Authenticity flag (complete, also used as defensive filter)
+    - authentic      # Authenticity flag (complete, also used as defensive filter) - no .x suffix after safe_left_join migration
     - female_a1      # Adult 1 sex/gender (logical: TRUE=female)
     - a1_years_old   # Adult 1 age in years (numeric, mean ~32.5)
 
-  # Filter to eligible AND authentic records only (eligible.x == TRUE AND authentic.x == TRUE, n=2,676)
+  # Filter to eligible AND authentic records only (eligible == TRUE AND authentic == TRUE, n=2,676)
   eligible_only: true
 
   # mice imputation methods by variable

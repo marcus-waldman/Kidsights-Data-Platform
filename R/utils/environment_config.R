@@ -131,6 +131,68 @@ get_r_path <- function() {
   }
 }
 
+#' Get FRED API Key Path from Environment
+#'
+#' Reads FRED_API_KEY_PATH from .env file or falls back to default location
+#'
+#' @return Character string with FRED API key file path
+#' @export
+get_fred_api_key_path <- function() {
+  # Try to read from .env file first
+  env_file <- ".env"
+
+  if (file.exists(env_file)) {
+    # Read .env file
+    env_lines <- readLines(env_file, warn = FALSE)
+
+    # Filter out comments and empty lines
+    env_lines <- env_lines[!grepl("^\\s*#", env_lines)]
+    env_lines <- env_lines[nzchar(trimws(env_lines))]
+
+    # Look for FRED_API_KEY_PATH
+    fred_line <- env_lines[grepl("^FRED_API_KEY_PATH=", env_lines)]
+
+    if (length(fred_line) > 0) {
+      # Extract path (remove FRED_API_KEY_PATH= prefix)
+      fred_path <- sub("^FRED_API_KEY_PATH=", "", fred_line[1])
+      fred_path <- trimws(fred_path)
+
+      # Remove quotes if present
+      fred_path <- gsub("^['\"]|['\"]$", "", fred_path)
+
+      # Verify the path exists
+      if (file.exists(fred_path)) {
+        return(fred_path)
+      } else {
+        warning("FRED_API_KEY_PATH in .env points to non-existent file: ", fred_path)
+        warning("Falling back to default location")
+      }
+    }
+  }
+
+  # Fallback: Try system environment variable
+  env_fred <- Sys.getenv("FRED_API_KEY_PATH", unset = "")
+  if (nzchar(env_fred) && file.exists(env_fred)) {
+    return(env_fred)
+  }
+
+  # Fallback: Try default location in user home
+  home_dir <- Sys.getenv("HOME")
+  if (!nzchar(home_dir)) {
+    home_dir <- path.expand("~")
+  }
+
+  default_path <- file.path(home_dir, ".kidsights", "FRED.txt")
+
+  if (file.exists(default_path)) {
+    return(default_path)
+  }
+
+  # If nothing works, return the default path (will error if used)
+  warning("FRED API key file not found. Set FRED_API_KEY_PATH in .env")
+  return(default_path)
+}
+
 #' Test Python Path Configuration
 #'
 #' Verifies that Python executable can be found and is working

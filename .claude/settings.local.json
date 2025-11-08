@@ -1,8 +1,20 @@
 {
   "permissions": {
     "allow": [
-      "Update(*)",
-      "Write(*)"
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/temp/check_calibration_table.R)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/temp/check_ne25_columns.R)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\R.exe\" --slave --no-restore --file=run_ne25_pipeline.R)",
+      "Bash(py:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/authenticity_screening/01_prepare_data.R)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/temp/check_response_values.R)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/temp/check_lexequate_validation.R)",
+      "Bash(gh issue create:*)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" scripts/authenticity_screening/02_fit_full_model.R)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

@@ -52,7 +52,7 @@ sociodemographic:
     - puma           # Geographic PUMA from geography imputation m
     - county         # County FIPS from geography imputation m
     - source_project # REDCap project ID (complete)
-    - authentic.x    # Authenticity flag (complete)
+    - authentic      # Authenticity flag (complete) - no .x suffix after safe_left_join migration
     - age_in_days    # Child age in days (complete)
     - consent_date   # Survey completion date (complete)
     - mom_a1         # Is Adult 1 the mother? (TRUE/FALSE)

@@ -1,0 +1,302 @@
+# Psychometric Specialist Agent - Implementation Task List
+
+## PHASE 1: Foundation & Configuration Setup
+
+### Directory Structure
+- [ ] Create scripts/irt_scoring/ directory
+- [ ] Create scripts/irt_scoring/helpers/ subdirectory
+- [ ] Create scripts/irt_scoring/config/ subdirectory
+- [ ] Create data/mplus_calibration/ directory
+- [ ] Create docs/irt_scoring/ directory
+- [ ] Create docs/github_issues/ directory
+
+### Agent Configuration
+- [ ] Create .claude/agents/psychometric-specialist.yaml
+- [ ] Define agent prompt with all 4 core capabilities
+- [ ] Specify tools (Read, Write, Edit, Bash, Glob, Grep)
+- [ ] Add psychometric-specialist to .claude/agents/README.md
+
+### Configuration Files
+- [ ] Create config/irt_scoring/irt_scoring_config.yaml
+- [ ] Define standard_covariates section (main_effects + age_interactions)
+- [ ] Configure kidsights scale specification
+- [ ] Configure psychosocial scale specification
+- [ ] Add mplus_dataset_prep defaults
+
+### Database Schema
+- [ ] Create SQL script: sql/irt_scoring/create_irt_score_tables.sql
+- [ ] Define ne25_irt_scores_kidsights table schema
+- [ ] Define ne25_irt_scores_psychosocial table schema
+- [ ] Add indexes on (pid, record_id) and (imputation_m)
+- [ ] Add composite primary key (study_id, pid, record_id, imputation_m)
+- [ ] Execute SQL to create tables in DuckDB
+
+### PHASE 1 COMPLETION TASK
+- [ ] Load Phase 2 tasks into Claude todo list
+
+---
+
+## PHASE 2: Core Scoring Infrastructure
+
+### Helper Functions - Covariate Preparation
+- [ ] Create scripts/irt_scoring/helpers/covariate_preparation.R
+- [ ] Implement get_standard_covariates() function
+- [ ] Implement derive_age_years() function (age_in_days / 365.25)
+- [ ] Implement create_age_interactions() function
+- [ ] Implement add_developmental_terms() for log(age + 1)
+- [ ] Test covariate preparation with sample data
+
+### Helper Functions - MAP Scoring Wrapper
+- [ ] Create scripts/irt_scoring/helpers/map_scoring.R
+- [ ] Implement load_irt_parameters_from_codebook() function
+- [ ] Implement prepare_item_responses() function
+- [ ] Implement score_unidimensional_map() wrapper for IRTScoring
+- [ ] Implement score_bifactor_map() wrapper for IRTScoring
+- [ ] Add error handling for missing IRTScoring features
+
+### Helper Functions - Score Validation
+- [ ] Create scripts/irt_scoring/helpers/score_validation.R
+- [ ] Implement validate_score_range() function (check theta plausibility)
+- [ ] Implement check_se_values() function (SE > 0, reasonable range)
+- [ ] Implement compare_classical_irt() function (correlation check)
+- [ ] Implement person_fit_checks() function (if IRTScoring supports)
+
+### Scoring Script - Kidsights
+- [ ] Create scripts/irt_scoring/01_score_kidsights.R
+- [ ] Load configuration from irt_scoring_config.yaml
+- [ ] Extract items using lex_equate from codebook
+- [ ] Load completed datasets for m=1 to m=5
+- [ ] Prepare standard covariates + log(age+1) term
+- [ ] Call MAP scoring for each imputation
+- [ ] Validate scores
+- [ ] Write Feather files to temp directory
+- [ ] Test on subset of data
+
+### Scoring Script - Psychosocial
+- [ ] Create scripts/irt_scoring/02_score_psychosocial.R
+- [ ] Load configuration from irt_scoring_config.yaml
+- [ ] Extract PS items (ps001-ps049, excluding ps031/ps033)
+- [ ] Load completed datasets for m=1 to m=5
+- [ ] Prepare standard covariates (no log term)
+- [ ] Call bifactor MAP scoring for each imputation (6 factors)
+- [ ] Validate scores (general + 5 specific factors)
+- [ ] Write Feather files to temp directory
+- [ ] Test on subset of data
+
+### Database Insertion Scripts
+- [ ] Create scripts/irt_scoring/01b_insert_kidsights_scores.py
+- [ ] Implement read Feather files from temp directory
+- [ ] Implement insert into ne25_irt_scores_kidsights
+- [ ] Add row count validation
+- [ ] Create scripts/irt_scoring/02b_insert_psychosocial_scores.py
+- [ ] Implement insert into ne25_irt_scores_psychosocial (6 factor columns)
+- [ ] Add validation for bifactor score structure
+
+### Pipeline Orchestrator
+- [ ] Create scripts/irt_scoring/run_irt_scoring_pipeline.R
+- [ ] Implement command-line argument parsing (--scales flag)
+- [ ] Implement selective execution logic (kidsights, psychosocial, or both)
+- [ ] Add timing tracking for each scale
+- [ ] Add error handling and pipeline halting on failure
+- [ ] Add summary report at end
+- [ ] Test selective execution with --scales kidsights
+- [ ] Test selective execution with --scales psychosocial
+- [ ] Test full execution with --scales kidsights,psychosocial
+
+### PHASE 2 COMPLETION TASK
+- [ ] Load Phase 3 tasks into Claude todo list
+
+---
+
+## PHASE 3: Codebook Maintenance System
+
+### Codebook Update Functions
+- [ ] Create R/codebook/update_irt_parameters.R
+- [ ] Implement interactive_parameter_update() function
+- [ ] Add prompt for study selection
+- [ ] Add prompt for model type (unidimensional/bifactor/multidimensional)
+- [ ] Add prompt for factor structure
+- [ ] Add parameter entry interface (loadings, thresholds)
+- [ ] Implement batch update from CSV/data frame
+
+### Codebook Validation Functions
+- [ ] Create R/codebook/validate_irt_structure.R
+- [ ] Implement validate_json_structure() function
+- [ ] Implement validate_parameter_arrays() (loadings count = factors count)
+- [ ] Implement validate_thresholds_ordered() (ascending order check)
+- [ ] Implement validate_factor_names() (consistent naming)
+- [ ] Implement check_duplicate_items() function
+
+### Version Tracking
+- [ ] Add version field to codebook.json metadata
+- [ ] Implement increment_codebook_version() function
+- [ ] Add changelog tracking in codebook
+- [ ] Implement backup_codebook() before updates
+- [ ] Create codebook/backups/ directory
+
+### Codebook Workflow Testing
+- [ ] Test adding new item to codebook
+- [ ] Test updating existing IRT parameters
+- [ ] Test adding new study calibration to existing item
+- [ ] Test validation catches malformed parameters
+- [ ] Test version increments correctly
+
+### PHASE 3 COMPLETION TASK
+- [ ] Load Phase 4 tasks into Claude todo list
+
+---
+
+## PHASE 4: Mplus Integration & Calibration Workflow
+
+### Dataset Extraction Functions
+- [ ] Create scripts/irt_scoring/helpers/mplus_dataset_prep.R
+- [ ] Implement extract_items_for_calibration() function
+- [ ] Add user prompt for sample filter specification
+- [ ] Implement apply_sample_filters() function
+- [ ] Implement get_items_from_codebook() (with lex_equate mapping)
+- [ ] Implement sort_items_alphabetically() function
+
+### Variable Naming Functions
+- [ ] Implement map_database_to_lexequate() for Kidsights items
+- [ ] Implement standardize_ps_names() for psychosocial items (lowercase)
+- [ ] Add uppercase/lowercase conversion utilities
+- [ ] Implement check_naming_consistency() function
+
+### Mplus File Writing
+- [ ] Create scripts/irt_scoring/helpers/write_mplus_data.R
+- [ ] Implement write_dat_file() function (free format, whitespace delimited)
+- [ ] Implement format_missing_values() (convert NA to ".")
+- [ ] Implement create_variable_name_list() for Mplus syntax
+- [ ] Test .dat file readability in Mplus
+
+### Template Modification Functions
+- [ ] Create scripts/irt_scoring/helpers/modify_mplus_template.R
+- [ ] Implement read_mplus_template() function
+- [ ] Implement parse_variable_names() from template
+- [ ] Implement detect_naming_mismatches() (case, order, missing vars)
+- [ ] Implement update_data_file_path() in template
+- [ ] Implement update_variable_names() section
+- [ ] Implement update_usevariables() section
+- [ ] Implement write_modified_template() function
+
+### Interactive Mplus Workflow
+- [ ] Create scripts/irt_scoring/prepare_mplus_calibration.R
+- [ ] Implement template selection dialog
+- [ ] Implement scale selection (kidsights/psychosocial)
+- [ ] Implement sample filter specification interface
+- [ ] Implement variable reconciliation workflow
+- [ ] Add confirmation step before writing files
+- [ ] Test workflow with existing NE22 template
+- [ ] Test workflow from scratch (no template)
+
+### PHASE 4 COMPLETION TASK
+- [ ] Load Phase 5 tasks into Claude todo list
+
+---
+
+## PHASE 5: Documentation & Production Integration
+
+### Agent Documentation
+- [ ] Create docs/irt_scoring/USING_PSYCHOMETRIC_AGENT.md
+- [ ] Document all 4 core capabilities with examples
+- [ ] Add example interaction patterns (score construction, codebook update, etc.)
+- [ ] Add troubleshooting section
+- [ ] Create docs/irt_scoring/CONFIGURATION_GUIDE.md
+- [ ] Document irt_scoring_config.yaml structure
+- [ ] Document standard covariate specification
+- [ ] Document scale-specific settings
+- [ ] Add examples for adding new scales
+
+### Technical Documentation
+- [ ] Create docs/irt_scoring/SCORE_DATABASE_SCHEMA.md
+- [ ] Document table structures with column descriptions
+- [ ] Add example queries for retrieving scores
+- [ ] Document integration with imputation tables (joining on imputation_m)
+- [ ] Create docs/codebook/UPDATING_IRT_PARAMETERS.md
+- [ ] Document parameter update workflow
+- [ ] Add examples for different model types
+- [ ] Document validation requirements
+
+### Mplus Workflow Documentation
+- [ ] Create docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md
+- [ ] Document dataset preparation steps
+- [ ] Document variable reconciliation process
+- [ ] Add example templates for unidimensional and bifactor models
+- [ ] Document how to import new calibrations back to codebook
+
+### GitHub Issue Template
+- [ ] Create docs/github_issues/irtscoring_feature_request_template.md
+- [ ] Define template structure (use case, current behavior, requested feature)
+- [ ] Add sections for reproducible example and context
+- [ ] Document agent's issue drafting workflow
+
+### Update Existing Documentation
+- [ ] Update CLAUDE.md: Add IRT Scoring Pipeline section to "Current Status"
+- [ ] Update CLAUDE.md: Add IRT scoring to Quick Start commands
+- [ ] Update CLAUDE.md: Add psychometric-specialist to agent list
+- [ ] Update docs/architecture/PIPELINE_OVERVIEW.md: Add Stage 12-13 (IRT Scoring)
+- [ ] Update docs/QUICK_REFERENCE.md: Add IRT scoring commands
+- [ ] Update .claude/agents/README.md: Add psychometric-specialist entry
+- [ ] Update .claude/agents/README.md: Add "When to Use" table row
+
+### Integration Testing
+- [ ] Test end-to-end: Imputation → IRT Scoring for kidsights
+- [ ] Test end-to-end: Imputation → IRT Scoring for psychosocial
+- [ ] Verify score tables populated correctly (row counts, no NULLs)
+- [ ] Test querying scores across imputations
+- [ ] Test score retrieval with join to base data
+- [ ] Benchmark execution time (add to PIPELINE_OVERVIEW.md)
+
+### Production Readiness Preparation
+- [ ] Create scripts/irt_scoring/integrate_with_imputation_pipeline.R (stub for future)
+- [ ] Add TODO markers for automatic integration
+- [ ] Document integration points in imputation pipeline
+- [ ] Add configuration flag: auto_score_after_imputation (default: false)
+- [ ] Add timing estimates to documentation
+
+### Final Validation
+- [ ] Run full scoring pipeline on complete NE25 dataset
+- [ ] Validate kidsights scores (theta range, SE values, row counts)
+- [ ] Validate psychosocial scores (6 factors, correlations)
+- [ ] Compare to classical sum scores (sanity check)
+- [ ] Generate summary statistics report
+- [ ] Archive test results in docs/irt_scoring/validation/
+
+### PHASE 5 COMPLETION
+- [ ] Review all documentation for completeness
+- [ ] Test agent can be invoked from command line
+- [ ] Create summary report of implementation
+- [ ] Mark psychometric-specialist as "Production Ready" in README
+- [ ] Celebrate! 🎉
+
+---
+
+## NOTES
+
+### Implementation Order Rationale
+- Phase 1: Sets up infrastructure before writing any code
+- Phase 2: Core functionality that everything else depends on
+- Phase 3: Codebook system independent of Mplus workflow
+- Phase 4: Mplus integration can leverage existing codebook functions
+- Phase 5: Documentation and testing after all features complete
+
+### Parallel Work Opportunities
+- Phases 3 and 4 can be worked on in parallel (independent workflows)
+- Documentation can start during Phase 2-3 (iterative refinement)
+
+### Testing Strategy
+- Test each helper function independently before integration
+- Use subset of data for initial testing (faster iteration)
+- Full dataset testing only in Phase 5
+
+### Milestone Markers
+- Phase 1 Complete → Can configure agent and create database schema
+- Phase 2 Complete → Can calculate IRT scores (core value delivery)
+- Phase 3 Complete → Can maintain codebook (sustainability)
+- Phase 4 Complete → Can run calibration workflow (research capability)
+- Phase 5 Complete → Production ready with full documentation
+
+---
+
+Last Updated: 2025-01-04
+Version: 1.0
