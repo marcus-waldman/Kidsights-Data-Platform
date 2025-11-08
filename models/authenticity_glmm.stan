@@ -74,18 +74,18 @@ model {
     if (y == 0) {
       // Lowest category: p_left = 0, so p = p_right
       real tau_right = tau[j];  // First threshold
-      p = inv_logit(tau_right + lp);
+      p = inv_logit(tau_right - lp);
 
     } else if (y == k_max) {
       // Highest category: p_right = 1, so p = 1 - p_left
       real tau_left = tau[j] + (y - 1) * delta;
-      p = 1 - inv_logit(tau_left + lp);
+      p = 1 - inv_logit(tau_left - lp);
 
     } else {
       // Interior category: p = p_right - p_left
       real tau_left = tau[j] + (y - 1) * delta;
       real tau_right = tau[j] + y * delta;
-      p = inv_logit(tau_right + lp) - inv_logit(tau_left + lp);
+      p = inv_logit(tau_right - lp) - inv_logit(tau_left - lp);
     }
 
     // Add small constant to avoid log(0)
@@ -117,16 +117,16 @@ generated quantities {
 
     if (y == 0) {
       real tau_right = tau[j];
-      p = inv_logit(tau_right + lp);
+      p = inv_logit(tau_right - lp);
 
     } else if (y == k_max) {
       real tau_left = tau[j] + (y - 1) * delta;
-      p = 1 - inv_logit(tau_left + lp);
+      p = 1 - inv_logit(tau_left - lp);
 
     } else {
       real tau_left = tau[j] + (y - 1) * delta;
       real tau_right = tau[j] + y * delta;
-      p = inv_logit(tau_right + lp) - inv_logit(tau_left + lp);
+      p = inv_logit(tau_right - lp) - inv_logit(tau_left - lp);
     }
 
     // Numerical safeguard
