@@ -110,21 +110,27 @@ validate_item_responses <- function(dat,
         # Convert to character if it's a list
         response_ref_char <- if (is.list(response_ref)) unlist(response_ref) else response_ref
 
-        if (length(response_ref_char) == 1 &&
-            is.character(response_ref_char) &&
-            response_ref_char %in% names(cb$response_sets)) {
+        # Handle $ref: prefix for response_set references
+        if (length(response_ref_char) == 1 && is.character(response_ref_char)) {
+          # Strip $ref: prefix if present
+          if (grepl("^\\$ref:", response_ref_char)) {
+            response_ref_char <- sub("^\\$ref:", "", response_ref_char)
+          }
 
-          response_set <- cb$response_sets[[response_ref_char]]
+          # Now check if it exists in response_sets
+          if (response_ref_char %in% names(cb$response_sets)) {
+            response_set <- cb$response_sets[[response_ref_char]]
 
-          # Extract ALL values (including those marked as missing)
-          # We want to keep -9 if it's defined, but remove 9 if it's not defined
-          valid_vals <- sapply(response_set, function(opt) {
-            # With simplifyVector=FALSE, opt$value might be a list
-            val <- if (is.list(opt$value)) opt$value[[1]] else opt$value
-            as.numeric(val)
-          })
+            # Extract ALL values (including those marked as missing)
+            # We want to keep -9 if it's defined, but remove 9 if it's not defined
+            valid_vals <- sapply(response_set, function(opt) {
+              # With simplifyVector=FALSE, opt$value might be a list
+              val <- if (is.list(opt$value)) opt$value[[1]] else opt$value
+              as.numeric(val)
+            })
 
-          valid_responses[[var_name]] <- sort(unique(valid_vals))
+            valid_responses[[var_name]] <- sort(unique(valid_vals))
+          }
         }
       }
     }, error = function(e) {
