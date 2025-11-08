@@ -62,6 +62,11 @@ for (item_id in names(cb$items)) {
 
           # Look up response set in codebook
           if (!is.null(resp_ref) && length(resp_ref) == 1) {
+            # Strip $ref: prefix if present
+            if (grepl("^\\$ref:", resp_ref)) {
+              resp_ref <- sub("^\\$ref:", "", resp_ref)
+            }
+
             if (resp_ref %in% names(cb$response_sets)) {
               response_set_name <- resp_ref
               response_set <- cb$response_sets[[resp_ref]]
@@ -115,7 +120,15 @@ cat("\n      Filtering to validated items only...\n")
 items_df <- items_df %>%
   dplyr::filter(!is.na(response_set) & response_set != "")
 
-cat(sprintf("      Using %d validated items for analysis\n", nrow(items_df)))
+cat(sprintf("      Validated items: %d\n", nrow(items_df)))
+
+# Exclude PS items (psychosocial items with sentinel values)
+# These items have been fixed in the codebook but excluded from authenticity model
+cat("\n      Excluding PS items (psychosocial)...\n")
+items_df <- items_df %>%
+  dplyr::filter(!grepl("^PS", equate_name))
+
+cat(sprintf("      Using %d items for authenticity model (excluding PS items)\n", nrow(items_df)))
 cat(sprintf("        Binary: %d\n", sum(items_df$item_type == "binary")))
 cat(sprintf("        Polytomous: %d\n", sum(items_df$item_type == "polytomous")))
 
