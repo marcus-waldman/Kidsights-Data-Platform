@@ -91,7 +91,7 @@ seed <- config$random_seed
 #' Load base data from DuckDB
 #'
 #' @param db_path Path to DuckDB database
-#' @param eligible_only Logical, filter to eligible.x == TRUE
+#' @param eligible_only Logical, filter to meets_inclusion == TRUE
 #'
 #' @return data.frame with base sociodemographic data
 load_base_data <- function(db_path, eligible_only = TRUE) {
@@ -117,14 +117,14 @@ load_base_data <- function(db_path, eligible_only = TRUE) {
       family_size,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic.x\",
+      authentic,
       age_in_days,
       consent_date,
       mom_a1,
       relation1,
 
       -- Eligibility flag
-      \"eligible.x\"
+      eligible
 
     FROM ne25_transformed
   "
