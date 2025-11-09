@@ -275,7 +275,7 @@ cat(sprintf("        Age range: [%.1f, %.1f]\n", min(age_vec), max(age_vec)))
 cat("\n[Step 5/6] Vectorizing inauthentic data to Stan format...\n")
 
 inauthentic_items <- inauthentic_data %>%
-  dplyr::select(pid, age_years, dplyr::all_of(items_df$ne25_name))
+  dplyr::select(pid, record_id, age_years, dplyr::all_of(items_df$ne25_name))
 
 # Same vectorization process
 yvec_inauth <- c()
@@ -317,7 +317,9 @@ stan_data_inauthentic <- list(
 )
 
 # Store metadata separately
+person_record_ids_inauth <- inauthentic_items$record_id
 attr(stan_data_inauthentic, "pid") <- person_ids_inauth
+attr(stan_data_inauthentic, "record_id") <- person_record_ids_inauth
 attr(stan_data_inauthentic, "item_names") <- items_df$equate_name
 
 cat(sprintf("      M = %d non-missing observations\n", M_inauth))
