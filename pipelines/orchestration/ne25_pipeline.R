@@ -66,9 +66,27 @@ convert_dictionary_to_df <- function(dict_list) {
 
 #' Execute the complete NE25 pipeline
 #'
+#' Pipeline Steps:
+#'   1. Load API credentials
+#'   2. Extract REDCap data
+#'   3. Minimal data processing
+#'   4. Store raw data in DuckDB
+#'   5. Data transformation (geographic variables)
+#'   6. Eligibility validation
+#'   6.5. Authenticity screening & weighting (NEW)
+#'   7. Store transformed data
+#'   8. Generate variable metadata
+#'   9. Generate data dictionary
+#'
 #' @param config_path Path to NE25 configuration file
 #' @param pipeline_type Type of pipeline run ("full", "incremental", "test")
 #' @param overwrite_existing Logical, whether to overwrite existing data
+#'
+#' @section Options:
+#' - `ne25.rebuild_loocv` (default: FALSE): If TRUE, re-runs LOOCV for authenticity
+#'   screening (~7 min). If FALSE, uses cached LOOCV distribution (~30 sec).
+#'   Set via `options(ne25.rebuild_loocv = TRUE)` before running pipeline.
+#'
 #' @return List with execution results and metrics
 run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
                               pipeline_type = "full",
@@ -491,6 +509,42 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     } else {
       message("Eligibility summary stored successfully")
     }
+
+    # STEP 6.5: AUTHENTICITY SCREENING & WEIGHTING
+    message("\n--- Step 6.5: Authenticity Screening ---")
+    authenticity_start <- Sys.time()
+
+    # Source weighting function
+    source("scripts/authenticity_screening/08_compute_pipeline_weights.R")
+
+    # Check global option for LOOCV rebuild
+    rebuild_loocv <- getOption("ne25.rebuild_loocv", FALSE)
+    message(paste("Rebuild LOOCV:", rebuild_loocv))
+
+    # Compute authenticity weights
+    message("Computing authenticity weights...")
+    final_data <- compute_authenticity_weights(final_data, rebuild_loocv, "results/")
+
+    # Create meets_inclusion column
+    message("Creating meets_inclusion column...")
+    final_data$meets_inclusion <- (final_data$eligible == TRUE & !is.na(final_data$authenticity_weight))
+
+    # Cache result
+    message("DEBUG: Caching authenticity-weighted data...")
+    saveRDS(final_data, file.path(cache_dir, "step6.5_authenticity_weights.rds"))
+    message("DEBUG: Cached authenticity-weighted data (", nrow(final_data), " records)")
+
+    # Count authenticity metrics
+    metrics$records_weighted <- sum(!is.na(final_data$authenticity_weight), na.rm = TRUE)
+    metrics$records_meets_inclusion <- sum(final_data$meets_inclusion, na.rm = TRUE)
+
+    message(paste("Authenticity screening completed:"))
+    message(paste("  - Participants with weights:", metrics$records_weighted))
+    message(paste("  - Participants meeting inclusion:", metrics$records_meets_inclusion))
+
+    authenticity_time <- as.numeric(Sys.time() - authenticity_start)
+    metrics$authenticity_duration <- authenticity_time
+    message(paste("Authenticity screening completed in", round(authenticity_time, 2), "seconds"))
 
     # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS
     message("\n--- Step 7: Storing Transformed Data ---")
