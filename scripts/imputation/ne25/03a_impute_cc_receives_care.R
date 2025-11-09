@@ -28,6 +28,9 @@ library(dplyr)
 library(mice)
 library(arrow)
 
+# Load safe join utilities
+source("R/utils/safe_joins.R")
+
 if (!requireNamespace("duckdb", quietly = TRUE)) {
   stop("Package 'duckdb' is required. Install with: install.packages('duckdb')")
 }
@@ -40,9 +43,17 @@ if (!requireNamespace("mice", quietly = TRUE)) {
 if (!requireNamespace("arrow", quietly = TRUE)) {
   stop("Package 'arrow' is required. Install with: install.packages('arrow')")
 }
+if (!requireNamespace("reticulate", quietly = TRUE)) {
+  stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
+}
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # =============================================================================
 # LOAD CONFIGURATION
@@ -103,7 +114,7 @@ load_base_childcare_data <- function(db_path, eligible_only = TRUE) {
   "
 
   if (eligible_only) {
-    query <- paste0(query, "\n    WHERE \"eligible.x\" = TRUE")
+    query <- paste0(query, "\n    WHERE meets_inclusion = TRUE")
   }
 
   dat <- DBI::dbGetQuery(con, query)
@@ -180,7 +191,7 @@ load_sociodem_imputations <- function(db_path, m, study_id = "ne25") {
     if (is.null(sociodem_data)) {
       sociodem_data <- var_imp
     } else {
-      sociodem_data <- dplyr::left_join(sociodem_data, var_imp, by = c("pid", "record_id"))
+      sociodem_data <- safe_left_join(sociodem_data, var_imp, by_vars = c("pid", "record_id"))
     }
   }
 
@@ -203,7 +214,7 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
 
   # Merge PUMA
   dat_merged <- base_data %>%
-    dplyr::left_join(puma_imp, by = c("pid", "record_id"))
+    safe_left_join(puma_imp, by_vars = c("pid", "record_id"))
 
   # For records without geography ambiguity, fill from ne25_transformed
   if (any(is.na(dat_merged$puma))) {
@@ -219,14 +230,14 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(geo_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(geo_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(puma = ifelse(is.na(puma), puma_observed, puma)) %>%
       dplyr::select(-puma_observed)
   }
 
   # Merge sociodem imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(sociodem_imp, by = c("pid", "record_id"))
+    safe_left_join(sociodem_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing sociodem values from ne25_transformed (for records with observed values)
   sociodem_vars <- c("female", "raceG", "educ_mom", "educ_a2", "income", "family_size", "fplcat")
@@ -251,7 +262,7 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
         var_observed <- DBI::dbGetQuery(con_sociodem, query)
 
         dat_merged <- dat_merged %>%
-          dplyr::left_join(var_observed, by = c("pid", "record_id")) %>%
+          safe_left_join(var_observed, by_vars = c("pid", "record_id")) %>%
           dplyr::mutate(!!var := ifelse(is.na(.data[[var]]), .data[[paste0(var, "_observed")]], .data[[var]])) %>%
           dplyr::select(-!!paste0(var, "_observed"))
       }
@@ -351,7 +362,7 @@ for (m in 1:M) {
   # Step 4: Prepare data for mice
   # Variables: cc_receives_care (to impute) + 10 auxiliary variables
   imp_vars <- c("cc_receives_care")
-  aux_vars <- c("puma", "authentic.x", "age_in_days", "female", "raceG", "educ_mom", "educ_a2", "income", "family_size", "fplcat")
+  aux_vars <- c("puma", "authentic", "age_in_days", "female", "raceG", "educ_mom", "educ_a2", "income", "family_size", "fplcat")
 
   all_vars <- c(imp_vars, aux_vars, "study_id", "pid", "record_id")
 

@@ -38,7 +38,11 @@ cat(strrep("=", 60), "\n")
 library(duckdb)
 library(dplyr)
 library(mice)
+library(ranger)
 library(arrow)
+
+# Load safe join utilities
+source("R/utils/safe_joins.R")
 
 if (!requireNamespace("duckdb", quietly = TRUE)) {
   stop("Package 'duckdb' is required. Install with: install.packages('duckdb')")
@@ -52,9 +56,17 @@ if (!requireNamespace("mice", quietly = TRUE)) {
 if (!requireNamespace("arrow", quietly = TRUE)) {
   stop("Package 'arrow' is required. Install with: install.packages('arrow')")
 }
+if (!requireNamespace("reticulate", quietly = TRUE)) {
+  stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
+}
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # Load recode_missing function (used in NE25 transforms)
 source("R/transform/ne25_transforms.R")
@@ -75,7 +87,7 @@ cat("  Random seed:", config$random_seed, "\n")
 cat("  Data directory:", study_config$data_dir, "\n")
 cat("  Variables to impute: 8 child ACE items (cqr017-cqr024)\n")
 cat("  Method: Random Forest (all 8 variables)\n")
-cat("  Defensive filtering: eligible.x = TRUE AND authentic.x = TRUE\n")
+cat("  Defensive filtering: meets_inclusion = TRUE\n")
 
 M <- config$n_imputations
 seed <- config$random_seed
@@ -87,7 +99,7 @@ seed <- config$random_seed
 #' Load base child ACE data from DuckDB
 #'
 #' @param db_path Path to DuckDB database
-#' @param eligible_only Logical, filter to eligible.x == TRUE AND authentic.x == TRUE
+#' @param eligible_only Logical, filter to meets_inclusion == TRUE
 #'
 #' @return data.frame with base child ACE data
 load_base_child_aces_data <- function(db_path, eligible_only = TRUE) {
@@ -126,8 +138,8 @@ load_base_child_aces_data <- function(db_path, eligible_only = TRUE) {
   "
 
   if (eligible_only) {
-    # DEFENSIVE FILTERING: Both eligible AND authentic
-    query <- paste0(query, "\n    WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE")
+    # DEFENSIVE FILTERING: meets_inclusion (eligible with non-NA authenticity_weight)
+    query <- paste0(query, "\n    WHERE meets_inclusion = TRUE")
   }
 
   dat <- DBI::dbGetQuery(con, query)
@@ -278,7 +290,7 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, mh_imp, db_pat
 
   # Merge PUMA
   dat_merged <- base_data %>%
-    dplyr::left_join(puma_imp, by = c("pid", "record_id"))
+    safe_left_join(puma_imp, by_vars = c("pid", "record_id"))
 
   # For records without geography ambiguity, fill from ne25_transformed
   if (any(is.na(dat_merged$puma))) {
@@ -291,18 +303,18 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, mh_imp, db_pat
         CAST(record_id AS INTEGER) as record_id,
         puma as puma_observed
       FROM ne25_transformed
-      WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE
+      WHERE meets_inclusion = TRUE
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(geo_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(geo_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(puma = ifelse(is.na(puma), puma_observed, puma)) %>%
       dplyr::select(-puma_observed)
   }
 
   # Merge sociodem imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(sociodem_imp, by = c("pid", "record_id"))
+    safe_left_join(sociodem_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing sociodem values from ne25_transformed (for records with observed values)
   sociodem_vars <- c("raceG", "educ_mom", "income", "family_size", "fplcat")
@@ -321,13 +333,13 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, mh_imp, db_pat
             CAST(record_id AS INTEGER) as record_id,
             \"%s\" as %s_observed
           FROM ne25_transformed
-          WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE
+          WHERE meets_inclusion = TRUE
         ", var, var)
 
         var_observed <- DBI::dbGetQuery(con_sociodem, query)
 
         dat_merged <- dat_merged %>%
-          dplyr::left_join(var_observed, by = c("pid", "record_id")) %>%
+          safe_left_join(var_observed, by_vars = c("pid", "record_id")) %>%
           dplyr::mutate(!!var := ifelse(is.na(.data[[var]]), .data[[paste0(var, "_observed")]], .data[[var]])) %>%
           dplyr::select(-!!paste0(var, "_observed"))
       }
@@ -336,7 +348,7 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, mh_imp, db_pat
 
   # Merge mental health imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(mh_imp, by = c("pid", "record_id"))
+    safe_left_join(mh_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing mental health values from ne25_transformed
   mh_vars <- c("phq2_positive", "gad2_positive")
@@ -355,13 +367,13 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, mh_imp, db_pat
             CAST(record_id AS INTEGER) as record_id,
             %s as %s_observed
           FROM ne25_transformed
-          WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE
+          WHERE meets_inclusion = TRUE
         ", var, var)
 
         var_observed <- DBI::dbGetQuery(con_mh, query)
 
         dat_merged <- dat_merged %>%
-          dplyr::left_join(var_observed, by = c("pid", "record_id")) %>%
+          safe_left_join(var_observed, by_vars = c("pid", "record_id")) %>%
           dplyr::mutate(!!var := ifelse(is.na(.data[[var]]), .data[[paste0(var, "_observed")]], .data[[var]])) %>%
           dplyr::select(-!!paste0(var, "_observed"))
       }
@@ -465,7 +477,7 @@ derive_child_ace_total <- function(completed_data, original_data, m, output_dir)
     records_needing_total$needs_derivation <- TRUE
 
     # Merge with completed data to identify which records need derived values
-    total_data <- dplyr::left_join(
+    total_data <- safe_left_join(
       completed_data[, c("study_id", "pid", "record_id", "child_ace_total")],
       records_needing_total,
       by = c("pid", "record_id")

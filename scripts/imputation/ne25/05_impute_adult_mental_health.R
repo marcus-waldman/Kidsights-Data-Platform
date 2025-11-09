@@ -29,6 +29,18 @@
 # SETUP
 # =============================================================================
 
+cat("Adult Mental Health & Parenting Imputation for NE25\n")
+cat(strrep("=", 60), "\n")
+
+# Load required packages
+library(duckdb)
+library(dplyr)
+library(mice)
+library(arrow)
+
+# Load safe join utilities
+source("R/utils/safe_joins.R")
+
 cat("Adult Mental Health & Parenting: Impute PHQ-2, GAD-2, q1502 for NE25\n")
 cat(strrep("=", 60), "\n")
 
@@ -50,9 +62,17 @@ if (!requireNamespace("mice", quietly = TRUE)) {
 if (!requireNamespace("arrow", quietly = TRUE)) {
   stop("Package 'arrow' is required. Install with: install.packages('arrow')")
 }
+if (!requireNamespace("reticulate", quietly = TRUE)) {
+  stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
+}
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # =============================================================================
 # LOAD CONFIGURATION
@@ -70,7 +90,7 @@ cat("  Random seed:", config$random_seed, "\n")
 cat("  Data directory:", study_config$data_dir, "\n")
 cat("  Variables to impute: phq2_interest, phq2_depressed, gad2_nervous, gad2_worry, q1502\n")
 cat("  Method: CART (all 5 variables)\n")
-cat("  Defensive filtering: eligible.x = TRUE AND authentic.x = TRUE\n")
+cat("  Defensive filtering: meets_inclusion = TRUE\n")
 
 M <- config$n_imputations
 seed <- config$random_seed
@@ -82,7 +102,7 @@ seed <- config$random_seed
 #' Load base mental health data from DuckDB
 #'
 #' @param db_path Path to DuckDB database
-#' @param eligible_only Logical, filter to eligible.x == TRUE AND authentic.x == TRUE
+#' @param eligible_only Logical, filter to meets_inclusion == TRUE
 #'
 #' @return data.frame with base mental health data
 load_base_mental_health_data <- function(db_path, eligible_only = TRUE) {
@@ -126,8 +146,8 @@ load_base_mental_health_data <- function(db_path, eligible_only = TRUE) {
   "
 
   if (eligible_only) {
-    # DEFENSIVE FILTERING: Both eligible AND authentic
-    query <- paste0(query, "\n    WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE")
+    # DEFENSIVE FILTERING: meets_inclusion (eligible with non-NA authenticity_weight)
+    query <- paste0(query, "\n    WHERE meets_inclusion = TRUE")
   }
 
   dat <- DBI::dbGetQuery(con, query)
@@ -228,7 +248,7 @@ load_sociodem_imputations_for_mental_health <- function(db_path, m, study_id = "
       var_imp <- DBI::dbGetQuery(con, var_query)
 
       if (nrow(var_imp) > 0) {
-        sociodem_data <- dplyr::left_join(sociodem_data, var_imp, by = c("pid", "record_id"))
+        sociodem_data <- safe_left_join(sociodem_data, var_imp, by_vars = c("pid", "record_id"))
       }
     }
   }
@@ -252,7 +272,7 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
 
   # Merge PUMA
   dat_merged <- base_data %>%
-    dplyr::left_join(puma_imp, by = c("pid", "record_id"))
+    safe_left_join(puma_imp, by_vars = c("pid", "record_id"))
 
   # For records without geography ambiguity, fill from ne25_transformed
   if (any(is.na(dat_merged$puma))) {
@@ -265,18 +285,18 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
         CAST(record_id AS INTEGER) as record_id,
         puma as puma_observed
       FROM ne25_transformed
-      WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE
+      WHERE meets_inclusion = TRUE
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(geo_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(geo_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(puma = ifelse(is.na(puma), puma_observed, puma)) %>%
       dplyr::select(-puma_observed)
   }
 
   # Merge sociodem imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(sociodem_imp, by = c("pid", "record_id"))
+    safe_left_join(sociodem_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing sociodem values from ne25_transformed (for records with observed values)
   sociodem_vars <- c("a1_raceG", "educ_a1", "income")
@@ -296,13 +316,13 @@ merge_imputed_data <- function(base_data, puma_imp, sociodem_imp, db_path) {
             CAST(record_id AS INTEGER) as record_id,
             \"%s\" as %s_observed
           FROM ne25_transformed
-          WHERE \"eligible.x\" = TRUE AND \"authentic.x\" = TRUE
+          WHERE meets_inclusion = TRUE
         ", var, var)
 
         var_observed <- DBI::dbGetQuery(con_sociodem, query)
 
         dat_merged <- dat_merged %>%
-          dplyr::left_join(var_observed, by = c("pid", "record_id")) %>%
+          safe_left_join(var_observed, by_vars = c("pid", "record_id")) %>%
           dplyr::mutate(!!var := ifelse(is.na(.data[[var]]), .data[[paste0(var, "_observed")]], .data[[var]])) %>%
           dplyr::select(-!!paste0(var, "_observed"))
       }
@@ -397,7 +417,7 @@ derive_positive_screens <- function(completed_data, base_data, m, output_dir) {
     base_null_phq2$needs_derivation <- TRUE
 
     # Merge with completed data to identify which records need derived values
-    phq2_positive_data <- dplyr::left_join(
+    phq2_positive_data <- safe_left_join(
       completed_data[, c("study_id", "pid", "record_id", "phq2_positive")],
       base_null_phq2,
       by = c("pid", "record_id")
@@ -431,7 +451,7 @@ derive_positive_screens <- function(completed_data, base_data, m, output_dir) {
     base_null_gad2$needs_derivation <- TRUE
 
     # Merge with completed data to identify which records need derived values
-    gad2_positive_data <- dplyr::left_join(
+    gad2_positive_data <- safe_left_join(
       completed_data[, c("study_id", "pid", "record_id", "gad2_positive")],
       base_null_gad2,
       by = c("pid", "record_id")

@@ -28,6 +28,9 @@ library(duckdb)
 library(dplyr)
 library(mice)
 library(ranger)
+
+# Load safe join utilities
+source("R/utils/safe_joins.R")
 library(arrow)
 
 if (!requireNamespace("duckdb", quietly = TRUE)) {
@@ -49,11 +52,13 @@ if (!requireNamespace("reticulate", quietly = TRUE)) {
   stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
 }
 
-# Ensure Python has required packages
-reticulate::py_install(c("pyyaml", "pandas", "duckdb", "python-dotenv"), pip = TRUE)
-
 # Source configuration loader
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # =============================================================================
 # LOAD CONFIGURATION
@@ -125,7 +130,7 @@ load_base_data <- function(db_path, eligible_only = TRUE) {
   "
 
   if (eligible_only) {
-    query <- paste0(query, "\n    WHERE \"eligible.x\" = TRUE")
+    query <- paste0(query, "\n    WHERE meets_inclusion = TRUE")
   }
 
   dat <- DBI::dbGetQuery(con, query)
@@ -178,8 +183,8 @@ merge_geography_imputation <- function(base_data, db_path, m) {
 
   # Merge with base data
   dat_merged <- base_data %>%
-    dplyr::left_join(puma_imp, by = c("pid", "record_id")) %>%
-    dplyr::left_join(county_imp, by = c("pid", "record_id"))
+    safe_left_join(puma_imp, by_vars = c("pid", "record_id")) %>%
+    safe_left_join(county_imp, by_vars = c("pid", "record_id"))
 
   # For records without geography ambiguity, fill from ne25_transformed
   # (This handles records that weren't in imputed_puma/county tables)
@@ -197,7 +202,7 @@ merge_geography_imputation <- function(base_data, db_path, m) {
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(geo_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(geo_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(
         puma = ifelse(is.na(puma), puma_observed, puma),
         county = ifelse(is.na(county), county_observed, county)
