@@ -402,6 +402,10 @@ pip install pyreadstat
 - **Reliability:** 100% success rate (eliminated segmentation faults)
 - **Data:** 3,908 records from 4 REDCap projects
 - **Derived Variables:** 99 variables created by recode_it()
+- **Authenticity Screening:** IRT-based response pattern analysis integrated (Step 6.5)
+  - 2,643 authentic participants (weight = 1.0)
+  - 196 inauthentic participants with normalized weights (0.42-1.96, sum = 196)
+  - `meets_inclusion` filter: 2,831 participants for imputation (eligible + non-NA weights)
 - **Storage:** Local DuckDB with 11 tables, 7,812 records
 
 ### ✅ ACS Pipeline - Complete
@@ -434,6 +438,7 @@ pip install pyreadstat
 ### ✅ Imputation Pipeline - Production Ready (October 2025)
 - **Multi-Study Architecture:** Independent studies (ne25, ia26, co27) with shared codebase
 - **Multiple Imputations:** M=5 imputations (easily scalable to M=20+)
+- **Inclusion Criteria:** Uses `meets_inclusion` filter (eligible + non-NA authenticity_weight) - **2,831 participants** for ne25
 - **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations (ne25)
 - **Sociodemographic Variables:** 7 variables imputed via mice (female, raceG, educ_mom, educ_a2, income, family_size, fplcat)
 - **Childcare Variables:** 4 variables via 3-stage sequential imputation (cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily)
