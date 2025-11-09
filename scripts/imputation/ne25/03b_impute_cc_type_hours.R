@@ -18,7 +18,7 @@
 #
 # Auxiliary Variables (10 total):
 #   - puma (from geography imputation m)
-#   - authentic.x (from base data)
+#   - authentic (from base data)
 #   - female, raceG, educ_mom, educ_a2, income, family_size, fplcat (from sociodem imputation m)
 #   - cc_receives_care (from Stage 1 imputation m)
 
@@ -28,6 +28,15 @@
 
 cat("Childcare Stage 2: Conditional Imputation of Type and Hours\n")
 cat(strrep("=", 60), "\n")
+
+# Load required packages
+library(duckdb)
+library(dplyr)
+library(mice)
+library(arrow)
+
+# Load safe join utilities
+source("R/utils/safe_joins.R")
 
 # Load required packages
 library(duckdb)
@@ -47,9 +56,17 @@ if (!requireNamespace("mice", quietly = TRUE)) {
 if (!requireNamespace("arrow", quietly = TRUE)) {
   stop("Package 'arrow' is required. Install with: install.packages('arrow')")
 }
+if (!requireNamespace("reticulate", quietly = TRUE)) {
+  stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
+}
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # =============================================================================
 # LOAD CONFIGURATION
@@ -103,7 +120,7 @@ load_cc_receives_care_imputation <- function(feather_dir, m) {
 #' Load base childcare data from DuckDB (type and hours)
 #'
 #' @param db_path Path to DuckDB database
-#' @param eligible_only Logical, filter to eligible.x == TRUE
+#' @param eligible_only Logical, filter to eligible == TRUE
 #'
 #' @return data.frame with base childcare type and hours data
 load_base_childcare_type_hours <- function(db_path, eligible_only = TRUE) {
@@ -128,18 +145,18 @@ load_base_childcare_type_hours <- function(db_path, eligible_only = TRUE) {
       cc_receives_care,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic.x\",
+      \"authentic\",
       age_in_days,
       consent_date,
 
       -- Eligibility flag
-      \"eligible.x\"
+      \"eligible\"
 
     FROM ne25_transformed
   "
 
   if (eligible_only) {
-    query <- paste0(query, "\n    WHERE \"eligible.x\" = TRUE")
+    query <- paste0(query, "\n    WHERE meets_inclusion = TRUE")
   }
 
   dat <- DBI::dbGetQuery(con, query)
@@ -235,7 +252,7 @@ load_sociodem_imputations <- function(db_path, m, study_id = "ne25") {
     if (is.null(sociodem_data)) {
       sociodem_data <- var_imp
     } else {
-      sociodem_data <- dplyr::left_join(sociodem_data, var_imp, by = c("pid", "record_id"))
+      sociodem_data <- safe_left_join(sociodem_data, var_imp, by_vars = c("pid", "record_id"))
     }
   }
 
@@ -259,7 +276,7 @@ merge_and_filter_data <- function(base_data, puma_imp, sociodem_imp, cc_receives
 
   # Merge PUMA
   dat_merged <- base_data %>%
-    dplyr::left_join(puma_imp, by = c("pid", "record_id"))
+    safe_left_join(puma_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing PUMA from ne25_transformed (for records without geography ambiguity)
   if (any(is.na(dat_merged$puma))) {
@@ -275,14 +292,14 @@ merge_and_filter_data <- function(base_data, puma_imp, sociodem_imp, cc_receives
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(geo_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(geo_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(puma = ifelse(is.na(puma), puma_observed, puma)) %>%
       dplyr::select(-puma_observed)
   }
 
   # Merge sociodem imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(sociodem_imp, by = c("pid", "record_id"))
+    safe_left_join(sociodem_imp, by_vars = c("pid", "record_id"))
 
   # Fill missing sociodem from ne25_transformed
   sociodem_vars <- c("female", "raceG", "educ_mom", "educ_a2", "income", "family_size", "fplcat")
@@ -306,7 +323,7 @@ merge_and_filter_data <- function(base_data, puma_imp, sociodem_imp, cc_receives
         var_observed <- DBI::dbGetQuery(con_sociodem, query)
 
         dat_merged <- dat_merged %>%
-          dplyr::left_join(var_observed, by = c("pid", "record_id")) %>%
+          safe_left_join(var_observed, by_vars = c("pid", "record_id")) %>%
           dplyr::mutate(!!var := ifelse(is.na(.data[[var]]), .data[[paste0(var, "_observed")]], .data[[var]])) %>%
           dplyr::select(-!!paste0(var, "_observed"))
       }
@@ -315,9 +332,9 @@ merge_and_filter_data <- function(base_data, puma_imp, sociodem_imp, cc_receives
 
   # Merge cc_receives_care imputation (this adds completed values for originally missing)
   dat_merged <- dat_merged %>%
-    dplyr::left_join(
+    safe_left_join(
       cc_receives_imp %>% dplyr::select(pid, record_id, cc_receives_care_imp = cc_receives_care),
-      by = c("pid", "record_id")
+      by_vars = c("pid", "record_id")
     )
 
   # Use imputed cc_receives_care if observed is missing
@@ -341,7 +358,7 @@ merge_and_filter_data <- function(base_data, puma_imp, sociodem_imp, cc_receives
     ")
 
     dat_merged <- dat_merged %>%
-      dplyr::left_join(cc_observed, by = c("pid", "record_id")) %>%
+      safe_left_join(cc_observed, by_vars = c("pid", "record_id")) %>%
       dplyr::mutate(
         cc_receives_care = ifelse(
           is.na(cc_receives_care),
@@ -486,7 +503,7 @@ for (m in 1:M) {
   # Step 5: Prepare data for mice
   # Variables: cc_primary_type, cc_hours_per_week (to impute) + 11 auxiliary variables
   imp_vars <- c("cc_primary_type", "cc_hours_per_week")
-  aux_vars <- c("puma", "authentic.x", "age_in_days", "female", "raceG", "educ_mom", "educ_a2",
+  aux_vars <- c("puma", "authentic", "age_in_days", "female", "raceG", "educ_mom", "educ_a2",
                 "income", "family_size", "fplcat", "cc_receives_care")
 
   all_vars <- c(imp_vars, aux_vars, "study_id", "pid", "record_id")

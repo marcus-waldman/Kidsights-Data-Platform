@@ -25,7 +25,14 @@ if (!requireNamespace("reticulate", quietly = TRUE)) {
 }
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+cat("\nPython Configuration:\n")
+cat("  Python executable:", python_path, "\n")
+reticulate::use_python(python_path, required = TRUE)
 
 # Load study-specific configuration
 study_id <- "ne25"

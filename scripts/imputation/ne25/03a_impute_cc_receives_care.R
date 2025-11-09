@@ -12,7 +12,7 @@
 #
 # Auxiliary Variables (10 total):
 #   - puma (from geography imputation m)
-#   - authentic.x, age_in_days (from base data)
+#   - authentic, age_in_days (from base data)
 #   - female, raceG, educ_mom, educ_a2, income, family_size, fplcat (from sociodem imputation m)
 
 # =============================================================================
@@ -82,7 +82,7 @@ seed <- config$random_seed
 #' Load base childcare data from DuckDB
 #'
 #' @param db_path Path to DuckDB database
-#' @param eligible_only Logical, filter to eligible.x == TRUE
+#' @param eligible_only Logical, filter to meets_inclusion == TRUE
 #'
 #' @return data.frame with base childcare data
 load_base_childcare_data <- function(db_path, eligible_only = TRUE) {
@@ -103,12 +103,12 @@ load_base_childcare_data <- function(db_path, eligible_only = TRUE) {
       cc_receives_care,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic.x\",
+      authentic,
       age_in_days,
       consent_date,
 
       -- Eligibility flag
-      \"eligible.x\"
+      eligible
 
     FROM ne25_transformed
   "

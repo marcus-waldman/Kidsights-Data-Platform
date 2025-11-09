@@ -22,7 +22,7 @@
 # Auxiliary Variables (7 total):
 #   - puma (from geography imputation m)
 #   - a1_raceG, educ_a1, income (from sociodem imputation m if imputed, else base)
-#   - authentic.x (from base data, also used as defensive filter)
+#   - authentic (from base data, also used as defensive filter)
 #   - female_a1, a1_years_old (from base data)
 
 # =============================================================================
@@ -131,7 +131,7 @@ load_base_mental_health_data <- function(db_path, eligible_only = TRUE) {
       gad2_positive,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic.x\",
+      \"authentic\",
       age_in_days,
       consent_date,
 
@@ -140,7 +140,7 @@ load_base_mental_health_data <- function(db_path, eligible_only = TRUE) {
       a1_years_old,
 
       -- Eligibility flag
-      \"eligible.x\"
+      \"eligible\"
 
     FROM ne25_transformed
   "
@@ -527,7 +527,7 @@ for (m in 1:M) {
   # Step 4: Prepare data for mice
   # Variables: 5 mental health variables (to impute) + 7 auxiliary variables
   imp_vars <- c("phq2_interest", "phq2_depressed", "gad2_nervous", "gad2_worry", "q1502")
-  aux_vars <- c("puma", "a1_raceG", "educ_a1", "income", "authentic.x", "female_a1", "a1_years_old")
+  aux_vars <- c("puma", "a1_raceG", "educ_a1", "income", "authentic", "female_a1", "a1_years_old")
 
   all_vars <- c(imp_vars, aux_vars, "study_id", "pid", "record_id")
 

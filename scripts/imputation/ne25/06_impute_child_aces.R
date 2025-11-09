@@ -25,7 +25,7 @@
 #   - puma (from geography imputation m)
 #   - raceG, educ_mom, income, family_size, fplcat (from sociodem imputation m if imputed, else base)
 #   - phq2_positive, gad2_positive (from mental health imputation m if imputed, else base)
-#   - authentic.x, age_in_days, female (from base data)
+#   - authentic, age_in_days, female (from base data)
 
 # =============================================================================
 # SETUP
@@ -127,12 +127,12 @@ load_base_child_aces_data <- function(db_path, eligible_only = TRUE) {
       cqr024,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic.x\",
+      \"authentic\",
       age_in_days,
       female,
 
       -- Eligibility flag
-      \"eligible.x\"
+      \"eligible\"
 
     FROM ne25_transformed
   "
@@ -579,7 +579,7 @@ for (m in 1:M) {
   # Variables: 8 child ACE items (to impute) + 11 auxiliary variables
   imp_vars <- unname(ace_item_mapping)
   aux_vars <- c("puma", "raceG", "educ_mom", "income", "family_size", "fplcat",
-                "phq2_positive", "gad2_positive", "authentic.x", "age_in_days", "female")
+                "phq2_positive", "gad2_positive", "authentic", "age_in_days", "female")
 
   all_vars <- c(imp_vars, aux_vars, "study_id", "pid", "record_id")
 

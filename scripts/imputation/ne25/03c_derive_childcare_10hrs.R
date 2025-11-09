@@ -31,6 +31,11 @@ library(duckdb)
 library(dplyr)
 library(arrow)
 
+# Load safe join utilities
+source("R/utils/safe_joins.R")
+library(dplyr)
+library(arrow)
+
 if (!requireNamespace("duckdb", quietly = TRUE)) {
   stop("Package 'duckdb' is required. Install with: install.packages('duckdb')")
 }
@@ -40,9 +45,17 @@ if (!requireNamespace("dplyr", quietly = TRUE)) {
 if (!requireNamespace("arrow", quietly = TRUE)) {
   stop("Package 'arrow' is required. Install with: install.packages('arrow')")
 }
+if (!requireNamespace("reticulate", quietly = TRUE)) {
+  stop("Package 'reticulate' is required. Install with: install.packages('reticulate')")
+}
 
 # Source configuration
+source("R/utils/environment_config.R")
 source("R/imputation/config.R")
+
+# Configure reticulate to use .env Python executable
+python_path <- get_python_path()
+reticulate::use_python(python_path, required = TRUE)
 
 # =============================================================================
 # LOAD CONFIGURATION
@@ -85,7 +98,7 @@ load_base_eligible_records <- function(db_path) {
       cc_primary_type,
       cc_hours_per_week
     FROM ne25_transformed
-    WHERE \"eligible.x\" = TRUE
+    WHERE meets_inclusion = TRUE
   "
 
   dat <- DBI::dbGetQuery(con, query)
@@ -183,9 +196,9 @@ merge_all_childcare_variables <- function(base_data, cc_receives_imp, cc_type_im
 
   # Merge cc_receives_care imputations
   dat_merged <- dat_merged %>%
-    dplyr::left_join(
+    safe_left_join(
       cc_receives_imp %>% dplyr::select(pid, record_id, cc_receives_care_imp = cc_receives_care),
-      by = c("pid", "record_id")
+      by_vars = c("pid", "record_id")
     )
 
   # Use imputed cc_receives_care if observed is missing
@@ -200,9 +213,9 @@ merge_all_childcare_variables <- function(base_data, cc_receives_imp, cc_type_im
   # Merge cc_primary_type imputations (if available)
   if (!is.null(cc_type_imp)) {
     dat_merged <- dat_merged %>%
-      dplyr::left_join(
+      safe_left_join(
         cc_type_imp %>% dplyr::select(pid, record_id, cc_primary_type_imp = cc_primary_type),
-        by = c("pid", "record_id")
+        by_vars = c("pid", "record_id")
       )
 
     # Use imputed cc_primary_type if observed is missing
@@ -216,9 +229,9 @@ merge_all_childcare_variables <- function(base_data, cc_receives_imp, cc_type_im
   # Merge cc_hours_per_week imputations (if available)
   if (!is.null(cc_hours_imp)) {
     dat_merged <- dat_merged %>%
-      dplyr::left_join(
+      safe_left_join(
         cc_hours_imp %>% dplyr::select(pid, record_id, cc_hours_per_week_imp = cc_hours_per_week),
-        by = c("pid", "record_id")
+        by_vars = c("pid", "record_id")
       )
 
     # Use imputed cc_hours_per_week if observed is missing
