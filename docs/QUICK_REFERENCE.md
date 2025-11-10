@@ -254,7 +254,13 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 # Interactive: Prepare calibration dataset
 "C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
   --file=scripts/irt_scoring/prepare_calibration_dataset.R
+
+# Standalone: Create NE25 calibration table (outside pipeline)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" \
+  scripts/irt_scoring/create_ne25_calibration_table.R
 ```
+
+**Note:** NE25 calibration table is automatically created by NE25 pipeline (Step 11) - manual execution rarely needed
 
 **What it does:**
 - Combines 6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24

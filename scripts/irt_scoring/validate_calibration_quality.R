@@ -110,16 +110,16 @@ validate_calibration_quality <- function(
   # Check if combined table exists
   tables <- DBI::dbListTables(conn)
 
-  if (!"calibration_dataset_2020_2025" %in% tables) {
+  if (!"calibration_dataset_2020_2025_restructured" %in% tables) {
     DBI::dbDisconnect(conn)
-    stop("Table 'calibration_dataset_2020_2025' not found. Run calibration pipeline first.")
+    stop("Table 'calibration_dataset_2020_2025_restructured' not found. Run calibration pipeline first.")
   }
 
-  if (verbose) cat("      Loading calibration_dataset_2020_2025 table\n")
+  if (verbose) cat("      Loading calibration_dataset_2020_2025_restructured table\n")
 
   calibration_data <- DBI::dbGetQuery(conn, "
     SELECT *
-    FROM calibration_dataset_2020_2025
+    FROM calibration_dataset_2020_2025_restructured
   ")
 
   DBI::dbDisconnect(conn)
@@ -205,6 +205,48 @@ validate_calibration_quality <- function(
 
   if (verbose) {
     cat(sprintf("[OK] Extracted expected categories for %d items\n\n", length(expected_categories)))
+  }
+
+  # ===========================================================================
+  # Extract Instrument Mapping from Codebook
+  # ===========================================================================
+
+  if (verbose) {
+    cat(strrep("=", 80), "\n")
+    cat("EXTRACTING INSTRUMENT MAPPING\n")
+    cat(strrep("=", 80), "\n\n")
+  }
+
+  # Build lookup table: item_id (lex_equate) -> instruments array
+  instrument_lookup <- list()
+
+  for (item_id in names(codebook$items)) {
+    item <- codebook$items[[item_id]]
+
+    # Get lex_equate name
+    if (!is.null(item$lexicons$equate)) {
+      equate_name <- item$lexicons$equate
+
+      # Get instruments array
+      if (!is.null(item$instruments) && length(item$instruments) > 0) {
+        instrument_lookup[[equate_name]] <- unlist(item$instruments)
+      }
+    }
+  }
+
+  # Count items by instrument
+  kidsights_items <- names(instrument_lookup)[
+    sapply(instrument_lookup, function(x) "Kidsights Measurement Tool" %in% x)
+  ]
+
+  gsed_pf_items <- names(instrument_lookup)[
+    sapply(instrument_lookup, function(x) "GSED-PF" %in% x)
+  ]
+
+  if (verbose) {
+    cat(sprintf("[OK] Extracted instruments for %d items\n", length(instrument_lookup)))
+    cat(sprintf("      Kidsights Measurement Tool items: %d\n", length(kidsights_items)))
+    cat(sprintf("      GSED-PF items: %d\n\n", length(gsed_pf_items)))
   }
 
   # ===========================================================================
@@ -314,12 +356,21 @@ validate_calibration_quality <- function(
   if (verbose) {
     cat(strrep("=", 80), "\n")
     cat("FLAG 2: NEGATIVE AGE-RESPONSE CORRELATION\n")
+    cat("         (Kidsights Measurement Tool items only)\n")
     cat(strrep("=", 80), "\n\n")
   }
 
   flag2_count <- 0
 
   for (item in item_cols) {
+    # FILTER: Only check age-gradient for Kidsights Measurement Tool items
+    item_instruments <- instrument_lookup[[item]]
+
+    if (is.null(item_instruments) ||
+        !("Kidsights Measurement Tool" %in% item_instruments)) {
+      next  # Skip GSED-PF and other non-developmental items
+    }
+
     for (study_name in unique(calibration_data$study)) {
       study_data <- calibration_data %>%
         dplyr::filter(study == study_name) %>%
@@ -480,4 +531,18 @@ validate_calibration_quality <- function(
   }
 
   invisible(flags)
+}
+
+# ============================================================================
+# STANDALONE EXECUTION
+# ============================================================================
+
+# If script is run directly (not sourced), execute the function
+if (!interactive()) {
+  validate_calibration_quality(
+    db_path = "data/duckdb/kidsights_local.duckdb",
+    codebook_path = "codebook/data/codebook.json",
+    output_path = "docs/irt_scoring/quality_flags.csv",
+    verbose = TRUE
+  )
 }

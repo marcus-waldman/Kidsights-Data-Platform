@@ -117,9 +117,23 @@ python pipelines/python/init_database.py --config config/sources/ne25.yaml
 - Creates HTML data dictionary
 - Produces Markdown documentation
 
+#### 11. NE25 Calibration Table Creation
+**Executed by:** `scripts/irt_scoring/create_ne25_calibration_table.R`
+**What it does:**
+- Extracts all items with both ne25 and equate lexicons from codebook.json (~276 items)
+- Queries `ne25_transformed` table with `meets_inclusion=TRUE` filter (2,831 records)
+- Creates optimized calibration table: id, years, authenticity_weight + 276 items (279 columns)
+- Stores in `ne25_calibration` table with indexes on id and years
+- Execution time: ~5-10 seconds
+
+**Output:**
+- `ne25_calibration` table (~0.5 MB, 2,831 records, 279 columns)
+- Ready for IRT calibration dataset export
+- Includes authenticity_weight for weighted estimation (0.42-1.96 for inauthentic responses)
+
 ### Expected Output
 
-- **Tables:** `ne25_raw` (3,900+ rows), `ne25_transformed` (3,900+ rows)
+- **Tables:** `ne25_raw` (3,900+ rows), `ne25_transformed` (3,900+ rows), `ne25_calibration` (2,831 rows, 279 columns)
 - **Files:** Data dictionary HTML, JSON metadata, validation reports
 - **Status:** "Pipeline completed successfully" message
 

@@ -119,6 +119,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     transformation_duration = 0,
     metadata_generation_duration = 0,
     interactive_dictionary_duration = 0,
+    calibration_table_duration = 0,
     total_duration = 0
   )
 
@@ -644,6 +645,32 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       }
     }
 
+    # ===========================================================================
+    # STEP 11: CREATE NE25 CALIBRATION TABLE
+    # ===========================================================================
+
+    message("\n--- Step 11: Creating NE25 Calibration Table ---")
+    calibration_start <- Sys.time()
+
+    source("scripts/irt_scoring/create_ne25_calibration_table.R")
+
+    tryCatch({
+      create_ne25_calibration_table(
+        codebook_path = "codebook/data/codebook.json",
+        db_path = "data/duckdb/kidsights_local.duckdb",
+        verbose = TRUE
+      )
+      message("NE25 calibration table created successfully")
+    }, error = function(e) {
+      warning(paste("Calibration table creation failed:", e$message))
+      message("Pipeline will continue, but calibration table is unavailable")
+    })
+
+    calibration_time <- as.numeric(Sys.time() - calibration_start)
+    metrics$calibration_table_duration <- calibration_time
+    message(paste("Calibration table creation completed in",
+                  round(calibration_time, 2), "seconds"))
+
     # Calculate final metrics
     metrics$end_time <- Sys.time()
     metrics$total_duration <- as.numeric(metrics$end_time - metrics$start_time)
@@ -655,6 +682,14 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     message(paste("Pipeline execution ID:", execution_id, "completed successfully"))
 
     message(paste("Pipeline completed successfully in", round(metrics$total_duration, 2), "seconds"))
+
+    # Show calibration table timing if executed
+    if (!is.null(metrics$calibration_table_duration) &&
+        metrics$calibration_table_duration > 0) {
+      message(paste("  • Calibration table:",
+                    round(metrics$calibration_table_duration, 1),
+                    "seconds"))
+    }
 
     # Return success result with local data summaries
     return(list(

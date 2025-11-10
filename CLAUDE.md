@@ -457,8 +457,19 @@ pip install pyreadstat
 - **Validation:** 100% data integrity match with original, appropriate missingness patterns
 - **Mplus Compatibility:** Space-delimited .dat format, 38.71 MB output file
 - **Performance:** 28 seconds execution time (production scale)
-- **Database:** `calibration_dataset_2020_2025` table with 4 indexes
-- **Output:** `mplus/calibdat.dat` ready for graded response model IRT calibration
+- **Database:** `calibration_dataset_2020_2025_restructured` table with 4 indexes (303 columns: id, study, years, wgt + 299 items)
+- **Weighted Estimation:** wgt column (1.0 for all studies, authenticity_weight 0.42-1.96 for NE25 inauthentic responses)
+- **Output:** `mplus/calibdat.dat` ready for weighted graded response model IRT calibration
+
+### ✅ NE25 Calibration Table - Optimized (November 2025)
+- **Automated Creation:** Step 11 in NE25 pipeline (no manual intervention required)
+- **Streamlined Schema:** 279 columns (id, years, authenticity_weight + 276 calibration items)
+- **Storage Efficiency:** ~0.5 MB (vs 15 MB bloated version, 97% reduction)
+- **Inclusion Filter:** `meets_inclusion=TRUE` (2,831 participants)
+- **Weighted Calibration:** authenticity_weight column (0.42-1.96) for IRT estimation
+- **Database:** `ne25_calibration` table with 2 indexes (id, years)
+- **Execution Time:** ~5-10 seconds (Step 11)
+- **Purpose:** Optimized source for combined IRT calibration dataset with authenticity weighting
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
