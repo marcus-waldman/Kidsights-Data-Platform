@@ -197,6 +197,23 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   cat(sprintf("      Reverse-coding %d items\n", length(reverse_coded21)))
   cat(sprintf("      Forward-coding %d items\n", length(forwardly_coded21)))
 
+  # Recode NSCH missing codes (94-98) to NA BEFORE reverse/forward coding
+  # NSCH standard missing codes:
+  #   94 = Data not ascertained
+  #   95 = Refused
+  #   96 = Not applicable
+  #   97 = Don't know
+  #   98 = Missing
+  cat("      Recoding NSCH missing codes (94-98) to NA\n")
+  nsch21_filtered <- nsch21_filtered %>%
+    dplyr::mutate(
+      dplyr::across(dplyr::any_of(available_cahmi21_vars),
+                    function(x) dplyr::case_when(
+                      x >= 94 & x <= 98 ~ NA_real_,
+                      .default = x
+                    ))
+    )
+
   # Apply reverse/forward coding
   # Reverse: max - x (so Yes=1 becomes max=2, 2-1=1; No=2 becomes 2-2=0)
   # Forward: x - min (so min value becomes 0)
