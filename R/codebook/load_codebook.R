@@ -220,3 +220,101 @@ summary.codebook <- function(object, ...) {
 
 #' Helper operator for cleaner NA handling
 `%||%` <- function(x, y) if (is.null(x) || is.na(x)) y else x
+
+#' Get Item Order from Codebook
+#'
+#' Extracts the ordered list of item names (lex_equate values) from the codebook.
+#' The order matches the insertion order in the JSON file, which is the canonical
+#' ordering for Mplus syntax generation.
+#'
+#' @param codebook Codebook object (from load_codebook())
+#' @param use_lex_equate Logical, use lex_equate field if available (default: TRUE)
+#' @return Character vector of item names in codebook order
+#' @examples
+#' \dontrun{
+#' codebook <- load_codebook("codebook/data/codebook.json")
+#' item_order <- get_codebook_item_order(codebook)
+#' head(item_order)  # Shows first 6 items in canonical order
+#' }
+get_codebook_item_order <- function(codebook, use_lex_equate = TRUE) {
+
+  if (is.null(codebook$items) || length(codebook$items) == 0) {
+    stop("Codebook has no items")
+  }
+
+  # Get item names in order (names() preserves insertion order in R >= 3.6)
+  item_names <- names(codebook$items)
+
+  if (use_lex_equate) {
+    # Extract lex_equate field for each item
+    lex_equate_values <- sapply(item_names, function(item_name) {
+      item <- codebook$items[[item_name]]
+
+      # Use lex_equate if available, otherwise fall back to item name
+      if (!is.null(item$identifiers$lex_equate)) {
+        return(item$identifiers$lex_equate)
+      } else if (!is.null(item$lex_equate)) {
+        return(item$lex_equate)
+      } else {
+        return(item_name)
+      }
+    }, USE.NAMES = FALSE)
+
+    return(lex_equate_values)
+  } else {
+    return(item_names)
+  }
+}
+
+#' Sort Items by Codebook Order
+#'
+#' Takes a vector of item names and sorts them according to codebook order.
+#' Items not in codebook are appended at the end (alphabetically sorted).
+#'
+#' @param items Character vector of item names
+#' @param codebook Codebook object (from load_codebook())
+#' @param verbose Logical, print information about ordering (default: FALSE)
+#' @return Character vector of items sorted by codebook order
+#' @examples
+#' \dontrun{
+#' codebook <- load_codebook("codebook/data/codebook.json")
+#' my_items <- c("DD101", "AA102", "CC50", "NEW_ITEM", "AA10")
+#' sorted_items <- sort_items_by_codebook(my_items, codebook, verbose = TRUE)
+#' }
+sort_items_by_codebook <- function(items, codebook, verbose = FALSE) {
+
+  # Get canonical codebook order
+  codebook_order <- get_codebook_item_order(codebook, use_lex_equate = TRUE)
+
+  # Split items into: in codebook vs not in codebook
+  items_in_codebook <- items[items %in% codebook_order]
+  items_not_in_codebook <- items[!items %in% codebook_order]
+
+  # Sort items_in_codebook by codebook order
+  items_in_codebook_sorted <- codebook_order[codebook_order %in% items_in_codebook]
+
+  # Sort items not in codebook alphabetically
+  items_not_in_codebook_sorted <- sort(items_not_in_codebook)
+
+  if (verbose) {
+    cat(sprintf("Sorting %d items by codebook order:\n", length(items)))
+    cat(sprintf("  %d items found in codebook (sorted by codebook order)\n",
+                length(items_in_codebook_sorted)))
+    cat(sprintf("  %d items NOT in codebook (appended alphabetically)\n",
+                length(items_not_in_codebook_sorted)))
+
+    if (length(items_not_in_codebook_sorted) > 0) {
+      cat("\nItems not in codebook:\n")
+      cat(paste("  -", head(items_not_in_codebook_sorted, 10), collapse = "\n"))
+      if (length(items_not_in_codebook_sorted) > 10) {
+        cat(sprintf("\n  ... and %d more\n",
+                    length(items_not_in_codebook_sorted) - 10))
+      }
+    }
+  }
+
+  # Combine: codebook order first, then new items alphabetically
+  sorted_items <- c(items_in_codebook_sorted, items_not_in_codebook_sorted)
+
+  return(sorted_items)
+}

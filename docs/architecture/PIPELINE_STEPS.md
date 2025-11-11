@@ -131,6 +131,14 @@ python pipelines/python/init_database.py --config config/sources/ne25.yaml
 - Ready for IRT calibration dataset export
 - Includes authenticity_weight for weighted estimation (0.42-1.96 for inauthentic responses)
 
+**Development Status (November 2025):**
+⚠️ The IRT calibration pipeline is under active development following recent bug fixes (Issue #6):
+- NSCH missing code contamination fixed (commits 20e3cf5, 25d2b47)
+- Study field assignment corrected (commit d72afaa)
+- Syntax generator indexing bug resolved (commit 37d2034)
+
+This step benefits from clean NE25 transformed data. When combined with other studies in the IRT calibration dataset, the data quality improvements ensure accurate threshold specifications for Mplus estimation. See [PIPELINE_OVERVIEW.md](PIPELINE_OVERVIEW.md#data-quality-improvements-november-2025) for complete details.
+
 ### Expected Output
 
 - **Tables:** `ne25_raw` (3,900+ rows), `ne25_transformed` (3,900+ rows), `ne25_calibration` (2,831 rows, 279 columns)

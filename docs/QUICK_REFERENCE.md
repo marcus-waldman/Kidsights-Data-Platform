@@ -347,6 +347,85 @@ prepare_calibration_dataset(
 
 ---
 
+### IRT Calibration MODEL Syntax Generation
+
+**Purpose:** Generate Mplus MODEL, CONSTRAINT, and PRIOR syntax from codebook constraints
+
+```bash
+# Interactive workflow (prompts for outputs)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
+  --file=scripts/irt_scoring/run_calibration_workflow.R
+
+# Or source in R session for more control
+```
+
+**R Function Usage:**
+```r
+# Source orchestrator function
+source("scripts/irt_scoring/calibration/generate_model_syntax.R")
+
+# Generate Excel only (for review)
+result <- generate_kidsights_model_syntax(
+  scale_name = "kidsights",
+  output_xlsx = "mplus/generated_syntax.xlsx"
+)
+
+# Generate both Excel + complete .inp file
+result <- generate_kidsights_model_syntax(
+  scale_name = "kidsights",
+  output_xlsx = "mplus/generated_syntax.xlsx",
+  output_inp = "mplus/calibration.inp",
+  dat_file_path = "calibdat.dat"
+)
+
+# Use existing template for TITLE/DATA/VARIABLE/ANALYSIS sections
+result <- generate_kidsights_model_syntax(
+  output_xlsx = "mplus/generated_syntax.xlsx",
+  output_inp = "mplus/calibration.inp",
+  template_inp = "mplus/my_template.inp"
+)
+```
+
+**What it does:**
+- Loads codebook.json and builds equate table (jid <-> lex_equate)
+- Extracts param_constraints from psychometric metadata
+- Loads calibration dataset from DuckDB (47,084 records, 416 items)
+- Generates MODEL syntax (factor loadings, thresholds)
+- Generates MODEL CONSTRAINT syntax (5 constraint types + 1-PL)
+- Generates MODEL PRIOR syntax (N(1,1) Bayesian priors)
+- Writes Excel file with 3 sheets (MODEL, CONSTRAINT, PRIOR)
+- Optionally generates complete .inp file ready for Mplus execution
+
+**Timing:** ~5-10 seconds
+
+**Output Files:**
+- `mplus/generated_syntax.xlsx` - Review syntax in Excel (always created)
+- `mplus/calibration.inp` - Complete Mplus input file (if output_inp specified)
+
+**Supported Constraint Types (from codebook param_constraints field):**
+1. **Complete Equality:** "Constrain all to AA102"
+2. **Slope-Only Equality:** "Constrain slope to AA102"
+3. **Threshold Ordering:** "Constrain tau$1 to be greater than AA102$1"
+4. **Simplex Constraints:** "Constrain tau$1 to be a simplex between AA102$1 and AA102$4"
+5. **1-PL/Rasch:** Automatic for unconstrained items (equal discriminations)
+
+**Multiple Constraints Example:**
+```json
+"param_constraints": "Constrain slope to AA102; Constrain tau$1 to be greater than AA102$1"
+```
+
+**Next Steps:**
+1. Review Excel file to verify syntax correctness
+2. Open .inp file in Mplus (if generated)
+3. Run -> Run Mplus
+4. Check .out file for convergence and fit statistics
+
+**Documentation:**
+- [calibration/README.md](irt_scoring/calibration/README.md) - Complete syntax generation guide
+- [CONSTRAINT_SPECIFICATION.md](irt_scoring/CONSTRAINT_SPECIFICATION.md) - Constraint types reference
+
+---
+
 ## ACS Utility Scripts
 
 ### Test API Connection

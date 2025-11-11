@@ -1,8 +1,8 @@
 # Mplus IRT Calibration Workflow
 
-**Version:** 1.0
-**Last Updated:** January 2025
-**Status:** Production Ready
+**Version:** 1.1
+**Last Updated:** November 2025
+**Status:** In Development (Active Bug Fixes)
 
 ---
 
@@ -97,6 +97,37 @@ The .dat file meets all Mplus format requirements:
 
 File ready for Mplus IRT calibration: mplus/calibdat.dat
 ```
+
+### 1.4 Data Quality Fixes (November 2025)
+
+⚠️ **Development Status:** Recent bug fixes have been implemented to improve calibration data quality. The pipeline is under active validation.
+
+**Three Critical Fixes (Issue #6):**
+
+1. **NSCH Missing Code Contamination** (Commits: 20e3cf5, 25d2b47)
+   - **Problem:** NSCH variables with values >= 90 (e.g., 90="Not applicable", 95="Refused", 97="Don't know", 98="Missing", 99="Missing") were treated as valid response categories
+   - **Impact:** Dichotomous items showed inflated threshold counts (e.g., DD201 had 5 thresholds instead of 1)
+   - **Fix:** Modified `recode_nsch_2021.R` and `recode_nsch_2022.R` to recode values >= 90 to NA before transformations
+   - **Validation:** After fix, DD201 values: {0, 1}, max=1 (correct)
+
+2. **Missing Study Field** (Commit: d72afaa)
+   - **Problem:** NSCH data lacked study identifier column after helper function processing
+   - **Impact:** Combined dataset showed `study = NA` for NSCH records, preventing study-level tracing
+   - **Fix:** Added explicit study field assignment in `prepare_calibration_dataset.R`
+   - **Validation:** All 6 studies now properly labeled (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+
+3. **Syntax Generator Indexing** (Commit: 37d2034)
+   - **Problem:** `write_syntax2.R` used positional array indexing instead of category lookup
+   - **Impact:** 26 items (EG14b, EG16c, etc.) generated incorrect threshold specifications in Mplus syntax
+   - **Fix:** Replaced `Ks[jdx]` with `item_max_category <- categories[jid == jdx] + 1`
+   - **Validation:** All items now generate threshold counts matching actual data ranges
+
+**What This Means for Your Calibration:**
+- Clean data: No sentinel values (90-99) contaminating item responses
+- Accurate syntax: Threshold specifications match actual category ranges
+- Traceable sources: All records properly labeled with study identifiers
+
+**Verify Before Proceeding:** If you generated calibration data before November 2025, re-run `prepare_calibration_dataset.R` to get clean data.
 
 ---
 

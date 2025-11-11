@@ -187,6 +187,35 @@ quarto render calibration_quality_report.qmd
 
 **Execution time:** +2-3 minutes for quality check
 
+**Recent Bug Fixes (November 2025 - Issue #6):**
+
+Three critical data quality issues were identified and fixed in the calibration pipeline:
+
+1. **NSCH Missing Code Contamination**
+   - **Problem:** NSCH 2021/2022 variables had values >= 90 (e.g., 90="Not applicable", 95="Refused", 97="Don't know", 98="Missing", 99="Missing") being treated as valid response categories
+   - **Impact:** Created invalid IRT threshold counts - dichotomous items like DD201 showed 5 thresholds instead of 1 (values: 0, 1, 4, 97, 98 when should be 0, 1)
+   - **Fix:** Modified `scripts/irt_scoring/helpers/recode_nsch_2021.R` and `recode_nsch_2022.R` to recode all values >= 90 to NA before reverse/forward coding transformations
+   - **Commits:** 20e3cf5, 25d2b47
+
+2. **Missing Study Field Assignment**
+   - **Problem:** NSCH helper functions didn't create `study` column, causing `study = NA` when datasets were combined with `bind_rows()`
+   - **Impact:** Couldn't trace items back to original study source in combined calibration dataset
+   - **Fix:** Added explicit `study = "NSCH21"` and `study = "NSCH22"` assignments in `prepare_calibration_dataset.R` after sampling
+   - **Commit:** d72afaa
+
+3. **Syntax Generator Indexing Bug**
+   - **Problem:** `write_syntax2.R` used positional indexing `Ks[jdx]` (where jdx=150 for item jid) instead of named lookup `categories[jid == jdx]`
+   - **Impact:** Generated incorrect threshold counts - 26 items (EG14b, EG16c, EG17b, etc.) showed wrong threshold boundaries in Mplus syntax
+   - **Fix:** Replaced positional indexing with proper category lookup: `item_max_category <- categories[jid == jdx] + 1`
+   - **Commit:** 37d2034
+
+**Impact on Quality Checks:**
+- "Invalid values" flags now prevented for NSCH items (no longer detecting 90+ as valid responses)
+- "Non-Sequential Response Values" flags reduced (fewer gaps in NSCH data)
+- Expected flag count may differ from 605 after fixes are applied
+
+**Development Status:** ⚠️ Pipeline under active validation - verify data quality and syntax outputs before use in production analyses
+
 ### Step 3: Export Calibration Dataset
 
 **What happens:**

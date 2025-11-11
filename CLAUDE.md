@@ -449,17 +449,26 @@ pip install pyreadstat
 - **Database:** 85,746 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health + 2,345 child ACEs) for ne25
 - **Execution Time:** ~3 minutes for complete pipeline (11 stages)
 
-### ✅ IRT Calibration Pipeline - Production Ready (January 2025)
+### 🚧 IRT Calibration Pipeline - In Development (November 2025)
 - **Multi-Study Dataset:** 47,084 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
 - **Item Coverage:** 416 developmental/behavioral items with lexicon-based harmonization
 - **NSCH Integration:** National benchmarking samples (1,000 per year, ages 0-6)
 - **Historical Data:** 41,577 records from KidsightsPublic package (NE20, NE22, USA24)
-- **Validation:** 100% data integrity match with original, appropriate missingness patterns
 - **Mplus Compatibility:** Space-delimited .dat format, 38.71 MB output file
-- **Performance:** 28 seconds execution time (production scale)
-- **Database:** `calibration_dataset_2020_2025_restructured` table with 4 indexes (303 columns: id, study, years, wgt + 299 items)
+- **Performance:** 28 seconds execution time
+- **Database:** `calibration_dataset_2020_2025` table (303 columns: id, study, years, wgt + 299 items)
 - **Weighted Estimation:** wgt column (1.0 for all studies, authenticity_weight 0.42-1.96 for NE25 inauthentic responses)
 - **Output:** `mplus/calibdat.dat` ready for weighted graded response model IRT calibration
+- **MODEL Syntax Generation:** Automated Mplus syntax generation from codebook constraints
+  - 5 constraint types: complete equality, slope-only, threshold ordering, simplex, 1-PL/Rasch
+  - Outputs: Excel review file (MODEL, CONSTRAINT, PRIOR sheets) + optional complete .inp file
+  - Migration complete from Update-KidsightsPublic (write_syntax2 function)
+  - ~5-10 seconds generation time, eliminates 30-60 min manual .inp creation
+- **Recent Bug Fixes (November 2025 - Issue #6):**
+  - **NSCH Missing Code Contamination:** Fixed NSCH 2021/2022 helper functions to recode values >= 90 to NA before reverse/forward coding (prevents invalid threshold counts like DD201 showing 5 thresholds instead of 1). Commits: 20e3cf5, 25d2b47
+  - **Study Field Assignment:** Added study field creation in `prepare_calibration_dataset.R` to ensure NSCH records properly labeled with study source (fixes `study = NA` issue). Commit: d72afaa
+  - **Syntax Generator Indexing:** Fixed `write_syntax2.R` to use category lookup instead of positional indexing (prevents incorrect threshold counts like EG16c showing 4 thresholds for dichotomous data). Commit: 37d2034
+- **Development Status:** Pipeline under active validation - verify data quality and syntax outputs before use in production analyses
 
 ### ✅ NE25 Calibration Table - Optimized (November 2025)
 - **Automated Creation:** Step 11 in NE25 pipeline (no manual intervention required)

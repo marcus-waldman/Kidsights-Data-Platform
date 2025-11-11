@@ -354,10 +354,12 @@ See [ADDING_NEW_STUDY.md](../imputation/ADDING_NEW_STUDY.md) for complete onboar
 
 ---
 
-## IRT Calibration Pipeline: Multi-Study Psychometric Recalibration (January 2025)
+## IRT Calibration Pipeline: Multi-Study Psychometric Recalibration (In Development - November 2025)
 
 ### Purpose
 Create Mplus-compatible calibration dataset combining historical studies and national benchmarks for Item Response Theory recalibration of Kidsights developmental/behavioral scales
+
+⚠️ **Development Status:** Pipeline under active validation following recent bug fixes. See "Data Quality Improvements" section below.
 
 ### Architecture Diagram
 
@@ -391,7 +393,102 @@ NSCH National Benchmarks   │
 - **Comprehensive Validation:** 100% data integrity match with original historical data
 - **Interactive Workflow:** User prompts for NSCH sample size and output paths
 
-### Production Metrics
+### Data Quality Improvements (November 2025)
+
+**Issue #6: Three Critical Bug Fixes**
+
+The IRT calibration pipeline underwent significant data quality improvements in November 2025 to address contamination from NSCH missing codes and syntax generation errors. All fixes have been implemented and committed to the repository.
+
+#### 1. NSCH Missing Code Contamination (Commits: 20e3cf5, 25d2b47)
+
+**Problem:**
+- NSCH 2021 and 2022 variables used study-specific missing codes in the 90-99 range
+- Values >= 90 (e.g., 90="Not applicable", 95="Refused", 97="Don't know", 98="Missing", 99="Missing") were treated as valid response categories
+- When reverse/forward coding transformations were applied, `max(x)` calculations included these sentinel values
+
+**Impact:**
+- Dichotomous items showed inflated threshold counts (e.g., DD201 with values {0, 1} showed 5 thresholds instead of 1)
+- Example: ONEWORD (DD201) had values 0, 1, 4, 97, 98 (max=98) causing invalid IRT parameter estimation
+
+**Solution:**
+```r
+# Modified scripts/irt_scoring/helpers/recode_nsch_2021.R (lines 200-226)
+# Modified scripts/irt_scoring/helpers/recode_nsch_2022.R (lines 204-230)
+
+# Recode all values >= 90 to NA BEFORE reverse/forward coding
+nsch_data <- nsch_data %>%
+  dplyr::mutate(
+    dplyr::across(dplyr::any_of(available_cahmi_vars),
+                  function(x) dplyr::case_when(
+                    x >= 90 ~ NA_real_,
+                    .default = x
+                  ))
+  )
+```
+
+**Validation:**
+- After fix, DD201 values: {0, 1}, max=1 (correct for dichotomous item)
+- "Non-Sequential Response Values" quality flags reduced from 194 to 114 (80 NSCH-related flags eliminated)
+
+#### 2. Missing Study Field Assignment (Commit: d72afaa)
+
+**Problem:**
+- NSCH helper functions `recode_nsch_2021()` and `recode_nsch_2022()` didn't create a `study` column
+- When `bind_rows()` combined datasets in `prepare_calibration_dataset.R`, NSCH records showed `study = NA`
+
+**Impact:**
+- Couldn't trace items back to original study source in combined calibration dataset
+- Study-level analyses (DIF detection, study comparisons) were compromised
+
+**Solution:**
+```r
+# Modified scripts/irt_scoring/prepare_calibration_dataset.R (lines 292-293, 319-320)
+
+# After NSCH sampling, explicitly assign study field
+nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
+nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
+```
+
+**Validation:**
+- All 6 studies now properly labeled: NE20, NE22, NE25, NSCH21, NSCH22, USA24
+- Study breakdown shows correct record counts for each study source
+
+#### 3. Syntax Generator Indexing Bug (Commit: 37d2034)
+
+**Problem:**
+- `scripts/irt_scoring/calibration/write_syntax2.R` used positional array indexing `Ks[jdx]` where `jdx` is the item's `jid` value (e.g., 150 for EG16c)
+- The `Ks` vector only has ~260 elements (one per item), but `jid` values can exceed 400
+- When `jdx=150` but `Ks` length=260, R's indexing behavior caused incorrect threshold counts
+
+**Impact:**
+- 26 items (EG14b, EG16c, EG17b, EG19, etc.) generated incorrect threshold specifications
+- Example: EG16c (dichotomous, max=1) showed 4 thresholds in Mplus syntax instead of 1
+- Partial starting values appeared: threshold 1 had starting value, thresholds 2-4 were blank
+
+**Solution:**
+```r
+# Modified scripts/irt_scoring/calibration/write_syntax2.R (lines 167-234)
+
+# Before (BUGGY):
+if (!is.na(Ks[jdx]) && Ks[jdx] >= 2) { ... }  # Positional indexing by jid
+
+# After (FIXED):
+item_max_category <- categories[jid == jdx] + 1  # Named lookup from codebook_df
+if (!is.na(item_max_category) && item_max_category >= 2) { ... }
+```
+
+**Validation:**
+- All 261 items now generate threshold counts matching actual data ranges
+- EG16c: 1 threshold (correct for dichotomous item)
+- DD201: 1 threshold (correct for dichotomous item)
+- Generated syntax file: `todo/kidsights_syntax_FIXED.xlsx`
+
+**Development Implications:**
+- Clean calibration dataset: `calibration_dataset_2020_2025` (47,084 records, no sentinel values)
+- Accurate Mplus syntax: All threshold specifications match actual category ranges
+- Verify outputs: If calibration data generated before November 2025, re-run `prepare_calibration_dataset.R`
+
+### Current Metrics
 
 **Dataset Composition:**
 - **Historical Studies:** NE20 (37,546) + NE22 (2,431) + USA24 (1,600) = 41,577 records

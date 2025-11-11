@@ -1,0 +1,1252 @@
+TITLE: Your title goes here
+
+DATA:
+  FILE = "mplus/calibdat.dat";
+
+VARIABLE: 
+NAMES = studynum id years AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15 AA17 AA19
+     AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41 AA43 AA46 AA47
+     AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72 AA102 AA104 AA201
+     AA202 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12 CC13 CC14
+     CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30 CC31 CC32 CC33
+     CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48 CC50 CC51 CC52 CC53
+     CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76
+     CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 CQFA002 CQR014X DD10 DD15 DD16 DD19
+     DD25 DD30 DD32 DD36 DD39 DD44 DD103 DD201 DD203 DD205 DD207 DD221 DD299 EG1_1
+     EG1_2 EG2_1 EG2_2 EG3_1 EG3_2 EG4a_1 EG4a_2 EG4b_1 EG4b_2 EG5a EG5b EG6_1 EG6_2
+     EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG9b EG10a EG10b EG11_1 EG11_2 EG12a EG12b EG13a
+     EG13b EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b EG18a
+     EG18b EG19_b EG19a_1 EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20b_2 EG20c EG20d
+     EG20e_1 EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24a EG24b EG25a EG25b
+     EG26a EG26b EG27a EG27b_1 EG27b_2 EG27b_3 EG28a EG28b EG28c EG29a EG29b EG29c
+     EG30a EG30b EG30c EG30d EG30e EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a
+     EG33b EG34a EG34b EG35a EG35b EG36a EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a
+     EG39b EG40_1 EG40_2 EG41_1 EG41_2 EG42a EG42b EG42c EG43a_1 EG43a_2 EG43b
+     EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b
+     EG48_1 EG48_2 EG49_1 EG49_2 EG50a EG50b NOM046X PS001 PS002 PS003 PS004 PS005
+     PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014 PS015 PS016 PS017 PS018 PS019
+     PS020 PS022 PS023 PS024 PS025 PS026 PS027 PS028 PS029 PS030 PS031 PS032 PS034
+     PS035 PS036 PS037 PS038 PS039 PS040 PS041 PS042 PS043 PS044 PS045 PS046 PS047
+     PS048 PS049; 
+IDVARIABLE = id;
+USEV = years-NOM046X logyrs;
+CATEGORICAL = AA4-NOM046X;
+MISSING=.;
+
+DEFINE:
+  logyrs = log(years + .1);
+
+ANALYSIS:
+  TYPE = basic;
+  ESTIMATOR = mlr;
+  ALGORITHM = integration;
+  INTEGRATION = gauss(16);
+  LINK = logit;
+  PROCESSORS = 16;
+
+
+MODEL:
+
+  f@1;
+  [f@0];
+  f ON logyrs*4.54605;
+  f on years*-0.35628;
+
+
+    !ITEM: AA102 | jid = 1
+    f BY AA102*0.298 (a_1);
+    [AA102$1*-2.674] (t1_1);
+
+    !ITEM: AA104 | jid = 2
+    f BY AA104*0.503 (a_2);
+    [AA104$1*0.237] (t1_2);
+
+    !ITEM: AA11 | jid = 3
+    f BY AA11*1.18 (a_3);
+    [AA11$1*-6.531] (t1_3);
+
+    !ITEM: AA12 | jid = 4
+    f BY AA12*1.315 (a_4);
+    [AA12$1*-6.015] (t1_4);
+
+    !ITEM: AA13 | jid = 5
+    f BY AA13*2.124 (a_5);
+    [AA13$1*-7.909] (t1_5);
+
+    !ITEM: AA14 | jid = 6
+    f BY AA14*1.849 (a_6);
+    [AA14$1*-7.735] (t1_6);
+
+    !ITEM: AA15 | jid = 7
+    f BY AA15*2.49 (a_7);
+    [AA15$1*-7.417] (t1_7);
+
+    !ITEM: AA17 | jid = 8
+    f BY AA17*1.445 (a_8);
+    [AA17$1*-3.655] (t1_8);
+
+    !ITEM: AA19 | jid = 9
+    f BY AA19*2.698 (a_9);
+    [AA19$1*-3.121] (t1_9);
+
+    !ITEM: AA20 | jid = 10
+    f BY AA20*3.279 (a_10);
+    [AA20$1*-0.495] (t1_10);
+
+    !ITEM: AA201 | jid = 11
+    f BY AA201* (a_11);
+    [AA201$1*] (t1_11);
+
+    !ITEM: AA202 | jid = 12
+    f BY AA202*1.672 (a_12);
+    [AA202$1*-13.396] (t1_12);
+
+    !ITEM: AA203 | jid = 13
+    f BY AA203* (a_13);
+    [AA203$1*] (t1_13);
+
+    !ITEM: AA205 | jid = 14
+    f BY AA205*1.992 (a_14);
+    [AA205$1*5.024] (t1_14);
+
+    !ITEM: AA21 | jid = 15
+    f BY AA21*2.046 (a_15);
+    [AA21$1*-1.319] (t1_15);
+
+    !ITEM: AA24 | jid = 16
+    f BY AA24*1.548 (a_16);
+    [AA24$1*1.212] (t1_16);
+
+    !ITEM: AA26 | jid = 17
+    f BY AA26*2.361 (a_17);
+    [AA26$1*4.567] (t1_17);
+
+    !ITEM: AA27 | jid = 18
+    f BY AA27*1.567 (a_18);
+    [AA27$1*2.252] (t1_18);
+
+    !ITEM: AA28 | jid = 19
+    f BY AA28*1.332 (a_19);
+    [AA28$1*1.468] (t1_19);
+
+    !ITEM: AA29 | jid = 20
+    f BY AA29*2.176 (a_20);
+    [AA29$1*3.801] (t1_20);
+
+    !ITEM: AA30 | jid = 21
+    f BY AA30*2.358 (a_21);
+    [AA30$1*4.096] (t1_21);
+
+    !ITEM: AA31 | jid = 22
+    f BY AA31*1.045 (a_22);
+    [AA31$1*1.972] (t1_22);
+
+    !ITEM: AA34 | jid = 23
+    f BY AA34*0.926 (a_23);
+    [AA34$1*2.958] (t1_23);
+
+    !ITEM: AA36 | jid = 24
+    f BY AA36*2.462 (a_24);
+    [AA36$1*8.538] (t1_24);
+
+    !ITEM: AA38 | jid = 25
+    f BY AA38*1.349 (a_25);
+    [AA38$1*4.086] (t1_25);
+
+    !ITEM: AA4 | jid = 26
+    f BY AA4*0.272 (a_26);
+    [AA4$1*-3.625] (t1_26);
+
+    !ITEM: AA41 | jid = 27
+    f BY AA41*2.481 (a_27);
+    [AA41$1*8.584] (t1_27);
+
+    !ITEM: AA43 | jid = 28
+    f BY AA43*1.782 (a_28);
+    [AA43$1*6.175] (t1_28);
+
+    !ITEM: AA46 | jid = 29
+    f BY AA46*1.013 (a_29);
+    [AA46$1*5.579] (t1_29);
+
+    !ITEM: AA47 | jid = 30
+    f BY AA47*2.698 (a_30);
+    [AA47$1*10.26] (t1_30);
+
+    !ITEM: AA49 | jid = 31
+    f BY AA49*2.152 (a_31);
+    [AA49$1*9.539] (t1_31);
+
+    !ITEM: AA5 | jid = 32
+    f BY AA5*1.431 (a_32);
+    [AA5$1*-9.044] (t1_32);
+
+    !ITEM: AA50 | jid = 33
+    f BY AA50*1.436 (a_33);
+    [AA50$1*-11.454] (t1_33);
+
+    !ITEM: AA54 | jid = 34
+    f BY AA54*0.453 (a_34);
+    [AA54$1*-2.166] (t1_34);
+
+    !ITEM: AA55 | jid = 35
+    f BY AA55*1.418 (a_35);
+    [AA55$1*5.185] (t1_35);
+
+    !ITEM: AA56 | jid = 36
+    f BY AA56*0.434 (a_36);
+    [AA56$1*-0.096] (t1_36);
+
+    !ITEM: AA57 | jid = 37
+    f BY AA57*0.892 (a_37);
+    [AA57$1*1.403] (t1_37);
+
+    !ITEM: AA6 | jid = 38
+    f BY AA6*0.698 (a_38);
+    [AA6$1*-5.951] (t1_38);
+
+    !ITEM: AA60 | jid = 39
+    f BY AA60*0.38 (a_39);
+    [AA60$1*-0.333] (t1_39);
+
+    !ITEM: AA65 | jid = 40
+    f BY AA65*1.027 (a_40);
+    [AA65$1*1.436] (t1_40);
+
+    !ITEM: AA68 | jid = 41
+    f BY AA68*0.437 (a_41);
+    [AA68$1*-0.738] (t1_41);
+
+    !ITEM: AA69 | jid = 42
+    f BY AA69*0.608 (a_42);
+    [AA69$1*1.01] (t1_42);
+
+    !ITEM: AA7 | jid = 43
+    f BY AA7*1.267 (a_43);
+    [AA7$1*-10.123] (t1_43);
+
+    !ITEM: AA71 | jid = 44
+    f BY AA71*0.748 (a_44);
+    [AA71$1*3.373] (t1_44);
+
+    !ITEM: AA72 | jid = 45
+    f BY AA72*1.477 (a_45);
+    [AA72$1*4.382] (t1_45);
+
+    !ITEM: AA9 | jid = 46
+    f BY AA9*1.049 (a_46);
+    [AA9$1*-5.137] (t1_46);
+
+    !ITEM: BB201 | jid = 47
+    f BY BB201*1.999 (a_47);
+    [BB201$1*3.889] (t1_47);
+
+    !ITEM: BB5 | jid = 48
+    f BY BB5*1.625 (a_48);
+    [BB5$1*4.64] (t1_48);
+
+    !ITEM: BB6 | jid = 49
+    f BY BB6*1.071 (a_49);
+    [BB6$1*3.34] (t1_49);
+
+    !ITEM: CC10 | jid = 50
+    f BY CC10*0.548 (a_50);
+    [CC10$1*-6.62] (t1_50);
+
+    !ITEM: CC11 | jid = 51
+    f BY CC11*0.925 (a_51);
+    [CC11$1*-8.039] (t1_51);
+
+    !ITEM: CC12 | jid = 52
+    f BY CC12*0.724 (a_52);
+    [CC12$1*-8.266] (t1_52);
+
+    !ITEM: CC13 | jid = 53
+    f BY CC13*0.412 (a_53);
+    [CC13$1*-5.67] (t1_53);
+
+    !ITEM: CC14 | jid = 54
+    f BY CC14*0.556 (a_54);
+    [CC14$1*-5.799] (t1_54);
+
+    !ITEM: CC15 | jid = 55
+    f BY CC15*0.593 (a_55);
+    [CC15$1*-6.17] (t1_55);
+
+    !ITEM: CC16 | jid = 56
+    f BY CC16*0.6 (a_56);
+    [CC16$1*-5.89] (t1_56);
+
+    !ITEM: CC17 | jid = 57
+    f BY CC17*0.563 (a_57);
+    [CC17$1*-6.989] (t1_57);
+
+    !ITEM: CC18 | jid = 58
+    f BY CC18*1.151 (a_58);
+    [CC18$1*-10.294] (t1_58);
+
+    !ITEM: CC19 | jid = 59
+    f BY CC19*0.673 (a_59);
+    [CC19$1*-7.23] (t1_59);
+
+    !ITEM: CC20 | jid = 60
+    f BY CC20*1.071 (a_60);
+    [CC20$1*-8.636] (t1_60);
+
+    !ITEM: CC21 | jid = 61
+    f BY CC21*0.857 (a_61);
+    [CC21$1*-4.564] (t1_61);
+
+    !ITEM: CC25 | jid = 62
+    f BY CC25*1.03 (a_62);
+    [CC25$1*-6.953] (t1_62);
+
+    !ITEM: CC26 | jid = 63
+    f BY CC26*1.333 (a_63);
+    [CC26$1*-10.582] (t1_63);
+
+    !ITEM: CC27 | jid = 64
+    f BY CC27*1.276 (a_64);
+    [CC27$1*-7.326] (t1_64);
+
+    !ITEM: CC28 | jid = 65
+    f BY CC28*1.547 (a_65);
+    [CC28$1*-5.646] (t1_65);
+
+    !ITEM: CC29 | jid = 66
+    f BY CC29*1.125 (a_66);
+    [CC29$1*-7.744] (t1_66);
+
+    !ITEM: CC30 | jid = 67
+    f BY CC30*1.874 (a_67);
+    [CC30$1*-7.348] (t1_67);
+
+    !ITEM: CC31 | jid = 68
+    f BY CC31*1.658 (a_68);
+    [CC31$1*-6.188] (t1_68);
+
+    !ITEM: CC32 | jid = 69
+    f BY CC32*1.245 (a_69);
+    [CC32$1*-5.985] (t1_69);
+
+    !ITEM: CC33 | jid = 70
+    f BY CC33*0.95 (a_70);
+    [CC33$1*-5.908] (t1_70);
+
+    !ITEM: CC34 | jid = 71
+    f BY CC34*1.218 (a_71);
+    [CC34$1*-4.856] (t1_71);
+
+    !ITEM: CC35 | jid = 72
+    f BY CC35*2.122 (a_72);
+    [CC35$1*-7.34] (t1_72);
+
+    !ITEM: CC36 | jid = 73
+    f BY CC36*1.368 (a_73);
+    [CC36$1*-4.245] (t1_73);
+
+    !ITEM: CC37 | jid = 74
+    f BY CC37*2.073 (a_74);
+    [CC37$1*-6.878] (t1_74);
+
+    !ITEM: CC39 | jid = 75
+    f BY CC39*3.946 (a_75);
+    [CC39$1*-6.703] (t1_75);
+
+    !ITEM: CC4 | jid = 76
+    f BY CC4*1.042 (a_76);
+    [CC4$1*-10.897] (t1_76);
+
+    !ITEM: CC40 | jid = 77
+    f BY CC40*3.684 (a_77);
+    [CC40$1*-4.648] (t1_77);
+
+    !ITEM: CC41 | jid = 78
+    f BY CC41*0.978 (a_78);
+    [CC41$1*-2.239] (t1_78);
+
+    !ITEM: CC42 | jid = 79
+    f BY CC42*2.494 (a_79);
+    [CC42$1*-1.617] (t1_79);
+
+    !ITEM: CC43 | jid = 80
+    f BY CC43*1.661 (a_80);
+    [CC43$1*-0.808] (t1_80);
+
+    !ITEM: CC45 | jid = 81
+    f BY CC45*2.927 (a_81);
+    [CC45$1*0.288] (t1_81);
+
+    !ITEM: CC46 | jid = 82
+    f BY CC46*2.58 (a_82);
+    [CC46$1*0.44] (t1_82);
+
+    !ITEM: CC48 | jid = 83
+    f BY CC48*2.971 (a_83);
+    [CC48$1*0.547] (t1_83);
+
+    !ITEM: CC5 | jid = 84
+    f BY CC5*1.073 (a_84);
+    [CC5$1*-11.634] (t1_84);
+
+    !ITEM: CC50 | jid = 85
+    f BY CC50*1.661 (a_85);
+    [CC50$1*-0.228] (t1_85);
+
+    !ITEM: CC51 | jid = 86
+    f BY CC51*1.593 (a_86);
+    [CC51$1*-0.417] (t1_86);
+
+    !ITEM: CC52 | jid = 87
+    f BY CC52*1.699 (a_87);
+    [CC52$1*0.56] (t1_87);
+
+    !ITEM: CC53 | jid = 88
+    f BY CC53*0.926 (a_88);
+    [CC53$1*1.5] (t1_88);
+
+    !ITEM: CC54 | jid = 89
+    f BY CC54*1.315 (a_89);
+    [CC54$1*0.524] (t1_89);
+
+    !ITEM: CC56 | jid = 90
+    f BY CC56*2.142 (a_90);
+    [CC56$1*1.406] (t1_90);
+
+    !ITEM: CC6 | jid = 91
+    f BY CC6*0.6 (a_91);
+    [CC6$1*-7.551] (t1_91);
+
+    !ITEM: CC60 | jid = 92
+    f BY CC60*0.515 (a_92);
+    [CC60$1*-2.481] (t1_92);
+
+    !ITEM: CC61 | jid = 93
+    f BY CC61*1.808 (a_93);
+    [CC61$1*2.452] (t1_93);
+
+    !ITEM: CC62 | jid = 94
+    f BY CC62*1.111 (a_94);
+    [CC62$1*-0.172] (t1_94);
+
+    !ITEM: CC64 | jid = 95
+    f BY CC64*1.344 (a_95);
+    [CC64$1*2.888] (t1_95);
+
+    !ITEM: CC65 | jid = 96
+    f BY CC65*1.406 (a_96);
+    [CC65$1*6.455] (t1_96);
+
+    !ITEM: CC66 | jid = 97
+    f BY CC66*2.212 (a_97);
+    [CC66$1*3.883] (t1_97);
+
+    !ITEM: CC67 | jid = 98
+    f BY CC67*1.566 (a_98);
+    [CC67$1*4.988] (t1_98);
+
+    !ITEM: CC68 | jid = 99
+    f BY CC68*0.862 (a_99);
+    [CC68$1*-0.181] (t1_99);
+
+    !ITEM: CC69 | jid = 100
+    f BY CC69*1.154 (a_100);
+    [CC69$1*1.577] (t1_100);
+
+    !ITEM: CC71 | jid = 101
+    f BY CC71*2.151 (a_101);
+    [CC71$1*2.876] (t1_101);
+
+    !ITEM: CC72 | jid = 102
+    !early_learning
+    f BY CC72*1.659 (a_102);
+    [CC72$1*3.885] (t1_102);
+
+    !ITEM: CC74 | jid = 103
+    f BY CC74*2.112 (a_103);
+    [CC74$1*4.735] (t1_103);
+
+    !ITEM: CC75 | jid = 104
+    f BY CC75*2.065 (a_104);
+    [CC75$1*5.684] (t1_104);
+
+    !ITEM: CC76 | jid = 105
+    f BY CC76*1.417 (a_105);
+    [CC76$1*4.307] (t1_105);
+
+    !ITEM: CC78 | jid = 106
+    f BY CC78*2.67 (a_106);
+    [CC78$1*8.572] (t1_106);
+
+    !ITEM: CC79y | jid = 107
+    f BY CC79y*1.665 (a_107);
+    [CC79y$1*5.119] (t1_107);
+
+    !ITEM: CC8 | jid = 108
+    f BY CC8*1.656 (a_108);
+    [CC8$1*-14.955] (t1_108);
+
+    !ITEM: CC80 | jid = 109
+    f BY CC80*0.75 (a_109);
+    [CC80$1*2.338] (t1_109);
+
+    !ITEM: CC83 | jid = 110
+    f BY CC83*1.567 (a_110);
+    [CC83$1*4.415] (t1_110);
+
+    !ITEM: CC84 | jid = 111
+    f BY CC84*1.248 (a_111);
+    [CC84$1*6.116] (t1_111);
+
+    !ITEM: CC85 | jid = 112
+    f BY CC85*0.864 (a_112);
+    [CC85$1*1.252] (t1_112);
+
+    !ITEM: CC87 | jid = 113
+    f BY CC87*1.516 (a_113);
+    [CC87$1*6.646] (t1_113);
+
+    !ITEM: CC89 | jid = 114
+    f BY CC89*0.892 (a_114);
+    [CC89$1*2.057] (t1_114);
+
+    !ITEM: CC9 | jid = 115
+    f BY CC9*1.408 (a_115);
+    [CC9$1*-15.252] (t1_115);
+
+    !ITEM: DD10 | jid = 116
+    f BY DD10*1.748 (a_116);
+    [DD10$1*6.304] (t1_116);
+
+    !ITEM: DD103 | jid = 117
+    f BY DD103*0.986 (a_117);
+    [DD103$1*-0.024] (t1_117);
+
+    !ITEM: DD15 | jid = 118
+    f BY DD15*1.158 (a_118);
+    [DD15$1*5.261] (t1_118);
+
+    !ITEM: DD16 | jid = 119
+    f BY DD16*1.662 (a_119);
+    [DD16$1*6.05] (t1_119);
+
+    !ITEM: DD19 | jid = 120
+    f BY DD19*1.184 (a_120);
+    [DD19$1*6.829] (t1_120);
+
+    !ITEM: DD201 | jid = 121
+    f BY DD201*0.837 (a_121);
+    [DD201$1*-0.631] (t1_121);
+
+    !ITEM: DD203 | jid = 122
+    f BY DD203*1.228 (a_122);
+    [DD203$1*1.436] (t1_122);
+
+    !ITEM: DD205 | jid = 123
+    f BY DD205*1.551 (a_123);
+    [DD205$1*5.998] (t1_123);
+    [DD205$2*7.615] (t2_123);
+    [DD205$3*8.231] (t3_123);
+    [DD205$4*10.104] (t4_123);
+
+    !ITEM: DD207 | jid = 124
+    f BY DD207*0.753 (a_124);
+    [DD207$1*1.367] (t1_124);
+    [DD207$2*3.328] (t2_124);
+    [DD207$3*6.1] (t3_124);
+
+    !ITEM: DD221 | jid = 125
+    f BY DD221*0.745 (a_125);
+    [DD221$1*0.479] (t1_125);
+
+    !ITEM: DD25 | jid = 126
+    f BY DD25*0.243 (a_126);
+    [DD25$1*-1.961] (t1_126);
+
+    !ITEM: DD299 | jid = 127
+    f BY DD299*0.581 (a_127);
+    [DD299$1*0.108] (t1_127);
+    [DD299$2*1.726] (t2_127);
+    [DD299$3*3.013] (t3_127);
+    [DD299$4*6.863] (t4_127);
+
+    !ITEM: DD30 | jid = 128
+    f BY DD30*1.005 (a_128);
+    [DD30$1*1.785] (t1_128);
+
+    !ITEM: DD32 | jid = 129
+    f BY DD32*0.984 (a_129);
+    [DD32$1*1.763] (t1_129);
+
+    !ITEM: DD36 | jid = 130
+    f BY DD36*0.669 (a_130);
+    [DD36$1*1.324] (t1_130);
+
+    !ITEM: DD39 | jid = 131
+    f BY DD39*0.746 (a_131);
+    [DD39$1*1.888] (t1_131);
+
+    !ITEM: DD44 | jid = 132
+    f BY DD44*0.45 (a_132);
+    [DD44$1*-2.192] (t1_132);
+
+    !ITEM: EG1_1 | jid = 133
+    f BY EG1_1*1.619 (a_133);
+    [EG1_1$1*1.63] (t1_133);
+
+    !ITEM: EG1_2 | jid = 134
+    !Constrain all to EG1_1
+    f BY EG1_2*1.619 (a_133);
+    [EG1_2$1*1.63] (t1_133);
+
+    !ITEM: EG10a | jid = 135
+    f BY EG10a*1.071 (a_135);
+    [EG10a$1*0.027] (t1_135);
+
+    !ITEM: EG10b | jid = 136
+    !Constrain slope to EG10a
+    f BY EG10b*1.071 (a_135);
+    [EG10b$1*2.727] (t1_136);
+
+    !ITEM: EG11_1 | jid = 137
+    f BY EG11_1*1.363 (a_137);
+    [EG11_1$1*2.488] (t1_137);
+
+    !ITEM: EG11_2 | jid = 138
+    !Constrain all to EG11_1
+    f BY EG11_2*1.363 (a_137);
+    [EG11_2$1*2.488] (t1_137);
+
+    !ITEM: EG12a | jid = 139
+    f BY EG12a*1.656 (a_139);
+    [EG12a$1*3.735] (t1_139);
+
+    !ITEM: EG12b | jid = 140
+    !Constrain slope to EG12a
+    f BY EG12b*1.656 (a_139);
+    [EG12b$1*3.819] (t1_140);
+
+    !ITEM: EG13a | jid = 141
+    f BY EG13a*2.353 (a_141);
+    [EG13a$1*9.73] (t1_141);
+
+    !ITEM: EG13b | jid = 142
+    !Constrain slope to EG13a. Constrain tau$1 to be greater than EG13a$1
+    f BY EG13b*2.353 (a_141);
+    [EG13b$1*11.424] (t1_142);
+
+    !ITEM: EG14a | jid = 143
+    f BY EG14a*1.728 (a_143);
+    [EG14a$1*7.358] (t1_143);
+
+    !ITEM: EG14b | jid = 144
+    !Constrain slope to EG14a
+    f BY EG14b*1.728 (a_143);
+    [EG14b$1*7.559] (t1_144);
+
+    !ITEM: EG15_1 | jid = 145
+    f BY EG15_1*1.214 (a_145);
+    [EG15_1$1*3.996] (t1_145);
+
+    !ITEM: EG15_2 | jid = 146
+    !Constrain all to EG15_1
+    f BY EG15_2*1.214 (a_145);
+    [EG15_2$1*3.996] (t1_145);
+    [EG15_2$2*5.736] (t2_145);
+    [EG15_2$3*6.351] (t3_145);
+    [EG15_2$4*8.215] (t4_145);
+
+    !ITEM: EG16a_1 | jid = 147
+    f BY EG16a_1*0.694 (a_147);
+    [EG16a_1$1*-1.086] (t1_147);
+    [EG16a_1$2*1.084] (t2_147);
+    [EG16a_1$3*2.044] (t3_147);
+    [EG16a_1$4*5.093] (t4_147);
+
+    !ITEM: EG16a_2 | jid = 148
+    !Constrain all to EG16a_1
+    f BY EG16a_2*0.694 (a_147);
+    [EG16a_2$1*-1.086] (t1_147);
+
+    !ITEM: EG16b | jid = 149
+    !Constrain slope to EG16a_1
+    f BY EG16b*0.694 (a_147);
+    [EG16b$1*0.227] (t1_149);
+
+    !ITEM: EG16c | jid = 150
+    !Constrain slope to EG16a_1.
+    f BY EG16c*0.694 (a_147);
+    [EG16c$1*0.619] (t1_150);
+
+    !ITEM: EG17a | jid = 151
+    f BY EG17a*0.891 (a_151);
+    [EG17a$1*0.594] (t1_151);
+
+    !ITEM: EG17b | jid = 152
+    !Constrain slope to to be equal to EG17a. Constrain tau$1 to be less than EG17a$1.
+    f BY EG17b*0.891 (a_151);
+    [EG17b$1*2.204] (t1_152);
+
+    !ITEM: EG18a | jid = 153
+    f BY EG18a*0.753 (a_153);
+    [EG18a$1*0.029] (t1_153);
+
+    !ITEM: EG18b | jid = 154
+    !Constrain slope to EG18a
+    f BY EG18b*0.753 (a_153);
+    [EG18b$1*1.625] (t1_154);
+
+    !ITEM: EG19_b | jid = 155
+    !Constrain slope to EG19a_1
+    f BY EG19_b*1.984 (a_156);
+    [EG19_b$1*7.242] (t1_155);
+
+    !ITEM: EG19a_1 | jid = 156
+    f BY EG19a_1*1.984 (a_156);
+    [EG19a_1$1*5.955] (t1_156);
+
+    !ITEM: EG19a_2 | jid = 157
+    !Constrain all to EG19a_1
+    f BY EG19a_2*1.984 (a_156);
+    [EG19a_2$1*5.955] (t1_156);
+
+    !ITEM: EG19a_3 | jid = 158
+    !Constrain all to EG19a_1
+    f BY EG19a_3*1.984 (a_156);
+    [EG19a_3$1*5.955] (t1_156);
+
+    !ITEM: EG19a_4 | jid = 159
+    !Constrain all to EG19a_1
+    f BY EG19a_4*1.984 (a_156);
+    [EG19a_4$1*5.955] (t1_156);
+
+    !ITEM: EG2_1 | jid = 160
+    f BY EG2_1*1.518 (a_160);
+    [EG2_1$1*3.39] (t1_160);
+
+    !ITEM: EG2_2 | jid = 161
+    !Constrain all to EG2_1
+    f BY EG2_2*1.518 (a_160);
+    [EG2_2$1*3.39] (t1_160);
+
+    !ITEM: EG20a | jid = 162
+    f BY EG20a*1.303 (a_162);
+    [EG20a$1*3.49] (t1_162);
+    [EG20a$2*4.917] (t2_162);
+    [EG20a$3*8.322] (t3_162);
+    [EG20a$4*9.628] (t4_162);
+
+    !ITEM: EG20b_1 | jid = 163
+    !Constrain slope to EG20a. Constrain tau$1 to EG20a$1. Constrain tau$2 to EG20a$2. Constrain tau$4 to EG20a$3. Constrain tau$5 to EG20a$4
+    f BY EG20b_1*1.303 (a_162);
+    [EG20b_1$1*3.49] (t1_162);
+
+    !ITEM: EG20b_2 | jid = 164
+    !Constrain slope to EG20a. Constrain tau$1 to EG20a$1. Constrain tau$2 to EG20a$2. Constrain tau$4 to EG20a$3. Constrain tau$5 to EG20a$4
+    f BY EG20b_2*1.303 (a_162);
+    [EG20b_2$1*3.49] (t1_162);
+
+    !ITEM: EG20c | jid = 165
+    !Constrain slope to EG20a. Constrain tau$1 to EG20a$2.
+    f BY EG20c*1.303 (a_162);
+    [EG20c$1*4.917] (t2_162);
+
+    !ITEM: EG20d | jid = 166
+    !Constrain slope to EG20a. Constrain tau$1 to EG20a$1
+    f BY EG20d*1.303 (a_162);
+    [EG20d$1*3.49] (t1_162);
+
+    !ITEM: EG20e_1 | jid = 167
+    !Constrain slope to EG20a. Constrain tau$1 to be less than EG20a$1.
+    f BY EG20e_1*1.303 (a_162);
+    [EG20e_1$1*4.544] (t1_167);
+
+    !ITEM: EG20e_2 | jid = 168
+    !Constrain slope to EG20a. Constrain tau$1 to be equal to EG20e_1$1.
+    f BY EG20e_2*1.303 (a_162);
+    [EG20e_2$1*4.544] (t1_167);
+
+    !ITEM: EG21a | jid = 169
+    f BY EG21a*1.351 (a_169);
+    [EG21a$1*5.293] (t1_169);
+    [EG21a$2*6.624] (t2_169);
+    [EG21a$3*7.122] (t3_169);
+    [EG21a$4*8.37] (t4_169);
+
+    !ITEM: EG21b | jid = 170
+    !Constrain slope to EG21a. Constrain tau$1 to be a simplex  between EG21a$1 and EG21a$4
+    f BY EG21b*1.351 (a_169);
+    [EG21b$1*5.785] (t1_170);
+
+    !ITEM: EG22_1 | jid = 171
+    f BY EG22_1*1.558 (a_171);
+    [EG22_1$1*8.518] (t1_171);
+
+    !ITEM: EG22_2 | jid = 172
+    !Constrain all to EG22_1
+    f BY EG22_2*1.558 (a_171);
+    [EG22_2$1*8.518] (t1_171);
+    [EG22_2$2*10.009] (t2_171);
+    [EG22_2$3*10.617] (t3_171);
+    [EG22_2$4*12.268] (t4_171);
+
+    !ITEM: EG23a | jid = 173
+    f BY EG23a*0.673 (a_173);
+    [EG23a$1*-1.553] (t1_173);
+    [EG23a$2*1.956] (t2_173);
+    [EG23a$3*3.357] (t3_173);
+    [EG23a$4*6.12] (t4_173);
+
+    !ITEM: EG23b | jid = 174
+    !Constrain slope to EG23a. Constrain tau$1 to be a simplex between EG23a$1 and EG23a$4
+    f BY EG23b*0.673 (a_173);
+    [EG23b$1*-0.326] (t1_174);
+
+    !ITEM: EG24a | jid = 175
+    f BY EG24a*0.482 (a_175);
+    [EG24a$1*-0.821] (t1_175);
+
+    !ITEM: EG24b | jid = 176
+    !Constrain slope to EG24a
+    f BY EG24b*0.482 (a_175);
+    [EG24b$1*-1.241] (t1_176);
+    [EG24b$2*0.557] (t2_176);
+    [EG24b$3*1.646] (t3_176);
+    [EG24b$4*5.732] (t4_176);
+
+    !ITEM: EG25a | jid = 177
+    f BY EG25a*0.369 (a_177);
+    [EG25a$1*-1.983] (t1_177);
+    [EG25a$2*0.273] (t2_177);
+    [EG25a$3*1.509] (t3_177);
+    [EG25a$4*4.337] (t4_177);
+
+    !ITEM: EG25b | jid = 178
+    !Constrain slope to EG25a
+    f BY EG25b*0.369 (a_177);
+    [EG25b$1*0.613] (t1_178);
+
+    !ITEM: EG26a | jid = 179
+    f BY EG26a*0.003 (a_179);
+    [EG26a$1*-4.328] (t1_179);
+
+    !ITEM: EG26b | jid = 180
+    !Constrain slope to EG26a
+    f BY EG26b*0.003 (a_179);
+    [EG26b$1*-1.714] (t1_180);
+    [EG26b$2*0.845] (t2_180);
+    [EG26b$3*1.843] (t3_180);
+    [EG26b$4*3.161] (t4_180);
+
+    !ITEM: EG27a | jid = 181
+    f BY EG27a*1.415 (a_181);
+    [EG27a$1*3.171] (t1_181);
+
+    !ITEM: EG27b_1 | jid = 182
+    !Constrain slope to EG27a. Constrain tau$1 to be between EG27a$1 and EG27a$4
+    f BY EG27b_1*1.415 (a_181);
+    [EG27b_1$1*4.563] (t1_182);
+
+    !ITEM: EG27b_2 | jid = 183
+    !Constrain slope to EG27a. Constrain tau$1 to be EG27b_1$1
+    f BY EG27b_2*1.415 (a_181);
+    [EG27b_2$1*4.563] (t1_182);
+
+    !ITEM: EG27b_3 | jid = 184
+    !Constrain slope to EG27a. Constrain tau$1 to be EG27b_1$1
+    f BY EG27b_3*1.415 (a_181);
+    [EG27b_3$1*4.563] (t1_182);
+
+    !ITEM: EG28a | jid = 185
+    f BY EG28a*1.788 (a_185);
+    [EG28a$1*9.819] (t1_185);
+    [EG28a$2*10.731] (t2_185);
+    [EG28a$3*11.081] (t3_185);
+    [EG28a$4*11.881] (t4_185);
+
+    !ITEM: EG28b | jid = 186
+    !Constrain slope to EG28a. Constrain tau$1 to be equal to a simplex between EG28a$1 and EG28a$4
+    f BY EG28b*1.788 (a_185);
+    [EG28b$1*10.149] (t1_186);
+
+    !ITEM: EG28c | jid = 187
+    !Constrain slope to EG28a. Constrain tau$1 to be equal to a simplex between EG28a$1 and EG28a$4
+    f BY EG28c*1.788 (a_185);
+    [EG28c$1*10.149] (t1_187);
+
+    !ITEM: EG29a | jid = 188
+    f BY EG29a*1.201 (a_188);
+    [EG29a$1*3.849] (t1_188);
+    [EG29a$2*6.025] (t2_188);
+    [EG29a$3*6.622] (t3_188);
+    [EG29a$4*7.938] (t4_188);
+
+    !ITEM: EG29b | jid = 189
+    !Constrain slope to EG29a. Constrain tau$1 to be equal to EG29a$1. Constrain tau$2  to be equal to EG29a$3. Constrain tau$3 to be equal to EG29a$4
+    f BY EG29b*1.201 (a_188);
+    [EG29b$1*3.849] (t1_188);
+
+    !ITEM: EG29c | jid = 190
+    !Constrain slope to EG29a. Constrain tau$1 to be equal to EG29a$1.
+    f BY EG29c*1.201 (a_188);
+    [EG29c$1*3.849] (t1_188);
+
+    !ITEM: EG3_1 | jid = 191
+    f BY EG3_1*2.08 (a_191);
+    [EG3_1$1*6.773] (t1_191);
+
+    !ITEM: EG3_2 | jid = 192
+    !Constrain all to EG3_1
+    f BY EG3_2*2.08 (a_191);
+    [EG3_2$1*6.773] (t1_191);
+
+    !ITEM: EG30a | jid = 193
+    !Constrain slope to EG27a
+    f BY EG30a*1.415 (a_181);
+    [EG30a$1*4.104] (t1_193);
+    [EG30a$2*6.105] (t2_193);
+    [EG30a$3*9.71] (t3_193);
+
+    !ITEM: EG30b | jid = 194
+    !Constrain slope to EG30a. Constrain tau$1 to be a simplex between EG30a$1 and EG30a$3
+    f BY EG30b*1.406 (a_193);
+    [EG30b$1*5.001] (t1_194);
+
+    !ITEM: EG30c | jid = 195
+    !Constrain slope to EG27a. Constrain tau$1 to between EG30a$1 and EG30a$3
+    f BY EG30c*1.415 (a_181);
+    [EG30c$1*5.93] (t1_195);
+
+    !ITEM: EG30d | jid = 196
+    !Constrain slope to EG27a
+    f BY EG30d*1.415 (a_181);
+    [EG30d$1*7.232] (t1_196);
+
+    !ITEM: EG30e | jid = 197
+    !Constrain slope to EG27a
+    f BY EG30e*1.415 (a_181);
+    [EG30e$1*7.029] (t1_197);
+
+    !ITEM: EG30f | jid = 198
+    !Constrain slope to EG27a
+    f BY EG30f*1.415 (a_181);
+    [EG30f$1*4.776] (t1_198);
+
+    !ITEM: EG31a_1 | jid = 199
+    f BY EG31a_1*0.871 (a_199);
+    [EG31a_1$1*0.754] (t1_199);
+
+    !ITEM: EG31a_2 | jid = 200
+    !Constrain all to EG31a_1.
+    f BY EG31a_2*0.871 (a_199);
+    [EG31a_2$1*0.754] (t1_199);
+
+    !ITEM: EG31b | jid = 201
+    !Constrain slope to be equal to EG31a_1. Constrain tau$1 to be less than EG31a_1$1.
+    f BY EG31b*0.871 (a_199);
+    [EG31b$1*-0.735] (t1_201);
+
+    !ITEM: EG32a | jid = 202
+    f BY EG32a*1.67 (a_202);
+    [EG32a$1*7.33] (t1_202);
+    [EG32a$2*9.001] (t2_202);
+    [EG32a$3*11.798] (t3_202);
+
+    !ITEM: EG32b | jid = 203
+    !constraint slope to EG32a. Constrain tau$1 to be a simplex between EG32a$1 and EG32a$3
+    f BY EG32b*1.67 (a_202);
+    [EG32b$1*8.044] (t1_203);
+
+    !ITEM: EG33a | jid = 204
+    f BY EG33a*1.647 (a_204);
+    [EG33a$1*8.289] (t1_204);
+    [EG33a$2*9.885] (t2_204);
+    [EG33a$3*12.487] (t3_204);
+
+    !ITEM: EG33b | jid = 205
+    !Constrain slope to EG32a. Constrain tau$1 to be a simplex between EG33a$1 and EG33a$2.
+    f BY EG33b*1.67 (a_202);
+    [EG33b$1*8.544] (t1_205);
+
+    !ITEM: EG34a | jid = 206
+    f BY EG34a*0.755 (a_206);
+    [EG34a$1*-0.15] (t1_206);
+
+    !ITEM: EG34b | jid = 207
+    !Constrain slope to EG34a. Constrain tau$1 to EG34a$2.
+    f BY EG34b*0.755 (a_206);
+    [EG34b$1*3.248] (t2_206);
+
+    !ITEM: EG35a | jid = 208
+    f BY EG35a*1.288 (a_208);
+    [EG35a$1*4.274] (t1_208);
+
+    !ITEM: EG35b | jid = 209
+    !Constrain slope to EG35a.
+    f BY EG35b*1.288 (a_208);
+    [EG35b$1*3.039] (t1_209);
+
+    !ITEM: EG36a | jid = 210
+    f BY EG36a*1.045 (a_210);
+    [EG36a$1*3.543] (t1_210);
+
+    !ITEM: EG36b | jid = 211
+    !Constrain slope to EG36a
+    f BY EG36b*1.045 (a_210);
+    [EG36b$1*3.052] (t1_211);
+
+    !ITEM: EG37_1 | jid = 212
+    f BY EG37_1*0.49 (a_212);
+    [EG37_1$1*-1.258] (t1_212);
+    [EG37_1$2*0.66] (t2_212);
+    [EG37_1$3*1.411] (t3_212);
+    [EG37_1$4*3.597] (t4_212);
+
+    !ITEM: EG37_2 | jid = 213
+    !Constrain all to EG37_1
+    f BY EG37_2*0.49 (a_212);
+    [EG37_2$1*-1.258] (t1_212);
+
+    !ITEM: EG38a | jid = 214
+    f BY EG38a*1.054 (a_214);
+    [EG38a$1*2.513] (t1_214);
+    [EG38a$2*4.358] (t2_214);
+    [EG38a$3*5.226] (t3_214);
+    [EG38a$4*7.822] (t4_214);
+
+    !ITEM: EG38b | jid = 215
+    !Constrain slope to EG38a. Constrain tau$1 to be a simplex between EG38a$1 and EG38a$4.
+    f BY EG38b*1.054 (a_214);
+    [EG38b$1*3.362] (t1_215);
+
+    !ITEM: EG38c | jid = 216
+    !Constrain slope to EG38a.
+    f BY EG38c*1.054 (a_214);
+    [EG38c$1*2.69] (t1_216);
+
+    !ITEM: EG39a | jid = 217
+    f BY EG39a*0.586 (a_217);
+    [EG39a$1*-0.339] (t1_217);
+    [EG39a$2*1.445] (t2_217);
+    [EG39a$3*2.648] (t3_217);
+    [EG39a$4*5.985] (t4_217);
+
+    !ITEM: EG39b | jid = 218
+    !Constrain slope to EG39a. Constrain tau$1 to be equal to EG39a$1. Constrain tau$4 to be equal to EG39a$4.
+    f BY EG39b*0.586 (a_217);
+    [EG39b$1*-0.339] (t1_217);
+
+    !ITEM: EG40_1 | jid = 219
+    f BY EG40_1*0.512 (a_219);
+    [EG40_1$1*-0.573] (t1_219);
+
+    !ITEM: EG40_2 | jid = 220
+    !Constrain all to EG40_1.
+    f BY EG40_2*0.512 (a_219);
+    [EG40_2$1*-0.573] (t1_219);
+
+    !ITEM: EG41_1 | jid = 221
+    f BY EG41_1*0.028 (a_221);
+    [EG41_1$1*-4.133] (t1_221);
+
+    !ITEM: EG41_2 | jid = 222
+    !Constrain slope to EG41_1. Constrain tau$1 to EG41_1$1. Constrain tau$4 to EG41_1$3
+    f BY EG41_2*0.028 (a_221);
+    [EG41_2$1*-4.133] (t1_221);
+
+    !ITEM: EG42a | jid = 223
+    f BY EG42a*1.507 (a_223);
+    [EG42a$1*7.483] (t1_223);
+    [EG42a$2*8.645] (t2_223);
+    [EG42a$3*11.414] (t3_223);
+
+    !ITEM: EG42b | jid = 224
+    !Constrain slope to EG42a. Constrain tau$1 to be a simplex between EG42a$1 and EG42a$3.
+    f BY EG42b*1.507 (a_223);
+    [EG42b$1*8.112] (t1_224);
+
+    !ITEM: EG42c | jid = 225
+    !Constrain slope to EG42a. Constrain tau$1 to be equal to EG42a$1. Constrain tau$4 to be equal to EG42a$3.
+    f BY EG42c*1.507 (a_223);
+    [EG42c$1*7.483] (t1_223);
+
+    !ITEM: EG43a_1 | jid = 226
+    f BY EG43a_1*1.319 (a_226);
+    [EG43a_1$1*3.5] (t1_226);
+    [EG43a_1$2*5.186] (t2_226);
+    [EG43a_1$3*5.983] (t3_226);
+    [EG43a_1$4*8.459] (t4_226);
+
+    !ITEM: EG43a_2 | jid = 227
+    !Constrain all to EG43a_1.
+    f BY EG43a_2*1.319 (a_226);
+    [EG43a_2$1*3.5] (t1_226);
+
+    !ITEM: EG43b | jid = 228
+    !Constrain slope to EG42a.
+    f BY EG43b*1.507 (a_223);
+    [EG43b$1*6.935] (t1_228);
+
+    !ITEM: EG44_1 | jid = 229
+    f BY EG44_1*1.211 (a_229);
+    [EG44_1$1*2.623] (t1_229);
+
+    !ITEM: EG44_2 | jid = 230
+    !Constrain all to EG44_1
+    f BY EG44_2*1.211 (a_229);
+    [EG44_2$1*2.623] (t1_229);
+
+    !ITEM: EG45_1 | jid = 231
+    f BY EG45_1*1.516 (a_231);
+    [EG45_1$1*6.1] (t1_231);
+    [EG45_1$2*7.955] (t2_231);
+    [EG45_1$3*8.713] (t3_231);
+    [EG45_1$4*10.718] (t4_231);
+
+    !ITEM: EG45_2 | jid = 232
+    !Constrain all to EG45_1
+    f BY EG45_2*1.516 (a_231);
+    [EG45_2$1*6.1] (t1_231);
+
+    !ITEM: EG46a_1 | jid = 233
+    f BY EG46a_1*1.855 (a_233);
+    [EG46a_1$1*-3.643] (t1_233);
+
+    !ITEM: EG46a_2 | jid = 234
+    !Constrain all to EG46a_1
+    f BY EG46a_2*1.855 (a_233);
+    [EG46a_2$1*-3.643] (t1_233);
+
+    !ITEM: EG46b | jid = 235
+    !Constrain slope to EG46a_1. Constrain tau$1 to be less than EG46c$1.
+    f BY EG46b*1.855 (a_233);
+    [EG46b$1*-8.037] (t1_235);
+
+    !ITEM: EG46c | jid = 236
+    !Constrain slope to EG46a_1.
+    f BY EG46c*1.855 (a_233);
+    [EG46c$1*-4.224] (t1_236);
+
+    !ITEM: EG46d | jid = 237
+    !Constrain slope to EG46a_1. Constrain tau$1 to be less than EG46c$1.
+    f BY EG46d*1.855 (a_233);
+    [EG46d$1*-4.534] (t1_237);
+
+    !ITEM: EG47a | jid = 238
+    f BY EG47a*3.418 (a_238);
+    [EG47a$1*-0.077] (t1_238);
+
+    !ITEM: EG47b | jid = 239
+    !Constrain slope to EG47a. Constrain tau$1 to be less than EG47a$1.
+    f BY EG47b*3.418 (a_238);
+    [EG47b$1*-4.047] (t1_239);
+
+    !ITEM: EG48_1 | jid = 240
+    f BY EG48_1*1.244 (a_240);
+    [EG48_1$1*3.382] (t1_240);
+
+    !ITEM: EG48_2 | jid = 241
+    !Constrain all to EG48_1
+    f BY EG48_2*1.244 (a_240);
+    [EG48_2$1*3.382] (t1_240);
+
+    !ITEM: EG49_1 | jid = 242
+    f BY EG49_1*1.459 (a_242);
+    [EG49_1$1*-7.709] (t1_242);
+
+    !ITEM: EG49_2 | jid = 243
+    !Constrain all to EG49_1.
+    f BY EG49_2*1.459 (a_242);
+    [EG49_2$1*-7.709] (t1_242);
+
+    !ITEM: EG4a_1 | jid = 244
+    f BY EG4a_1*2.183 (a_244);
+    [EG4a_1$1*7.732] (t1_244);
+
+    !ITEM: EG4a_2 | jid = 245
+    !Constrain all to EG4a_1
+    f BY EG4a_2*2.183 (a_244);
+    [EG4a_2$1*7.732] (t1_244);
+
+    !ITEM: EG4b_1 | jid = 246
+    !Constrain slope to EG4a_1
+    f BY EG4b_1*2.183 (a_244);
+    [EG4b_1$1*8.678] (t1_246);
+
+    !ITEM: EG4b_2 | jid = 247
+    !Constrain slope to EG4a_1; Constrain tau$1 to EG4b_1$1
+    f BY EG4b_2*2.183 (a_244);
+    [EG4b_2$1*8.678] (t1_246);
+
+    !ITEM: EG50a | jid = 248
+    f BY EG50a*1.354 (a_248);
+    [EG50a$1*2.041] (t1_248);
+
+    !ITEM: EG50b | jid = 249
+    !Constrain slope to EG50a. Constrain tau$1 to be greater than EG50a$1
+    f BY EG50b*1.354 (a_248);
+    [EG50b$1*2.748] (t1_249);
+
+    !ITEM: EG5a | jid = 250
+    f BY EG5a*1.093 (a_250);
+    [EG5a$1*1.32] (t1_250);
+    [EG5a$2*3.969] (t2_250);
+    [EG5a$3*5.133] (t3_250);
+    [EG5a$4*7.872] (t4_250);
+
+    !ITEM: EG5b | jid = 251
+    !Constrain slope to EG5a
+    f BY EG5b*1.093 (a_250);
+    [EG5b$1*3.563] (t1_251);
+
+    !ITEM: EG6_1 | jid = 252
+    f BY EG6_1*0.72 (a_252);
+    [EG6_1$1*1.657] (t1_252);
+
+    !ITEM: EG6_2 | jid = 253
+    !Constrain all to EG6_1
+    f BY EG6_2*0.72 (a_252);
+    [EG6_2$1*1.657] (t1_252);
+
+    !ITEM: EG7_1 | jid = 254
+    f BY EG7_1*0.972 (a_254);
+    [EG7_1$1*-6.48] (t1_254);
+
+    !ITEM: EG7_2 | jid = 255
+    !Constrain all to EG7_1
+    f BY EG7_2*0.972 (a_254);
+    [EG7_2$1*-6.48] (t1_254);
+
+    !ITEM: EG8_1 | jid = 256
+    f BY EG8_1*1.055 (a_256);
+    [EG8_1$1*-5.38] (t1_256);
+
+    !ITEM: EG8_2 | jid = 257
+    !Constrain all to EG8_1
+    f BY EG8_2*1.055 (a_256);
+    [EG8_2$1*-5.38] (t1_256);
+
+    !ITEM: EG9a | jid = 258
+    f BY EG9a*0.745 (a_258);
+    [EG9a$1*-0.635] (t1_258);
+
+    !ITEM: EG9b | jid = 259
+    !Constrain slope to EG9a
+    f BY EG9b*0.745 (a_258);
+    [EG9b$1*-0.634] (t1_259);
+
+    !ITEM: NOM044 | jid = 261
+    f BY NOM044* (a_261);
+    [NOM044$1*] (t1_261);
+
+    !ITEM: NOM046X | jid = 263
+    f BY NOM046X* (a_263);
+    [NOM046X$1*] (t1_263);
+
+
+
+
+  OUTPUT:
+  noserror;
+  svalues;
+  nochisquare;

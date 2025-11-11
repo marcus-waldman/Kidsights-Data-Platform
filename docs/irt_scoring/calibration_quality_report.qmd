@@ -61,7 +61,7 @@ The validation system detected **3 types of data quality issues**:
    - **Invalid values**: Response values not defined in codebook (e.g., value=9 when only {0,1,2} expected)
    - **Fewer categories**: Missing response categories (ceiling/floor effects)
 
-2. **Negative Age-Response Correlation**: Items where older children score lower than younger children (developmentally unexpected)
+2. **Negative Age-Response Correlation**: Items where older children score lower than younger children (developmentally unexpected). **Only checked for Kidsights Measurement Tool items; GSED-PF psychosocial items are excluded as they are not developmental.**
 
 3. **Non-Sequential Response Values**: Response values with gaps (e.g., {0,1,9} instead of {0,1,2}), suggesting undocumented missing codes
 
@@ -75,7 +75,7 @@ conn <- dbConnect(duckdb(), "../../data/duckdb/kidsights_local.duckdb", read_onl
 
 calibration_data <- dbGetQuery(conn, "
   SELECT *
-  FROM calibration_dataset_2020_2025
+  FROM calibration_dataset_2020_2025_restructured
 ")
 
 dbDisconnect(conn)
@@ -85,6 +85,34 @@ quality_flags <- read.csv("quality_flags.csv", stringsAsFactors = FALSE)
 
 # Load codebook
 codebook <- fromJSON("../../codebook/data/codebook.json", simplifyVector = FALSE)
+
+# Extract instrument mapping from codebook
+instrument_mapping <- data.frame(
+  item_id = character(),
+  instrument = character(),
+  stringsAsFactors = FALSE
+)
+
+for (item_id in names(codebook$items)) {
+  item <- codebook$items[[item_id]]
+  if (!is.null(item$lexicons$equate) && !is.null(item$instruments)) {
+    equate_name <- item$lexicons$equate
+    instruments <- unlist(item$instruments)
+
+    # Create one row per instrument
+    for (inst in instruments) {
+      instrument_mapping <- rbind(instrument_mapping, data.frame(
+        item_id = equate_name,
+        instrument = inst,
+        stringsAsFactors = FALSE
+      ))
+    }
+  }
+}
+
+# Add instrument column to quality flags
+quality_flags <- quality_flags %>%
+  left_join(instrument_mapping, by = "item_id")
 
 # Extract item columns
 metadata_cols <- c("study_num", "id", "years", "study")
@@ -224,6 +252,7 @@ detailed_flags <- quality_flags %>%
   select(
     Item = item_id,
     Study = study,
+    Instrument = instrument,
     `Flag Type` = flag_type,
     Severity = flag_severity,
     `Observed Categories` = observed_categories,
@@ -258,6 +287,15 @@ datatable(
     fontWeight = 'bold'
   ) %>%
   formatStyle(
+    'Instrument',
+    backgroundColor = styleEqual(
+      c('Kidsights Measurement Tool', 'GSED-PF'),
+      c('#d4e6f1', '#fdebd0')  # Light blue for Kidsights, light orange for GSED-PF
+    ),
+    fontWeight = 'bold',
+    fontSize = '11px'
+  ) %>%
+  formatStyle(
     'Item',
     fontFamily = 'monospace'
   ) %>%
@@ -275,6 +313,9 @@ datatable(
 
 - **ERROR flags** (red): Require immediate attention - invalid data values detected
 - **WARNING flags** (yellow): Noteworthy patterns that may affect modeling
+- **Instruments** (color-coded):
+  - <span style="background-color:#d4e6f1; padding:2px 6px; font-weight:bold;">Kidsights Measurement Tool</span> - Developmental items (checked for age correlation)
+  - <span style="background-color:#fdebd0; padding:2px 6px; font-weight:bold;">GSED-PF</span> - Psychosocial items (excluded from age checks)
 - Use column filters to focus on specific studies, flag types, or severities
 - Click "CSV" or "Excel" buttons to export data for further analysis
 :::

@@ -1,13 +1,20 @@
 # =============================================================================
 # Import Historical Calibration Data from KidsightsPublic Package
 # =============================================================================
-# Purpose: One-time script to load historical calibration data (NE20, NE22, USA24)
-#          from KidsightsPublic package into DuckDB as separate study tables
+# Purpose: Load historical calibration data (NE20, NE22, USA24) from KidsightsPublic
+#          package and apply lexicon mapping (kidsight → equate) to harmonize with
+#          current codebook naming conventions
 #
-# Output: 3 DuckDB tables:
-#   - ne20_calibration (37,546 records)
-#   - ne22_calibration (2,431 records)
-#   - usa24_calibration (1,600 records)
+# Lexicon Mapping: Maps historical kidsight lexicon to equate lexicon
+#   - Example: AA10 (kidsight) → EG46b (equate)
+#   - Example: DD202 (kidsight) → EG5a (equate)
+#   - Uses codebook.json for mapping definitions
+#
+# Output: 1 DuckDB table:
+#   - historical_calibration_2020_2024 (41,577 records with equate lexicon names)
+#     - NE20:  37,546 records
+#     - NE22:  2,431 records
+#     - USA24: 1,600 records
 # =============================================================================
 
 cat("\n")
@@ -19,9 +26,9 @@ cat(strrep("=", 80), "\n\n")
 # Load Dependencies
 # =============================================================================
 
-cat("[1/8] Loading required packages\n")
+cat("[1/9] Loading required packages\n")
 
-required_packages <- c("KidsightsPublic", "duckdb", "dplyr", "haven")
+required_packages <- c("KidsightsPublic", "duckdb", "dplyr", "haven", "jsonlite")
 
 for (pkg in required_packages) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -34,6 +41,7 @@ library(KidsightsPublic)
 library(duckdb)
 library(dplyr)
 library(haven)
+library(jsonlite)
 
 cat("      Packages loaded successfully\n\n")
 
@@ -41,7 +49,7 @@ cat("      Packages loaded successfully\n\n")
 # Load Historical Calibration Data from KidsightsPublic
 # =============================================================================
 
-cat("[2/8] Loading calibdat from KidsightsPublic package\n")
+cat("[2/9] Loading calibdat from KidsightsPublic package\n")
 
 # Load the calibdat dataset from package
 data(calibdat, package = "KidsightsPublic")
@@ -65,15 +73,79 @@ if (length(missing_cols) > 0) {
 # Process Calibration Data
 # =============================================================================
 
-cat("[3/8] Processing calibration data\n")
+cat("[3/9] Processing calibration data\n")
 
 # Strip haven labels from all columns (prevents errors with summary/median/etc)
 cat("      Stripping haven labels from data\n")
 calibdat <- calibdat %>%
   dplyr::mutate(dplyr::across(dplyr::everything(), haven::zap_formats))
 
-# Derive study column from ID ranges (based on Update-KidsightsPublic/main.R logic)
-cat("      Deriving study column from ID ranges\n")
+# =============================================================================
+# Map Kidsight Lexicon to Equate Lexicon
+# =============================================================================
+
+cat("[4/9] Mapping kidsight lexicon to equate lexicon\n")
+
+# Load codebook
+codebook_path <- "codebook/data/codebook.json"
+if (!file.exists(codebook_path)) {
+  stop(sprintf("Codebook file not found at: %s", codebook_path))
+}
+
+cat(sprintf("      Loading codebook from: %s\n", codebook_path))
+codebook <- jsonlite::fromJSON(codebook_path, simplifyVector = FALSE)
+
+# Build kidsight → equate mapping from codebook
+kidsight_to_equate <- list()
+for (item_id in names(codebook$items)) {
+  item <- codebook$items[[item_id]]
+
+  # Extract lexicons
+  if (!is.null(item$lexicons$kidsight) && nchar(item$lexicons$kidsight) > 0 &&
+      !is.null(item$lexicons$equate) && nchar(item$lexicons$equate) > 0) {
+    kidsight_name <- item$lexicons$kidsight
+    equate_name <- item$lexicons$equate
+    kidsight_to_equate[[kidsight_name]] <- equate_name
+  }
+}
+
+cat(sprintf("      Found %d items with kidsight->equate mappings\n", length(kidsight_to_equate)))
+
+# Identify item columns in calibdat
+metadata_cols <- c("id", "years")
+item_cols <- setdiff(names(calibdat), metadata_cols)
+cat(sprintf("      Item columns in calibdat: %d\n", length(item_cols)))
+
+# Identify which columns need renaming
+cols_to_rename <- intersect(item_cols, names(kidsight_to_equate))
+cols_no_mapping <- setdiff(item_cols, names(kidsight_to_equate))
+
+cat(sprintf("      Columns to rename (kidsight->equate): %d\n", length(cols_to_rename)))
+cat(sprintf("      Columns with no mapping (kept as-is): %d\n", length(cols_no_mapping)))
+
+# Build dplyr rename mapping (new_name = old_name format)
+rename_map <- character()
+for (old_col in cols_to_rename) {
+  new_col <- kidsight_to_equate[[old_col]]
+  rename_map[new_col] <- old_col
+}
+
+# Apply lexicon mapping
+cat("      Applying lexicon mapping (renaming columns)\n")
+calibdat <- calibdat %>%
+  dplyr::rename(!!!rename_map)
+
+cat(sprintf("      [OK] Lexicon mapping complete\n"))
+cat(sprintf("      Sample renamed columns: %s -> %s, %s -> %s\n",
+            "AA10", kidsight_to_equate[["AA10"]] %||% "AA10",
+            "DD202", kidsight_to_equate[["DD202"]] %||% "DD202"))
+cat("\n")
+
+# =============================================================================
+# Derive Study Column
+# =============================================================================
+
+cat("[5/9] Deriving study column from ID ranges\n")
 calibdat <- calibdat %>%
   dplyr::mutate(
     study = dplyr::case_when(
@@ -95,7 +167,7 @@ cat("\n")
 # Split by Study
 # =============================================================================
 
-cat("[4/8] Splitting data by study\n")
+cat("[6/9] Splitting data by study\n")
 
 # Split into separate data frames and create integer IDs following convention: YYFFFSNNNNNN
 # YY=year, FFF=031 (Nebraska) or 999 (USA), S=1 (non-NSCH), N=sequential (6 digits)
@@ -139,7 +211,7 @@ cat("\n")
 # Validate Data Structure
 # =============================================================================
 
-cat("[5/8] Validating data structure\n")
+cat("[7/9] Validating data structure\n")
 
 # Check required columns
 required_cols <- c("id", "years")
@@ -172,7 +244,7 @@ cat("\n")
 # Connect to DuckDB
 # =============================================================================
 
-cat("[6/8] Connecting to DuckDB database\n")
+cat("[8/9] Connecting to DuckDB database\n")
 
 db_path <- "data/duckdb/kidsights_local.duckdb"
 
@@ -184,86 +256,90 @@ conn <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = FALSE)
 cat(sprintf("      Connected to: %s\n\n", db_path))
 
 # =============================================================================
-# Create Study-Specific Calibration Tables
+# Create Combined Historical Calibration Table
 # =============================================================================
 
-cat("[7/8] Creating study-specific calibration tables\n\n")
+cat("[9/9] Creating combined historical_calibration_2020_2024 table\n\n")
 
-# Helper function to create table with indexes
-create_calibration_table <- function(conn, table_name, data, study_label) {
-  cat(sprintf("  Creating '%s' table\n", table_name))
+# Combine all studies into single table
+historical_combined <- dplyr::bind_rows(
+  ne20_data %>% dplyr::mutate(study = "NE20"),
+  ne22_data %>% dplyr::mutate(study = "NE22"),
+  usa24_data %>% dplyr::mutate(study = "USA24")
+) %>%
+  dplyr::relocate(study, id, years)
 
-  # Drop table if exists
-  if (table_name %in% DBI::dbListTables(conn)) {
-    cat(sprintf("    Dropping existing '%s' table\n", table_name))
-    DBI::dbExecute(conn, sprintf("DROP TABLE %s", table_name))
-  }
+cat(sprintf("  Combined data: %d records, %d columns\n", nrow(historical_combined), ncol(historical_combined)))
 
-  # Write data
-  cat(sprintf("    Inserting %d records\n", nrow(data)))
-  DBI::dbWriteTable(conn, table_name, data, overwrite = TRUE)
-
-  # Create indexes
-  cat("    Creating indexes:\n")
-  index_queries <- c(
-    sprintf("CREATE INDEX idx_%s_id ON %s (id)", table_name, table_name),
-    sprintf("CREATE INDEX idx_%s_years ON %s (years)", table_name, table_name)
-  )
-
-  for (query in index_queries) {
-    tryCatch({
-      DBI::dbExecute(conn, query)
-      index_name <- sub("CREATE INDEX (\\w+) .*", "\\1", query)
-      cat(sprintf("      [OK] %s\n", index_name))
-    }, error = function(e) {
-      cat(sprintf("      [WARN] Index creation failed: %s\n", e$message))
-    })
-  }
-
-  cat("\n")
+# Drop table if exists
+table_name <- "historical_calibration_2020_2024"
+if (table_name %in% DBI::dbListTables(conn)) {
+  cat(sprintf("  Dropping existing '%s' table\n", table_name))
+  DBI::dbExecute(conn, sprintf("DROP TABLE %s", table_name))
 }
 
-# Create tables for each study
-create_calibration_table(conn, "ne20_calibration", ne20_data, "NE20")
-create_calibration_table(conn, "ne22_calibration", ne22_data, "NE22")
-create_calibration_table(conn, "usa24_calibration", usa24_data, "USA24")
+# Write data
+cat(sprintf("  Inserting %d records into '%s'\n", nrow(historical_combined), table_name))
+DBI::dbWriteTable(conn, table_name, historical_combined, overwrite = TRUE)
 
-# =============================================================================
-# Verify Import and Generate Summary
-# =============================================================================
+# Create indexes
+cat("  Creating indexes:\n")
+index_queries <- c(
+  sprintf("CREATE INDEX idx_%s_study ON %s (study)", table_name, table_name),
+  sprintf("CREATE INDEX idx_%s_study_num ON %s (study, id)", table_name, table_name),
+  sprintf("CREATE INDEX idx_%s_id ON %s (id)", table_name, table_name),
+  sprintf("CREATE INDEX idx_%s_years ON %s (years)", table_name, table_name)
+)
 
-cat("[8/8] Verifying import and generating summary\n\n")
-
-# Verify each table
-verify_table <- function(conn, table_name, expected_count) {
-  actual_count <- DBI::dbGetQuery(conn,
-    sprintf("SELECT COUNT(*) as n FROM %s", table_name))$n
-
-  cat(sprintf("  %s:\n", table_name))
-  cat(sprintf("    Records: %d", actual_count))
-
-  if (actual_count == expected_count) {
-    cat(" [OK]\n")
-  } else {
-    cat(sprintf(" [WARN] Expected %d\n", expected_count))
-  }
-
-  # Age summary
-  age_summary <- DBI::dbGetQuery(conn,
-    sprintf("SELECT MIN(years) as min, AVG(years) as mean, MAX(years) as max FROM %s",
-            table_name))
-  cat(sprintf("    Age range: %.2f - %.2f years (mean: %.2f)\n",
-              age_summary$min, age_summary$max, age_summary$mean))
-  cat("\n")
-
-  return(actual_count)
+for (query in index_queries) {
+  tryCatch({
+    DBI::dbExecute(conn, query)
+    index_name <- sub("CREATE INDEX (\\w+) .*", "\\1", query)
+    cat(sprintf("    [OK] %s\n", index_name))
+  }, error = function(e) {
+    cat(sprintf("    [WARN] Index creation failed: %s\n", e$message))
+  })
 }
 
-ne20_count <- verify_table(conn, "ne20_calibration", nrow(ne20_data))
-ne22_count <- verify_table(conn, "ne22_calibration", nrow(ne22_data))
-usa24_count <- verify_table(conn, "usa24_calibration", nrow(usa24_data))
+cat("\n")
 
-total_count <- ne20_count + ne22_count + usa24_count
+# Verify table
+cat("  Verifying import:\n")
+verify_count <- DBI::dbGetQuery(conn,
+  sprintf("SELECT COUNT(*) as n FROM %s", table_name))$n
+
+cat(sprintf("    Records in table: %d", verify_count))
+if (verify_count == nrow(historical_combined)) {
+  cat(" [OK]\n")
+} else {
+  cat(sprintf(" [WARN] Expected %d\n", nrow(historical_combined)))
+}
+
+# Study breakdown
+study_counts_db <- DBI::dbGetQuery(conn,
+  sprintf("SELECT study, COUNT(*) as n FROM %s GROUP BY study ORDER BY study", table_name))
+cat("\n    Study breakdown:\n")
+for (i in 1:nrow(study_counts_db)) {
+  cat(sprintf("      %s: %d records\n", study_counts_db$study[i], study_counts_db$n[i]))
+}
+
+# Age summary
+age_summary <- DBI::dbGetQuery(conn,
+  sprintf("SELECT MIN(years) as min, AVG(years) as mean, MAX(years) as max FROM %s", table_name))
+cat(sprintf("\n    Age range: %.2f - %.2f years (mean: %.2f)\n",
+            age_summary$min, age_summary$max, age_summary$mean))
+
+# Check for equate lexicon names (verify mapping worked)
+cols_in_table <- DBI::dbGetQuery(conn,
+  sprintf("SELECT * FROM %s LIMIT 0", table_name))
+has_aa10 <- "AA10" %in% names(cols_in_table)
+has_eg46b <- "EG46b" %in% names(cols_in_table)
+
+cat("\n    Lexicon mapping verification:\n")
+cat(sprintf("      Has AA10 (old kidsight name): %s\n", ifelse(has_aa10, "YES [PROBLEM]", "NO [OK]")))
+cat(sprintf("      Has EG46b (equate name): %s\n", ifelse(has_eg46b, "YES [OK]", "NO [PROBLEM]")))
+
+total_count <- verify_count
 
 # Disconnect
 DBI::dbDisconnect(conn)
@@ -280,21 +356,25 @@ cat(strrep("=", 80), "\n\n")
 
 cat("Summary:\n")
 cat(sprintf("  Source: KidsightsPublic package (calibdat dataset)\n"))
-cat(sprintf("  Tables created: 3 study-specific calibration tables\n\n"))
+cat(sprintf("  Lexicon: Kidsight → Equate (harmonized)\n"))
+cat(sprintf("  Table created: historical_calibration_2020_2024\n\n"))
 
-cat("  Study-specific tables:\n")
-cat(sprintf("    ne20_calibration:  %d records\n", ne20_count))
-cat(sprintf("    ne22_calibration:  %d records\n", ne22_count))
-cat(sprintf("    usa24_calibration: %d records\n", usa24_count))
-cat(sprintf("    Total:             %d records\n\n", total_count))
+cat("  Study breakdown:\n")
+cat(sprintf("    NE20:  %d records\n", nrow(ne20_data)))
+cat(sprintf("    NE22:  %d records\n", nrow(ne22_data)))
+cat(sprintf("    USA24: %d records\n", nrow(usa24_data)))
+cat(sprintf("    Total: %d records\n\n", total_count))
 
-cat(sprintf("  Columns per table: %d (id, years, %d items)\n",
-            ncol(ne20_data), ncol(ne20_data) - 2))
+cat(sprintf("  Columns: %d (study, id, years, %d items with equate names)\n",
+            ncol(historical_combined), ncol(historical_combined) - 3))
+
+cat(sprintf("\n  Lexicon mapping applied: %d items renamed (kidsight -> equate)\n", length(cols_to_rename)))
+cat(sprintf("  Examples: AA10 -> EG46b, DD202 -> %s\n",
+            kidsight_to_equate[["DD202"]] %||% "DD202"))
 
 cat("\nNext steps:\n")
-cat("  1. Create ne25_calibration table (from ne25_transformed)\n")
-cat("  2. Create nsch21_calibration table (all records, age < 6)\n")
-cat("  3. Create nsch22_calibration table (all records, age < 6)\n")
-cat("  4. Use export_calibration_dat() to combine studies and create .dat file\n\n")
+cat("  1. Run prepare_calibration_dataset.R to create combined calibration dataset\n")
+cat("  2. Verify AA10 no longer appears in final .dat file\n")
+cat("  3. Verify only codebook items (299) appear in NAMES field of .inp file\n\n")
 
-cat("[OK] Historical calibration tables ready for use\n\n")
+cat("[OK] Historical calibration table ready with equate lexicon\n\n")

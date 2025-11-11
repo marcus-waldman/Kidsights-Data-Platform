@@ -62,7 +62,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -163,7 +163,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -265,7 +265,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -366,7 +366,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -468,7 +468,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -570,7 +570,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -672,7 +672,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -773,7 +773,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -875,7 +875,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -977,7 +977,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1079,7 +1079,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1181,7 +1181,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1283,7 +1283,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1385,7 +1385,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1487,7 +1487,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1589,7 +1589,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1691,7 +1691,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1795,7 +1795,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -1903,7 +1903,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2007,7 +2007,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2115,7 +2115,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2217,7 +2217,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2321,7 +2321,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2429,7 +2429,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2531,7 +2531,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2633,7 +2633,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2737,7 +2737,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2845,7 +2845,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -2947,7 +2947,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3043,7 +3043,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3128,7 +3128,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3212,7 +3212,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3297,7 +3297,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3382,7 +3382,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3467,7 +3467,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3551,7 +3551,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3636,7 +3636,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3721,7 +3721,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3805,7 +3805,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3889,7 +3889,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -3972,7 +3972,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4049,7 +4049,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4122,7 +4122,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -4183,7 +4183,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4250,7 +4250,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -4310,7 +4310,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4385,7 +4385,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4479,7 +4479,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4564,7 +4564,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4639,7 +4639,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4733,7 +4733,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4826,7 +4826,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4919,7 +4919,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5013,7 +5013,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5107,7 +5107,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5200,7 +5200,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5294,7 +5294,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5388,7 +5388,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5482,7 +5482,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5576,7 +5576,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5670,7 +5670,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5763,7 +5763,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5856,7 +5856,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -5950,7 +5950,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6043,7 +6043,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6137,7 +6137,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6230,7 +6230,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6323,7 +6323,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6417,7 +6417,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6511,7 +6511,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6605,7 +6605,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6699,7 +6699,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6793,7 +6793,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6887,7 +6887,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -6981,7 +6981,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7075,7 +7075,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7168,7 +7168,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7262,7 +7262,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7356,7 +7356,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7450,7 +7450,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7544,7 +7544,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7637,7 +7637,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7731,7 +7731,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7825,7 +7825,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -7919,7 +7919,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8013,7 +8013,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8107,7 +8107,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8201,7 +8201,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8295,7 +8295,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8389,7 +8389,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8483,7 +8483,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8576,7 +8576,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8670,7 +8670,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8764,7 +8764,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8858,7 +8858,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -8951,7 +8951,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9045,7 +9045,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9138,7 +9138,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9232,7 +9232,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9325,7 +9325,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9419,7 +9419,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9512,7 +9512,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9606,7 +9606,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9699,7 +9699,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "early_learning",
         "irt_parameters": {
           "NE25": {
@@ -9796,7 +9796,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9890,7 +9890,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -9984,7 +9984,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10077,7 +10077,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10169,7 +10169,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10257,7 +10257,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10351,7 +10351,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10444,7 +10444,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10538,7 +10538,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10631,7 +10631,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10725,7 +10725,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -10809,7 +10809,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -10869,7 +10869,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -10933,7 +10933,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11018,7 +11018,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -11100,7 +11100,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11185,7 +11185,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -11269,7 +11269,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11353,7 +11353,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11434,7 +11434,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11515,7 +11515,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11596,7 +11596,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11677,7 +11677,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -11762,7 +11762,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -11849,7 +11849,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "CAHMI22": {
             "factors": [],
@@ -11938,7 +11938,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "CAHMI22": {
             "factors": [],
@@ -12179,7 +12179,7 @@
         "reverse": true
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -12353,7 +12353,7 @@
         "equate_group": 1
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -12454,7 +12454,7 @@
         "equate_group": 1
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG1_1",
         "irt_parameters": {
           "NE25": {
@@ -12554,7 +12554,7 @@
         "equate_group": 2
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -12658,7 +12658,7 @@
         "equate_group": 2
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG2_1",
         "irt_parameters": {
           "CAHMI22": {
@@ -12751,7 +12751,7 @@
         "equate_group": 3
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -12862,7 +12862,7 @@
         "equate_group": 3
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG3_1",
         "irt_parameters": {
           "CAHMI22": {
@@ -12953,7 +12953,7 @@
         "equate_group": 4
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -13062,7 +13062,7 @@
         "equate_group": 4
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG4a_1",
         "irt_parameters": {
           "NE22": {
@@ -13171,7 +13171,7 @@
         "equate_group": 4
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG4a_1",
         "irt_parameters": {
           "NE22": {
@@ -13274,7 +13274,7 @@
         "equate_group": 4
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG4a_1; Constrain tau$1 to EG4b_1$1",
         "irt_parameters": {
           "NE25": {
@@ -13456,7 +13456,7 @@
         "equate_group": 5
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG5a",
         "irt_parameters": {
           "NE25": {
@@ -13548,7 +13548,7 @@
         "equate_group": 6
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -13634,7 +13634,7 @@
         "equate_group": 6
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG6_1",
         "irt_parameters": {
           "NE25": {
@@ -13714,7 +13714,7 @@
         "equate_group": 7
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -13800,7 +13800,7 @@
         "equate_group": 7
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG7_1",
         "irt_parameters": {
           "NE25": {
@@ -13880,7 +13880,7 @@
         "equate_group": 8
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -13966,7 +13966,7 @@
         "equate_group": 8
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG8_1",
         "irt_parameters": {
           "NE25": {
@@ -14046,7 +14046,7 @@
         "equate_group": 9
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -14144,7 +14144,7 @@
         "equate_group": 9
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG9a",
         "irt_parameters": {
           "CAHMI22": {
@@ -14233,7 +14233,7 @@
         "equate_group": 10
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -14322,7 +14322,7 @@
         "equate_group": 10
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG10a",
         "irt_parameters": {
           "NE22": {
@@ -14411,7 +14411,7 @@
         "equate_group": 11
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -14508,7 +14508,7 @@
         "equate_group": 11
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG11_1",
         "irt_parameters": {
           "CAHMI22": {
@@ -14597,7 +14597,7 @@
         "equate_group": 12
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -14680,7 +14680,7 @@
         "equate_group": 12
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG12a",
         "irt_parameters": {
           "CAHMI21": {
@@ -14764,7 +14764,7 @@
         "equate_group": 13
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -14861,7 +14861,7 @@
         "equate_group": 13
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG13a. Constrain tau$1 to be greater than EG13a$1",
         "irt_parameters": {
           "CAHMI22": {
@@ -14950,7 +14950,7 @@
         "equate_group": 14
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -15043,7 +15043,7 @@
         "equate_group": 14
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG14a",
         "irt_parameters": {
           "NE25": {
@@ -15133,7 +15133,7 @@
         "equate_group": 15
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -15404,7 +15404,7 @@
         "equate_group": 16
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG16a_1",
         "irt_parameters": {
           "NE25": {
@@ -15499,7 +15499,7 @@
         "equate_group": 16
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG16a_1",
         "irt_parameters": {
           "NE25": {
@@ -15594,7 +15594,7 @@
         "equate_group": 16
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG16a_1.",
         "irt_parameters": {
           "NE25": {
@@ -15681,7 +15681,7 @@
         "equate_group": 17
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -15764,7 +15764,7 @@
         "equate_group": 17
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to to be equal to EG17a. Constrain tau$1 to be less than EG17a$1.",
         "irt_parameters": {
           "NE25": {
@@ -15851,7 +15851,7 @@
         "equate_group": 18
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -15934,7 +15934,7 @@
         "equate_group": 18
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG18a",
         "irt_parameters": {
           "NE25": {
@@ -16020,7 +16020,7 @@
         "equate_group": 19
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG19a_1",
         "irt_parameters": {
           "NE22": {
@@ -16103,7 +16103,7 @@
         "equate_group": 19
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -16193,7 +16193,7 @@
         "equate_group": 19
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG19a_1",
         "irt_parameters": {
           "NE25": {
@@ -16297,7 +16297,7 @@
         "equate_group": 19
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG19a_1",
         "irt_parameters": {
           "NE25": {
@@ -16386,7 +16386,7 @@
         "equate_group": 19
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG19a_1",
         "irt_parameters": {
           "NE25": {
@@ -16545,7 +16545,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to EG20a$1. Constrain tau$2 to EG20a$2. Constrain tau$4 to EG20a$3. Constrain tau$5 to EG20a$4",
         "irt_parameters": {
           "NE25": {
@@ -16637,7 +16637,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to EG20a$1. Constrain tau$2 to EG20a$2. Constrain tau$4 to EG20a$3. Constrain tau$5 to EG20a$4",
         "irt_parameters": {
           "NE22": {
@@ -16736,7 +16736,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to EG20a$2.",
         "irt_parameters": {
           "NE25": {
@@ -16836,7 +16836,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to EG20a$1",
         "irt_parameters": {
           "NE25": {
@@ -16944,7 +16944,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to be less than EG20a$1.",
         "irt_parameters": {
           "NE25": {
@@ -17045,7 +17045,7 @@
         "equate_group": 20
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG20a. Constrain tau$1 to be equal to EG20e_1$1.",
         "irt_parameters": {
           "NE25": {
@@ -17204,7 +17204,7 @@
         "equate_group": 21
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG21a. Constrain tau$1 to be a simplex  between EG21a$1 and EG21a$4",
         "irt_parameters": {
           "NE25": {
@@ -17294,7 +17294,7 @@
         "equate_group": 22
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -17551,7 +17551,7 @@
         "equate_group": 23
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG23a. Constrain tau$1 to be a simplex between EG23a$1 and EG23a$4",
         "irt_parameters": {
           "NE25": {
@@ -17636,7 +17636,7 @@
         "equate_group": 24
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "CAHMI21": {
             "factors": [],
@@ -17889,7 +17889,7 @@
         "equate_group": 25
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG25a",
         "irt_parameters": {
           "NE25": {
@@ -17962,7 +17962,7 @@
         "equate_group": 26
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "CAHMI21": {
             "factors": [],
@@ -18126,7 +18126,7 @@
         "equate_group": 27
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -18210,7 +18210,7 @@
         "equate_group": 27
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a. Constrain tau$1 to be between EG27a$1 and EG27a$4",
         "irt_parameters": {
           "NE25": {
@@ -18296,7 +18296,7 @@
         "equate_group": 27
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a. Constrain tau$1 to be EG27b_1$1",
         "irt_parameters": {
           "NE22": {
@@ -18379,7 +18379,7 @@
         "equate_group": 27
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a. Constrain tau$1 to be EG27b_1$1",
         "irt_parameters": {
           "NE22": {
@@ -18555,7 +18555,7 @@
         "equate_group": 28
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG28a. Constrain tau$1 to be equal to a simplex between EG28a$1 and EG28a$4",
         "irt_parameters": {
           "NE25": {
@@ -18647,7 +18647,7 @@
         "equate_group": 28
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG28a. Constrain tau$1 to be equal to a simplex between EG28a$1 and EG28a$4",
         "irt_parameters": {
           "NE25": {
@@ -18832,7 +18832,7 @@
         "equate_group": 29
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG29a. Constrain tau$1 to be equal to EG29a$1. Constrain tau$2  to be equal to EG29a$3. Constrain tau$3 to be equal to EG29a$4",
         "irt_parameters": {
           "NE25": {
@@ -18926,7 +18926,7 @@
         "equate_group": 29
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG29a. Constrain tau$1 to be equal to EG29a$1.",
         "irt_parameters": {
           "NE25": {
@@ -19101,7 +19101,7 @@
         "equate_group": 30
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG30a. Constrain tau$1 to be a simplex between EG30a$1 and EG30a$3",
         "irt_parameters": {
           "NE22": {
@@ -19190,7 +19190,7 @@
         "equate_group": 30
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a. Constrain tau$1 to between EG30a$1 and EG30a$3",
         "irt_parameters": {
           "NE25": {
@@ -19286,7 +19286,7 @@
         "equate_group": 30
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a",
         "irt_parameters": {
           "NE25": {
@@ -19376,7 +19376,7 @@
         "equate_group": 30
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a",
         "irt_parameters": {
           "NE25": {
@@ -19468,7 +19468,7 @@
         "equate_group": 30
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG27a",
         "irt_parameters": {
           "NE25": {
@@ -19564,7 +19564,7 @@
         "equate_group": 31
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -19655,7 +19655,7 @@
         "equate_group": 31
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG31a_1.",
         "irt_parameters": {
           "NE25": {
@@ -19759,7 +19759,7 @@
         "equate_group": 31
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to be equal to EG31a_1. Constrain tau$1 to be less than EG31a_1$1.",
         "irt_parameters": {
           "NE25": {
@@ -19935,7 +19935,7 @@
         "equate_group": 32
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "constraint slope to EG32a. Constrain tau$1 to be a simplex between EG32a$1 and EG32a$3",
         "irt_parameters": {
           "NE25": {
@@ -20105,7 +20105,7 @@
         "equate_group": 33
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG32a. Constrain tau$1 to be a simplex between EG33a$1 and EG33a$2.",
         "irt_parameters": {
           "NE25": {
@@ -20192,7 +20192,7 @@
         "equate_group": 34
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -20274,7 +20274,7 @@
         "equate_group": 34
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG34a. Constrain tau$1 to EG34a$2.",
         "irt_parameters": {
           "NE25": {
@@ -20360,7 +20360,7 @@
         "equate_group": 35
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -20452,7 +20452,7 @@
         "equate_group": 35
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG35a.",
         "irt_parameters": {
           "NE25": {
@@ -20556,7 +20556,7 @@
         "equate_group": 36
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -20644,7 +20644,7 @@
         "equate_group": 36
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG36a",
         "irt_parameters": {
           "NE25": {
@@ -20836,7 +20836,7 @@
         "equate_group": 37
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG37_1",
         "irt_parameters": {
           "NE25": {
@@ -21004,7 +21004,7 @@
         "equate_group": 38
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG38a. Constrain tau$1 to be a simplex between EG38a$1 and EG38a$4.",
         "irt_parameters": {
           "NE25": {
@@ -21096,7 +21096,7 @@
         "equate_group": 38
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG38a.",
         "irt_parameters": {
           "NE25": {
@@ -21273,7 +21273,7 @@
         "equate_group": 39
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG39a. Constrain tau$1 to be equal to EG39a$1. Constrain tau$4 to be equal to EG39a$4.",
         "irt_parameters": {
           "NE25": {
@@ -21363,7 +21363,7 @@
         "equate_group": 40
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -21443,7 +21443,7 @@
         "equate_group": 40
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG40_1.",
         "irt_parameters": {
           "NE22": {
@@ -21532,7 +21532,7 @@
         "equate_group": 41
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -21621,7 +21621,7 @@
         "equate_group": 41
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG41_1. Constrain tau$1 to EG41_1$1. Constrain tau$4 to EG41_1$3",
         "irt_parameters": {
           "NE25": {
@@ -21794,7 +21794,7 @@
         "equate_group": 42
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG42a. Constrain tau$1 to be a simplex between EG42a$1 and EG42a$3.",
         "irt_parameters": {
           "CAHMI21": {
@@ -21875,7 +21875,7 @@
         "equate_group": 42
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG42a. Constrain tau$1 to be equal to EG42a$1. Constrain tau$4 to be equal to EG42a$3.",
         "irt_parameters": {
           "NE25": {
@@ -22049,7 +22049,7 @@
         "equate_group": 43
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG43a_1.",
         "irt_parameters": {
           "NE25": {
@@ -22146,7 +22146,7 @@
         "equate_group": 43
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG42a.",
         "irt_parameters": {
           "NE25": {
@@ -22252,7 +22252,7 @@
         "equate_group": 44
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -22355,7 +22355,7 @@
         "equate_group": 44
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG44_1",
         "irt_parameters": {
           "NE25": {
@@ -22538,7 +22538,7 @@
         "equate_group": 45
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG45_1",
         "irt_parameters": {
           "NE25": {
@@ -22624,7 +22624,7 @@
         "equate_group": 46
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -22703,7 +22703,7 @@
         "equate_group": 46
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG46a_1",
         "irt_parameters": {
           "NE25": {
@@ -22809,7 +22809,7 @@
         "equate_group": 46
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG46a_1. Constrain tau$1 to be less than EG46c$1.",
         "irt_parameters": {
           "NE25": {
@@ -22915,7 +22915,7 @@
         "equate_group": 46
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG46a_1.",
         "irt_parameters": {
           "NE25": {
@@ -23019,7 +23019,7 @@
         "equate_group": 46
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG46a_1. Constrain tau$1 to be less than EG46c$1.",
         "irt_parameters": {
           "NE25": {
@@ -23117,7 +23117,7 @@
         "equate_group": 47
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -23212,7 +23212,7 @@
         "equate_group": 47
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG47a. Constrain tau$1 to be less than EG47a$1.",
         "irt_parameters": {
           "NE25": {
@@ -23304,7 +23304,7 @@
         "equate_group": 48
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE22": {
             "factors": [],
@@ -23394,7 +23394,7 @@
         "equate_group": 48
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -23498,7 +23498,7 @@
         "equate_group": 49
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -23599,7 +23599,7 @@
         "equate_group": 49
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain all to EG49_1.",
         "irt_parameters": {
           "NE25": {
@@ -23700,7 +23700,7 @@
         "equate_group": 50
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "CAHMI22": {
             "factors": [],
@@ -23788,7 +23788,7 @@
         "equate_group": 50
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "param_constraints": "Constrain slope to EG50a. Constrain tau$1 to be greater than EG50a$1",
         "irt_parameters": {
           "NE25": {
@@ -23935,7 +23935,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -23989,7 +23989,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24046,7 +24046,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24103,7 +24103,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24160,7 +24160,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24217,7 +24217,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24274,7 +24274,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24331,7 +24331,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24388,7 +24388,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24445,7 +24445,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24502,7 +24502,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24559,7 +24559,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24616,7 +24616,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24673,7 +24673,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24730,7 +24730,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24787,7 +24787,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24844,7 +24844,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24901,7 +24901,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -24958,7 +24958,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25015,7 +25015,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25072,7 +25072,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25129,7 +25129,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25186,7 +25186,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25243,7 +25243,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25300,7 +25300,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25357,7 +25357,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25414,7 +25414,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25471,7 +25471,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25528,7 +25528,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25585,7 +25585,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25642,7 +25642,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25699,7 +25699,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25756,7 +25756,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25813,7 +25813,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25870,7 +25870,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25927,7 +25927,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -25984,7 +25984,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26041,7 +26041,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26098,7 +26098,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26155,7 +26155,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26212,7 +26212,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26269,7 +26269,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26326,7 +26326,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26383,7 +26383,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26440,7 +26440,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26497,7 +26497,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
@@ -26554,7 +26554,7 @@
         "equate_group": "GSED_PF"
       },
       "psychometric": {
-        "calibration_item": false,
+        "calibration_item": true,
         "irt_parameters": {
           "GSED_PF": {
             "factors": [],
