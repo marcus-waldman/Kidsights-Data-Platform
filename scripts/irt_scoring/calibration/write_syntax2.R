@@ -169,6 +169,9 @@ write_syntax2 <- function(
     # Base MODEL syntax for this item
     out_df <- with(codebook_df, {
 
+      # Get max category for this item (FIX: use codebook_df lookup instead of Ks[jdx])
+      item_max_category <- categories[jid == jdx] + 1  # categories = Ks - 1
+
       # Get starting values for this item
       alpha_start <- alpha_start[jid == jdx]
       tau_start <- tau_start[[which(jid == jdx)]]
@@ -195,7 +198,7 @@ write_syntax2 <- function(
       }
 
       # Threshold 2 (if K >= 2)
-      if (!is.na(Ks[jdx]) && Ks[jdx] >= 2) {
+      if (!is.na(item_max_category) && item_max_category >= 2) {
         if (!is.null(tau_start) && length(tau_start) >= 2 && !is.na(tau_start[2])) {
           threshold_syntaxes[[2]] <- paste0("[", lex_equate[jid == jdx], "$2*", tau_start[2], "] (t2_", jdx, ");")
         } else {
@@ -204,7 +207,7 @@ write_syntax2 <- function(
       }
 
       # Threshold 3 (if K >= 3)
-      if (!is.na(Ks[jdx]) && Ks[jdx] >= 3) {
+      if (!is.na(item_max_category) && item_max_category >= 3) {
         if (!is.null(tau_start) && length(tau_start) >= 3 && !is.na(tau_start[3])) {
           threshold_syntaxes[[3]] <- paste0("[", lex_equate[jid == jdx], "$3*", tau_start[3], "] (t3_", jdx, ");")
         } else {
@@ -213,7 +216,7 @@ write_syntax2 <- function(
       }
 
       # Threshold 4 (if K >= 4)
-      if (!is.na(Ks[jdx]) && Ks[jdx] >= 4) {
+      if (!is.na(item_max_category) && item_max_category >= 4) {
         if (!is.null(tau_start) && length(tau_start) >= 4 && !is.na(tau_start[4])) {
           threshold_syntaxes[[4]] <- paste0("[", lex_equate[jid == jdx], "$4*", tau_start[4], "] (t4_", jdx, ");")
         } else {
@@ -222,7 +225,7 @@ write_syntax2 <- function(
       }
 
       # Threshold 5 (if K >= 5)
-      if (!is.na(Ks[jdx]) && Ks[jdx] >= 5) {
+      if (!is.na(item_max_category) && item_max_category >= 5) {
         if (!is.null(tau_start) && length(tau_start) >= 5 && !is.na(tau_start[5])) {
           threshold_syntaxes[[5]] <- paste0("[", lex_equate[jid == jdx], "$5*", tau_start[5], "] (t5_", jdx, ");")
         } else {
