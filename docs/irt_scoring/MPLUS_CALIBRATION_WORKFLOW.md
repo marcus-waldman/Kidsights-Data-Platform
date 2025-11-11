@@ -8,15 +8,16 @@
 
 ## Overview
 
-This document provides a complete workflow for recalibrating Kidsights developmental and behavioral scales using Item Response Theory (IRT) in Mplus. The workflow combines historical Nebraska studies (NE20, NE22, USA24), current NE25 data, and national benchmarking samples (NSCH 2021, 2022) to create robust, population-representative item parameters.
+This document provides a complete workflow for recalibrating the **Kidsights developmental and behavioral scale** using Item Response Theory (IRT) in Mplus. The workflow combines historical Nebraska studies (NE20, NE22, USA24), current NE25 data, and national benchmarking samples (NSCH 2021, 2022) to create robust, population-representative item parameters.
 
 **Workflow Stages:**
 1. **Data Preparation** - Create calibration dataset using R
 2. **Mplus Calibration** - Estimate IRT parameters (graded response model)
-3. **Parameter Extraction** - Extract and store item parameters in codebook
+3. **Parameter Extraction** - Automated extraction using MplusAutomation and codebook update
 4. **Scoring Application** - Apply parameters to score NE25 data
 
 **Estimated Time:** 2-4 hours (including Mplus model estimation)
+**Key Improvement:** Stage 3 now fully automated (30 seconds vs 15-30 minutes manual extraction)
 
 ---
 
@@ -264,83 +265,116 @@ mplus mplus/calibration.inp
 
 ## Stage 3: Parameter Extraction
 
-### 3.1 Extract Item Parameters from Mplus Output
+### 3.1 Automated Parameter Extraction and Codebook Update
 
-**Manual Extraction (Recommended for First Time):**
-1. Open `mplus/calibration.out`
-2. Locate "IRT PARAMETERIZATION" section
-3. Copy item parameters to CSV/spreadsheet
+**Use the automated extraction function** to parse Mplus output and update the codebook:
 
-**Automated Extraction (R Script):**
 ```r
-# Parse Mplus output file
-library(stringr)
-library(dplyr)
+# Run automated parameter extraction
+source("scripts/irt_scoring/update_codebook_parameters.R")
 
-output_file <- "mplus/calibration.out"
-output_text <- readLines(output_file)
-
-# Find IRT parameterization section
-irt_start <- which(str_detect(output_text, "IRT PARAMETERIZATION"))
-irt_end <- which(str_detect(output_text, "STANDARDIZED MODEL RESULTS"))
-
-irt_section <- output_text[(irt_start+5):(irt_end-3)]
-
-# Parse parameters (adjust based on actual output format)
-params <- data.frame(
-  item = character(),
-  discrimination = numeric(),
-  threshold_1 = numeric(),
-  threshold_2 = numeric(),
-  threshold_3 = numeric(),
-  threshold_4 = numeric(),
-  stringsAsFactors = FALSE
+# Extract parameters from calibration output and update codebook
+stats <- update_codebook_parameters(
+  mplus_output_path = "mplus/Kidsights-calibration.out",
+  codebook_path = "codebook/data/codebook.json",
+  study_name = "NE25",
+  factor_name = "kidsights",
+  latent_class = 1,
+  backup = TRUE,
+  verbose = TRUE
 )
 
-# Save to CSV
-write.csv(params, "mplus/item_parameters.csv", row.names = FALSE)
+# View update statistics
+cat(sprintf("Items updated: %d\n", stats$items_updated))
+cat(sprintf("Items not found: %d\n", stats$items_not_found))
 ```
 
-### 3.2 Store Parameters in Codebook
+**What this function does:**
+1. **Parses Mplus Output**: Uses `MplusAutomation::readModels()` to extract item parameters
+2. **Extracts Discrimination (α)**: Factor loadings from `.BY` parameters
+3. **Extracts Thresholds (τ)**: Difficulty parameters from `Thresholds` section
+4. **Matches Items**: Finds items in codebook by `lex_equate` lexicon name
+5. **Updates Codebook**: Stores parameters in study-specific IRT parameters
+6. **Creates Backup**: Automatically backs up codebook before updating
 
-**Update `codebook/data/codebook.json`:**
+**Expected Output:**
+```
+================================================================================
+UPDATE CODEBOOK WITH IRT PARAMETERS
+================================================================================
 
-For each item, add/update IRT parameters:
-```json
-{
-  "items": {
-    "ITEM001": {
-      "id": "ITEM001",
-      "lexicons": {
-        "equate": "DD103",
-        "ne25": "c020"
-      },
-      "irt_params": {
-        "model": "graded_response",
-        "discrimination": 1.234,
-        "thresholds": [-2.1, -0.5, 0.8, 2.3],
-        "calibration_date": "2025-01-15",
-        "calibration_sample": "NE20+NE22+NE25+USA24+NSCH21+NSCH22",
-        "n_calibration": 47084
-      }
-    }
-  }
-}
+Mplus output: mplus/Kidsights-calibration.out
+Codebook: codebook/data/codebook.json
+Study: NE25
+Factor: kidsights
+
+================================================================================
+EXTRACT IRT PARAMETERS FROM MPLUS OUTPUT
+================================================================================
+
+[1/3] Reading Mplus output file with MplusAutomation...
+      [OK] Output file parsed successfully
+
+[2/3] Extracting discrimination parameters (alpha)...
+      Extracted 257 discrimination parameters
+      Alpha range: [0.003, 3.946]
+
+[3/3] Extracting threshold parameters (tau)...
+      Extracted 399 threshold parameters
+      Unique items: 257
+      Tau range: [-15.252, 12.487]
+
+================================================================================
+UPDATE COMPLETE
+================================================================================
+
+Summary:
+  Study: NE25
+  Items updated: 161
+  Backup: codebook/data/codebook_backup.json
 ```
 
-**Validation:**
+### 3.2 Verify Updated Codebook
+
+**Check parameter storage:**
 ```r
 library(jsonlite)
 
 codebook <- fromJSON("codebook/data/codebook.json", simplifyVector = FALSE)
 
-# Count items with IRT parameters
-items_with_params <- sum(sapply(codebook$items, function(x) {
-  !is.null(x$irt_params)
-}))
+# Find an item with updated NE25 parameters
+sample_item <- codebook$items$AA4
 
-cat(sprintf("Items with IRT parameters: %d\n", items_with_params))
+# View parameter structure
+cat("Item: AA4\n")
+cat("NE25 IRT Parameters:\n")
+str(sample_item$psychometric$irt_parameters$NE25)
+
+# Example output:
+# List of 4
+#  $ factors          : chr "kidsights"
+#  $ loadings         : num 0.272
+#  $ thresholds       : num -3.625
+#  $ param_constraints: list()
 ```
+
+**Parameter Storage Format:**
+```json
+"irt_parameters": {
+  "NE25": {
+    "factors": ["kidsights"],
+    "loadings": [1.234],
+    "thresholds": [0.567, 1.234, 2.345],
+    "param_constraints": []
+  }
+}
+```
+
+**Key Features:**
+- `factors`: Factor name used in MODEL syntax (typically "kidsights" for Kidsights scale)
+- `loadings`: Single discrimination parameter per item
+- `thresholds`: Array of difficulty parameters (ordered by response category)
+- `param_constraints`: Preserved from existing codebook (not modified)
 
 ---
 
@@ -485,8 +519,9 @@ DEFINITE G MATRIX
 - Large model (400+ items, 8 factors): ~2 hours
 
 **Stage 3: Parameter Extraction**
-- Manual extraction: 15-30 minutes
-- Automated extraction: <1 minute
+- Automated extraction: ~30 seconds
+- Codebook update: ~5 seconds
+- Total: <1 minute (was 15-30 minutes manual)
 
 **Stage 4: Scoring Application**
 - Execution time: ~5 minutes for 3,500 NE25 records

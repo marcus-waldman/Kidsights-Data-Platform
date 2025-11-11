@@ -1,24 +1,30 @@
 # =============================================================================
-# Export Calibration Dataset to Mplus .dat File
+# Export Calibration Dataset to Mplus .dat and .inp Files
 # =============================================================================
 # Purpose: Combine study-specific calibration tables and export to Mplus format
 #          Sampling of NSCH data happens at export time (not storage time)
+#          Uses MplusAutomation::prepareMplusData() to create both files
 #
 # Input: 6 DuckDB calibration tables:
 #   - ne20_calibration, ne22_calibration, usa24_calibration (historical)
 #   - ne25_calibration (current study)
 #   - nsch21_calibration, nsch22_calibration (national benchmarking)
 #
-# Output: Mplus .dat file (space-delimited, missing as ".")
+# Output:
+#   - Mplus .dat file (tab-delimited, missing as ".")
+#   - Mplus .inp file (basic template with TITLE, DATA, VARIABLE sections)
 # =============================================================================
 
 #' Export Calibration Dataset to Mplus .dat File
 #'
 #' Combines study-specific calibration tables and exports to Mplus-compatible
 #' .dat file format. NSCH data is sampled at export time for flexibility.
+#' Uses MplusAutomation::prepareMplusData() to create both .dat and .inp files.
 #'
 #' @param output_dat Character. Path for output .dat file.
 #'   Default: "mplus/calibdat.dat"
+#' @param create_inp Logical. Create .inp file alongside .dat file?
+#'   Default: TRUE (uses MplusAutomation::prepareMplusData)
 #' @param db_path Character. Path to DuckDB database file.
 #'   Default: "data/duckdb/kidsights_local.duckdb"
 #' @param studies Character vector. Which studies to include.
@@ -87,6 +93,7 @@
 #' @export
 export_calibration_dat <- function(
     output_dat = "mplus/calibdat.dat",
+    create_inp = TRUE,
     db_path = "data/duckdb/kidsights_local.duckdb",
     studies = "ALL",
     nsch_sample_size = 1000,
@@ -107,7 +114,8 @@ export_calibration_dat <- function(
   cat(sprintf("Configuration:\n"))
   cat(sprintf("  Studies: %s\n", paste(studies, collapse = ", ")))
   cat(sprintf("  NSCH sample size: %d per year\n", nsch_sample_size))
-  cat(sprintf("  Output file: %s\n", output_dat))
+  cat(sprintf("  Output .dat file: %s\n", output_dat))
+  cat(sprintf("  Create .inp file: %s\n", ifelse(create_inp, "YES", "NO")))
   cat(sprintf("  Create DB view: %s\n", ifelse(create_db_view, "YES", "NO")))
   cat("\n")
 
@@ -118,6 +126,9 @@ export_calibration_dat <- function(
   cat("[SETUP] Loading required packages\n")
 
   required_packages <- c("duckdb", "dplyr")
+  if (create_inp) {
+    required_packages <- c(required_packages, "MplusAutomation")
+  }
 
   for (pkg in required_packages) {
     if (!requireNamespace(pkg, quietly = TRUE)) {
@@ -128,6 +139,9 @@ export_calibration_dat <- function(
 
   library(duckdb)
   library(dplyr)
+  if (create_inp) {
+    library(MplusAutomation)
+  }
 
   cat("        Packages loaded successfully\n\n")
 
@@ -262,7 +276,7 @@ export_calibration_dat <- function(
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("EXPORTING TO MPLUS .DAT FILE\n")
+  cat("EXPORTING TO MPLUS FILES\n")
   cat(strrep("=", 80), "\n\n")
 
   # Ensure output directory exists
@@ -272,24 +286,54 @@ export_calibration_dat <- function(
     dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
   }
 
-  cat(sprintf("[1/2] Writing to: %s\n", output_dat))
-  cat("      Format: space-delimited, missing as '.'\n")
+  if (create_inp) {
+    # Use MplusAutomation to create both .dat and .inp files
+    cat(sprintf("[1/2] Using MplusAutomation::prepareMplusData()\n"))
+    cat(sprintf("      Output .dat: %s\n", output_dat))
+    cat("      Format: tab-delimited, missing as '.'\n")
 
-  # Write with Mplus format
-  write.table(calibration_combined,
-              file = output_dat,
-              row.names = FALSE,
-              col.names = FALSE,
-              sep = " ",
-              na = ".")
+    # prepareMplusData creates .inp file automatically when inpfile=TRUE
+    MplusAutomation::prepareMplusData(
+      df = calibration_combined,
+      filename = output_dat,
+      inpfile = TRUE,
+      quiet = FALSE
+    )
+
+    # Get output .inp filename (same name but .inp extension)
+    output_inp <- sub("\\.dat$", ".inp", output_dat)
+
+    cat(sprintf("      Output .inp: %s\n", output_inp))
+
+  } else {
+    # Original write.table() approach (space-delimited)
+    cat(sprintf("[1/2] Writing to: %s\n", output_dat))
+    cat("      Format: space-delimited, missing as '.'\n")
+
+    write.table(calibration_combined,
+                file = output_dat,
+                row.names = FALSE,
+                col.names = FALSE,
+                sep = " ",
+                na = ".")
+  }
 
   # Check file size
   file_size <- file.info(output_dat)$size
   file_size_mb <- file_size / (1024^2)
 
   cat(sprintf("\n[2/2] Export complete\n"))
-  cat(sprintf("      File size: %.2f MB (%s bytes)\n",
+  cat(sprintf("      .dat file size: %.2f MB (%s bytes)\n",
               file_size_mb, format(file_size, big.mark = ",")))
+
+  if (create_inp) {
+    output_inp <- sub("\\.dat$", ".inp", output_dat)
+    if (file.exists(output_inp)) {
+      inp_size <- file.info(output_inp)$size
+      cat(sprintf("      .inp file size: %.2f KB (%s bytes)\n",
+                  inp_size / 1024, format(inp_size, big.mark = ",")))
+    }
+  }
   cat("\n")
 
   # ===========================================================================
@@ -360,7 +404,11 @@ export_calibration_dat <- function(
   cat(strrep("=", 80), "\n\n")
 
   cat("Output:\n")
-  cat(sprintf("  File: %s (%.2f MB)\n", output_dat, file_size_mb))
+  cat(sprintf("  .dat file: %s (%.2f MB)\n", output_dat, file_size_mb))
+  if (create_inp) {
+    output_inp <- sub("\\.dat$", ".inp", output_dat)
+    cat(sprintf("  .inp file: %s\n", output_inp))
+  }
   cat(sprintf("  Records: %d\n", nrow(calibration_combined)))
   cat(sprintf("  Studies: %d (%s)\n", length(studies), paste(studies, collapse = ", ")))
   cat(sprintf("  NSCH samples: %d per year (seed: %d)\n",
@@ -371,9 +419,16 @@ export_calibration_dat <- function(
   }
 
   cat("\nNext steps:\n")
-  cat("  1. Test Mplus compatibility: scripts/irt_scoring/test_mplus_compatibility.R\n")
-  cat("  2. Create Mplus .inp file: See docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md\n")
-  cat("  3. Run Mplus calibration: mplus input.inp\n\n")
+  if (create_inp) {
+    cat(sprintf("  1. Open .inp file in Mplus: %s\n", sub("\\.dat$", ".inp", output_dat)))
+    cat("  2. Add MODEL section (factor loadings, constraints)\n")
+    cat("  3. Add ANALYSIS section (estimator, parameterization)\n")
+    cat("  4. Run Mplus calibration: Run → Run Mplus\n\n")
+  } else {
+    cat("  1. Test Mplus compatibility: scripts/irt_scoring/test_mplus_compatibility.R\n")
+    cat("  2. Create Mplus .inp file: See docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md\n")
+    cat("  3. Run Mplus calibration: mplus input.inp\n\n")
+  }
 
   cat("[OK] Calibration dataset exported successfully\n\n")
 
