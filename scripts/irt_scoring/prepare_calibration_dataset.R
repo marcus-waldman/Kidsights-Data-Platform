@@ -289,6 +289,9 @@ prepare_calibration_dataset <- function(
     cat(sprintf("[INFO] Using all %d NSCH 2021 records\n\n", nrow(nsch21_data)))
   }
 
+  # Add study identifier (recode function doesn't create this)
+  nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
+
   # ===========================================================================
   # Step 5: Load NSCH 2022 Data
   # ===========================================================================
@@ -312,6 +315,9 @@ prepare_calibration_dataset <- function(
     nsch22_data <- nsch22_full
     cat(sprintf("[INFO] Using all %d NSCH 2022 records\n\n", nrow(nsch22_data)))
   }
+
+  # Add study identifier (recode function doesn't create this)
+  nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
 
   # ===========================================================================
   # Step 6: Combine Datasets & Create Study Indicator
