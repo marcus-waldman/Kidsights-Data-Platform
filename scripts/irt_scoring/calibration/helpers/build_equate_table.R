@@ -169,22 +169,26 @@ build_codebook_df <- function(
   codebook_df <- equate %>%
     dplyr::select(jid, lex_equate)
 
+  # Build case-insensitive lookup: uppercase(lex_equate) → item_id
+  equate_to_item_id <- list()
+  for (item_id in names(codebook$items)) {
+    lex_equate <- codebook$items[[item_id]]$lexicons$equate
+    if (!is.null(lex_equate) && lex_equate != "") {
+      equate_to_item_id[[toupper(lex_equate)]] <- item_id
+    }
+  }
+
   # Add param_constraints from codebook
   param_constraints_vec <- sapply(codebook_df$lex_equate, function(eq_name) {
 
-    # Find item in codebook by equate name
-    item <- codebook$items[[eq_name]]
+    # Find item in codebook by equate name (case-insensitive)
+    item_id <- equate_to_item_id[[toupper(eq_name)]]
 
-    if (is.null(item)) {
-      # Try finding by matching equate lexicon
-      for (item_id in names(codebook$items)) {
-        if (!is.null(codebook$items[[item_id]]$lexicons$equate) &&
-            codebook$items[[item_id]]$lexicons$equate == eq_name) {
-          item <- codebook$items[[item_id]]
-          break
-        }
-      }
+    if (is.null(item_id)) {
+      return(NA_character_)
     }
+
+    item <- codebook$items[[item_id]]
 
     if (is.null(item)) {
       return(NA_character_)
@@ -223,19 +227,14 @@ build_codebook_df <- function(
   # Extract discrimination (alpha) starting values
   alpha_start_vec <- sapply(codebook_df$lex_equate, function(eq_name) {
 
-    # Find item in codebook by equate name
-    item <- codebook$items[[eq_name]]
+    # Find item in codebook by equate name (case-insensitive)
+    item_id <- equate_to_item_id[[toupper(eq_name)]]
 
-    if (is.null(item)) {
-      # Try finding by matching equate lexicon
-      for (item_id in names(codebook$items)) {
-        if (!is.null(codebook$items[[item_id]]$lexicons$equate) &&
-            codebook$items[[item_id]]$lexicons$equate == eq_name) {
-          item <- codebook$items[[item_id]]
-          break
-        }
-      }
+    if (is.null(item_id)) {
+      return(NA_real_)
     }
+
+    item <- codebook$items[[item_id]]
 
     if (is.null(item)) {
       return(NA_real_)
@@ -257,19 +256,14 @@ build_codebook_df <- function(
   # Extract threshold (tau) starting values as list column
   tau_start_list <- lapply(codebook_df$lex_equate, function(eq_name) {
 
-    # Find item in codebook by equate name
-    item <- codebook$items[[eq_name]]
+    # Find item in codebook by equate name (case-insensitive)
+    item_id <- equate_to_item_id[[toupper(eq_name)]]
 
-    if (is.null(item)) {
-      # Try finding by matching equate lexicon
-      for (item_id in names(codebook$items)) {
-        if (!is.null(codebook$items[[item_id]]$lexicons$equate) &&
-            codebook$items[[item_id]]$lexicons$equate == eq_name) {
-          item <- codebook$items[[item_id]]
-          break
-        }
-      }
+    if (is.null(item_id)) {
+      return(NA_real_)
     }
+
+    item <- codebook$items[[item_id]]
 
     if (is.null(item)) {
       return(NA_real_)
@@ -295,19 +289,14 @@ build_codebook_df <- function(
     # Determine which items belong to the specified instrument
     items_in_instrument <- sapply(codebook_df$lex_equate, function(eq_name) {
 
-      # Find item in codebook
-      item <- codebook$items[[eq_name]]
+      # Find item in codebook (case-insensitive)
+      item_id <- equate_to_item_id[[toupper(eq_name)]]
 
-      if (is.null(item)) {
-        # Try finding by matching equate lexicon
-        for (item_id in names(codebook$items)) {
-          if (!is.null(codebook$items[[item_id]]$lexicons$equate) &&
-              codebook$items[[item_id]]$lexicons$equate == eq_name) {
-            item <- codebook$items[[item_id]]
-            break
-          }
-        }
+      if (is.null(item_id)) {
+        return(FALSE)
       }
+
+      item <- codebook$items[[item_id]]
 
       if (is.null(item)) {
         return(FALSE)

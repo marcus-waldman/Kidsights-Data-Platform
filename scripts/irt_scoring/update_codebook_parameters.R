@@ -153,6 +153,7 @@ update_codebook_parameters <- function(
   }
 
   # Create lookup: lex_equate → item key in codebook$items
+  # Use uppercase keys for case-insensitive matching
   lex_to_key <- list()
 
   for (item_key in names(codebook$items)) {
@@ -160,7 +161,8 @@ update_codebook_parameters <- function(
     lex_equate <- item$lexicons$equate
 
     if (!is.null(lex_equate) && lex_equate != "") {
-      lex_to_key[[lex_equate]] <- item_key
+      # Store with uppercase key for case-insensitive lookup
+      lex_to_key[[toupper(lex_equate)]] <- item_key
     }
   }
 
@@ -187,8 +189,8 @@ update_codebook_parameters <- function(
 
   for (lex_equate in unique_items) {
 
-    # Find item key in codebook
-    item_key <- lex_to_key[[lex_equate]]
+    # Find item key in codebook (case-insensitive)
+    item_key <- lex_to_key[[toupper(lex_equate)]]
 
     if (is.null(item_key)) {
       if (verbose) {
