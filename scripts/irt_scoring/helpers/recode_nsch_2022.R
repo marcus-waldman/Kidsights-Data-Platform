@@ -201,19 +201,22 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
   cat(sprintf("      Reverse-coding %d items\n", length(reverse_coded22)))
   cat(sprintf("      Forward-coding %d items\n", length(forwardly_coded22)))
 
-  # Recode NSCH missing codes (94-98) to NA BEFORE reverse/forward coding
-  # NSCH standard missing codes:
+  # Recode NSCH missing codes (>= 90) to NA BEFORE reverse/forward coding
+  # NSCH uses variable-specific missing codes in the 90-99 range:
+  #   90 = Not applicable (some variables)
   #   94 = Data not ascertained
   #   95 = Refused
   #   96 = Not applicable
   #   97 = Don't know
   #   98 = Missing
-  cat("      Recoding NSCH missing codes (94-98) to NA\n")
+  #   99 = Missing (some variables, e.g., ONEWORD)
+  # Conservative approach: recode ALL values >= 90 to prevent contamination
+  cat("      Recoding NSCH missing codes (>= 90) to NA\n")
   nsch22_filtered <- nsch22_filtered %>%
     dplyr::mutate(
       dplyr::across(dplyr::any_of(available_cahmi22_vars),
                     function(x) dplyr::case_when(
-                      x >= 94 & x <= 98 ~ NA_real_,
+                      x >= 90 ~ NA_real_,
                       .default = x
                     ))
     )
