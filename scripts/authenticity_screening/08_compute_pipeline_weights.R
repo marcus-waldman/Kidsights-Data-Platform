@@ -122,6 +122,17 @@ compute_authenticity_weights <- function(data,
                 i, quintile_breaks[i], quintile_breaks[i+1]))
   }
 
+  # Load eta_full lookup for authentic participants
+  eta_full_file <- file.path(cache_dir, "full_model_eta_lookup.rds")
+  if (!file.exists(eta_full_file)) {
+    stop(paste0("Full model eta lookup not found: ", eta_full_file, "\n",
+                "Run scripts/authenticity_screening/02_fit_full_model.R first."))
+  }
+
+  eta_full_lookup_authentic <- readRDS(eta_full_file)
+  cat(sprintf("\n[Loaded] eta_full lookup: %d authentic participants\n",
+              nrow(eta_full_lookup_authentic)))
+
   # ==========================================================================
   # PHASE 2: PREPARE STAN DATA FOR INAUTHENTIC
   # ==========================================================================
@@ -234,7 +245,8 @@ compute_authenticity_weights <- function(data,
         log_posterior = NA_real_,
         avg_logpost = NA_real_,
         n_items = M_holdout,
-        eta_est = NA_real_
+        authenticity_eta_full = NA_real_,
+        authenticity_eta_holdout = NA_real_
       ))
     }
 
@@ -274,7 +286,8 @@ compute_authenticity_weights <- function(data,
         log_posterior = NA_real_,
         avg_logpost = NA_real_,
         n_items = M_holdout,
-        eta_est = NA_real_
+        authenticity_eta_full = NA_real_,
+        authenticity_eta_holdout = NA_real_
       ))
     }
 
@@ -290,7 +303,8 @@ compute_authenticity_weights <- function(data,
       log_posterior = log_posterior,
       avg_logpost = avg_logpost,
       n_items = M_holdout,
-      eta_est = eta_est
+      authenticity_eta_full = eta_est,       # Same as holdout for inauthentic
+      authenticity_eta_holdout = eta_est     # Estimated using full model params
     ))
   }
 
@@ -388,30 +402,122 @@ compute_authenticity_weights <- function(data,
 
   cat("\n=== PHASE 7: MERGE WEIGHTS TO DATA ===\n\n")
 
-  # Prepare weight lookup (now includes both pid and record_id)
+  # Prepare eta lookup for inauthentic participants
+  inauthentic_eta_lookup <- inauthentic_scored %>%
+    dplyr::select(pid, record_id, authenticity_eta_full, authenticity_eta_holdout)
+
+  # Load safe_left_join
+  source("R/utils/safe_joins.R")
+
+  # MERGE ORDER: Authentic LOOCV scores FIRST, then inauthentic weights
+  # (to avoid column collision - both have avg_logpost and lz)
+
+  # Prepare authentic LOOCV scores lookup
+  cat("[Merging] LOOCV scores (avg_logpost, lz) for authentic participants...\n")
+  authentic_loocv_lookup <- loocv_results %>%
+    dplyr::filter(converged_holdout == TRUE) %>%
+    dplyr::select(pid, record_id, avg_logpost, lz) %>%
+    dplyr::rename(
+      authenticity_avg_logpost = avg_logpost,
+      authenticity_lz = lz
+    )
+
+  # Merge authentic LOOCV scores FIRST
+  data <- data %>%
+    safe_left_join(authentic_loocv_lookup, by_vars = c("pid", "record_id"),
+                   allow_collision = FALSE, auto_fix = TRUE)
+
+  cat(sprintf("  Merged LOOCV scores for %d authentic participants\n",
+              nrow(authentic_loocv_lookup)))
+
+  # Prepare inauthentic weight lookup (weights and scores)
   weight_lookup <- inauthentic_scored %>%
     dplyr::select(pid, record_id, authenticity_weight, lz, avg_logpost, quintile) %>%
     dplyr::rename(
-      authenticity_weight = authenticity_weight,
       authenticity_lz = lz,
       authenticity_avg_logpost = avg_logpost,
       authenticity_quintile = quintile
     )
 
-  # Load safe_left_join
-  source("R/utils/safe_joins.R")
-
-  # Merge to data using composite key (pid, record_id)
-  # This is a 1:1 join since weight_lookup has unique (pid, record_id) combinations
+  # Merge inauthentic weights and scores (allow collision since columns already exist for authentic)
+  cat("[Merging] Weights and scores for inauthentic participants...\n")
   data <- data %>%
-    safe_left_join(weight_lookup, by_vars = c("pid", "record_id"), allow_collision = FALSE, auto_fix = TRUE)
+    safe_left_join(weight_lookup, by_vars = c("pid", "record_id"),
+                   allow_collision = TRUE, auto_fix = FALSE)
 
-  # Assign weight = 1.0 for authentic participants
+  # Coalesce .x and .y columns (keep authentic .x values, use inauthentic .y values)
+  # Note: authenticity_weight and authenticity_quintile only exist as .y (no collision)
   data <- data %>%
     dplyr::mutate(
-      authenticity_weight = ifelse(authentic, 1.0, authenticity_weight),
-      authenticity_lz = ifelse(authentic, (mean_authentic - mean_authentic) / sd_authentic, authenticity_lz)
+      authenticity_lz = dplyr::coalesce(authenticity_lz.x, authenticity_lz.y),
+      authenticity_avg_logpost = dplyr::coalesce(authenticity_avg_logpost.x, authenticity_avg_logpost.y)
+    ) %>%
+    dplyr::select(-authenticity_lz.x, -authenticity_lz.y,
+                  -authenticity_avg_logpost.x, -authenticity_avg_logpost.y)
+
+  # Assign weight = 1.0 for authentic participants (keep their LOOCV lz values)
+  data <- data %>%
+    dplyr::mutate(
+      authenticity_weight = ifelse(authentic, 1.0, authenticity_weight)
     )
+
+  # Calculate quintiles for ALL participants based on authentic LOOCV distribution
+  cat("[Computing] Quintiles for all participants based on LOOCV distribution...\n")
+  quintile_breaks <- quantile(loocv_results$avg_logpost[loocv_results$converged_holdout],
+                               probs = seq(0, 1, 0.2), na.rm = TRUE)
+
+  data <- data %>%
+    dplyr::mutate(
+      authenticity_quintile = dplyr::case_when(
+        is.na(authenticity_avg_logpost) ~ NA_integer_,
+        authenticity_avg_logpost <= quintile_breaks[2] ~ 1L,
+        authenticity_avg_logpost <= quintile_breaks[3] ~ 2L,
+        authenticity_avg_logpost <= quintile_breaks[4] ~ 3L,
+        authenticity_avg_logpost <= quintile_breaks[5] ~ 4L,
+        TRUE ~ 5L
+      )
+    )
+
+  # Merge eta values for ALL participants (authentic + inauthentic)
+  cat("\n[Merging] eta_full for all participants...\n")
+
+  # Combine eta_full from authentic (full model) and inauthentic (holdout model)
+  eta_full_combined <- dplyr::bind_rows(
+    eta_full_lookup_authentic,  # 2,635 authentic from full model
+    inauthentic_eta_lookup %>% dplyr::select(pid, record_id, authenticity_eta_full)  # 196 inauthentic
+  )
+
+  data <- data %>%
+    safe_left_join(
+      eta_full_combined,
+      by_vars = c("pid", "record_id"),
+      allow_collision = FALSE,
+      auto_fix = TRUE
+    )
+
+  cat(sprintf("  Merged %d eta_full values\n", sum(!is.na(data$authenticity_eta_full))))
+
+  # Merge eta_holdout for all participants
+  cat("[Merging] eta_holdout for all participants...\n")
+
+  # Combine eta_holdout from authentic (LOOCV) and inauthentic (same as eta_full)
+  loocv_eta_lookup <- loocv_results %>%
+    dplyr::select(pid, record_id, authenticity_eta_holdout)
+
+  eta_holdout_combined <- dplyr::bind_rows(
+    loocv_eta_lookup,  # 2,635 authentic from LOOCV
+    inauthentic_eta_lookup %>% dplyr::select(pid, record_id, authenticity_eta_holdout)  # 196 inauthentic
+  )
+
+  data <- data %>%
+    safe_left_join(
+      eta_holdout_combined,
+      by_vars = c("pid", "record_id"),
+      allow_collision = FALSE,
+      auto_fix = TRUE
+    )
+
+  cat(sprintf("  Merged %d eta_holdout values\n", sum(!is.na(data$authenticity_eta_holdout))))
 
   # Convert quintile to integer
   data$authenticity_quintile <- as.integer(data$authenticity_quintile)
@@ -428,6 +534,23 @@ compute_authenticity_weights <- function(data,
               max(data$authenticity_weight[!data$authentic & !is.na(data$authenticity_weight)], na.rm = TRUE)))
   cat(sprintf("[Merge] Inauthentic with NA weights: %d (<5 items)\n", n_inauthentic_na))
 
+  # Eta and LOOCV summary
+  n_eta_full <- sum(!is.na(data$authenticity_eta_full), na.rm = TRUE)
+  n_eta_holdout <- sum(!is.na(data$authenticity_eta_holdout), na.rm = TRUE)
+  n_loocv_scores <- sum(!is.na(data$authenticity_avg_logpost), na.rm = TRUE)
+  n_expected_eta <- n_authentic + n_inauthentic_weighted  # 2,635 + 196 = 2,831
+  cat(sprintf("\n[Eta] authenticity_eta_full: %d records (expected: %d)\n", n_eta_full, n_expected_eta))
+  cat(sprintf("[Eta] authenticity_eta_holdout: %d records (expected: %d)\n", n_eta_holdout, n_expected_eta))
+  cat(sprintf("[LOOCV] authenticity_avg_logpost & authenticity_lz: %d records\n", n_loocv_scores))
+
+  # Quintile distribution
+  quintile_counts <- table(data$authenticity_quintile, useNA = "ifany")
+  cat("\n[Quintiles] Distribution across all participants:\n")
+  for(q in 1:5) {
+    count <- ifelse(as.character(q) %in% names(quintile_counts), quintile_counts[as.character(q)], 0)
+    cat(sprintf("  Q%d: %d participants\n", q, count))
+  }
+
   # ==========================================================================
   # SUMMARY
   # ==========================================================================
@@ -440,9 +563,13 @@ compute_authenticity_weights <- function(data,
 
   cat("Columns Added:\n")
   cat("  - authenticity_weight: Normalized weight (1.0 for authentic, 0.42-1.96 for inauthentic)\n")
-  cat("  - authenticity_lz: Standardized z-score\n")
-  cat("  - authenticity_avg_logpost: Raw log_posterior / n_items\n")
-  cat("  - authenticity_quintile: Quintile assignment (1-5)\n")
+  cat("  - authenticity_avg_logpost: Out-of-sample log_posterior / n_items (from LOOCV for all)\n")
+  cat("  - authenticity_lz: Standardized z-score of avg_logpost (from LOOCV distribution)\n")
+  cat("  - authenticity_quintile: Quintile assignment (1-5) based on LOOCV distribution\n")
+  cat("  - authenticity_eta_full: Individual ability from full N=2,635 model\n")
+  cat("    * Authentic: from joint full model | Inauthentic: from holdout with full params\n")
+  cat("  - authenticity_eta_holdout: Individual ability from holdout models\n")
+  cat("    * Authentic: from LOO (N-1 model) | Inauthentic: same as eta_full\n")
   cat("\n")
 
   cat("Next Steps:\n")
