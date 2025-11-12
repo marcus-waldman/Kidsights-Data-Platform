@@ -53,6 +53,7 @@ Comprehensive documentation for the Kidsights Data Platform - a multi-source ETL
 - **[NHIS Pipeline](nhis/)** - Health surveys data, ACEs, mental health measures
 - **[NSCH Pipeline](nsch/)** - Children's health survey, database schema, queries
 - **[Raking Targets](raking/)** - Population-representative targets, statistical methods, pipeline execution
+- **[IRT Calibration](irt_scoring/)** - Mplus calibration pipeline, quality assurance tools, constraint specification
 
 ### 🛠️ Development & References
 

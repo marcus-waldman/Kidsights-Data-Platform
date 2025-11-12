@@ -13,6 +13,7 @@ This document provides a quick reference cheatsheet for common Kidsights Data Pl
 3. [Environment Setup](#environment-setup)
 4. [Quick Debugging](#quick-debugging)
 5. [Common Tasks](#common-tasks)
+6. [Interactive Tools](#interactive-tools)
 
 ---
 
@@ -271,6 +272,15 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 **Timing:** ~30 seconds
 
 **Output:** 47,084 records × 419 columns (~38 MB)
+
+**⚠️ REQUIRED NEXT STEP:** After creating the calibration dataset, you MUST run the Age-Response Gradient Explorer for visual quality assurance before proceeding to Mplus calibration.
+
+```r
+# Launch QA tool
+shiny::runApp("scripts/shiny/age_gradient_explorer")
+```
+
+See [Interactive Tools](#interactive-tools) section for detailed QA checklist.
 
 **Validation Commands:**
 ```bash
@@ -769,6 +779,41 @@ county_data %>%
 5. Run validation script
 
 **Documentation:** [guides/MISSING_DATA_GUIDE.md#creating-new-composite-variables](guides/MISSING_DATA_GUIDE.md#creating-new-composite-variables)
+
+---
+
+## Interactive Tools
+
+### Launch Age-Response Gradient Explorer (REQUIRED QA)
+
+**Purpose:** Mandatory visual quality assurance for IRT calibration before Mplus
+
+```r
+# Launch from project root
+shiny::runApp("scripts/shiny/age_gradient_explorer")
+```
+
+**What it does:**
+- Box-and-whisker plots showing age distributions at each response level
+- GAM smoothing (b-splines) for non-linear age trends
+- Multi-study filtering (6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+- Quality flag warnings (negative correlations, category mismatches)
+- Codebook metadata integration
+- Interactive controls for GAM smoothness (k=3-10)
+
+**Prerequisites:**
+- Calibration dataset created (`calibration_dataset_2020_2025` table)
+- Required R packages: shiny, duckdb, dplyr, ggplot2, mgcv, jsonlite, DT
+
+**Quality Assurance Checklist:**
+1. **Developmental Gradients:** Verify positive age-response correlations for skill items
+2. **Negative Flags:** Investigate items with negative gradients (may need exclusion/recoding)
+3. **Category Separation:** Check box plot overlap - overlapping categories indicate poor discrimination
+4. **Study Consistency:** Compare age patterns across all 6 studies
+
+**Timing:** 3-5 seconds startup, <1 second plot rendering, 15-30 minutes thorough review
+
+**Documentation:** [scripts/shiny/age_gradient_explorer/README.md](../scripts/shiny/age_gradient_explorer/README.md)
 
 ---
 

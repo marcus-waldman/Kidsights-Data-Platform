@@ -1,9 +1,9 @@
 {
   "metadata": {
-    "generated": "2025-10-03 07:09:14",
+    "generated": "2025-11-10 10:54:31",
     "study": "ne25",
     "status": "export_failed",
-    "error": "Python script failed with exit code: 1",
+    "error": "Python script failed with exit code: 127",
     "generated_by": "Kidsights Data Platform - R Fallback"
   },
   "note": "Full JSON export failed. Please use Python script directly."

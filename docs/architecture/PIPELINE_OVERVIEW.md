@@ -537,6 +537,15 @@ This eliminates manual crosswalks and ensures single source of truth.
 - `scripts/irt_scoring/test_mplus_compatibility.R` - Verify .dat file format
 - `scripts/irt_scoring/run_full_scale_test.R` - Production performance benchmarking
 
+**Quality Assurance Tools:**
+- Age-Response Gradient Explorer Shiny app (`scripts/shiny/age_gradient_explorer/`)
+- Box plots + GAM smoothing for 308 items across 6 studies
+- Real-time filtering by item, study, and quality flags
+- Codebook metadata integration
+- **Role:** Mandatory pre-calibration visual inspection of age gradients
+- **Status:** Production-ready (15 test scenarios passed)
+- **Launch:** `shiny::runApp("scripts/shiny/age_gradient_explorer")`
+
 **Database Tables:**
 - `historical_calibration_2020_2024` - Historical studies (NE20, NE22, USA24)
 - `calibration_dataset_2020_2025` - Complete calibration dataset (all 6 studies)
@@ -606,11 +615,18 @@ Mplus dataset uses numeric `study_num` for grouping/DIF analysis:
 
 After dataset preparation, follow [MPLUS_CALIBRATION_WORKFLOW.md](../irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md):
 
-1. **Create Mplus .inp file** with graded response model specification
-2. **Run Mplus calibration** (10-120 minutes depending on model complexity)
-3. **Extract item parameters** (discrimination, thresholds)
-4. **Store parameters in codebook** (`irt_params` section)
-5. **Apply IRT scoring to NE25 data** (generate theta scores)
+1. **Quality Assurance (REQUIRED)** - Use Age-Response Gradient Explorer to inspect age-response patterns
+   - Launch: `shiny::runApp("scripts/shiny/age_gradient_explorer")`
+   - Complete QA checklist: developmental gradients, negative flags, category separation, study consistency
+   - Document item exclusion decisions (items with negative correlations, poor discrimination, etc.)
+   - Export quality summary for calibration notes
+   - **Timing:** 15-30 minutes for thorough review of 308 items
+   - **Output:** Documented list of items to exclude or investigate before Mplus calibration
+2. **Create Mplus .inp file** with graded response model specification
+3. **Run Mplus calibration** (10-120 minutes depending on model complexity)
+4. **Extract item parameters** (discrimination, thresholds)
+5. **Store parameters in codebook** (`irt_params` section)
+6. **Apply IRT scoring to NE25 data** (generate theta scores)
 
 ---
 

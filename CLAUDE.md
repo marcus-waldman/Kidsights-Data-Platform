@@ -320,6 +320,22 @@ print(f"Total records: {result[0][0]}")
 #   - DuckDB table: calibration_dataset_2020_2025
 ```
 
+### Launch Quality Assurance Tools
+```bash
+# Age-Response Gradient Explorer (IRT calibration QA - REQUIRED)
+shiny::runApp("scripts/shiny/age_gradient_explorer")
+```
+
+**Purpose:** Mandatory visual inspection of age-response gradients before Mplus calibration
+
+**Prerequisites:** Calibration dataset created (`calibration_dataset_2020_2025` table)
+
+**What it does:**
+- Box plots showing age distributions at each response level
+- GAM smoothing for non-linear developmental trends
+- Quality flag warnings (negative correlations, category mismatches)
+- Multi-study filtering (6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+
 ### Quick Debugging
 1. **Database:** `python -c "from python.db.connection import DatabaseManager; print(DatabaseManager().test_connection())"`
 2. **R Packages:** Use temp script files, never inline `-e`
@@ -358,6 +374,7 @@ print(f"Total records: {result[0][0]}")
 - **NSCH Pipeline:** [docs/nsch/](docs/nsch/) - Database schema, example queries, troubleshooting, variables reference
 - **Raking Targets:** [docs/raking/](docs/raking/) - Raking targets pipeline, statistical methods, implementation plan
 - **Imputation Pipeline:** [docs/imputation/](docs/imputation/) - Multiple imputation architecture, helper functions, usage examples
+- **IRT Calibration:** [docs/irt_scoring/](docs/irt_scoring/) - Calibration pipeline, Mplus workflow, constraint specification, quality assurance tools
 
 ---
 
@@ -469,6 +486,12 @@ pip install pyreadstat
   - **Study Field Assignment:** Added study field creation in `prepare_calibration_dataset.R` to ensure NSCH records properly labeled with study source (fixes `study = NA` issue). Commit: d72afaa
   - **Syntax Generator Indexing:** Fixed `write_syntax2.R` to use category lookup instead of positional indexing (prevents incorrect threshold counts like EG16c showing 4 thresholds for dichotomous data). Commit: 37d2034
 - **Development Status:** Pipeline under active validation - verify data quality and syntax outputs before use in production analyses
+- **Quality Assurance Tools:** Age-Response Gradient Explorer Shiny app (production-ready, REQUIRED)
+  - Mandatory pre-calibration visual inspection of 308 developmental items
+  - Box plots + GAM smoothing across 6 calibration studies
+  - Quality flag integration (negative correlations, category mismatches)
+  - Launch: `shiny::runApp("scripts/shiny/age_gradient_explorer")`
+  - Documentation: [scripts/shiny/age_gradient_explorer/README.md](scripts/shiny/age_gradient_explorer/README.md)
 
 ### ✅ NE25 Calibration Table - Optimized (November 2025)
 - **Automated Creation:** Step 11 in NE25 pipeline (no manual intervention required)

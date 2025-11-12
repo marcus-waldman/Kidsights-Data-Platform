@@ -29,6 +29,59 @@ This guide explains how to generate and export IRT calibration datasets for Mplu
 
 ---
 
+## Visual Quality Assurance (REQUIRED STEP)
+
+### Age-Response Gradient Explorer
+
+**⚠️ MANDATORY:** Before running Mplus calibration, you MUST use the Age-Response Gradient Explorer to visually inspect item quality.
+
+```r
+# Launch interactive explorer
+shiny::runApp("scripts/shiny/age_gradient_explorer")
+```
+
+### Quality Assurance Checklist
+
+**Required Checks (allow 15-30 minutes):**
+
+1. **✓ Developmental Gradients**
+   - Verify positive age-response correlations for skill items
+   - Items should show increasing response values with age
+   - Look for smooth GAM curves trending upward
+
+2. **✓ Negative Correlation Flags**
+   - Review all items flagged with NEGATIVE_CORRELATION
+   - Investigate unexpected negative age-response relationships
+   - Document decisions: exclude, recode, or justify retention
+
+3. **✓ Category Separation**
+   - Check box plot overlap at each response level
+   - Overlapping boxes indicate poor discrimination between categories
+   - Consider collapsing categories or excluding items with severe overlap
+
+4. **✓ Study Consistency**
+   - Compare age patterns across NE20, NE22, NE25, NSCH21, NSCH22, USA24
+   - Flag items with dramatically different patterns across studies
+   - Verify sufficient sample size in each study
+
+### Quality Flags Integrated
+
+- **NEGATIVE_CORRELATION:** Unexpected negative age-response relationship
+- **CATEGORY_MISMATCH:** Observed categories don't match codebook expectations
+- **NON_SEQUENTIAL:** Non-consecutive response values
+
+### Output
+
+Document your QA findings:
+- List of items to exclude from calibration
+- Items requiring recoding or category collapsing
+- Items flagged for further investigation
+- Justification notes for borderline decisions
+
+**Documentation:** See [scripts/shiny/age_gradient_explorer/README.md](../../scripts/shiny/age_gradient_explorer/README.md) for detailed app usage.
+
+---
+
 ## Usage Scenarios
 
 ### Scenario 1: Update NE25 Data Only

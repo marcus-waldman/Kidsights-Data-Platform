@@ -150,8 +150,36 @@ combined <- mitools::MIcombine(results)
 - `documentation/` - Documentation generation scripts
 - `validation/` - Validation utilities
 - `imputation/` - Imputation pipeline scripts
+- `shiny/` - Interactive Shiny applications for data exploration and quality assurance
+  - `age_gradient_explorer/` - IRT calibration age-response visualization (REQUIRED QA tool)
 
 **Pattern:** Scripts are for maintenance/debugging, not production pipeline.
+
+### `/scripts/shiny/`
+**Purpose:** Interactive Shiny applications for exploratory analysis and quality assurance
+
+**Current Apps:**
+- **`age_gradient_explorer/`** - Age-response gradient visualization for IRT calibration
+  - **Classification:** Quality assurance utility (mandatory pre-calibration step)
+  - **Purpose:** Visual inspection of developmental gradients before Mplus calibration
+  - **Features:**
+    - Box plots showing age distributions at each response category
+    - GAM smoothing for non-linear developmental trends
+    - Multi-study filtering across 6 calibration studies
+    - Quality flag integration (negative correlations, category mismatches)
+  - **Launch:** `shiny::runApp("scripts/shiny/age_gradient_explorer")`
+  - **Prerequisites:** `calibration_dataset_2020_2025` table exists
+  - **Status:** Production-ready (commit e003a36)
+
+**Architecture:**
+- `app.R` - Launcher script (sources ui.R and server.R)
+- `global.R` - Data loading (runs once on startup)
+- `ui.R` - User interface definition
+- `server.R` - Server logic and reactivity
+- `README.md` - Usage documentation and interpretation guide
+- `TEST_REPORT.md` - Production validation results
+
+**Design Pattern:** Traditional Shiny multi-file structure for maintainability
 
 ### `/codebook/`
 **Purpose:** JSON-based codebook metadata system

@@ -103,6 +103,72 @@ All R code is checked for namespace compliance during code review. Scripts viola
 
 ---
 
+### Safe Joins (CRITICAL)
+
+**Rule:** All `dplyr::left_join()` calls MUST use the `safe_left_join()` wrapper function to prevent column name collisions.
+
+**Why?**
+- **Prevents `.x`/`.y` suffixes:** Detects overlapping column names before joining
+- **Auto-fixes collisions:** Automatically removes duplicate columns from right table with warnings
+- **Validates cardinality:** Ensures row count doesn't change (catches many-to-many joins)
+- **Clear error messages:** Provides detailed guidance when collisions are detected
+
+### Correct Pattern
+
+```r
+# ✅ CORRECT - Uses safe_left_join wrapper
+source("R/utils/safe_joins.R")
+
+data %>%
+  safe_left_join(eligibility_data, by_vars = c("pid", "record_id")) %>%
+  safe_left_join(geography_data, by_vars = c("pid", "record_id"))
+```
+
+### Incorrect Pattern
+
+```r
+# ❌ INCORRECT - Direct dplyr::left_join (causes collisions)
+data %>%
+  dplyr::left_join(eligibility_data, by = c("pid", "record_id")) %>%
+  dplyr::left_join(geography_data, by = c("pid", "record_id"))
+# Creates: eligible.x, eligible.y, authentic.x, authentic.y
+```
+
+**What can go wrong:**
+```r
+# Without safe_left_join, collisions create .x/.y suffixes
+data <- data.frame(pid = 1, eligible = TRUE)
+join_data <- data.frame(pid = 1, eligible = FALSE)
+
+result <- dplyr::left_join(data, join_data, by = "pid")
+# Result: pid, eligible.x, eligible.y
+# Problem: eligible.x used in WHERE clauses, eligible.y ignored!
+```
+
+### Function Parameters
+
+- `by_vars`: Join key column names (required)
+- `allow_collision`: If TRUE, allows `.x`/`.y` suffixes (default: FALSE)
+- `auto_fix`: If TRUE, automatically removes colliding columns from right table (default: TRUE)
+
+### Example with Intentional Collisions
+
+```r
+# ✅ OK - Explicit allowance for _child/_parent suffixes
+children_with_parents <- nhis_children %>%
+  safe_left_join(
+    parent_pool,
+    by_vars = c("SERIAL", "PAR1REL" = "PERNUM", "YEAR"),
+    allow_collision = TRUE  # Intentional AGE_child/AGE_parent suffixes
+  )
+```
+
+### Enforcement
+
+The `safe_left_join` function is required in all pipeline code. Auto-fix warnings must be reviewed during code review to ensure collisions are intentional.
+
+---
+
 ## Python Coding Standards
 
 ### Windows Console Output (CRITICAL)

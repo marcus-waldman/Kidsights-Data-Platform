@@ -1,8 +1,8 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-11-08 22:33:44  
+**Generated:** 2025-11-10 10:54:30  
 **Total Records:** 4966  
-**Total Variables:** 677  
+**Total Variables:** 672  
 **Categories:** 16  
 
 ## Overview
@@ -23,7 +23,7 @@ for race/ethnicity, education categories, and other demographic variables.
 - [Adverse_Experiences](#adverse_experiences) (32 variables)
 - [Childcare](#childcare) (21 variables)
 - [Coglan](#coglan) (80 variables)
-- [Eligibility](#eligibility) (8 variables)
+- [Eligibility](#eligibility) (3 variables)
 - [Geography](#geography) (28 variables)
 - [Health](#health) (4 variables)
 - [Mental_Health](#mental_health) (10 variables)
@@ -322,22 +322,17 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 ## Eligibility
 
-**Description:** Study eligibility and authenticity screening variables, including IRT-based response pattern analysis
+**Description:** No description available
 
-**Variables:** 8
-**Average Missing:** ~16%
-**Data Types:** 0 factors, 4 numeric, 4 logical, 0 character
+**Variables:** 3  
+**Average Missing:** 0.0%  
+**Data Types:** 0 factors, 0 numeric, 3 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
-| `authentic` | Passes authenticity screening | logical | 0.0% | TRUE (authentic), FALSE (inauthentic) |
-| `authenticity_avg_logpost` | IRT authenticity metric (log-posterior / n_items) | numeric | 32.6% | Raw metric for authentic participants; NA for inauthentic |
-| `authenticity_lz` | Standardized authenticity score (z-score) | numeric | 32.6% | Z-score of avg_logpost; NA for inauthentic |
-| `authenticity_quintile` | Authenticity quintile assignment (1-5) | numeric | 32.6% | Quintile based on authentic distribution; NA for inauthentic |
-| `authenticity_weight` | Normalized weight for weighted analyses | numeric | 0.0% | 1.0 (authentic), 0.42-1.96 (inauthentic with 5+ items), NA (inauthentic <5 items) |
-| `eligible` | Meets study inclusion criteria | logical | 0.0% | TRUE (eligible), FALSE (ineligible) |
-| `include` | Meets inclusion criteria (inclusion + authenticity) | logical | 0.0% | DEPRECATED: Use `meets_inclusion` instead |
-| `meets_inclusion` | Inclusion flag for imputation (eligible + non-NA weight) | logical | 0.0% | TRUE (2,831: eligible with authenticity_weight), FALSE (otherwise) |
+| `authentic` | Passes authenticity screening | logical | 0.0% | N/A |
+| `eligible` | Meets study inclusion criteria | logical | 0.0% | N/A |
+| `include` | Meets inclusion criteria (inclusion + authenticity) | logical | 0.0% | N/A |
 
 ## Geography
 
@@ -361,7 +356,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
 | `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251108_223141) |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251110_105226) |
 | `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.3% | N/A |
 | `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
@@ -953,4 +948,4 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-11-08 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-11-10 by the Kidsights Data Platform*

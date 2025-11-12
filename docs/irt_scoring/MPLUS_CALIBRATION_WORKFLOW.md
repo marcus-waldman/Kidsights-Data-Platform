@@ -11,13 +11,70 @@
 This document provides a complete workflow for recalibrating the **Kidsights developmental and behavioral scale** using Item Response Theory (IRT) in Mplus. The workflow combines historical Nebraska studies (NE20, NE22, USA24), current NE25 data, and national benchmarking samples (NSCH 2021, 2022) to create robust, population-representative item parameters.
 
 **Workflow Stages:**
+0. **Visual Quality Assurance (REQUIRED)** - Mandatory visual inspection of age-response patterns
 1. **Data Preparation** - Create calibration dataset using R
 2. **Mplus Calibration** - Estimate IRT parameters (graded response model)
 3. **Parameter Extraction** - Automated extraction using MplusAutomation and codebook update
 4. **Scoring Application** - Apply parameters to score NE25 data
 
-**Estimated Time:** 2-4 hours (including Mplus model estimation)
+**Estimated Time:** 2-4 hours (including Mplus model estimation + 15-30 min QA)
 **Key Improvement:** Stage 3 now fully automated (30 seconds vs 15-30 minutes manual extraction)
+
+---
+
+## Stage 0: Visual Quality Assurance (REQUIRED)
+
+**Purpose:** Mandatory visual inspection of item quality before formal Mplus calibration
+
+**Tool:** Age-Response Gradient Explorer Shiny app
+
+```r
+# Launch interactive explorer
+shiny::runApp("scripts/shiny/age_gradient_explorer")
+```
+
+### Quality Assurance Checklist
+
+**⚠️ You MUST complete all 4 checks before proceeding to Stage 1:**
+
+- [ ] **Developmental Gradients** - Verify positive age-response correlations for skill items
+  - Items should show increasing response values with age
+  - GAM curves should trend upward for developmental items
+  - Flag items with flat or negative trends
+
+- [ ] **Negative Correlation Flags** - Investigate items with unexpected patterns
+  - Review all items flagged with NEGATIVE_CORRELATION
+  - Document decisions: exclude, recode, or justify retention
+  - Export list of items to exclude from calibration
+
+- [ ] **Category Separation** - Check box plot overlap
+  - Overlapping boxes indicate poor discrimination between categories
+  - Consider collapsing categories or excluding items with severe overlap
+  - Verify adequate spread in age distributions across response levels
+
+- [ ] **Study Consistency** - Compare patterns across all 6 studies
+  - NE20, NE22, NE25 (Nebraska studies)
+  - NSCH21, NSCH22 (National benchmarking samples)
+  - USA24 (National validation study)
+  - Flag items with dramatically different patterns across studies
+
+### Timing
+
+- **Startup:** 3-5 seconds (data loading)
+- **Per-item review:** 30-60 seconds (thorough inspection)
+- **Complete review:** 15-30 minutes for all 308 items
+
+### Output
+
+**Required documentation before proceeding:**
+- List of items to exclude from calibration (with justification)
+- Items requiring recoding or category collapsing
+- Items flagged for further investigation
+- Quality summary notes for calibration documentation
+
+### Next Step
+
+Once QA is complete and exclusion list is documented, proceed to Stage 1 (Data Preparation) with the refined item list.
 
 ---
 
