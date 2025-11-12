@@ -11,10 +11,13 @@
 #   - Uses codebook.json for mapping definitions
 #
 # Output: 1 DuckDB table:
-#   - historical_calibration_2020_2024 (41,577 records with equate lexicon names)
-#     - NE20:  37,546 records
-#     - NE22:  2,431 records
-#     - USA24: 1,600 records
+#   - historical_calibration_2020_2024 (~5,009 records with equate lexicon names)
+#     - NE20:  ~978 records (IDs 1-10,000, actual range 1-2,141)
+#     - NE22:  2,431 records (negative IDs)
+#     - USA24: 1,600 records (IDs 990,000-991,695)
+#
+# Note: KidsightsPublic package contains 41,577 total records, but 36,568 old
+#       records (IDs > 1,000,000) are excluded from calibration
 # =============================================================================
 
 cat("\n")
@@ -145,15 +148,31 @@ cat("\n")
 # Derive Study Column
 # =============================================================================
 
-cat("[5/9] Deriving study column from ID ranges\n")
+cat("[5/9] Deriving study column from ID ranges and filtering to known studies\n")
 calibdat <- calibdat %>%
   dplyr::mutate(
     study = dplyr::case_when(
-      id < 0 ~ "NE22",              # Negative IDs = NE22
+      id < 0 ~ "NE22",                        # Negative IDs = NE22
+      id >= 1 & id <= 10000 ~ "NE20",         # 1-10000 = NE20
       id >= 990000 & id <= 991695 ~ "USA24",  # 990000-991695 = USA24
-      .default = "NE20"             # Everything else = NE20
+      .default = NA_character_                # Unknown IDs = NA (will be filtered)
     )
   )
+
+# Count records before filtering
+total_before <- nrow(calibdat)
+unknown_count <- sum(is.na(calibdat$study))
+
+cat(sprintf("      Total records in calibdat: %d\n", total_before))
+if (unknown_count > 0) {
+  cat(sprintf("      Records with unknown ID ranges: %d (will be excluded)\n", unknown_count))
+}
+
+# Filter to only known studies
+calibdat <- calibdat %>%
+  dplyr::filter(!is.na(study))
+
+cat(sprintf("      Records after filtering: %d\n", nrow(calibdat)))
 
 # Display available studies
 study_counts <- table(calibdat$study)

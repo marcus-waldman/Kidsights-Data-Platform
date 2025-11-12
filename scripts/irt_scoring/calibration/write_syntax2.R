@@ -137,8 +137,14 @@ write_syntax2 <- function(
 
   if (verbose) {
     cat(sprintf("     Total items (J): %d\n", J))
-    cat(sprintf("     Category range: %d to %d\n\n",
-                min(Ks, na.rm = TRUE), max(Ks, na.rm = TRUE)))
+    # Filter out -Inf values (items with all NAs) before calculating range
+    Ks_valid <- Ks[is.finite(Ks)]
+    if (length(Ks_valid) > 0) {
+      cat(sprintf("     Category range: %.0f to %.0f\n\n",
+                  min(Ks_valid), max(Ks_valid)))
+    } else {
+      cat("     Category range: No valid data\n\n")
+    }
   }
 
   # ---------------------------------------------------------------------------
