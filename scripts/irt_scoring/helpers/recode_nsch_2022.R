@@ -184,22 +184,46 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
   cat(sprintf("      %d records remain after age filter\n", nrow(nsch22_filtered)))
 
   # ============================================================================
-  # Handle Reverse-Coded Items
+  # Handle Reverse-Coded Items (Using Codebook as Single Source of Truth)
   # ============================================================================
 
-  cat("[5/7] Handling reverse-coded items\n")
+  cat("[5/7] Determining coding direction from codebook\n")
 
-  # Forward-coded items for NSCH 2022 (different from 2021!)
-  forwardly_coded22 <- c("BOUNCEABALL", "DISTRACTED", "COUNTTO_R", "TEMPER_R",
-                          "CALMDOWN_R", "DRAWACIRCLE", "DRAWAFACE", "DRAWAPERSON",
-                          "RHYMEWORD_R", "WAITFORTURN")
-  forwardly_coded22 <- intersect(forwardly_coded22, available_cahmi22_vars)
+  # Build reverse/forward lists from codebook instead of hardcoding
+  forwardly_coded22 <- character(0)
+  reverse_coded22 <- character(0)
 
-  # All other items are reverse-coded
-  reverse_coded22 <- setdiff(available_cahmi22_vars, forwardly_coded22)
+  for (cahmi_var in available_cahmi22_vars) {
+    # Find this variable in codebook
+    should_reverse <- NA
 
-  cat(sprintf("      Reverse-coding %d items\n", length(reverse_coded22)))
-  cat(sprintf("      Forward-coding %d items\n", length(forwardly_coded22)))
+    for (item_id in names(codebook$items)) {
+      item <- codebook$items[[item_id]]
+
+      if (!is.null(item$lexicons$cahmi22) && item$lexicons$cahmi22 == cahmi_var) {
+        should_reverse <- item$scoring$reverse
+        if (is.null(should_reverse)) {
+          # Default to reverse coding if not specified (conservative approach)
+          should_reverse <- TRUE
+          cat(sprintf("        [WARN] No scoring.reverse for %s, defaulting to reverse\n", cahmi_var))
+        }
+        break
+      }
+    }
+
+    # Categorize based on codebook specification
+    if (is.na(should_reverse)) {
+      cat(sprintf("        [WARN] %s not found in codebook, defaulting to reverse\n", cahmi_var))
+      reverse_coded22 <- c(reverse_coded22, cahmi_var)
+    } else if (should_reverse) {
+      reverse_coded22 <- c(reverse_coded22, cahmi_var)
+    } else {
+      forwardly_coded22 <- c(forwardly_coded22, cahmi_var)
+    }
+  }
+
+  cat(sprintf("      Reverse-coding %d items (per codebook)\n", length(reverse_coded22)))
+  cat(sprintf("      Forward-coding %d items (per codebook)\n", length(forwardly_coded22)))
 
   # Recode NSCH missing codes (>= 90) to NA BEFORE reverse/forward coding
   # NSCH uses variable-specific missing codes in the 90-99 range:

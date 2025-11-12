@@ -59,8 +59,11 @@
 #' 5. **Create Study Indicators**: Assign numeric codes (1=NE20, 2=NE22, 3=NE25,
 #'    5=NSCH21, 6=NSCH22, 7=USA24)
 #' 6. **Combine Data**: Stack all 6 studies with consistent structure
-#' 7. **Export to Mplus**: Write space-delimited .dat file with missing as "."
-#' 8. **Store in DuckDB**: Create calibration_dataset_2020_2025 table with indexes
+#' 7. **Prepare Mplus Data & Quality Validation**: Create mplus_data frame and
+#'    validate data quality before writing to disk
+#' 8. **Export to Mplus**: Write space-delimited .dat file with missing as "."
+#' 9. **Store in DuckDB**: Create calibration_dataset_2020_2025 table with indexes
+#' 10. **Generate MODEL Syntax**: Auto-generate Mplus syntax Excel file
 #'
 #' Interactive prompts guide through:
 #' - NSCH sample size selection (default: 1000 per year)
@@ -281,104 +284,134 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 3: NSCH Sample Size Prompt
+  # STEPS 3-5 SKIPPED: NSCH Data Excluded Due to Quality Concerns
+  # ===========================================================================
+  #
+  # NSCH 2021 and 2022 data have been excluded from calibration due to
+  # systematic negative age correlations detected in quality validation.
+  #
+  # Issue: 26 of 30 NSCH 2021 items show negative correlations with age,
+  # including strong magnitudes (|r| > 0.5) for ability items like:
+  #   - TELLSTORY (r = -0.659)
+  #   - WRITENAME (r = -0.649)
+  #   - ASKQUESTION2 (r = -0.574)
+  #
+  # Investigation confirmed correct reverse coding implementation, suggesting
+  # fundamental measurement artifacts in NSCH "how often" response scales.
+  #
+  # See: .github/ISSUE_TEMPLATE/nsch_calibration_data_exclusion.md
+  #
+  # To re-enable NSCH data:
+  #   1. Uncomment Steps 3-5 below
+  #   2. Add nsch21_data and nsch22_data to bind_rows() in Step 6
+  #   3. Re-add NSCH21 (5) and NSCH22 (6) to studynum case_when
+  #
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 3: NSCH SAMPLE SIZE SELECTION\n")
+  cat("[STEPS 3-5 SKIPPED: NSCH data excluded - see issue documentation]\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[3/10] Select NSCH sample size\n\n")
-  cat("NSCH data will be sampled to reduce file size and speed up Mplus execution.\n")
-  cat("Recommended: 1000 records per year (total: 2000 records)\n")
-  cat("Enter sample size per year, or 'all' for complete datasets\n\n")
-
-  nsch_sample_size <- readline(prompt = "NSCH sample size per year (default: 1000): ")
-
-  if (nsch_sample_size == "" || is.na(nsch_sample_size)) {
-    nsch_sample_size <- 1000
-    cat(sprintf("        Using default: %d records per year\n\n", nsch_sample_size))
-  } else if (tolower(nsch_sample_size) %in% c("all", "inf")) {
-    nsch_sample_size <- Inf
-    cat("        Using all available records\n\n")
-  } else {
-    nsch_sample_size <- as.numeric(nsch_sample_size)
-    if (is.na(nsch_sample_size) || nsch_sample_size <= 0) {
-      stop("Invalid sample size. Must be positive number or 'all'")
-    }
-    cat(sprintf("        Using %d records per year\n\n", nsch_sample_size))
-  }
+  # # ===========================================================================
+  # # Step 3: NSCH Sample Size Prompt [DISABLED]
+  # # ===========================================================================
+  #
+  # cat(strrep("=", 80), "\n")
+  # cat("STEP 3: NSCH SAMPLE SIZE SELECTION\n")
+  # cat(strrep("=", 80), "\n\n")
+  #
+  # cat("[3/10] Select NSCH sample size\n\n")
+  # cat("NSCH data will be sampled to reduce file size and speed up Mplus execution.\n")
+  # cat("Recommended: 1000 records per year (total: 2000 records)\n")
+  # cat("Enter sample size per year, or 'all' for complete datasets\n\n")
+  #
+  # nsch_sample_size <- readline(prompt = "NSCH sample size per year (default: 1000): ")
+  #
+  # if (nsch_sample_size == "" || is.na(nsch_sample_size)) {
+  #   nsch_sample_size <- 1000
+  #   cat(sprintf("        Using default: %d records per year\n\n", nsch_sample_size))
+  # } else if (tolower(nsch_sample_size) %in% c("all", "inf")) {
+  #   nsch_sample_size <- Inf
+  #   cat("        Using all available records\n\n")
+  # } else {
+  #   nsch_sample_size <- as.numeric(nsch_sample_size)
+  #   if (is.na(nsch_sample_size) || nsch_sample_size <= 0) {
+  #     stop("Invalid sample size. Must be positive number or 'all'")
+  #   }
+  #   cat(sprintf("        Using %d records per year\n\n", nsch_sample_size))
+  # }
+  #
+  # # ===========================================================================
+  # # Step 4: Load NSCH 2021 Data [DISABLED]
+  # # ===========================================================================
+  #
+  # cat(strrep("=", 80), "\n")
+  # cat("STEP 4: LOAD NSCH 2021 DATA\n")
+  # cat(strrep("=", 80), "\n\n")
+  #
+  # cat("[4/10] Loading NSCH 2021 data\n\n")
+  #
+  # # Call recode function (includes all output messages)
+  # nsch21_full <- recode_nsch_2021(codebook_path = codebook_path, db_path = db_path)
+  #
+  # # Apply sampling if needed
+  # if (is.finite(nsch_sample_size) && nrow(nsch21_full) > nsch_sample_size) {
+  #   set.seed(2021)  # Reproducible sampling
+  #   nsch21_data <- nsch21_full %>% dplyr::slice_sample(n = nsch_sample_size)
+  #   cat(sprintf("[INFO] Sampled %d of %d NSCH 2021 records\n\n",
+  #               nrow(nsch21_data), nrow(nsch21_full)))
+  # } else {
+  #   nsch21_data <- nsch21_full
+  #   cat(sprintf("[INFO] Using all %d NSCH 2021 records\n\n", nrow(nsch21_data)))
+  # }
+  #
+  # # Add study identifier (recode function doesn't create this)
+  # nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
+  #
+  # # ===========================================================================
+  # # Step 5: Load NSCH 2022 Data [DISABLED]
+  # # ===========================================================================
+  #
+  # cat(strrep("=", 80), "\n")
+  # cat("STEP 5: LOAD NSCH 2022 DATA\n")
+  # cat(strrep("=", 80), "\n\n")
+  #
+  # cat("[5/10] Loading NSCH 2022 data\n\n")
+  #
+  # # Call recode function (includes all output messages)
+  # nsch22_full <- recode_nsch_2022(codebook_path = codebook_path, db_path = db_path)
+  #
+  # # Apply sampling if needed
+  # if (is.finite(nsch_sample_size) && nrow(nsch22_full) > nsch_sample_size) {
+  #   set.seed(2022)  # Reproducible sampling
+  #   nsch22_data <- nsch22_full %>% dplyr::slice_sample(n = nsch_sample_size)
+  #   cat(sprintf("[INFO] Sampled %d of %d NSCH 2022 records\n\n",
+  #               nrow(nsch22_data), nrow(nsch22_full)))
+  # } else {
+  #   nsch22_data <- nsch22_full
+  #   cat(sprintf("[INFO] Using all %d NSCH 2022 records\n\n", nrow(nsch22_data)))
+  # }
+  #
+  # # Add study identifier (recode function doesn't create this)
+  # nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
 
   # ===========================================================================
-  # Step 4: Load NSCH 2021 Data
+  # Step 3: Combine Datasets & Create Study Indicator (was Step 6)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 4: LOAD NSCH 2021 DATA\n")
+  cat("STEP 3: COMBINE DATASETS & CREATE STUDY INDICATOR\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[4/10] Loading NSCH 2021 data\n\n")
-
-  # Call recode function (includes all output messages)
-  nsch21_full <- recode_nsch_2021(codebook_path = codebook_path, db_path = db_path)
-
-  # Apply sampling if needed
-  if (is.finite(nsch_sample_size) && nrow(nsch21_full) > nsch_sample_size) {
-    set.seed(2021)  # Reproducible sampling
-    nsch21_data <- nsch21_full %>% dplyr::slice_sample(n = nsch_sample_size)
-    cat(sprintf("[INFO] Sampled %d of %d NSCH 2021 records\n\n",
-                nrow(nsch21_data), nrow(nsch21_full)))
-  } else {
-    nsch21_data <- nsch21_full
-    cat(sprintf("[INFO] Using all %d NSCH 2021 records\n\n", nrow(nsch21_data)))
-  }
-
-  # Add study identifier (recode function doesn't create this)
-  nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
-
-  # ===========================================================================
-  # Step 5: Load NSCH 2022 Data
-  # ===========================================================================
-
-  cat(strrep("=", 80), "\n")
-  cat("STEP 5: LOAD NSCH 2022 DATA\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("[5/10] Loading NSCH 2022 data\n\n")
-
-  # Call recode function (includes all output messages)
-  nsch22_full <- recode_nsch_2022(codebook_path = codebook_path, db_path = db_path)
-
-  # Apply sampling if needed
-  if (is.finite(nsch_sample_size) && nrow(nsch22_full) > nsch_sample_size) {
-    set.seed(2022)  # Reproducible sampling
-    nsch22_data <- nsch22_full %>% dplyr::slice_sample(n = nsch_sample_size)
-    cat(sprintf("[INFO] Sampled %d of %d NSCH 2022 records\n\n",
-                nrow(nsch22_data), nrow(nsch22_full)))
-  } else {
-    nsch22_data <- nsch22_full
-    cat(sprintf("[INFO] Using all %d NSCH 2022 records\n\n", nrow(nsch22_data)))
-  }
-
-  # Add study identifier (recode function doesn't create this)
-  nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
-
-  # ===========================================================================
-  # Step 6: Combine Datasets & Create Study Indicator
-  # ===========================================================================
-
-  cat(strrep("=", 80), "\n")
-  cat("STEP 6: COMBINE DATASETS & CREATE STUDY INDICATOR\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("[6/10] Combining all datasets\n")
+  cat("[3/10] Combining all datasets\n")
 
   # Bind all datasets (dplyr::bind_rows matches by column names)
+  # NOTE: NSCH data excluded - see issue documentation
   calibdat <- dplyr::bind_rows(
     historical_data,
-    ne25_data,
-    nsch21_data,
-    nsch22_data
+    ne25_data
+    # nsch21_data,  # EXCLUDED
+    # nsch22_data   # EXCLUDED
   )
 
   cat(sprintf("        Combined %d total records from %d studies\n",
@@ -392,8 +425,8 @@ prepare_calibration_dataset <- function(
         study == "NE20" ~ 1,
         study == "NE22" ~ 2,
         study == "NE25" ~ 3,
-        study == "NSCH21" ~ 5,
-        study == "NSCH22" ~ 6,
+        # study == "NSCH21" ~ 5,  # EXCLUDED
+        # study == "NSCH22" ~ 6,  # EXCLUDED
         study == "USA24" ~ 7,
         .default = NA_real_
       )
@@ -465,14 +498,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 7: Output File Path Prompt
+  # Step 4: Output File Path Prompt (was Step 7)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 7: OUTPUT FILE PATH SPECIFICATION\n")
+  cat("STEP 4: OUTPUT FILE PATH SPECIFICATION\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[7/10] Specify output file path\n\n")
+  cat("[4/8] Specify output file path\n\n")
   cat("Calibration dataset will be written to Mplus .dat format.\n")
   cat("Default location: mplus/calibdat.dat\n\n")
 
@@ -505,23 +538,355 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 8: Write Mplus .dat File
+  # Step 5: Prepare Mplus Data & Quality Validation (was Step 8)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 8: WRITE MPLUS .DAT FILE\n")
+  cat("STEP 5: PREPARE MPLUS DATA & QUALITY VALIDATION\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[8/10] Writing Mplus .dat file\n")
+  cat("[5/8] Preparing Mplus data\n")
 
   # Select columns for Mplus: studynum, id, years, items (alphabetically sorted)
   # Exclude "study" character column - Mplus needs numeric values only
   mplus_cols <- c("studynum", "id", "years", item_cols_sorted)
   mplus_data <- calibdat %>% dplyr::select(dplyr::all_of(mplus_cols))
 
-  cat(sprintf("        Writing %d records x %d columns\n",
+  cat(sprintf("        Prepared %d records x %d columns\n",
               nrow(mplus_data), ncol(mplus_data)))
-  cat(sprintf("        Using MplusAutomation::prepareMplusData()\n"))
+  cat(sprintf("        Columns: studynum, id, years + %d items\n", length(item_cols_sorted)))
+  cat("\n")
+
+  # -------------------------------------------------------------------------
+  # Quality Validation (validate exact data going to Mplus)
+  # -------------------------------------------------------------------------
+
+  cat("        Running comprehensive quality validation on mplus_data...\n\n")
+
+  quality_flags <- tryCatch({
+    # Use mplus_data directly (not reloading from database)
+    # Add study name mapping for by-study validation
+    calibration_data_quality <- mplus_data %>%
+      dplyr::mutate(
+        study = dplyr::case_when(
+          studynum == 1 ~ "NE20",
+          studynum == 2 ~ "NE22",
+          studynum == 3 ~ "NE25",
+          studynum == 5 ~ "NSCH21",
+          studynum == 6 ~ "NSCH22",
+          studynum == 7 ~ "USA24",
+          .default = NA_character_
+        )
+      )
+
+    # Extract item columns (everything except metadata)
+    metadata_cols_quality <- c("studynum", "id", "years", "study")
+    item_cols_quality <- setdiff(names(calibration_data_quality), metadata_cols_quality)
+
+    cat(sprintf("          Validating %d items across %d studies\n",
+                length(item_cols_quality), length(unique(calibration_data_quality$study))))
+
+    # Load codebook for expected categories and instruments
+    codebook_quality <- jsonlite::fromJSON(codebook_path, simplifyVector = FALSE)
+
+    # Extract expected categories from codebook
+    expected_categories <- list()
+    for (item_id in names(codebook_quality$items)) {
+      item <- codebook_quality$items[[item_id]]
+      if (!is.null(item$lexicons$equate)) {
+        equate_name <- item$lexicons$equate
+
+        # Get response set reference
+        response_ref <- NULL
+        if (!is.null(item$content$response_options$ne25)) {
+          response_ref <- item$content$response_options$ne25
+        } else if (!is.null(item$content$response_options$ne22)) {
+          response_ref <- item$content$response_options$ne22
+        } else if (!is.null(item$content$response_options$ne20)) {
+          response_ref <- item$content$response_options$ne20
+        }
+
+        # Extract values from response_sets
+        if (!is.null(response_ref) &&
+            length(response_ref) == 1 &&
+            is.character(response_ref) &&
+            response_ref %in% names(codebook_quality$response_sets)) {
+
+          response_set <- codebook_quality$response_sets[[response_ref]]
+
+          # Extract non-missing numeric values
+          non_missing_values <- sapply(seq_along(response_set), function(i) {
+            opt <- response_set[[i]]
+            is_missing <- !is.null(opt$missing) && opt$missing == TRUE
+            if (!is_missing) {
+              return(as.numeric(opt$value))
+            } else {
+              return(NA)
+            }
+          })
+
+          non_missing_values <- non_missing_values[!is.na(non_missing_values)]
+          expected_categories[[equate_name]] <- sort(non_missing_values)
+        }
+      }
+    }
+
+    # Extract instrument mapping from codebook
+    instrument_lookup <- list()
+    for (item_id in names(codebook_quality$items)) {
+      item <- codebook_quality$items[[item_id]]
+      if (!is.null(item$lexicons$equate)) {
+        equate_name <- item$lexicons$equate
+        if (!is.null(item$instruments) && length(item$instruments) > 0) {
+          instrument_lookup[[equate_name]] <- unlist(item$instruments)
+        }
+      }
+    }
+
+    # Perform quality checks
+    cat("          Quality checks:\n")
+    cat("            [1/3] Category mismatch detection\n")
+    cat("            [2/3] Age-response correlation check (Kidsights items only)\n")
+    cat("            [3/3] Non-sequential values check\n\n")
+
+    # Initialize flags data frame
+    flags <- data.frame(
+      item_id = character(),
+      study = character(),
+      flag_type = character(),
+      flag_severity = character(),
+      observed_categories = character(),
+      expected_categories = character(),
+      correlation_value = numeric(),
+      n_responses = integer(),
+      pct_missing = numeric(),
+      description = character(),
+      stringsAsFactors = FALSE
+    )
+
+    # FLAG 1: Category mismatch detection
+    flag1_count <- 0
+    for (item in item_cols_quality) {
+      if (!item %in% names(expected_categories)) {
+        next
+      }
+
+      expected_vals <- expected_categories[[item]]
+
+      for (study_name in unique(calibration_data_quality$study)) {
+        study_data <- calibration_data_quality %>%
+          dplyr::filter(study == study_name) %>%
+          dplyr::pull(!!item)
+
+        study_data_clean <- study_data[!is.na(study_data)]
+
+        if (length(study_data_clean) == 0) {
+          next
+        }
+
+        observed_vals <- sort(unique(study_data_clean))
+
+        fewer_categories <- all(observed_vals %in% expected_vals) && length(observed_vals) < length(expected_vals)
+        different_categories <- !all(observed_vals %in% expected_vals)
+
+        if (fewer_categories || different_categories) {
+          flag_type_detail <- if (different_categories) {
+            "CATEGORY_MISMATCH_INVALID"
+          } else {
+            "CATEGORY_MISMATCH_FEWER"
+          }
+
+          flag_severity <- if (different_categories) "ERROR" else "WARNING"
+
+          description <- if (different_categories) {
+            sprintf("Invalid values detected: %s (expected: %s)",
+                    paste(setdiff(observed_vals, expected_vals), collapse = ","),
+                    paste(expected_vals, collapse = ","))
+          } else {
+            sprintf("Fewer categories observed (%d/%d): %s (expected: %s)",
+                    length(observed_vals), length(expected_vals),
+                    paste(observed_vals, collapse = ","),
+                    paste(expected_vals, collapse = ","))
+          }
+
+          flags <- rbind(flags, data.frame(
+            item_id = item,
+            study = study_name,
+            flag_type = flag_type_detail,
+            flag_severity = flag_severity,
+            observed_categories = paste(observed_vals, collapse = ","),
+            expected_categories = paste(expected_vals, collapse = ","),
+            correlation_value = NA,
+            n_responses = length(study_data_clean),
+            pct_missing = sum(is.na(study_data)) / length(study_data) * 100,
+            description = description,
+            stringsAsFactors = FALSE
+          ))
+
+          flag1_count <- flag1_count + 1
+        }
+      }
+    }
+
+    # FLAG 2: Negative age-response correlation (Kidsights items only)
+    flag2_count <- 0
+    for (item in item_cols_quality) {
+      # Only check age-gradient for Kidsights Measurement Tool items
+      item_instruments <- instrument_lookup[[item]]
+
+      if (is.null(item_instruments) ||
+          !("Kidsights Measurement Tool" %in% item_instruments)) {
+        next
+      }
+
+      for (study_name in unique(calibration_data_quality$study)) {
+        study_data <- calibration_data_quality %>%
+          dplyr::filter(study == study_name) %>%
+          dplyr::select(years, !!item)
+
+        study_data_clean <- study_data[!is.na(study_data[[item]]), ]
+
+        if (nrow(study_data_clean) < 10) {
+          next
+        }
+
+        cor_value <- cor(study_data_clean$years, study_data_clean[[item]], method = "pearson")
+
+        if (!is.na(cor_value) && cor_value < 0) {
+          flags <- rbind(flags, data.frame(
+            item_id = item,
+            study = study_name,
+            flag_type = "NEGATIVE_CORRELATION",
+            flag_severity = "WARNING",
+            observed_categories = NA,
+            expected_categories = NA,
+            correlation_value = cor_value,
+            n_responses = nrow(study_data_clean),
+            pct_missing = sum(is.na(study_data[[item]])) / nrow(study_data) * 100,
+            description = sprintf("Negative correlation (r = %.3f): Older children score lower", cor_value),
+            stringsAsFactors = FALSE
+          ))
+
+          flag2_count <- flag2_count + 1
+        }
+      }
+    }
+
+    # FLAG 3: Non-sequential response values
+    flag3_count <- 0
+    for (item in item_cols_quality) {
+      for (study_name in unique(calibration_data_quality$study)) {
+        study_data <- calibration_data_quality %>%
+          dplyr::filter(study == study_name) %>%
+          dplyr::pull(!!item)
+
+        study_data_clean <- study_data[!is.na(study_data)]
+
+        if (length(study_data_clean) == 0) {
+          next
+        }
+
+        observed_vals <- sort(unique(study_data_clean))
+
+        if (length(observed_vals) > 1) {
+          diffs <- diff(observed_vals)
+          is_sequential <- all(diffs == 1)
+
+          if (!is_sequential) {
+            flags <- rbind(flags, data.frame(
+              item_id = item,
+              study = study_name,
+              flag_type = "NON_SEQUENTIAL",
+              flag_severity = "WARNING",
+              observed_categories = paste(observed_vals, collapse = ","),
+              expected_categories = NA,
+              correlation_value = NA,
+              n_responses = length(study_data_clean),
+              pct_missing = sum(is.na(study_data)) / length(study_data) * 100,
+              description = sprintf("Non-sequential values: %s (gaps: %s)",
+                                    paste(observed_vals, collapse = ","),
+                                    paste(diffs, collapse = ",")),
+              stringsAsFactors = FALSE
+            ))
+
+            flag3_count <- flag3_count + 1
+          }
+        }
+      }
+    }
+
+    # Write quality flags to CSV
+    quality_output_path <- "docs/irt_scoring/quality_flags.csv"
+
+    if (nrow(flags) > 0) {
+      if (!dir.exists(dirname(quality_output_path))) {
+        dir.create(dirname(quality_output_path), recursive = TRUE)
+      }
+      write.csv(flags, quality_output_path, row.names = FALSE)
+      cat(sprintf("          [WARN] Found %d quality issues:\n", nrow(flags)))
+      cat(sprintf("                 - Category mismatches: %d\n", flag1_count))
+      cat(sprintf("                 - Negative correlations: %d\n", flag2_count))
+      cat(sprintf("                 - Non-sequential values: %d\n", flag3_count))
+      cat(sprintf("          Quality flags: %s\n", quality_output_path))
+    } else {
+      cat("          [OK] No quality issues detected\n")
+    }
+
+    # Generate cross-tabulation: items × response values
+    cat("          Generating item response cross-tabulation...\n")
+
+    # Build cross-tabulation data frame
+    crosstab_list <- list()
+
+    for (item_name in item_cols_quality) {
+      values <- calibration_data_quality[[item_name]]
+      value_counts <- table(values, useNA = "ifany")
+
+      # Create row for this item
+      row_data <- list(item = item_name)
+
+      # Add counts for each observed value
+      for (val_name in names(value_counts)) {
+        col_name <- if (is.na(val_name)) "NA" else paste0("y", val_name)
+        row_data[[col_name]] <- as.integer(value_counts[val_name])
+      }
+
+      crosstab_list[[item_name]] <- row_data
+    }
+
+    # Convert to data frame
+    crosstab_df <- dplyr::bind_rows(crosstab_list)
+
+    # Replace NA with 0 for counts
+    crosstab_df[is.na(crosstab_df)] <- 0
+
+    # Write cross-tabulation to CSV
+    crosstab_output_path <- "docs/irt_scoring/item_response_crosstab.csv"
+
+    if (!dir.exists(dirname(crosstab_output_path))) {
+      dir.create(dirname(crosstab_output_path), recursive = TRUE)
+    }
+
+    write.csv(crosstab_df, crosstab_output_path, row.names = FALSE)
+
+    cat(sprintf("          Cross-tabulation: %s\n", crosstab_output_path))
+    cat(sprintf("          Items: %d, Response columns: %d\n", nrow(crosstab_df), ncol(crosstab_df) - 1))
+
+    flags
+
+  }, error = function(e) {
+    cat(sprintf("          [WARN] Quality validation failed: %s\n", e$message))
+    cat("          Continuing without quality report\n")
+    data.frame()
+  })
+
+  cat("\n")
+
+  # -------------------------------------------------------------------------
+  # Write Mplus Files
+  # -------------------------------------------------------------------------
+
+  cat("        Writing Mplus .dat and .inp files...\n")
   cat(sprintf("        Format: tab-delimited, missing = '.'\n"))
 
   # Use MplusAutomation to create both .dat and .inp files
@@ -567,14 +932,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 9: Insert into DuckDB
+  # Step 6: Insert into DuckDB (was Step 9)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 9: INSERT INTO DUCKDB\n")
+  cat("STEP 6: INSERT INTO DUCKDB\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[9/10] Creating DuckDB table: calibration_dataset_2020_2025\n")
+  cat("[6/8] Creating DuckDB table: calibration_dataset_2020_2025\n")
 
   # Connect to DuckDB (read_only = FALSE for writing)
   conn <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = FALSE)
@@ -631,14 +996,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 10: Summary Report
+  # Step 7: Summary Report (was Step 10)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 10: SUMMARY REPORT\n")
+  cat("STEP 7: SUMMARY REPORT\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[10/12] Generating summary report\n\n")
+  cat("[7/8] Generating summary report\n\n")
 
   # Final record counts by study
   cat("Study Record Counts:\n")
@@ -662,6 +1027,10 @@ prepare_calibration_dataset <- function(
                 study_final$pct[i]))
   }
   cat(sprintf("  %6s              %6d records (100.0%%)\n", "TOTAL", total_records))
+
+  cat("\n")
+  cat("  [NOTE] NSCH 2021 and NSCH 2022 data EXCLUDED due to quality concerns.\n")
+  cat("         See: .github/ISSUE_TEMPLATE/nsch_calibration_data_exclusion.md\n")
 
   # Item coverage summary
   cat("\n")
@@ -737,14 +1106,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 11: Generate Mplus MODEL Syntax
+  # Step 8: Generate Mplus MODEL Syntax (was Step 10)
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 11: GENERATE MPLUS MODEL SYNTAX\n")
+  cat("STEP 8: GENERATE MPLUS MODEL SYNTAX\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[11/12] Generating Mplus MODEL, CONSTRAINT, and PRIOR syntax...\n\n")
+  cat("[8/8] Generating Mplus MODEL, CONSTRAINT, and PRIOR syntax...\n\n")
 
   # Source syntax generation functions
   cat("Loading syntax generation functions...\n")
@@ -776,134 +1145,6 @@ prepare_calibration_dataset <- function(
   cat("     Sheets: MODEL, CONSTRAINT, PRIOR\n\n")
 
   # ===========================================================================
-  # Step 12: Data Quality Validation
-  # ===========================================================================
-
-  cat(strrep("=", 80), "\n")
-  cat("STEP 12: DATA QUALITY VALIDATION\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("[12/12] Running quality validation checks...\n\n")
-
-  # Create a modified validation function that uses the correct table name
-  quality_flags <- tryCatch({
-    # Connect to database
-    conn_quality <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = TRUE)
-
-    # Load calibration data from our table
-    calibration_data_quality <- DBI::dbGetQuery(conn_quality,
-      "SELECT * FROM calibration_dataset_2020_2025")
-
-    DBI::dbDisconnect(conn_quality)
-
-    cat(sprintf("        Loaded %d records for validation\n", nrow(calibration_data_quality)))
-
-    # Extract item columns
-    metadata_cols_quality <- c("study", "studynum", "id", "years")
-    item_cols_quality <- setdiff(names(calibration_data_quality), metadata_cols_quality)
-
-    cat(sprintf("        Validating %d items\n\n", length(item_cols_quality)))
-
-    # Load codebook for expected categories
-    codebook_quality <- jsonlite::fromJSON(codebook_path, simplifyVector = FALSE)
-
-    # Perform quality checks
-    cat("        Running quality checks:\n")
-    cat("          [1/3] Category mismatch detection\n")
-    cat("          [2/3] Age-response correlation check\n")
-    cat("          [3/3] Non-sequential values check\n\n")
-
-    quality_results <- data.frame(
-      item = character(),
-      flag_type = character(),
-      severity = character(),
-      message = character(),
-      stringsAsFactors = FALSE
-    )
-
-    # FLAG 1: Category mismatch (items with < 2 categories)
-    for (item_name in item_cols_quality) {
-      values <- calibration_data_quality[[item_name]]
-      non_na_values <- values[!is.na(values)]
-
-      if (length(non_na_values) > 0) {
-        unique_vals <- length(unique(non_na_values))
-
-        if (unique_vals < 2) {
-          quality_results <- rbind(quality_results, data.frame(
-            item = item_name,
-            flag_type = "CATEGORY_MISMATCH",
-            severity = "ERROR",
-            message = sprintf("Only %d unique value(s). Mplus requires >= 2 categories.", unique_vals),
-            stringsAsFactors = FALSE
-          ))
-        }
-      }
-    }
-
-    # Write quality flags to CSV
-    quality_output_path <- "docs/irt_scoring/quality_flags.csv"
-
-    if (nrow(quality_results) > 0) {
-      if (!dir.exists(dirname(quality_output_path))) {
-        dir.create(dirname(quality_output_path), recursive = TRUE)
-      }
-      write.csv(quality_results, quality_output_path, row.names = FALSE)
-      cat(sprintf("        [WARN] Found %d quality issues\n", nrow(quality_results)))
-      cat(sprintf("        Quality flags written to: %s\n\n", quality_output_path))
-    } else {
-      cat("        [OK] No quality issues detected\n\n")
-    }
-
-    # Generate cross-tabulation: items × response values
-    cat("        Generating item response cross-tabulation...\n")
-
-    # Build cross-tabulation data frame
-    crosstab_list <- list()
-
-    for (item_name in item_cols_quality) {
-      values <- calibration_data_quality[[item_name]]
-      value_counts <- table(values, useNA = "ifany")
-
-      # Create row for this item
-      row_data <- list(item = item_name)
-
-      # Add counts for each observed value
-      for (val_name in names(value_counts)) {
-        col_name <- if (is.na(val_name)) "NA" else paste0("y", val_name)
-        row_data[[col_name]] <- as.integer(value_counts[val_name])
-      }
-
-      crosstab_list[[item_name]] <- row_data
-    }
-
-    # Convert to data frame
-    crosstab_df <- dplyr::bind_rows(crosstab_list)
-
-    # Replace NA with 0 for counts
-    crosstab_df[is.na(crosstab_df)] <- 0
-
-    # Write cross-tabulation to CSV
-    crosstab_output_path <- "docs/irt_scoring/item_response_crosstab.csv"
-
-    if (!dir.exists(dirname(crosstab_output_path))) {
-      dir.create(dirname(crosstab_output_path), recursive = TRUE)
-    }
-
-    write.csv(crosstab_df, crosstab_output_path, row.names = FALSE)
-
-    cat(sprintf("        Cross-tabulation written to: %s\n", crosstab_output_path))
-    cat(sprintf("        Items: %d, Response columns: %d\n\n", nrow(crosstab_df), ncol(crosstab_df) - 1))
-
-    quality_results
-
-  }, error = function(e) {
-    cat(sprintf("        [WARN] Quality validation failed: %s\n", e$message))
-    cat("        Continuing without quality report\n\n")
-    data.frame()
-  })
-
-  # ===========================================================================
   # Completion
   # ===========================================================================
 
@@ -911,7 +1152,9 @@ prepare_calibration_dataset <- function(
   cat("CALIBRATION DATASET PREPARATION COMPLETE\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[OK] Calibration dataset ready for Mplus IRT recalibration\n\n")
+  cat("[OK] Calibration dataset ready for Mplus IRT recalibration\n")
+  cat(sprintf("[OK] Quality validation: %d flags detected\n", nrow(quality_flags)))
+  cat("\n")
 
   return(invisible(NULL))
 }
