@@ -62,20 +62,44 @@ fluidPage(
     mainPanel(
       width = 9,
 
-      # Item Description
-      htmlOutput("item_description"),
+      tabsetPanel(
+        id = "main_tabs",
 
-      # Quality Flag Warning
-      uiOutput("quality_flag_warning"),
+        # ======================================================================
+        # Tab 1: Correlation Table
+        # ======================================================================
 
-      # Age Gradient Plot
-      plotOutput("age_gradient_plot", height = "600px"),
+        tabPanel(
+          "Correlation Table",
+          br(),
+          p("Age correlations for each item across studies. Negative correlations are highlighted in red."),
+          DT::dataTableOutput("correlation_table")
+        ),
 
-      hr(),
+        # ======================================================================
+        # Tab 2: Age Gradient Plot
+        # ======================================================================
 
-      # Codebook JSON Display
-      h4("Codebook Metadata"),
-      verbatimTextOutput("codebook_json")
+        tabPanel(
+          "Age Gradient Plot",
+          br(),
+
+          # Item Description
+          htmlOutput("item_description"),
+
+          # Quality Flag Warning
+          uiOutput("quality_flag_warning"),
+
+          # Age Gradient Plot
+          plotOutput("age_gradient_plot", height = "600px"),
+
+          hr(),
+
+          # Codebook JSON Display
+          h4("Codebook Metadata"),
+          verbatimTextOutput("codebook_json")
+        )
+      )
     )
   )
 )

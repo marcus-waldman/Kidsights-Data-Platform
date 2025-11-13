@@ -26,6 +26,26 @@ function(input, output, session) {
   })
 
   # ============================================================================
+  # Correlation Table
+  # ============================================================================
+
+  output$correlation_table <- DT::renderDataTable({
+    DT::datatable(
+      corr_matrix,
+      options = list(
+        pageLength = 25,
+        scrollX = TRUE
+      ),
+      rownames = FALSE
+    ) %>%
+      DT::formatRound(columns = 2:6, digits = 3) %>%
+      DT::formatStyle(
+        columns = 2:6,
+        color = DT::styleInterval(0, c('red', 'black'))
+      )
+  })
+
+  # ============================================================================
   # Reactive Data Filtering
   # ============================================================================
 

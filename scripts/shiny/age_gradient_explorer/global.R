@@ -126,4 +126,65 @@ study_colors <- c(
   "USA24" = "#8c564b"   # Brown
 )
 
-cat("Data loading complete!\n\n")
+# ==============================================================================
+# Pre-compute Correlation Table
+# ==============================================================================
+
+cat("Computing age correlations for all items...\n")
+
+# Studies to include (no NSCH data)
+studies_for_corr <- c("NE20", "NE22", "NE25", "USA24")
+
+# Filter out PS (Parenting Stress) items - expected to have negative correlations
+item_cols_filtered <- item_cols[!grepl("^PS", item_cols)]
+
+cat(sprintf("  Filtered out %d PS (Parenting Stress) items\n",
+            length(item_cols) - length(item_cols_filtered)))
+
+# Initialize correlation matrix
+corr_matrix <- data.frame(
+  Item = item_cols_filtered,
+  stringsAsFactors = FALSE
+)
+
+# Calculate correlations for each study
+for (study_name in studies_for_corr) {
+  study_data <- calibration_data[calibration_data$study == study_name, ]
+
+  corr_values <- sapply(item_cols_filtered, function(item) {
+    valid_idx <- !is.na(study_data[[item]]) & !is.na(study_data$years)
+
+    if (sum(valid_idx) >= 30) {
+      cor(study_data$years[valid_idx], study_data[[item]][valid_idx],
+          use = "complete.obs")
+    } else {
+      NA_real_
+    }
+  })
+
+  corr_matrix[[study_name]] <- corr_values
+}
+
+# Calculate pooled correlation (all studies combined)
+corr_matrix[["Pooled"]] <- sapply(item_cols_filtered, function(item) {
+  valid_idx <- !is.na(calibration_data[[item]]) & !is.na(calibration_data$years)
+
+  if (sum(valid_idx) >= 30) {
+    cor(calibration_data$years[valid_idx], calibration_data[[item]][valid_idx],
+        use = "complete.obs")
+  } else {
+    NA_real_
+  }
+})
+
+cat(sprintf("  Computed correlations for %d items across %d studies + pooled\n",
+            nrow(corr_matrix), length(studies_for_corr)))
+
+# Debug: Check data structure
+cat(sprintf("  corr_matrix dimensions: %d rows x %d columns\n",
+            nrow(corr_matrix), ncol(corr_matrix)))
+cat(sprintf("  Column names: %s\n", paste(names(corr_matrix), collapse = ", ")))
+cat("  First 3 rows:\n")
+print(head(corr_matrix, 3))
+
+cat("\nData loading complete!\n\n")
