@@ -503,6 +503,27 @@ pip install pyreadstat
 - **Execution Time:** ~5-10 seconds (Step 11)
 - **Purpose:** Optimized source for combined IRT calibration dataset with authenticity weighting
 
+### 🚧 HRTL Scoring - In Development (November 2025)
+- **Status:** **IN DEVELOPMENT** - Functional but pending validation (see GitHub Issue #9)
+- **Framework:** Healthy & Ready to Learn (HRTL) for ages 3-5 school readiness assessment
+- **Components:** 27 items across 5 domains (Early Learning, Health, Motor, Self-Regulation, Social-Emotional)
+- **Functions Created:**
+  - `load_hrtl_codebook()`: Extracts 27 items with age-specific thresholds from codebook.json
+  - `classify_items()`: Applies age-specific thresholds (3, 4, 5 years) to classify item responses
+  - `aggregate_domains()`: Computes domain means using simple averaging with `na.rm=TRUE`
+  - `score_hrtl()`: Overall "Ready for Learning" classification using HRTL logic
+- **Classification Logic:** Child is "Ready" if `(≥4 domains On-Track) AND (0 domains Needs-Support)`
+- **Known Limitations (Issue #9):**
+  - Age-based routing excludes 8/27 items from ages 3-5 (developmentally appropriate)
+  - Motor Development: Only 1/4 items available (DD207)
+  - Early Learning: 6/9 items available
+  - Social-Emotional: 4/6 items available
+- **Interim Approach:** Simple averaging handles missing items; NE25-specific validation needed
+- **Test Results (N=978):** 1.5% Ready, 96.1% Not Ready, 2.4% Insufficient Data
+- **Location:** `R/hrtl/` directory with 4 core functions
+- **Documentation:** `docs/hrtl/hrtl_item_age_contingency.csv` (27 items × 6 ages with stems/lexicons)
+- **Next Steps:** Validate against external criteria, develop NE25-specific norms, integrate into pipeline
+
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
 - **Feather Format:** 3x faster R/Python data exchange, perfect type preservation

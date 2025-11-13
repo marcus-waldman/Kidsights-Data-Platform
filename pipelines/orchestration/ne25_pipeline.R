@@ -435,6 +435,17 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     message("Applying all transformations (race, education, geographic, age, etc.)...")
     transformed_data <- recode_it(dat = validated_data, dict = combined_dictionary, what = "all")
 
+    # CRITICAL: Apply reverse coding for items where higher values = worse performance
+    # This affects 5 HRTL self-regulation items and ensures correct IRT calibration
+    message("Applying reverse coding to negatively-keyed items...")
+    source("R/transform/reverse_code_items.R")
+    transformed_data <- reverse_code_items(
+      dat = transformed_data,
+      codebook_path = "codebook/data/codebook.json",
+      lexicon_name = "ne25",
+      verbose = TRUE
+    )
+
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
 
