@@ -1,11 +1,11 @@
 {
   "metadata": {
-    "version": "2.9",
+    "version": "2.12",
     "generated_date": "2025-11-10 08:57:02",
     "source_file": "codebook.csv",
     "total_items": 309,
     "conversion_script": "scripts/codebook/initial_conversion.R",
-    "last_update": "Added instruments field (GSED-PF vs Kidsights Measurement Tool)"
+    "last_update": "Added hrtl_thresholds.years with age-specific on_track and emerging thresholds for 27 HRTL items"
   },
   "items": {
     "AA4": {
@@ -10769,11 +10769,15 @@
     },
     "CQFA002": {
       "id": 262,
-      "studies": "NE25",
+      "studies": [
+        "NE25",
+        "CAHMI22"
+      ],
       "lexicons": {
         "equate": "CQFA002",
         "kidsight": "CQFA002",
-        "ne25": "CQFA002"
+        "ne25": "CQFA002",
+        "cahmi22": "K2Q01"
       },
       "content": {
         "stems": {
@@ -10799,7 +10803,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Health"
       },
       "age_range": [
         0,
@@ -10825,15 +10830,35 @@
       },
       "instruments": [
         "Healthy and Ready to Learn"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "CQR014X": {
       "id": 260,
-      "studies": "NE25",
+      "studies": [
+        "NE25",
+        "CAHMI22"
+      ],
       "lexicons": {
         "equate": "CQR014X",
         "kidsight": "CQR014X",
-        "ne25": "CQR014X"
+        "ne25": "CQR014X",
+        "cahmi22": "HCABILITY"
       },
       "content": {
         "stems": {
@@ -10859,7 +10884,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Health"
       },
       "age_range": [
         0,
@@ -10885,7 +10911,23 @@
       },
       "instruments": [
         "Healthy and Ready to Learn"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 2,
+            "emerging": 1
+          }
+        }
+      }
     },
     "DD10": {
       "id": 116,
@@ -12010,7 +12052,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -12051,7 +12094,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 3
+          }
+        }
+      }
     },
     "DD207": {
       "id": 124,
@@ -12063,7 +12122,10 @@
         "equate": "DD207",
         "kidsight": "DD207",
         "ne25": "NOM042X",
-        "cahmi22": "BOUNCEABALL"
+        "cahmi22": [
+          "BOUNCEBALL",
+          "BOUNCEABALL"
+        ]
       },
       "content": {
         "stems": {
@@ -12090,7 +12152,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Motor Development"
       },
       "age_range": [
         0,
@@ -12130,7 +12193,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 2,
+            "emerging": 1
+          }
+        }
+      }
     },
     "DD221": {
       "id": 125,
@@ -12249,7 +12328,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Self-Regulation"
       },
       "age_range": [
         0,
@@ -12296,7 +12376,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG1_1": {
       "id": 133,
@@ -13362,7 +13458,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -13404,7 +13501,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG5b": {
       "id": 251,
@@ -15211,7 +15324,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -15262,7 +15376,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG16a_1": {
       "id": 147,
@@ -15303,7 +15433,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -15351,7 +15482,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG16a_2": {
       "id": 148,
@@ -16450,7 +16597,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -16492,7 +16640,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 3
+          }
+        }
+      }
     },
     "EG20b_1": {
       "id": 163,
@@ -17109,7 +17273,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -17151,7 +17316,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 3
+          }
+        }
+      }
     },
     "EG21b": {
       "id": 170,
@@ -17370,7 +17551,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -17415,7 +17597,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG23a": {
       "id": 173,
@@ -17454,7 +17652,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -17496,7 +17695,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG23b": {
       "id": 174,
@@ -17678,7 +17893,10 @@
         "equate": "EG24b",
         "kidsight": "DD052x",
         "ne25": "NOM052Y",
-        "cahmi22": "TEMPER_R"
+        "cahmi22": [
+          "TEMPERR",
+          "TEMPER_R"
+        ]
       },
       "content": {
         "stems": {
@@ -17705,7 +17923,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Self-Regulation"
       },
       "age_range": [
         0,
@@ -17750,7 +17969,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG25a": {
       "id": 177,
@@ -17764,7 +17999,10 @@
         "kidsight": "DD060x",
         "ne25": "NOM060Y",
         "cahmi22": "CALMDOWN_R",
-        "cahmi21": "CALMDOWN"
+        "cahmi21": [
+          "CALMDOWNR",
+          "CALMDOWN"
+        ]
       },
       "content": {
         "stems": {
@@ -17791,7 +18029,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Self-Regulation"
       },
       "age_range": [
         0,
@@ -17839,7 +18078,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG25b": {
       "id": 178,
@@ -18031,7 +18286,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Self-Regulation"
       },
       "age_range": [
         0,
@@ -18076,7 +18332,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG27a": {
       "id": 181,
@@ -18454,7 +18726,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -18502,7 +18775,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG28b": {
       "id": 186,
@@ -18703,7 +18992,10 @@
         "equate": "EG29a",
         "kidsight": "DD26x",
         "ne25": "NOM026X",
-        "cahmi22": "RECOGABC",
+        "cahmi22": [
+          "RECOGLETTER",
+          "RECOGABC"
+        ],
         "cahmi21": "RECOGABC"
       },
       "content": {
@@ -18731,7 +19023,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -18779,7 +19072,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG29b": {
       "id": 189,
@@ -18981,7 +19290,10 @@
         "equate": "EG30a",
         "kidsight": "DD27x",
         "ne25": "NOM029X",
-        "cahmi22": "DRAWACIRCLE"
+        "cahmi22": [
+          "DRAWCIRCLE",
+          "DRAWACIRCLE"
+        ]
       },
       "content": {
         "stems": {
@@ -19008,7 +19320,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Motor Development"
       },
       "age_range": [
         0,
@@ -19052,7 +19365,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG30b": {
       "id": 194,
@@ -19814,7 +20143,10 @@
         "equate": "EG32a",
         "kidsight": "DD33x",
         "ne25": "NOM033X",
-        "cahmi22": "DRAWAFACE"
+        "cahmi22": [
+          "DRAWFACE",
+          "DRAWAFACE"
+        ]
       },
       "content": {
         "stems": {
@@ -19841,7 +20173,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Motor Development"
       },
       "age_range": [
         0,
@@ -19882,7 +20215,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG32b": {
       "id": 203,
@@ -19984,7 +20333,10 @@
         "equate": "EG33a",
         "kidsight": "DD34x",
         "ne25": "NOM034X",
-        "cahmi22": "DRAWAPERSON"
+        "cahmi22": [
+          "DRAWPERSON",
+          "DRAWAPERSON"
+        ]
       },
       "content": {
         "stems": {
@@ -20011,7 +20363,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Motor Development"
       },
       "age_range": [
         0,
@@ -20052,7 +20405,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG33b": {
       "id": 205,
@@ -20731,7 +21100,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -20786,7 +21156,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG37_2": {
       "id": 213,
@@ -20909,7 +21295,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -20951,7 +21338,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG38b": {
       "id": 215,
@@ -21178,7 +21581,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Self-Regulation"
       },
       "age_range": [
         0,
@@ -21220,7 +21624,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG39b": {
       "id": 218,
@@ -21673,7 +22093,10 @@
         "equate": "EG42a",
         "kidsight": "DD213",
         "ne25": "NOM005X",
-        "cahmi22": "RHYMEWORD_R"
+        "cahmi22": [
+          "RHYMEWORDR",
+          "RHYMEWORD_R"
+        ]
       },
       "content": {
         "stems": {
@@ -21700,7 +22123,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -21741,7 +22165,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "5": {
+            "on_track": 2,
+            "emerging": 1
+          }
+        }
+      }
     },
     "EG42b": {
       "id": 224,
@@ -21954,7 +22394,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Social-Emotional Development"
       },
       "age_range": [
         0,
@@ -21996,7 +22437,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 4,
+            "emerging": 3
+          }
+        }
+      }
     },
     "EG43a_2": {
       "id": 227,
@@ -22443,7 +22900,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Early Learning Skills"
       },
       "age_range": [
         0,
@@ -22485,7 +22943,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 1,
+            "emerging": 0
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "EG45_2": {
       "id": 232,
@@ -23835,11 +24309,15 @@
     },
     "NOM044": {
       "id": 261,
-      "studies": "NE25",
+      "studies": [
+        "NE25",
+        "CAHMI22"
+      ],
       "lexicons": {
         "equate": "NOM044",
         "kidsight": "NOM044",
-        "ne25": "NOM044"
+        "ne25": "NOM044",
+        "cahmi22": "HCEXTENT"
       },
       "content": {
         "stems": {
@@ -23865,7 +24343,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Health"
       },
       "age_range": [
         0,
@@ -23895,11 +24374,15 @@
     },
     "NOM046X": {
       "id": 263,
-      "studies": "NE25",
+      "studies": [
+        "NE25",
+        "CAHMI22"
+      ],
       "lexicons": {
         "equate": "NOM046X",
         "kidsight": "NOM046X",
-        "ne25": "NOM046X"
+        "ne25": "NOM046X",
+        "cahmi22": "K2Q01_D"
       },
       "content": {
         "stems": {
@@ -23925,7 +24408,8 @@
             "CAHMI22",
             "CAHMI21"
           ]
-        }
+        },
+        "hrtl22": "Health"
       },
       "age_range": [
         0,
@@ -23951,7 +24435,23 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "4": {
+            "on_track": 3,
+            "emerging": 2
+          },
+          "5": {
+            "on_track": 3,
+            "emerging": 2
+          }
+        }
+      }
     },
     "PS001": {
       "id": 2001,
@@ -26574,6 +27074,81 @@
       "instruments": [
         "GSED-PF"
       ]
+    },
+    "DAILYACT": {
+      "id": 2047,
+      "age_range": [
+        36,
+        72
+      ],
+      "instruments": [
+        "Healthy and Ready to Learn"
+      ],
+      "lexicons": {
+        "cahmi22": "DAILYACT",
+        "equate": "DAILYACT"
+      },
+      "studies": [
+        "CAHMI22"
+      ],
+      "domains": {
+        "cahmi": {
+          "studies": [
+            "CAHMI22",
+            "CAHMI21"
+          ],
+          "value": "health"
+        },
+        "hrtl22": "Health"
+      },
+      "content": {
+        "stems": {
+          "combined": "Does this child have health conditions that consistently and often greatly affect their daily activities during the past 12 months?",
+          "cahmi22": "Does this child have health conditions that consistently and often greatly affect their daily activities during the past 12 months?"
+        },
+        "response_options": {
+          "cahmi22": "hrtl_dailyact_cahmi22"
+        },
+        "derivation": {
+          "type": "composite",
+          "components": [
+            "HCABILITY",
+            "HCEXTENT"
+          ],
+          "codebook_items": [
+            "CQR014X",
+            "NOM044"
+          ],
+          "description": "Derived from HCABILITY (health conditions affect ability) and HCEXTENT (extent of health impact)"
+        }
+      },
+      "hrtl_thresholds": {
+        "years": {
+          "3": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "4": {
+            "on_track": 2,
+            "emerging": 1
+          },
+          "5": {
+            "on_track": 2,
+            "emerging": 1
+          }
+        }
+      },
+      "scoring": {
+        "reverse": false
+      },
+      "psychometric": {
+        "calibration_item": false
+      },
+      "metadata": {
+        "added_date": "2025-11-13",
+        "modified_date": "2025-11-13",
+        "notes": "Composite variable derived from HCABILITY and HCEXTENT for HRTL22 scoring"
+      }
     }
   },
   "response_sets": {
@@ -28427,6 +29002,24 @@
       {
         "value": 2,
         "label": "Often"
+      }
+    ],
+    "hrtl_dailyact_cahmi22": [
+      {
+        "value": 0,
+        "label": "Do not have any health conditions"
+      },
+      {
+        "value": 1,
+        "label": "Daily activities never affected"
+      },
+      {
+        "value": 2,
+        "label": "Daily activities moderately affected some of time"
+      },
+      {
+        "value": 3,
+        "label": "Daily activities consistently affected, often a great deal"
       }
     ]
   },
