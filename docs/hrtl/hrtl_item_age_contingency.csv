@@ -1,0 +1,28 @@
+domain,item,stem,ne25,0,1,2,3,4,5,Total
+Early Learning Skills,DD205,"How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks?",NOM2205,6,28,330,480,464,522,1830
+Early Learning Skills,EG28a,"How often can this child write his or her first name, even if some of the letters aren't quite right or are backwards?",NOM024X,5,11,177,269,243,262,967
+Early Learning Skills,EG15_2,"How often can this child recognize the beginning sound of a word? For example, can this child tell you that the word ""ball"" starts with the ""buh"" sound?",NOM002X,5,11,177,269,242,262,966
+Early Learning Skills,EG22_2,"How often can this child correctly do simple addition? For example, can this child tell you that two blocks and three blocks add to a total of five blocks?",NOM018X,5,11,177,268,242,260,963
+Early Learning Skills,EG42a,"How well can this child come up with words that rhyme? For example, can this child come up with ""cat"" and ""mat?""",NOM005X,5,11,177,268,242,260,963
+Early Learning Skills,EG45_1,"How often can this child come up with words that start with the same sound? For example, can this child come up with ""sock"" and ""sun?""",NOM003X,5,11,177,268,242,260,963
+Early Learning Skills,EG21a,"How often can this child read one-digit numbers? For example, can this child read the numbers 2 or 8?",NOM017X,5,27,219,1,1,0,253
+Early Learning Skills,EG20a,"If asked to count objects, how high can this child count correctly?",NOM014X,5,12,182,1,0,0,200
+Early Learning Skills,EG29a,About how many letters of the alphabet can this child recognize?,NOM026X,5,11,182,1,0,0,199
+Health,NOM046X,How would you describe the condition of this child's teeth?,NOM046X,289,438,559,496,475,533,2790
+Health,CQFA002,"In general, how would you describe this child's health?",CQFA002,287,439,557,496,476,532,2787
+Health,CQR014X,"DURING THE PAST 12 MONTHS, how often have this child's health conditions or problems affected their ability to do things other children their age do?",CQR014X,289,439,558,494,474,532,2786
+Motor Development,DD207,How well can this child bounce a ball for several seconds?,NOM042X,6,28,332,481,469,525,1841
+Motor Development,EG32a,How well can this child draw a face with eyes and mouth?,NOM033X,5,16,205,1,0,0,227
+Motor Development,EG30a,How well can this child draw a circle?,NOM029X,5,12,182,1,0,0,200
+Motor Development,EG33a,"How well can this child draw a person with a head, body, arms, and legs?",NOM034X,5,11,182,1,0,0,199
+Self-Regulation,EG39a,How often does this child have difficulty waiting for their turn?,NOM056X,6,28,332,481,469,525,1841
+Self-Regulation,EG25a,How often does this child have trouble calming down?,NOM060Y,6,28,331,480,469,525,1839
+Self-Regulation,EG26b,How often does this child have difficulty when asked to end one activity and start a new activity?,NOM062Y,6,28,331,480,468,524,1837
+Self-Regulation,DD299,How often does this child get easily distracted?,NOM054X,5,27,330,480,461,521,1824
+Self-Regulation,EG24b,How often does this child lose their temper?,NOM052Y,5,27,330,480,461,521,1824
+Social-Emotional Development,EG5a,"How often can this child focus on a task you give them for at least a few minutes? For example, can this child focus on simple chores?",NOM2202,6,28,331,480,465,522,1832
+Social-Emotional Development,EG23a,How often does this child share toys or games with other children?,NOM2208,6,28,330,480,464,522,1830
+Social-Emotional Development,EG38a,How often can this child recognize and name their own emotions?,NOM053X,5,11,179,270,245,263,973
+Social-Emotional Development,EG37_1,How often does this child show concern when they see others are hurt or unhappy?,NOM059,1,19,155,217,228,267,887
+Social-Emotional Development,EG43a_1,How often can this child explain things they have seen or done so that you know what happened?,NOM006X,5,16,205,1,0,0,227
+Social-Emotional Development,EG16a_1,How often does this child play well with other children?,NOM049X,9,47,0,0,0,0,56
