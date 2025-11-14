@@ -70,10 +70,10 @@
 #' - Output file path specification (default: mplus/calibdat.dat)
 #'
 #' Expected output dimensions:
-#' - Records: ~47,000 (varies by NSCH sample size)
+#' - Records: ~47,000-49,000 (varies by NSCH sample size)
 #' - Columns: 419 (studynum, id, years, 416 items)
-#' - File size: ~38-40 MB
-#' - Execution time: ~30 seconds
+#' - File size: ~38-42 MB
+#' - Execution time: ~30-35 seconds
 #'
 #' @examples
 #' \dontrun{
@@ -255,6 +255,47 @@ prepare_calibration_dataset <- function(
 
   cat(sprintf("        Loaded %d eligible and authentic records\n", nrow(ne25_raw)))
 
+  # Calculate Mahalanobis distance for multivariate outlier detection
+  cat("        Calculating Mahalanobis distance for outlier filtering\n")
+
+  # Mean vector (mu)
+  mu <- c(
+    mean(ne25_raw$authenticity_eta_holdout, na.rm = TRUE),
+    mean(ne25_raw$authenticity_avg_logpost, na.rm = TRUE)
+  )
+
+  # Covariance matrix (sigma)
+  sigma <- ne25_raw %>%
+    dplyr::select(authenticity_eta_holdout, authenticity_avg_logpost) %>%
+    cov(use = "complete.obs")
+
+  # Calculate Mahalanobis distance for each observation
+  ne25_raw <- ne25_raw %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(
+      dmaha = stats::mahalanobis(
+        c(authenticity_eta_holdout, authenticity_avg_logpost),
+        center = mu,
+        cov = sigma
+      )
+    ) %>%
+    dplyr::ungroup()
+
+  # Filter to 95th percentile (exclude top 5% outliers)
+  p95 <- quantile(ne25_raw$dmaha, 0.95, na.rm = TRUE)
+  records_before <- nrow(ne25_raw)
+  ne25_raw <- ne25_raw %>%
+    dplyr::filter(dmaha <= p95 | is.na(dmaha))
+  records_after <- nrow(ne25_raw)
+  records_excluded <- records_before - records_after
+
+  cat(sprintf("        Filtered to dmaha <= 95th percentile (%.2f): %d records retained (%.1f%%)\n",
+              p95, records_after, 100 * records_after / records_before))
+  if (records_excluded > 0) {
+    cat(sprintf("        Excluded %d multivariate outliers\n",
+                records_excluded))
+  }
+
   # Extract and rename items
   ne25_item_cols <- intersect(tolower(names(ne25_raw)), names(ne25_to_equate))
 
@@ -284,134 +325,104 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # STEPS 3-5 SKIPPED: NSCH Data Excluded Due to Quality Concerns
-  # ===========================================================================
-  #
-  # NSCH 2021 and 2022 data have been excluded from calibration due to
-  # systematic negative age correlations detected in quality validation.
-  #
-  # Issue: 26 of 30 NSCH 2021 items show negative correlations with age,
-  # including strong magnitudes (|r| > 0.5) for ability items like:
-  #   - TELLSTORY (r = -0.659)
-  #   - WRITENAME (r = -0.649)
-  #   - ASKQUESTION2 (r = -0.574)
-  #
-  # Investigation confirmed correct reverse coding implementation, suggesting
-  # fundamental measurement artifacts in NSCH "how often" response scales.
-  #
-  # See: .github/ISSUE_TEMPLATE/nsch_calibration_data_exclusion.md
-  #
-  # To re-enable NSCH data:
-  #   1. Uncomment Steps 3-5 below
-  #   2. Add nsch21_data and nsch22_data to bind_rows() in Step 6
-  #   3. Re-add NSCH21 (5) and NSCH22 (6) to studynum case_when
-  #
+  # Step 3: NSCH Sample Size Prompt
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("[STEPS 3-5 SKIPPED: NSCH data excluded - see issue documentation]\n")
+  cat("STEP 3: NSCH SAMPLE SIZE SELECTION\n")
   cat(strrep("=", 80), "\n\n")
 
-  # # ===========================================================================
-  # # Step 3: NSCH Sample Size Prompt [DISABLED]
-  # # ===========================================================================
-  #
-  # cat(strrep("=", 80), "\n")
-  # cat("STEP 3: NSCH SAMPLE SIZE SELECTION\n")
-  # cat(strrep("=", 80), "\n\n")
-  #
-  # cat("[3/10] Select NSCH sample size\n\n")
-  # cat("NSCH data will be sampled to reduce file size and speed up Mplus execution.\n")
-  # cat("Recommended: 1000 records per year (total: 2000 records)\n")
-  # cat("Enter sample size per year, or 'all' for complete datasets\n\n")
-  #
-  # nsch_sample_size <- readline(prompt = "NSCH sample size per year (default: 1000): ")
-  #
-  # if (nsch_sample_size == "" || is.na(nsch_sample_size)) {
-  #   nsch_sample_size <- 1000
-  #   cat(sprintf("        Using default: %d records per year\n\n", nsch_sample_size))
-  # } else if (tolower(nsch_sample_size) %in% c("all", "inf")) {
-  #   nsch_sample_size <- Inf
-  #   cat("        Using all available records\n\n")
-  # } else {
-  #   nsch_sample_size <- as.numeric(nsch_sample_size)
-  #   if (is.na(nsch_sample_size) || nsch_sample_size <= 0) {
-  #     stop("Invalid sample size. Must be positive number or 'all'")
-  #   }
-  #   cat(sprintf("        Using %d records per year\n\n", nsch_sample_size))
-  # }
-  #
-  # # ===========================================================================
-  # # Step 4: Load NSCH 2021 Data [DISABLED]
-  # # ===========================================================================
-  #
-  # cat(strrep("=", 80), "\n")
-  # cat("STEP 4: LOAD NSCH 2021 DATA\n")
-  # cat(strrep("=", 80), "\n\n")
-  #
-  # cat("[4/10] Loading NSCH 2021 data\n\n")
-  #
-  # # Call recode function (includes all output messages)
-  # nsch21_full <- recode_nsch_2021(codebook_path = codebook_path, db_path = db_path)
-  #
-  # # Apply sampling if needed
-  # if (is.finite(nsch_sample_size) && nrow(nsch21_full) > nsch_sample_size) {
-  #   set.seed(2021)  # Reproducible sampling
-  #   nsch21_data <- nsch21_full %>% dplyr::slice_sample(n = nsch_sample_size)
-  #   cat(sprintf("[INFO] Sampled %d of %d NSCH 2021 records\n\n",
-  #               nrow(nsch21_data), nrow(nsch21_full)))
-  # } else {
-  #   nsch21_data <- nsch21_full
-  #   cat(sprintf("[INFO] Using all %d NSCH 2021 records\n\n", nrow(nsch21_data)))
-  # }
-  #
-  # # Add study identifier (recode function doesn't create this)
-  # nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
-  #
-  # # ===========================================================================
-  # # Step 5: Load NSCH 2022 Data [DISABLED]
-  # # ===========================================================================
-  #
-  # cat(strrep("=", 80), "\n")
-  # cat("STEP 5: LOAD NSCH 2022 DATA\n")
-  # cat(strrep("=", 80), "\n\n")
-  #
-  # cat("[5/10] Loading NSCH 2022 data\n\n")
-  #
-  # # Call recode function (includes all output messages)
-  # nsch22_full <- recode_nsch_2022(codebook_path = codebook_path, db_path = db_path)
-  #
-  # # Apply sampling if needed
-  # if (is.finite(nsch_sample_size) && nrow(nsch22_full) > nsch_sample_size) {
-  #   set.seed(2022)  # Reproducible sampling
-  #   nsch22_data <- nsch22_full %>% dplyr::slice_sample(n = nsch_sample_size)
-  #   cat(sprintf("[INFO] Sampled %d of %d NSCH 2022 records\n\n",
-  #               nrow(nsch22_data), nrow(nsch22_full)))
-  # } else {
-  #   nsch22_data <- nsch22_full
-  #   cat(sprintf("[INFO] Using all %d NSCH 2022 records\n\n", nrow(nsch22_data)))
-  # }
-  #
-  # # Add study identifier (recode function doesn't create this)
-  # nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
+  cat("[3/10] Select NSCH sample size\n\n")
+  cat("NSCH data will be sampled to reduce file size and speed up Mplus execution.\n")
+  cat("Recommended: 1000 records per year (total: 2000 records)\n")
+  cat("Enter sample size per year, or 'all' for complete datasets\n\n")
+
+  nsch_sample_size <- readline(prompt = "NSCH sample size per year (default: 1000): ")
+
+  if (nsch_sample_size == "" || is.na(nsch_sample_size)) {
+    nsch_sample_size <- 1000
+    cat(sprintf("        Using default: %d records per year\n\n", nsch_sample_size))
+  } else if (tolower(nsch_sample_size) %in% c("all", "inf")) {
+    nsch_sample_size <- Inf
+    cat("        Using all available records\n\n")
+  } else {
+    nsch_sample_size <- as.numeric(nsch_sample_size)
+    if (is.na(nsch_sample_size) || nsch_sample_size <= 0) {
+      stop("Invalid sample size. Must be positive number or 'all'")
+    }
+    cat(sprintf("        Using %d records per year\n\n", nsch_sample_size))
+  }
 
   # ===========================================================================
-  # Step 3: Combine Datasets & Create Study Indicator (was Step 6)
+  # Step 4: Load NSCH 2021 Data
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 3: COMBINE DATASETS & CREATE STUDY INDICATOR\n")
+  cat("STEP 4: LOAD NSCH 2021 DATA\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[3/10] Combining all datasets\n")
+  cat("[4/10] Loading NSCH 2021 data\n\n")
+
+  # Call recode function (includes all output messages)
+  nsch21_full <- recode_nsch_2021(codebook_path = codebook_path, db_path = db_path)
+
+  # Apply sampling if needed
+  if (is.finite(nsch_sample_size) && nrow(nsch21_full) > nsch_sample_size) {
+    set.seed(2021)  # Reproducible sampling
+    nsch21_data <- nsch21_full %>% dplyr::slice_sample(n = nsch_sample_size)
+    cat(sprintf("[INFO] Sampled %d of %d NSCH 2021 records\n\n",
+                nrow(nsch21_data), nrow(nsch21_full)))
+  } else {
+    nsch21_data <- nsch21_full
+    cat(sprintf("[INFO] Using all %d NSCH 2021 records\n\n", nrow(nsch21_data)))
+  }
+
+  # Add study identifier (recode function doesn't create this)
+  nsch21_data <- nsch21_data %>% dplyr::mutate(study = "NSCH21")
+
+  # ===========================================================================
+  # Step 5: Load NSCH 2022 Data
+  # ===========================================================================
+
+  cat(strrep("=", 80), "\n")
+  cat("STEP 5: LOAD NSCH 2022 DATA\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("[5/10] Loading NSCH 2022 data\n\n")
+
+  # Call recode function (includes all output messages)
+  nsch22_full <- recode_nsch_2022(codebook_path = codebook_path, db_path = db_path)
+
+  # Apply sampling if needed
+  if (is.finite(nsch_sample_size) && nrow(nsch22_full) > nsch_sample_size) {
+    set.seed(2022)  # Reproducible sampling
+    nsch22_data <- nsch22_full %>% dplyr::slice_sample(n = nsch_sample_size)
+    cat(sprintf("[INFO] Sampled %d of %d NSCH 2022 records\n\n",
+                nrow(nsch22_data), nrow(nsch22_full)))
+  } else {
+    nsch22_data <- nsch22_full
+    cat(sprintf("[INFO] Using all %d NSCH 2022 records\n\n", nrow(nsch22_data)))
+  }
+
+  # Add study identifier (recode function doesn't create this)
+  nsch22_data <- nsch22_data %>% dplyr::mutate(study = "NSCH22")
+
+  # ===========================================================================
+  # Step 6: Combine Datasets & Create Study Indicator
+  # ===========================================================================
+
+  cat(strrep("=", 80), "\n")
+  cat("STEP 6: COMBINE DATASETS & CREATE STUDY INDICATOR\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("[6/10] Combining all datasets\n")
 
   # Bind all datasets (dplyr::bind_rows matches by column names)
-  # NOTE: NSCH data excluded - see issue documentation
   calibdat <- dplyr::bind_rows(
     historical_data,
-    ne25_data
-    # nsch21_data,  # EXCLUDED
-    # nsch22_data   # EXCLUDED
+    ne25_data,
+    nsch21_data,
+    nsch22_data
   )
 
   cat(sprintf("        Combined %d total records from %d studies\n",
@@ -425,8 +436,8 @@ prepare_calibration_dataset <- function(
         study == "NE20" ~ 1,
         study == "NE22" ~ 2,
         study == "NE25" ~ 3,
-        # study == "NSCH21" ~ 5,  # EXCLUDED
-        # study == "NSCH22" ~ 6,  # EXCLUDED
+        study == "NSCH21" ~ 5,
+        study == "NSCH22" ~ 6,
         study == "USA24" ~ 7,
         .default = NA_real_
       )
@@ -498,14 +509,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 4: Output File Path Prompt (was Step 7)
+  # Step 7: Output File Path Prompt
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 4: OUTPUT FILE PATH SPECIFICATION\n")
+  cat("STEP 7: OUTPUT FILE PATH SPECIFICATION\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[4/8] Specify output file path\n\n")
+  cat("[7/10] Specify output file path\n\n")
   cat("Calibration dataset will be written to Mplus .dat format.\n")
   cat("Default location: mplus/calibdat.dat\n\n")
 
@@ -538,14 +549,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 5: Prepare Mplus Data & Quality Validation (was Step 8)
+  # Step 8: Prepare Mplus Data & Quality Validation
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 5: PREPARE MPLUS DATA & QUALITY VALIDATION\n")
+  cat("STEP 8: PREPARE MPLUS DATA & QUALITY VALIDATION\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[5/8] Preparing Mplus data\n")
+  cat("[8/10] Preparing Mplus data\n")
 
   # Select columns for Mplus: studynum, id, years, items (alphabetically sorted)
   # Exclude "study" character column - Mplus needs numeric values only
@@ -932,14 +943,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 6: Insert into DuckDB (was Step 9)
+  # Step 9: Insert into DuckDB
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 6: INSERT INTO DUCKDB\n")
+  cat("STEP 9: INSERT INTO DUCKDB\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[6/8] Creating DuckDB table: calibration_dataset_2020_2025\n")
+  cat("[9/10] Creating DuckDB table: calibration_dataset_2020_2025\n")
 
   # Connect to DuckDB (read_only = FALSE for writing)
   conn <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = FALSE)
@@ -996,14 +1007,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 7: Summary Report (was Step 10)
+  # Step 10: Summary Report
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 7: SUMMARY REPORT\n")
+  cat("STEP 10: SUMMARY REPORT\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[7/8] Generating summary report\n\n")
+  cat("[10/10] Generating summary report\n\n")
 
   # Final record counts by study
   cat("Study Record Counts:\n")
@@ -1027,10 +1038,6 @@ prepare_calibration_dataset <- function(
                 study_final$pct[i]))
   }
   cat(sprintf("  %6s              %6d records (100.0%%)\n", "TOTAL", total_records))
-
-  cat("\n")
-  cat("  [NOTE] NSCH 2021 and NSCH 2022 data EXCLUDED due to quality concerns.\n")
-  cat("         See: .github/ISSUE_TEMPLATE/nsch_calibration_data_exclusion.md\n")
 
   # Item coverage summary
   cat("\n")
@@ -1106,14 +1113,14 @@ prepare_calibration_dataset <- function(
   cat("\n")
 
   # ===========================================================================
-  # Step 8: Generate Mplus MODEL Syntax (was Step 10)
+  # Step 11: Generate Mplus MODEL Syntax
   # ===========================================================================
 
   cat(strrep("=", 80), "\n")
-  cat("STEP 8: GENERATE MPLUS MODEL SYNTAX\n")
+  cat("STEP 11: GENERATE MPLUS MODEL SYNTAX\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("[8/8] Generating Mplus MODEL, CONSTRAINT, and PRIOR syntax...\n\n")
+  cat("[11/11] Generating Mplus MODEL, CONSTRAINT, and PRIOR syntax...\n\n")
 
   # Source syntax generation functions
   cat("Loading syntax generation functions...\n")
