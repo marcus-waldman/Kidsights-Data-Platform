@@ -53,6 +53,9 @@ YEAR_TO_FILE = {
     2023: "NSCH_2023e_Topical_CAHMI_DRC.sav"
 }
 
+# Years with harmonization support (codebook lexicons available)
+HARMONIZE_YEARS = [2021, 2022]
+
 
 def parse_arguments() -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -335,6 +338,53 @@ def run_data_insertion(year: int, database: str, verbose: bool = False) -> bool:
         return False
 
 
+def run_harmonization(year: int, database: str, verbose: bool = False) -> bool:
+    """Run harmonization (add lex_equate columns).
+
+    Args:
+        year: Survey year
+        database: Database path
+        verbose: Enable verbose output
+
+    Returns:
+        True if successful
+    """
+    print(f"  [STEP 5/5] Harmonization (adding lex_equate columns)...")
+
+    cmd = [
+        "python",
+        "pipelines/python/nsch/harmonize_nsch_data.py",
+        "--year", str(year),
+        "--database", database
+    ]
+
+    if verbose:
+        cmd.append("--verbose")
+
+    # Set environment with PYTHONPATH
+    import os
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "."
+
+    try:
+        result = subprocess.run(
+            cmd,
+            check=True,
+            capture_output=not verbose,
+            text=True,
+            env=env
+        )
+
+        print(f"    [OK] Harmonization complete")
+        return True
+
+    except subprocess.CalledProcessError as e:
+        print(f"    [FAIL] Harmonization failed: {e}")
+        if not verbose and e.stdout:
+            print(f"    Output: {e.stdout[-200:]}")
+        return False
+
+
 def process_year(
     year: int,
     database: str,
@@ -396,6 +446,16 @@ def process_year(
     else:
         results["steps_failed"].append("data_insertion")
         return results
+
+    # Step 5: Harmonization (only for years with codebook lexicons)
+    if year in HARMONIZE_YEARS:
+        if run_harmonization(year, database, verbose):
+            results["steps_completed"].append("harmonization")
+        else:
+            results["steps_failed"].append("harmonization")
+            return results
+    else:
+        print(f"  [SKIP] Harmonization not available for {year} (no codebook lexicons)")
 
     # Calculate elapsed time
     end_time = datetime.now()
