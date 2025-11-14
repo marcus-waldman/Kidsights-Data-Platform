@@ -1,0 +1,1658 @@
+{
+  "total_items": 42,
+  "items_with_labels": 41,
+  "items_without_labels": 0,
+  "items_not_in_spss": 1,
+  "response_sets": {
+    "ONEWORD": {
+      "item_key": "DD201",
+      "ne25_var": "DD201",
+      "item_id": 121,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "DIRECTIONS": {
+      "item_key": "DD203",
+      "ne25_var": "DD203",
+      "item_id": 122,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "GROUPOFOBJECTS": {
+      "item_key": "DD205",
+      "ne25_var": "NOM2205",
+      "item_id": 123,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "BOUNCEABALL": {
+      "item_key": "DD207",
+      "ne25_var": "NOM042X",
+      "item_id": 124,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot bounce a ball"
+        },
+        {
+          "value": 2,
+          "label": "Not well"
+        },
+        {
+          "value": 3,
+          "label": "Somewhat well"
+        },
+        {
+          "value": 4,
+          "label": "Very well"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "DISTRACTED": {
+      "item_key": "DD299",
+      "ne25_var": "NOM054X",
+      "item_id": 127,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "DIRECTIONS2": {
+      "item_key": "EG11_2",
+      "ne25_var": "EG11_2",
+      "item_id": 138,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "TELLSTORY": {
+      "item_key": "EG13b",
+      "ne25_var": "EG13b",
+      "item_id": 142,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "RECOGBEGIN": {
+      "item_key": "EG15_2",
+      "ne25_var": "NOM002X",
+      "item_id": 146,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "PLAYWELL": {
+      "item_key": "EG16a_1",
+      "ne25_var": "NOM049X",
+      "item_id": 147,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "TWOWORDS": {
+      "item_key": "EG2_2",
+      "ne25_var": "EG2_2",
+      "item_id": 161,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "COUNTTO_R": {
+      "item_key": "EG20a",
+      "ne25_var": "NOM014X",
+      "item_id": 162,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot count"
+        },
+        {
+          "value": 2,
+          "label": "Up to five"
+        },
+        {
+          "value": 3,
+          "label": "Up to ten"
+        },
+        {
+          "value": 4,
+          "label": "Up to 20"
+        },
+        {
+          "value": 5,
+          "label": "Up to 30 or more"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "READONEDIGIT": {
+      "item_key": "EG21a",
+      "ne25_var": "NOM017X",
+      "item_id": 169,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "SIMPLEADDITION": {
+      "item_key": "EG22_2",
+      "ne25_var": "NOM018X",
+      "item_id": 172,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "SHARETOYS": {
+      "item_key": "EG23a",
+      "ne25_var": "NOM2208",
+      "item_id": 173,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "TEMPER_R": {
+      "item_key": "EG24b",
+      "ne25_var": "NOM052Y",
+      "item_id": 176,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "CALMDOWN_R": {
+      "item_key": "EG25a",
+      "ne25_var": "NOM060Y",
+      "item_id": 177,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "STARTNEWACT": {
+      "item_key": "EG26b",
+      "ne25_var": "NOM062Y",
+      "item_id": 180,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "WRITENAME": {
+      "item_key": "EG28a",
+      "ne25_var": "NOM024X",
+      "item_id": 185,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "RECOGABC": {
+      "item_key": "EG29a",
+      "ne25_var": "NOM026X",
+      "item_id": 188,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "All of them"
+        },
+        {
+          "value": 2,
+          "label": "Most of them"
+        },
+        {
+          "value": 3,
+          "label": "About half of them"
+        },
+        {
+          "value": 4,
+          "label": "Some of them"
+        },
+        {
+          "value": 5,
+          "label": "None of them"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "THREEWORDS": {
+      "item_key": "EG3_2",
+      "ne25_var": "EG3_2",
+      "item_id": 192,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "DRAWACIRCLE": {
+      "item_key": "EG30a",
+      "ne25_var": "NOM029X",
+      "item_id": 193,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot draw a circle"
+        },
+        {
+          "value": 2,
+          "label": "Not well"
+        },
+        {
+          "value": 3,
+          "label": "Somewhat well"
+        },
+        {
+          "value": 4,
+          "label": "Very well"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "DRAWAFACE": {
+      "item_key": "EG32a",
+      "ne25_var": "NOM033X",
+      "item_id": 202,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot draw a face"
+        },
+        {
+          "value": 2,
+          "label": "Not well"
+        },
+        {
+          "value": 3,
+          "label": "Somewhat well"
+        },
+        {
+          "value": 4,
+          "label": "Very well"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "DRAWAPERSON": {
+      "item_key": "EG33a",
+      "ne25_var": "NOM034X",
+      "item_id": 204,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot draw a person"
+        },
+        {
+          "value": 2,
+          "label": "Not well"
+        },
+        {
+          "value": 3,
+          "label": "Somewhat well"
+        },
+        {
+          "value": 4,
+          "label": "Very well"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "HURTSAD": {
+      "item_key": "EG37_1",
+      "ne25_var": "NOM059",
+      "item_id": 212,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "NAMEEMOTIONS": {
+      "item_key": "EG38a",
+      "ne25_var": "NOM053X",
+      "item_id": 214,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "WAITFORTURN": {
+      "item_key": "EG39a",
+      "ne25_var": "NOM056X",
+      "item_id": 217,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "HARDWORK": {
+      "item_key": "EG40_1",
+      "ne25_var": "NOM059X",
+      "item_id": 219,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "K6Q73_R": {
+      "item_key": "EG41_1",
+      "ne25_var": "NOM061X",
+      "item_id": 221,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Usually"
+        },
+        {
+          "value": 3,
+          "label": "Sometimes"
+        },
+        {
+          "value": 4,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "RHYMEWORD_R": {
+      "item_key": "EG42a",
+      "ne25_var": "NOM005X",
+      "item_id": 223,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot rhyme"
+        },
+        {
+          "value": 2,
+          "label": "Not well"
+        },
+        {
+          "value": 3,
+          "label": "Somewhat well"
+        },
+        {
+          "value": 4,
+          "label": "Very well"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 8
+    },
+    "CLEAREXP": {
+      "item_key": "EG43a_1",
+      "ne25_var": "NOM006X",
+      "item_id": 226,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "UNDERSTAND2": {
+      "item_key": "EG44_1",
+      "ne25_var": "NOM001",
+      "item_id": 229,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "SAMESOUND": {
+      "item_key": "EG45_1",
+      "ne25_var": "NOM003X",
+      "item_id": 231,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "ASKQUESTION": {
+      "item_key": "EG4a_2",
+      "ne25_var": "EG4a_2",
+      "item_id": 245,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "ASKQUESTION2": {
+      "item_key": "EG4b_1",
+      "ne25_var": "EG4b_1",
+      "item_id": 246,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "POINT": {
+      "item_key": "EG50a",
+      "ne25_var": "EG50a",
+      "item_id": 248,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "FOCUSON": {
+      "item_key": "EG5a",
+      "ne25_var": "NOM2202",
+      "item_id": 250,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "UNDERSTAND": {
+      "item_key": "EG9b",
+      "ne25_var": "EG9b",
+      "item_id": 259,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 6
+    },
+    "HCABILITY": {
+      "item_key": "CQR014X",
+      "ne25_var": "CQR014X",
+      "item_id": 260,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child does not have any health conditions"
+        },
+        {
+          "value": 2,
+          "label": "Never"
+        },
+        {
+          "value": 3,
+          "label": "Sometimes"
+        },
+        {
+          "value": 4,
+          "label": "Usually"
+        },
+        {
+          "value": 5,
+          "label": "Always"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "HCEXTENT": {
+      "item_key": "NOM044",
+      "ne25_var": "NOM044",
+      "item_id": 261,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Very little"
+        },
+        {
+          "value": 2,
+          "label": "Somewhat"
+        },
+        {
+          "value": 3,
+          "label": "A great deal"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 7
+    },
+    "K2Q01": {
+      "item_key": "CQFA002",
+      "ne25_var": "CQFA002",
+      "item_id": 262,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Excellent"
+        },
+        {
+          "value": 2,
+          "label": "Very Good"
+        },
+        {
+          "value": 3,
+          "label": "Good"
+        },
+        {
+          "value": 4,
+          "label": "Fair"
+        },
+        {
+          "value": 5,
+          "label": "Poor"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 9
+    },
+    "K2Q01_D": {
+      "item_key": "NOM046X",
+      "ne25_var": "NOM046X",
+      "item_id": 263,
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Excellent"
+        },
+        {
+          "value": 2,
+          "label": "Very Good"
+        },
+        {
+          "value": 3,
+          "label": "Good"
+        },
+        {
+          "value": 4,
+          "label": "Fair"
+        },
+        {
+          "value": 5,
+          "label": "Poor"
+        },
+        {
+          "value": 6,
+          "label": "This child does not have any teeth [T1 only]"
+        },
+        {
+          "value": 90,
+          "label": "Not in universe"
+        },
+        {
+          "value": 95,
+          "label": "Logical skip"
+        },
+        {
+          "value": 96,
+          "label": "Suppressed for confidentiality"
+        },
+        {
+          "value": 99,
+          "label": "No valid response"
+        }
+      ],
+      "n_categories": 10
+    }
+  },
+  "missing_vars": [
+    [
+      "DAILYACT"
+    ]
+  ],
+  "no_labels": []
+}

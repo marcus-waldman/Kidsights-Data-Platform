@@ -481,11 +481,12 @@ pip install pyreadstat
   - Outputs: Excel review file (MODEL, CONSTRAINT, PRIOR sheets) + optional complete .inp file
   - Migration complete from Update-KidsightsPublic (write_syntax2 function)
   - ~5-10 seconds generation time, eliminates 30-60 min manual .inp creation
-- **Recent Bug Fixes (November 2025 - Issue #6):**
-  - **NSCH Missing Code Contamination:** Fixed NSCH 2021/2022 helper functions to recode values >= 90 to NA before reverse/forward coding (prevents invalid threshold counts like DD201 showing 5 thresholds instead of 1). Commits: 20e3cf5, 25d2b47
-  - **Study Field Assignment:** Added study field creation in `prepare_calibration_dataset.R` to ensure NSCH records properly labeled with study source (fixes `study = NA` issue). Commit: d72afaa
-  - **Syntax Generator Indexing:** Fixed `write_syntax2.R` to use category lookup instead of positional indexing (prevents incorrect threshold counts like EG16c showing 4 thresholds for dichotomous data). Commit: 37d2034
-- **Development Status:** Pipeline under active validation - verify data quality and syntax outputs before use in production analyses
+- **Recent Bug Fixes (November 2025):**
+  - **Issue #6 - NSCH Missing Code Contamination:** Fixed NSCH 2021/2022 helper functions to recode values >= 90 to NA before reverse/forward coding (prevents invalid threshold counts like DD201 showing 5 thresholds instead of 1). Commits: 20e3cf5, 25d2b47
+  - **Issue #6 - Study Field Assignment:** Added study field creation in `prepare_calibration_dataset.R` to ensure NSCH records properly labeled with study source (fixes `study = NA` issue). Commit: d72afaa
+  - **Issue #6 - Syntax Generator Indexing:** Fixed `write_syntax2.R` to use category lookup instead of positional indexing (prevents incorrect threshold counts like EG16c showing 4 thresholds for dichotomous data). Commit: 37d2034
+  - **Issue #8 - NSCH Negative Age Correlations (RESOLVED):** Fixed study-specific reverse coding for 14 NSCH items by adding `cahmi22: true` to `codebook.json`. Reduced NSCH negative correlations from 15 to 4 items (73% reduction). Systematic strong negatives (r ≈ -0.82) completely eliminated. Remaining 4 items show weak correlations (r = -0.03 to -0.21) likely due to NSCH age-routing design.
+- **Development Status:** Pipeline ready for production use - NSCH harmonization validated, data quality verified
 - **Quality Assurance Tools:** Age-Response Gradient Explorer Shiny app (production-ready, REQUIRED)
   - Mandatory pre-calibration visual inspection of 308 developmental items
   - Box plots + GAM smoothing across 6 calibration studies

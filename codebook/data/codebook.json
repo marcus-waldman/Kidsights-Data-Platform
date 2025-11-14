@@ -11888,7 +11888,8 @@
       "scoring": {
         "reverse": false,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -11982,7 +11983,8 @@
       "scoring": {
         "reverse": false,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -12267,7 +12269,10 @@
         72
       ],
       "scoring": {
-        "reverse": true
+        "reverse": true,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -12773,7 +12778,8 @@
         "reverse": false,
         "equate_group": 2,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -12982,7 +12988,8 @@
         "reverse": false,
         "equate_group": 3,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -13187,7 +13194,8 @@
         "reverse": false,
         "equate_group": 4,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -13301,7 +13309,8 @@
         "reverse": false,
         "equate_group": 4,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -14300,7 +14309,8 @@
         "reverse": false,
         "equate_group": 9,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -14669,7 +14679,8 @@
         "reverse": false,
         "equate_group": 11,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -15032,7 +15043,8 @@
         "reverse": false,
         "equate_group": 13,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -17948,7 +17960,7 @@
         "reverse": true,
         "equate_group": 24,
         "reverse_by_study": {
-          "cahmi21": false
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -21940,7 +21952,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 40
+        "equate_group": 40,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -22885,7 +22900,8 @@
         "reverse": false,
         "equate_group": 44,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {
@@ -24359,7 +24375,8 @@
         "reverse": false,
         "equate_group": 50,
         "reverse_by_study": {
-          "cahmi21": true
+          "cahmi21": true,
+          "cahmi22": true
         }
       },
       "psychometric": {

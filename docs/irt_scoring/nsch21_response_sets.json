@@ -1,0 +1,712 @@
+{
+  "total_items": 30,
+  "items_with_labels": 30,
+  "items_without_labels": 0,
+  "response_sets": {
+    "SIMPLEINST": {
+      "item_key": "DD103",
+      "item_id": null,
+      "ne25_var": "NOM103",
+      "cahmi21_var": "SIMPLEINST",
+      "all_lexicons": "SIMPLEINST",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "ONEWORD": {
+      "item_key": "DD201",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "ONEWORD",
+      "all_lexicons": "ONEWORD",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "DIRECTIONS": {
+      "item_key": "DD203",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "DIRECTIONS",
+      "all_lexicons": "DIRECTIONS",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "MAKEFRIEND": {
+      "item_key": "DD221",
+      "item_id": null,
+      "ne25_var": "NOM048X",
+      "cahmi21_var": "MAKEFRIEND",
+      "all_lexicons": "MAKEFRIEND",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "No difficulty"
+        },
+        {
+          "value": 2,
+          "label": "A little difficulty"
+        },
+        {
+          "value": 3,
+          "label": "A lot of difficulty"
+        }
+      ]
+    },
+    "DISTRACTED": {
+      "item_key": "DD299",
+      "item_id": null,
+      "ne25_var": "NOM054X",
+      "cahmi21_var": "DISTRACTED",
+      "all_lexicons": "DISTRACTED",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "TWOWORDS": {
+      "item_key": "EG2_2",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "TWOWORDS",
+      "all_lexicons": "TWOWORDS",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "THREEWORDS": {
+      "item_key": "EG3_2",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "THREEWORDS",
+      "all_lexicons": "THREEWORDS",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "ASKQUESTION": {
+      "item_key": "EG4a_2",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "ASKQUESTION",
+      "all_lexicons": "ASKQUESTION",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "ASKQUESTION2": {
+      "item_key": "EG4b_1",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "ASKQUESTION2",
+      "all_lexicons": "ASKQUESTION2",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "UNDERSTAND": {
+      "item_key": "EG9b",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "UNDERSTAND",
+      "all_lexicons": "UNDERSTAND",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "DIRECTIONS2": {
+      "item_key": "EG11_2",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "DIRECTIONS2",
+      "all_lexicons": "DIRECTIONS2",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "COLOR": {
+      "item_key": "EG12b",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "COLOR",
+      "all_lexicons": "COLOR",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes, all of them"
+        },
+        {
+          "value": 2,
+          "label": "Yes, some of them"
+        },
+        {
+          "value": 3,
+          "label": "No, none of them"
+        }
+      ]
+    },
+    "TELLSTORY": {
+      "item_key": "EG13b",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "TELLSTORY",
+      "all_lexicons": "TELLSTORY",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "RECOGBEGIN": {
+      "item_key": "EG15_2",
+      "item_id": null,
+      "ne25_var": "NOM002X",
+      "cahmi21_var": "RECOGBEGIN",
+      "all_lexicons": "RECOGBEGIN",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "PLAYWELL": {
+      "item_key": "EG16a_1",
+      "item_id": null,
+      "ne25_var": "NOM049X",
+      "cahmi21_var": "PLAYWELL",
+      "all_lexicons": "PLAYWELL",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "WORKTOFIN": {
+      "item_key": "EG17a",
+      "item_id": null,
+      "ne25_var": "NOM102",
+      "cahmi21_var": "WORKTOFIN",
+      "all_lexicons": "WORKTOFIN",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "SITSTILL": {
+      "item_key": "EG18a",
+      "item_id": null,
+      "ne25_var": "NOM104",
+      "cahmi21_var": "SITSTILL",
+      "all_lexicons": "SITSTILL",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "COUNTTO": {
+      "item_key": "EG20b_2",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "COUNTTO",
+      "all_lexicons": "COUNTTO",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "This child cannot count"
+        },
+        {
+          "value": 2,
+          "label": "Up to five"
+        },
+        {
+          "value": 3,
+          "label": "Up to ten"
+        },
+        {
+          "value": 4,
+          "label": "Up to 20"
+        },
+        {
+          "value": 5,
+          "label": "Up to 50"
+        },
+        {
+          "value": 6,
+          "label": "Up to 100 or more"
+        }
+      ]
+    },
+    "TEMPER": {
+      "item_key": "EG24a",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "TEMPER",
+      "all_lexicons": "TEMPER",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "CALMDOWN": {
+      "item_key": "EG25a",
+      "item_id": null,
+      "ne25_var": "NOM060Y",
+      "cahmi21_var": "CALMDOWN",
+      "all_lexicons": [
+        "CALMDOWNR",
+        "CALMDOWN"
+      ],
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "NEWACTIVITY": {
+      "item_key": "EG26a",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "NEWACTIVITY",
+      "all_lexicons": "NEWACTIVITY",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "RECSHAPES": {
+      "item_key": "EG27a",
+      "item_id": null,
+      "ne25_var": "NOM022X",
+      "cahmi21_var": "RECSHAPES",
+      "all_lexicons": "RECSHAPES",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "WRITENAME": {
+      "item_key": "EG28a",
+      "item_id": null,
+      "ne25_var": "NOM024X",
+      "cahmi21_var": "WRITENAME",
+      "all_lexicons": "WRITENAME",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "RECOGABC": {
+      "item_key": "EG29a",
+      "item_id": null,
+      "ne25_var": "NOM026X",
+      "cahmi21_var": "RECOGABC",
+      "all_lexicons": "RECOGABC",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "All of them"
+        },
+        {
+          "value": 2,
+          "label": "Most of them"
+        },
+        {
+          "value": 3,
+          "label": "About half of them"
+        },
+        {
+          "value": 4,
+          "label": "Some of them"
+        },
+        {
+          "value": 5,
+          "label": "None of them"
+        }
+      ]
+    },
+    "USEPENCIL": {
+      "item_key": "EG34a",
+      "item_id": null,
+      "ne25_var": "NOM035X",
+      "cahmi21_var": "USEPENCIL",
+      "all_lexicons": "USEPENCIL",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Uses fingers to hold the pencil"
+        },
+        {
+          "value": 2,
+          "label": "Grips the pencil in their fist"
+        },
+        {
+          "value": 3,
+          "label": "This child cannot hold a pencil"
+        }
+      ]
+    },
+    "HURTSAD": {
+      "item_key": "EG37_2",
+      "item_id": null,
+      "ne25_var": "NOM047X",
+      "cahmi21_var": "HURTSAD",
+      "all_lexicons": "HURTSAD",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Most of the time"
+        },
+        {
+          "value": 3,
+          "label": "About half the time"
+        },
+        {
+          "value": 4,
+          "label": "Sometimes"
+        },
+        {
+          "value": 5,
+          "label": "Never"
+        }
+      ]
+    },
+    "K6Q73_R": {
+      "item_key": "EG41_1",
+      "item_id": null,
+      "ne25_var": "NOM061X",
+      "cahmi21_var": "K6Q73_R",
+      "all_lexicons": "K6Q73_R",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Always"
+        },
+        {
+          "value": 2,
+          "label": "Usually"
+        },
+        {
+          "value": 3,
+          "label": "Sometimes"
+        },
+        {
+          "value": 4,
+          "label": "Never"
+        }
+      ]
+    },
+    "RHYMEWORD": {
+      "item_key": "EG42b",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "RHYMEWORD",
+      "all_lexicons": "RHYMEWORD",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "UNDERSTAND2": {
+      "item_key": "EG44_1",
+      "item_id": null,
+      "ne25_var": "NOM001",
+      "cahmi21_var": "UNDERSTAND2",
+      "all_lexicons": "UNDERSTAND2",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    },
+    "POINT": {
+      "item_key": "EG50a",
+      "item_id": null,
+      "ne25_var": "N/A",
+      "cahmi21_var": "POINT",
+      "all_lexicons": "POINT",
+      "response_set": [
+        {
+          "value": 1,
+          "label": "Yes"
+        },
+        {
+          "value": 2,
+          "label": "No"
+        }
+      ]
+    }
+  }
+}
