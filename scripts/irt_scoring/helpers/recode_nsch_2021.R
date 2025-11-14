@@ -88,8 +88,9 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   cahmi21_mappings <- list()
   for (item_id in names(codebook$items)) {
     item <- codebook$items[[item_id]]
-    if (!is.null(item$lexicons$cahmi21) && nchar(item$lexicons$cahmi21) > 0) {
-      cahmi21_mappings[[item$lexicons$cahmi21]] <- item$lexicons$equate
+    cahmi21_val <- item$lexicons$cahmi21
+    if (!is.null(cahmi21_val) && length(cahmi21_val) == 1 && nchar(cahmi21_val) > 0) {
+      cahmi21_mappings[[cahmi21_val]] <- item$lexicons$equate
     }
   }
 
@@ -121,25 +122,51 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
     stop("Table 'nsch_2021' not found in database")
   }
 
-  # Select only needed columns (age vars + items that exist in both codebook and data)
-  # First check which cahmi21 variables exist in the NSCH data
+  # Check if harmonized columns already exist (Phase 3 optimization)
   all_cols <- DBI::dbGetQuery(conn, "SELECT * FROM nsch_2021 LIMIT 0")
-  available_cahmi21_vars <- intersect(cahmi21_vars, toupper(names(all_cols)))
+  all_col_names <- names(all_cols)
 
-  cat(sprintf("      %d/%d cahmi21 variables found in NSCH 2021 data\n",
-              length(available_cahmi21_vars), length(cahmi21_vars)))
+  # Get lex_equate names from codebook
+  lex_equate_names <- unique(unlist(cahmi21_mappings))
+  available_harmonized <- intersect(lex_equate_names, all_col_names)
 
-  if (length(available_cahmi21_vars) == 0) {
+  use_preharmonized <- length(available_harmonized) >= 25  # At least 25/29 items harmonized
+
+  if (use_preharmonized) {
+    cat("      [FAST PATH] Using pre-harmonized columns from database\n")
+    cat(sprintf("      %d/%d harmonized columns found\n",
+                length(available_harmonized), length(lex_equate_names)))
+
+    # Load harmonized columns directly (much faster)
+    select_cols <- c("HHID", "YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_harmonized)
+    query <- sprintf("SELECT %s FROM nsch_2021", paste(select_cols, collapse = ", "))
+
+    nsch21 <- DBI::dbGetQuery(conn, query)
     DBI::dbDisconnect(conn)
-    stop("No cahmi21 variables found in NSCH 2021 data")
+
+  } else {
+    cat("      [SLOW PATH] Pre-harmonized columns not available, transforming on-demand\n")
+    cat("      (Run harmonization pipeline to enable fast path)\n")
+
+    # Select only needed columns (age vars + items that exist in both codebook and data)
+    # First check which cahmi21 variables exist in the NSCH data
+    available_cahmi21_vars <- intersect(cahmi21_vars, toupper(all_col_names))
+
+    cat(sprintf("      %d/%d cahmi21 variables found in NSCH 2021 data\n",
+                length(available_cahmi21_vars), length(cahmi21_vars)))
+
+    if (length(available_cahmi21_vars) == 0) {
+      DBI::dbDisconnect(conn)
+      stop("No cahmi21 variables found in NSCH 2021 data")
+    }
+
+    # Build query with specific columns (include HHID for unique identifier)
+    select_cols <- c("HHID", "YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_cahmi21_vars)
+    query <- sprintf("SELECT %s FROM nsch_2021", paste(select_cols, collapse = ", "))
+
+    nsch21 <- DBI::dbGetQuery(conn, query)
+    DBI::dbDisconnect(conn)
   }
-
-  # Build query with specific columns (include HHID for unique identifier)
-  select_cols <- c("HHID", "YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_cahmi21_vars)
-  query <- sprintf("SELECT %s FROM nsch_2021", paste(select_cols, collapse = ", "))
-
-  nsch21 <- DBI::dbGetQuery(conn, query)
-  DBI::dbDisconnect(conn)
 
   cat(sprintf("      Loaded %d records with %d columns\n", nrow(nsch21), ncol(nsch21)))
 
@@ -175,9 +202,15 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
 
   cat(sprintf("[4/7] Filtering to children < %d years old\n", age_filter_years))
 
-  nsch21_filtered <- nsch21 %>%
-    dplyr::filter(SC_AGE_YEARS < age_filter_years) %>%
-    dplyr::select(HHID, years, SC_AGE_YEARS, dplyr::any_of(available_cahmi21_vars))
+  if (use_preharmonized) {
+    nsch21_filtered <- nsch21 %>%
+      dplyr::filter(SC_AGE_YEARS < age_filter_years) %>%
+      dplyr::select(HHID, years, SC_AGE_YEARS, dplyr::any_of(available_harmonized))
+  } else {
+    nsch21_filtered <- nsch21 %>%
+      dplyr::filter(SC_AGE_YEARS < age_filter_years) %>%
+      dplyr::select(HHID, years, SC_AGE_YEARS, dplyr::any_of(available_cahmi21_vars))
+  }
 
   cat(sprintf("      %d records remain after age filter\n", nrow(nsch21_filtered)))
 
@@ -185,7 +218,10 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   # Handle Reverse-Coded Items (Using Codebook as Single Source of Truth)
   # ============================================================================
 
-  cat("[5/7] Determining coding direction from codebook\n")
+  if (use_preharmonized) {
+    cat("[5/7] Skipping transformation (using pre-harmonized columns)\n")
+  } else {
+    cat("[5/7] Determining coding direction from codebook\n")
 
   # Build reverse/forward lists from codebook instead of hardcoding
   forwardly_coded21 <- character(0)
@@ -253,6 +289,7 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
       dplyr::across(dplyr::any_of(forwardly_coded21),
                     function(x) x - min(x, na.rm = TRUE))
     )
+  }  # End of slow path transformation
 
   # ============================================================================
   # Filter to Records with Sufficient Data
@@ -261,8 +298,10 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   cat("[6/7] Filtering to records with at least 2 item responses\n")
 
   # Count non-missing items per record
+  item_cols_for_filtering <- if (use_preharmonized) available_harmonized else available_cahmi21_vars
+
   item_counts <- nsch21_filtered %>%
-    dplyr::select(dplyr::any_of(available_cahmi21_vars)) %>%
+    dplyr::select(dplyr::any_of(item_cols_for_filtering)) %>%
     apply(1, function(x) sum(!is.na(x)))
 
   ids_keep <- which(item_counts > 1)
@@ -276,35 +315,50 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   cat(sprintf("      %d records remain after removing missing age\n", nrow(nsch21_filtered)))
 
   # ============================================================================
-  # Map CAHMI21 Names to lex_equate Names
+  # Map CAHMI21 Names to lex_equate Names (Slow Path Only)
   # ============================================================================
 
-  cat("[7/7] Mapping CAHMI21 variable names to lex_equate\n")
+  if (use_preharmonized) {
+    cat("[7/7] Skipping variable renaming (already using lex_equate names)\n")
+  } else {
+    cat("[7/7] Mapping CAHMI21 variable names to lex_equate\n")
 
-  # Create named vector for renaming: new_name = old_name (dplyr::rename format)
-  # Swap: lex_equate (new name) = cahmi21 (old name)
-  rename_mapping <- character()
-  for (cahmi_var in available_cahmi21_vars) {
-    # cahmi21 lexicon values in codebook are uppercase, matching database columns
-    if (cahmi_var %in% names(cahmi21_mappings)) {
-      lex_equate_name <- cahmi21_mappings[[cahmi_var]]
-      rename_mapping[lex_equate_name] <- cahmi_var  # new_name = old_name
+    # Create named vector for renaming: new_name = old_name (dplyr::rename format)
+    # Swap: lex_equate (new name) = cahmi21 (old name)
+    rename_mapping <- character()
+    for (cahmi_var in available_cahmi21_vars) {
+      # cahmi21 lexicon values in codebook are uppercase, matching database columns
+      if (cahmi_var %in% names(cahmi21_mappings)) {
+        lex_equate_name <- cahmi21_mappings[[cahmi_var]]
+        rename_mapping[lex_equate_name] <- cahmi_var  # new_name = old_name
+      }
     }
-  }
 
-  cat(sprintf("      Mapping %d variables to lex_equate names\n", length(rename_mapping)))
+    cat(sprintf("      Mapping %d variables to lex_equate names\n", length(rename_mapping)))
+  }
 
   # Create integer IDs following convention: YYFFFSNNNNNN
   # YY=21, FFF=999 (national), S=0 (NSCH), N=sequential (6 digits)
-  nsch21_final <- nsch21_filtered %>%
-    dplyr::mutate(
-      row_num = dplyr::row_number(),
-      id = 219990000000 + row_num  # 219990000001, 219990000002, etc.
-    ) %>%
-    dplyr::select(-row_num, -HHID) %>%
-    dplyr::rename(!!!rename_mapping) %>%
-    dplyr::relocate(id, years) %>%
-    dplyr::select(-SC_AGE_YEARS)
+  if (use_preharmonized) {
+    nsch21_final <- nsch21_filtered %>%
+      dplyr::mutate(
+        row_num = dplyr::row_number(),
+        id = 219990000000 + row_num  # 219990000001, 219990000002, etc.
+      ) %>%
+      dplyr::select(-row_num, -HHID) %>%
+      dplyr::relocate(id, years) %>%
+      dplyr::select(-SC_AGE_YEARS)
+  } else {
+    nsch21_final <- nsch21_filtered %>%
+      dplyr::mutate(
+        row_num = dplyr::row_number(),
+        id = 219990000000 + row_num  # 219990000001, 219990000002, etc.
+      ) %>%
+      dplyr::select(-row_num, -HHID) %>%
+      dplyr::rename(!!!rename_mapping) %>%
+      dplyr::relocate(id, years) %>%
+      dplyr::select(-SC_AGE_YEARS)
+  }
 
   # ============================================================================
   # Summary and Return
