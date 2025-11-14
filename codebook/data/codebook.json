@@ -10785,7 +10785,8 @@
           "ne25": "In general, how would you describe this child's health?"
         },
         "response_options": {
-          "ne25": "hrtl_health_rating_ne25"
+          "ne25": "hrtl_health_rating_ne25",
+          "cahmi22": "cahmi22_health_rating_5pt"
         }
       },
       "domains": {
@@ -10811,7 +10812,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -10866,7 +10870,8 @@
           "ne25": "DURING THE PAST 12 MONTHS, how often have this child's health conditions or problems affected their ability to do things other children their age do?"
         },
         "response_options": {
-          "ne25": "hrtl_health_impact_ne25"
+          "ne25": "hrtl_health_impact_ne25",
+          "cahmi22": "cahmi22_health_impact_5pt"
         }
       },
       "domains": {
@@ -10892,7 +10897,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -10911,23 +10919,7 @@
       },
       "instruments": [
         "Healthy and Ready to Learn"
-      ],
-      "hrtl_thresholds": {
-        "years": {
-          "3": {
-            "on_track": 2,
-            "emerging": 1
-          },
-          "4": {
-            "on_track": 2,
-            "emerging": 1
-          },
-          "5": {
-            "on_track": 2,
-            "emerging": 1
-          }
-        }
-      }
+      ]
     },
     "DD10": {
       "id": 116,
@@ -11864,7 +11856,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -11953,7 +11946,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -12034,7 +12028,8 @@
           "ne22": "How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_dd205"
+          "ne25": "$ref:ne25_dd205",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -12060,7 +12055,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -12134,7 +12132,8 @@
           "ne22": "How well can this child bounce a ball for several seconds?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_dd207"
+          "ne25": "$ref:ne25_dd207",
+          "cahmi22": "cahmi22_skill_bounceab_4pt"
         }
       },
       "domains": {
@@ -12310,7 +12309,8 @@
           "ne22": "How often does this child get easily distracted?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_dd299"
+          "ne25": "$ref:ne25_dd299",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -12336,7 +12336,10 @@
         72
       ],
       "scoring": {
-        "reverse": true
+        "reverse": true,
+        "reverse_by_study": {
+          "cahmi22": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -12725,7 +12728,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -12929,7 +12933,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -13129,7 +13134,8 @@
               "label": "Yes"
             }
           ],
-          "ne20": "Yes; No"
+          "ne20": "Yes; No",
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -13238,7 +13244,8 @@
               "label": "Yes"
             }
           ],
-          "ne20": "Yes; No"
+          "ne20": "Yes; No",
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -13440,7 +13447,8 @@
           "ne22": "How often can this child focus on a task you give them for at least a few minutes? For example, can this child focus on simple chores?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg5a"
+          "ne25": "$ref:ne25_eg5a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -13467,7 +13475,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 5
+        "equate_group": 5,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -14228,7 +14239,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -14593,7 +14605,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -14946,7 +14959,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -15306,7 +15320,8 @@
           "ne22": "How often can this child recognize the beginning sound of a word? For example, can this child tell you that the word \"ball\" starts with the \"buh\" sound?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg15_2"
+          "ne25": "$ref:ne25_eg15_2",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -15333,7 +15348,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 15
+        "equate_group": 15,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -15415,7 +15433,8 @@
           "ne22": "How often does this child play well with other children?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg16a_1"
+          "ne25": "$ref:ne25_eg16a_1",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -15442,7 +15461,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 16
+        "equate_group": 16,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -16579,7 +16601,8 @@
           "ne22": "If asked to count objects, how high can this child count correctly?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg20a"
+          "ne25": "$ref:ne25_eg20a",
+          "cahmi22": "cahmi22_countto_r_5pt"
         }
       },
       "domains": {
@@ -17255,7 +17278,8 @@
           "ne22": "How often can this child read one-digit numbers? For example, can this child read the numbers 2 or 8?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg21a"
+          "ne25": "$ref:ne25_eg21a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -17282,7 +17306,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 21
+        "equate_group": 21,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -17533,7 +17560,8 @@
           "ne22": "How often can this child correctly do simple addition? For example, can this child tell you that two blocks and three blocks add to a total of five blocks?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg22_2"
+          "ne25": "$ref:ne25_eg22_2",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -17560,7 +17588,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 22
+        "equate_group": 22,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -17634,7 +17665,8 @@
           "ne22": "How often does this child share toys or games with other children?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg23a"
+          "ne25": "$ref:ne25_eg23a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -17661,7 +17693,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 23
+        "equate_group": 23,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -17905,7 +17940,8 @@
           "ne22": "How often does this child lose their temper?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg24b"
+          "ne25": "$ref:ne25_eg24b",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -17932,7 +17968,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 24
+        "equate_group": 24,
+        "reverse_by_study": {
+          "cahmi22": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18011,7 +18050,8 @@
           "ne22": "How often does this child have trouble calming down?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg25a"
+          "ne25": "$ref:ne25_eg25a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -18038,7 +18078,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 25
+        "equate_group": 25,
+        "reverse_by_study": {
+          "cahmi22": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18268,7 +18311,8 @@
           "ne22": "How often does this child have difficulty when asked to end one activity and start a new activity?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg26b"
+          "ne25": "$ref:ne25_eg26b",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -18295,7 +18339,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 26
+        "equate_group": 26,
+        "reverse_by_study": {
+          "cahmi22": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18708,7 +18755,8 @@
           "ne22": "How often can this child write his or her first name, even if some of the letters aren't quite right or are backwards?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg28a"
+          "ne25": "$ref:ne25_eg28a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -18735,7 +18783,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 28
+        "equate_group": 28,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -19005,7 +19056,8 @@
           "ne22": "About how many letters of the alphabet can this child recognize?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg29a"
+          "ne25": "$ref:ne25_eg29a",
+          "cahmi22": "cahmi22_recogabc_5pt"
         }
       },
       "domains": {
@@ -19032,7 +19084,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 29
+        "equate_group": 29,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -19302,7 +19357,8 @@
           "ne22": "How well can this child draw a circle?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg30a"
+          "ne25": "$ref:ne25_eg30a",
+          "cahmi22": "cahmi22_skill_drawacir_4pt"
         }
       },
       "domains": {
@@ -20155,7 +20211,8 @@
           "ne22": "How well can this child draw a face with eyes and mouth?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg32a"
+          "ne25": "$ref:ne25_eg32a",
+          "cahmi22": "cahmi22_skill_drawafac_4pt"
         }
       },
       "domains": {
@@ -20345,7 +20402,8 @@
           "ne22": "How well can this child draw a person with a head, body, arms, and legs?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg33a"
+          "ne25": "$ref:ne25_eg33a",
+          "cahmi22": "cahmi22_skill_drawaper_4pt"
         }
       },
       "domains": {
@@ -21082,7 +21140,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg37_1",
-          "ne20": "None of the time, some of the time, half of the time, most of the time, all of the time"
+          "ne20": "None of the time, some of the time, half of the time, most of the time, all of the time",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -21110,7 +21169,10 @@
       "scoring": {
         "reverse": false,
         "discrepancy": 1,
-        "equate_group": 37
+        "equate_group": 37,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -21277,7 +21339,8 @@
           "ne22": "How often can this child recognize and name their own emotions?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg38a"
+          "ne25": "$ref:ne25_eg38a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -21304,7 +21367,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 38
+        "equate_group": 38,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -21563,7 +21629,8 @@
           "ne22": "How often does this child have difficulty waiting for their turn?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg39a"
+          "ne25": "$ref:ne25_eg39a",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -21590,7 +21657,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 39
+        "equate_group": 39,
+        "reverse_by_study": {
+          "cahmi22": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -21754,7 +21824,8 @@
           "ne22": "How often does this child keep working on a task even when it is hard for them?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg40_1"
+          "ne25": "$ref:ne25_eg40_1",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -21923,7 +21994,8 @@
           "ne22": "Does this child bounce back quickly when things do not go their way?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg41_1"
+          "ne25": "$ref:ne25_eg41_1",
+          "cahmi22": "cahmi22_always_never_4pt"
         }
       },
       "domains": {
@@ -21949,7 +22021,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 41
+        "equate_group": 41,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -22105,7 +22180,8 @@
           "ne22": "How well can this child come up with words that rhyme? For example, can this child come up with \"cat\" and \"mat?\""
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg42a"
+          "ne25": "$ref:ne25_eg42a",
+          "cahmi22": "cahmi22_skill_rhymewor_4pt"
         }
       },
       "domains": {
@@ -22376,7 +22452,8 @@
           "ne22": "How often can this child explain things they have seen or done so that you know what happened?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg43a_1"
+          "ne25": "$ref:ne25_eg43a_1",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -22403,7 +22480,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 43
+        "equate_group": 43,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -22680,7 +22760,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg44_1",
-          "ne20": "Yes; No"
+          "ne20": "Yes; No",
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -22882,7 +22963,8 @@
           "ne22": "How often can this child come up with words that start with the same sound? For example, can this child come up with \"sock\" and \"sun?\""
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg45_1"
+          "ne25": "$ref:ne25_eg45_1",
+          "cahmi22": "cahmi22_always_never_5pt"
         }
       },
       "domains": {
@@ -22909,7 +22991,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 45
+        "equate_group": 45,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -24145,7 +24230,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi22": "cahmi22_binary_yesno"
         }
       },
       "domains": {
@@ -24325,7 +24411,8 @@
           "ne25": "To what extent do this child's health conditions or problems affect their ability to do things? (Only administer if answer is NOT 'This child does not have any health conditions' on CQR014X)"
         },
         "response_options": {
-          "ne25": "hrtl_extent_ne25"
+          "ne25": "hrtl_extent_ne25",
+          "cahmi22": "cahmi22_extent_3pt"
         }
       },
       "domains": {
@@ -24351,7 +24438,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": false,
@@ -24390,7 +24480,8 @@
           "ne25": "How would you describe the condition of this child's teeth?"
         },
         "response_options": {
-          "ne25": "hrtl_dental_ne25"
+          "ne25": "hrtl_dental_ne25",
+          "cahmi22": "cahmi22_dental_rating_5pt"
         }
       },
       "domains": {
@@ -24416,7 +24507,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -27085,7 +27179,7 @@
         "Healthy and Ready to Learn"
       ],
       "lexicons": {
-        "cahmi22": "DAILYACT",
+        "cahmi22": "DailyAct_22",
         "equate": "DAILYACT"
       },
       "studies": [
@@ -27139,7 +27233,10 @@
         }
       },
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi22": true
+        }
       },
       "psychometric": {
         "calibration_item": false
@@ -29020,6 +29117,270 @@
       {
         "value": 3,
         "label": "Daily activities consistently affected, often a great deal"
+      }
+    ],
+    "cahmi22_binary_yesno": [
+      {
+        "value": 1,
+        "label": "Yes"
+      },
+      {
+        "value": 2,
+        "label": "No"
+      }
+    ],
+    "cahmi22_always_never_5pt": [
+      {
+        "value": 1,
+        "label": "Always"
+      },
+      {
+        "value": 2,
+        "label": "Most of the time"
+      },
+      {
+        "value": 3,
+        "label": "About half the time"
+      },
+      {
+        "value": 4,
+        "label": "Sometimes"
+      },
+      {
+        "value": 5,
+        "label": "Never"
+      }
+    ],
+    "cahmi22_skill_bounceab_4pt": [
+      {
+        "value": 1,
+        "label": "This child cannot bounce a ball"
+      },
+      {
+        "value": 2,
+        "label": "Not well"
+      },
+      {
+        "value": 3,
+        "label": "Somewhat well"
+      },
+      {
+        "value": 4,
+        "label": "Very well"
+      }
+    ],
+    "cahmi22_countto_r_5pt": [
+      {
+        "value": 1,
+        "label": "This child cannot count"
+      },
+      {
+        "value": 2,
+        "label": "Up to five"
+      },
+      {
+        "value": 3,
+        "label": "Up to ten"
+      },
+      {
+        "value": 4,
+        "label": "Up to 20"
+      },
+      {
+        "value": 5,
+        "label": "Up to 30 or more"
+      }
+    ],
+    "cahmi22_recogabc_5pt": [
+      {
+        "value": 1,
+        "label": "All of them"
+      },
+      {
+        "value": 2,
+        "label": "Most of them"
+      },
+      {
+        "value": 3,
+        "label": "About half of them"
+      },
+      {
+        "value": 4,
+        "label": "Some of them"
+      },
+      {
+        "value": 5,
+        "label": "None of them"
+      }
+    ],
+    "cahmi22_skill_drawacir_4pt": [
+      {
+        "value": 1,
+        "label": "This child cannot draw a circle"
+      },
+      {
+        "value": 2,
+        "label": "Not well"
+      },
+      {
+        "value": 3,
+        "label": "Somewhat well"
+      },
+      {
+        "value": 4,
+        "label": "Very well"
+      }
+    ],
+    "cahmi22_skill_drawafac_4pt": [
+      {
+        "value": 1,
+        "label": "This child cannot draw a face"
+      },
+      {
+        "value": 2,
+        "label": "Not well"
+      },
+      {
+        "value": 3,
+        "label": "Somewhat well"
+      },
+      {
+        "value": 4,
+        "label": "Very well"
+      }
+    ],
+    "cahmi22_skill_drawaper_4pt": [
+      {
+        "value": 1,
+        "label": "This child cannot draw a person"
+      },
+      {
+        "value": 2,
+        "label": "Not well"
+      },
+      {
+        "value": 3,
+        "label": "Somewhat well"
+      },
+      {
+        "value": 4,
+        "label": "Very well"
+      }
+    ],
+    "cahmi22_always_never_4pt": [
+      {
+        "value": 1,
+        "label": "Always"
+      },
+      {
+        "value": 2,
+        "label": "Usually"
+      },
+      {
+        "value": 3,
+        "label": "Sometimes"
+      },
+      {
+        "value": 4,
+        "label": "Never"
+      }
+    ],
+    "cahmi22_skill_rhymewor_4pt": [
+      {
+        "value": 1,
+        "label": "This child cannot rhyme"
+      },
+      {
+        "value": 2,
+        "label": "Not well"
+      },
+      {
+        "value": 3,
+        "label": "Somewhat well"
+      },
+      {
+        "value": 4,
+        "label": "Very well"
+      }
+    ],
+    "cahmi22_extent_3pt": [
+      {
+        "value": 1,
+        "label": "Very little"
+      },
+      {
+        "value": 2,
+        "label": "Somewhat"
+      },
+      {
+        "value": 3,
+        "label": "A great deal"
+      }
+    ],
+    "cahmi22_health_rating_5pt": [
+      {
+        "value": 1,
+        "label": "Excellent"
+      },
+      {
+        "value": 2,
+        "label": "Very Good"
+      },
+      {
+        "value": 3,
+        "label": "Good"
+      },
+      {
+        "value": 4,
+        "label": "Fair"
+      },
+      {
+        "value": 5,
+        "label": "Poor"
+      }
+    ],
+    "cahmi22_health_impact_5pt": [
+      {
+        "value": 1,
+        "label": "This child does not have any health conditions"
+      },
+      {
+        "value": 2,
+        "label": "Never"
+      },
+      {
+        "value": 3,
+        "label": "Sometimes"
+      },
+      {
+        "value": 4,
+        "label": "Usually"
+      },
+      {
+        "value": 5,
+        "label": "Always"
+      }
+    ],
+    "cahmi22_dental_rating_5pt": [
+      {
+        "value": 1,
+        "label": "Excellent"
+      },
+      {
+        "value": 2,
+        "label": "Very Good"
+      },
+      {
+        "value": 3,
+        "label": "Good"
+      },
+      {
+        "value": 4,
+        "label": "Fair"
+      },
+      {
+        "value": 5,
+        "label": "Poor"
       }
     ]
   },
