@@ -36,14 +36,14 @@
 #' - Structure: id, years, {416 items}
 #'
 #' **NSCH21 Calibration Table:**
-#' - Source: nsch_2021_raw table
+#' - Source: nsch_2021 table
 #' - Filter: age < 6 years, ≥2 item responses
 #' - Records: ~50,000
 #' - Structure: id (HHID), years, {30 items}
 #' - Uses: recode_nsch_2021() helper function
 #'
 #' **NSCH22 Calibration Table:**
-#' - Source: nsch_2022_raw table
+#' - Source: nsch_2022 table
 #' - Filter: age < 6 years, ≥2 item responses
 #' - Records: ~50,000
 #' - Structure: id (HHID), years, {37 items}
@@ -278,8 +278,8 @@ create_calibration_tables <- function(
 
     # Check source table exists
     tables <- DBI::dbGetQuery(conn, "SHOW TABLES")
-    if (!"nsch_2021_raw" %in% tables$name) {
-      cat("[WARN] nsch_2021_raw table not found. Skipping NSCH21.\n")
+    if (!"nsch_2021" %in% tables$name) {
+      cat("[WARN] nsch_2021 table not found. Skipping NSCH21.\n")
       cat("       Run NSCH pipeline first: python scripts/nsch/process_all_years.py --years 2021\n\n")
     } else {
       cat("[1/5] Loading and harmonizing NSCH 2021 data\n")
@@ -354,8 +354,8 @@ create_calibration_tables <- function(
 
     # Check source table exists
     tables <- DBI::dbGetQuery(conn, "SHOW TABLES")
-    if (!"nsch_2022_raw" %in% tables$name) {
-      cat("[WARN] nsch_2022_raw table not found. Skipping NSCH22.\n")
+    if (!"nsch_2022" %in% tables$name) {
+      cat("[WARN] nsch_2022 table not found. Skipping NSCH22.\n")
       cat("       Run NSCH pipeline first: python scripts/nsch/process_all_years.py --years 2022\n\n")
     } else {
       cat("[1/5] Loading and harmonizing NSCH 2022 data\n")

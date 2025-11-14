@@ -250,13 +250,13 @@ def generate_summary(database_path, output_file=None):
         print_header("SAMPLE QUERIES", file=f)
 
         print("\n1. Query all records from a specific year:", file=f)
-        print("   SELECT * FROM nsch_2023_raw LIMIT 10;", file=f)
+        print("   SELECT * FROM nsch_2023 LIMIT 10;", file=f)
 
         print("\n2. Get record count by year:", file=f)
-        print("   SELECT COUNT(*) FROM nsch_2023_raw;", file=f)
+        print("   SELECT COUNT(*) FROM nsch_2023;", file=f)
 
         print("\n3. Query specific variables:", file=f)
-        print("   SELECT HHID, YEAR, SC_AGE_YEARS FROM nsch_2023_raw LIMIT 10;", file=f)
+        print("   SELECT HHID, YEAR, SC_AGE_YEARS FROM nsch_2023 LIMIT 10;", file=f)
 
         print("\n4. Get variable metadata:", file=f)
         print("   SELECT * FROM nsch_variables WHERE year = 2023;", file=f)
@@ -265,11 +265,11 @@ def generate_summary(database_path, output_file=None):
         print("   SELECT * FROM nsch_value_labels WHERE year = 2023 AND variable_name = 'SC_SEX';", file=f)
 
         print("\n6. Cross-year comparison (example):", file=f)
-        print("   SELECT 2017 AS year, COUNT(*) AS count FROM nsch_2017_raw", file=f)
+        print("   SELECT 2017 AS year, COUNT(*) AS count FROM nsch_2017", file=f)
         print("   UNION ALL", file=f)
-        print("   SELECT 2018, COUNT(*) FROM nsch_2018_raw", file=f)
+        print("   SELECT 2018, COUNT(*) FROM nsch_2018", file=f)
         print("   UNION ALL", file=f)
-        print("   SELECT 2019, COUNT(*) FROM nsch_2019_raw;", file=f)
+        print("   SELECT 2019, COUNT(*) FROM nsch_2019;", file=f)
 
         # Data quality notes
         print_header("DATA QUALITY NOTES", file=f)

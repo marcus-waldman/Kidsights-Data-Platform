@@ -17,7 +17,7 @@
 #'
 #' @details
 #' This function performs the following transformations:
-#' 1. Loads NSCH 2022 data from DuckDB table `nsch_2022_raw`
+#' 1. Loads NSCH 2022 data from DuckDB table `nsch_2022`
 #' 2. Maps CAHMI22 variable names to lex_equate names via codebook
 #' 3. Calculates child age in years from birth month/year
 #' 4. Handles reverse-coded items (scales items so higher = more developed)
@@ -118,14 +118,14 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
 
   # Check table exists
   tables <- DBI::dbGetQuery(conn, "SHOW TABLES")
-  if (!"nsch_2022_raw" %in% tables$name) {
+  if (!"nsch_2022" %in% tables$name) {
     DBI::dbDisconnect(conn)
-    stop("Table 'nsch_2022_raw' not found in database")
+    stop("Table 'nsch_2022' not found in database")
   }
 
   # Select only needed columns (age vars + items that exist in both codebook and data)
   # First check which cahmi22 variables exist in the NSCH data
-  all_cols <- DBI::dbGetQuery(conn, "SELECT * FROM nsch_2022_raw LIMIT 0")
+  all_cols <- DBI::dbGetQuery(conn, "SELECT * FROM nsch_2022 LIMIT 0")
   available_cahmi22_vars <- intersect(cahmi22_vars, toupper(names(all_cols)))
 
   cat(sprintf("      %d/%d cahmi22 variables found in NSCH 2022 data\n",
@@ -138,7 +138,7 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
 
   # Build query with specific columns (include HHID for unique identifier)
   select_cols <- c("HHID", "YEAR", "BIRTH_YR", "BIRTH_MO", "SC_AGE_YEARS", available_cahmi22_vars)
-  query <- sprintf("SELECT %s FROM nsch_2022_raw", paste(select_cols, collapse = ", "))
+  query <- sprintf("SELECT %s FROM nsch_2022", paste(select_cols, collapse = ", "))
 
   nsch22 <- DBI::dbGetQuery(conn, query)
   DBI::dbDisconnect(conn)

@@ -49,7 +49,7 @@ nsch_ne_multi <- DBI::dbGetQuery(con, "
     MEDB10ScrQ5_20 as MEDB10ScrQ5,
     K2Q01,
     SC_SEX, SC_RACE_R, SC_HISPANIC_R
-  FROM nsch_2020_raw
+  FROM nsch_2020
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -66,7 +66,7 @@ nsch_ne_multi <- DBI::dbGetQuery(con, "
     MEDB10ScrQ5_21 as MEDB10ScrQ5,
     K2Q01,
     SC_SEX, SC_RACE_R, SC_HISPANIC_R
-  FROM nsch_2021_raw
+  FROM nsch_2021
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -83,7 +83,7 @@ nsch_ne_multi <- DBI::dbGetQuery(con, "
     MEDB10ScrQ5_22 as MEDB10ScrQ5,
     K2Q01,
     SC_SEX, SC_RACE_R, SC_HISPANIC_R
-  FROM nsch_2022_raw
+  FROM nsch_2022
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -100,7 +100,7 @@ nsch_ne_multi <- DBI::dbGetQuery(con, "
     MEDB10ScrQ5_23 as MEDB10ScrQ5,
     K2Q01,
     SC_SEX, SC_RACE_R, SC_HISPANIC_R
-  FROM nsch_2023_raw
+  FROM nsch_2023
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)

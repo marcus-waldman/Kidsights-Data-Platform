@@ -22,7 +22,7 @@ cat("[2] Loading NSCH 2023 Nebraska children (FIPSST=31, ages 0-5)...\n")
 
 nsch_ne <- DBI::dbGetQuery(con, "
   SELECT *
-  FROM nsch_2023_raw
+  FROM nsch_2023
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)

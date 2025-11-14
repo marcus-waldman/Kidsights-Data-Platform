@@ -30,7 +30,7 @@ Command-line Arguments:
     --verbose: Enable verbose logging
 
 Output:
-    - Creates nsch_{year}_raw table in DuckDB
+    - Creates nsch_{year} table in DuckDB
     - Inserts data with progress tracking
     - Generates insertion summary statistics
 
@@ -176,7 +176,7 @@ def load_feather_data(year: int, source: str = "processed") -> pd.DataFrame:
 
 
 def create_nsch_table(conn, year: int, df: pd.DataFrame, mode: str) -> None:
-    """Create nsch_{year}_raw table.
+    """Create nsch_{year} table.
 
     Args:
         conn: DuckDB connection
@@ -184,7 +184,7 @@ def create_nsch_table(conn, year: int, df: pd.DataFrame, mode: str) -> None:
         df: Sample DataFrame for schema inference
         mode: 'replace' or 'append'
     """
-    table_name = f"nsch_{year}_raw"
+    table_name = f"nsch_{year}"
 
     if mode == "replace":
         # Drop table if exists
@@ -221,7 +221,7 @@ def create_indexes(conn, year: int) -> None:
         conn: DuckDB connection
         year: Survey year
     """
-    table_name = f"nsch_{year}_raw"
+    table_name = f"nsch_{year}"
 
     log.info("Creating indexes", table=table_name)
 
@@ -257,7 +257,7 @@ def insert_data_chunked(
     Returns:
         int: Total rows inserted
     """
-    table_name = f"nsch_{year}_raw"
+    table_name = f"nsch_{year}"
     total_rows = len(df)
     num_chunks = (total_rows + chunk_size - 1) // chunk_size
 
@@ -313,7 +313,7 @@ def validate_insertion(conn, year: int, expected_rows: int) -> Dict[str, Any]:
     Returns:
         Dict: Validation results
     """
-    table_name = f"nsch_{year}_raw"
+    table_name = f"nsch_{year}"
 
     log.info("Validating insertion", table=table_name)
 

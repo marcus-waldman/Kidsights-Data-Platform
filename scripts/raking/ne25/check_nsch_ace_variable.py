@@ -9,7 +9,7 @@ db = DatabaseManager()
 
 with db.get_connection() as conn:
     # Look for ACE-related variables
-    cols = conn.execute("DESCRIBE nsch_2023_raw").fetchall()
+    cols = conn.execute("DESCRIBE nsch_2023").fetchall()
     col_names = [c[0] for c in cols]
     
     # Search for ACE patterns

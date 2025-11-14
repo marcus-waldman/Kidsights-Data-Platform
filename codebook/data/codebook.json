@@ -11768,7 +11768,8 @@
           "ne22": "When this child is paying attention, how often can he or she follow instructions to complete a simple task?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_dd103"
+          "ne25": "$ref:ne25_dd103",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -11793,7 +11794,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -11857,7 +11861,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -11881,7 +11886,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -11947,7 +11955,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -11971,7 +11980,10 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": false,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -12229,7 +12241,8 @@
           "ne22": "Compared to other children his or her age, how much difficulty does this child have making or keeping friends?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_dd221"
+          "ne25": "$ref:ne25_dd221",
+          "cahmi21": "cahmi21_difficulty_3pt"
         }
       },
       "domains": {
@@ -12310,7 +12323,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_dd299",
-          "cahmi22": "cahmi22_always_never_5pt"
+          "cahmi22": "cahmi22_always_never_5pt",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -12338,7 +12352,8 @@
       "scoring": {
         "reverse": true,
         "reverse_by_study": {
-          "cahmi22": false
+          "cahmi22": false,
+          "cahmi21": false
         }
       },
       "psychometric": {
@@ -12729,7 +12744,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -12755,7 +12771,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 2
+        "equate_group": 2,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -12934,7 +12953,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -12960,7 +12980,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 3
+        "equate_group": 3,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -13135,7 +13158,8 @@
             }
           ],
           "ne20": "Yes; No",
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -13161,7 +13185,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 4
+        "equate_group": 4,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -13245,7 +13272,8 @@
             }
           ],
           "ne20": "Yes; No",
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -13271,7 +13299,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 4
+        "equate_group": 4,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -14240,7 +14271,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -14266,7 +14298,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 9
+        "equate_group": 9,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -14606,7 +14641,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -14631,7 +14667,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 11
+        "equate_group": 11,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -14778,7 +14817,9 @@
           "combined": "Can this child identify the colors red, yellow, and green by name",
           "ne25": "Can this child identify the colors red, yellow, and green by name"
         },
-        "response_options": []
+        "response_options": {
+          "cahmi21": "cahmi21_color_knowledge_3pt"
+        }
       },
       "domains": {
         "kidsights": {
@@ -14803,7 +14844,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 12
+        "equate_group": 12,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -14960,7 +15004,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -14985,7 +15030,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 13
+        "equate_group": 13,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -15321,7 +15369,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg15_2",
-          "cahmi22": "cahmi22_always_never_5pt"
+          "cahmi22": "cahmi22_always_never_5pt",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -15350,7 +15399,8 @@
         "reverse": false,
         "equate_group": 15,
         "reverse_by_study": {
-          "cahmi22": true
+          "cahmi22": true,
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -15434,7 +15484,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg16a_1",
-          "cahmi22": "cahmi22_always_never_5pt"
+          "cahmi22": "cahmi22_always_never_5pt",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -15463,7 +15514,8 @@
         "reverse": false,
         "equate_group": 16,
         "reverse_by_study": {
-          "cahmi22": true
+          "cahmi22": true,
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -15821,7 +15873,8 @@
           "ne22": "How often does this child keep working at something until he or she is finished?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg17a"
+          "ne25": "$ref:ne25_eg17a",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -15847,7 +15900,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 17
+        "equate_group": 17,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -15991,7 +16047,8 @@
           "ne22": "Compared to other children their age, how often is this child able to sit still?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg18a"
+          "ne25": "$ref:ne25_eg18a",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -16017,7 +16074,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 18
+        "equate_group": 18,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -16795,7 +16855,8 @@
           "ne22": "How high can this child count correctly?"
         },
         "response_options": {
-          "ne20": "Child cannot count, 5, 10, 15, 20, 30"
+          "ne20": "Child cannot count, 5, 10, 15, 20, 30",
+          "cahmi21": "cahmi21_counting_ability_6pt"
         }
       },
       "domains": {
@@ -17859,7 +17920,9 @@
           "combined": "How often does this child lose control of their  temper when things do not go their way?",
           "ne25": "How often does this child lose control of their  temper when things do not go their way?"
         },
-        "response_options": []
+        "response_options": {
+          "cahmi21": "cahmi21_always_never_5pt"
+        }
       },
       "domains": {
         "kidsights": {
@@ -17883,7 +17946,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 24
+        "equate_group": 24,
+        "reverse_by_study": {
+          "cahmi21": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18051,7 +18117,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg25a",
-          "cahmi22": "cahmi22_always_never_5pt"
+          "cahmi22": "cahmi22_always_never_5pt",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -18080,7 +18147,8 @@
         "reverse": true,
         "equate_group": 25,
         "reverse_by_study": {
-          "cahmi22": false
+          "cahmi22": false,
+          "cahmi21": false
         }
       },
       "psychometric": {
@@ -18233,7 +18301,9 @@
           "combined": "How often does this child become angry or anxious when going from one activity to another?",
           "ne25": "How often does this child become angry or anxious when going from one activity to another?"
         },
-        "response_options": []
+        "response_options": {
+          "cahmi21": "cahmi21_always_never_5pt"
+        }
       },
       "domains": {
         "kidsights": {
@@ -18257,7 +18327,10 @@
       ],
       "scoring": {
         "reverse": true,
-        "equate_group": 26
+        "equate_group": 26,
+        "reverse_by_study": {
+          "cahmi21": false
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18416,7 +18489,8 @@
           "ne22": "How often can this child identify basic shapes such as a triangle, circle, or square?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg27a"
+          "ne25": "$ref:ne25_eg27a",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -18442,7 +18516,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 27
+        "equate_group": 27,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -18756,7 +18833,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg28a",
-          "cahmi22": "cahmi22_always_never_5pt"
+          "cahmi22": "cahmi22_always_never_5pt",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -18785,7 +18863,8 @@
         "reverse": false,
         "equate_group": 28,
         "reverse_by_study": {
-          "cahmi22": true
+          "cahmi22": true,
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -19057,7 +19136,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg29a",
-          "cahmi22": "cahmi22_recogabc_5pt"
+          "cahmi22": "cahmi22_recogabc_5pt",
+          "cahmi21": "cahmi21_letter_recognition_5pt"
         }
       },
       "domains": {
@@ -19086,7 +19166,8 @@
         "reverse": false,
         "equate_group": 29,
         "reverse_by_study": {
-          "cahmi22": true
+          "cahmi22": true,
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -20590,7 +20671,8 @@
           "ne22": "How does this child usually hold a pencil?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg34a"
+          "ne25": "$ref:ne25_eg34a",
+          "cahmi21": "cahmi21_pencil_grip_3pt"
         }
       },
       "domains": {
@@ -20616,7 +20698,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 34
+        "equate_group": 34,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -21255,7 +21340,8 @@
           "ne22": "How often does this child show concern when they see others who are hurt or unhappy?"
         },
         "response_options": {
-          "ne25": "$ref:ne25_eg37_2"
+          "ne25": "$ref:ne25_eg37_2",
+          "cahmi21": "cahmi21_always_never_5pt"
         }
       },
       "domains": {
@@ -21281,7 +21367,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 37
+        "equate_group": 37,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -21995,7 +22084,8 @@
         },
         "response_options": {
           "ne25": "$ref:ne25_eg41_1",
-          "cahmi22": "cahmi22_always_never_4pt"
+          "cahmi22": "cahmi22_always_never_4pt",
+          "cahmi21": "cahmi21_always_never_4pt"
         }
       },
       "domains": {
@@ -22023,7 +22113,8 @@
         "reverse": false,
         "equate_group": 41,
         "reverse_by_study": {
-          "cahmi22": true
+          "cahmi22": true,
+          "cahmi21": true
         }
       },
       "psychometric": {
@@ -22282,7 +22373,8 @@
               "value": 1,
               "label": "Yes"
             }
-          ]
+          ],
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -22307,7 +22399,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 42
+        "equate_group": 42,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -22761,7 +22856,8 @@
         "response_options": {
           "ne25": "$ref:ne25_eg44_1",
           "ne20": "Yes; No",
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -22787,7 +22883,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 44
+        "equate_group": 44,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -24231,7 +24330,8 @@
               "label": "Yes"
             }
           ],
-          "cahmi22": "cahmi22_binary_yesno"
+          "cahmi22": "cahmi22_binary_yesno",
+          "cahmi21": "cahmi21_binary_yesno"
         }
       },
       "domains": {
@@ -24257,7 +24357,10 @@
       ],
       "scoring": {
         "reverse": false,
-        "equate_group": 50
+        "equate_group": 50,
+        "reverse_by_study": {
+          "cahmi21": true
+        }
       },
       "psychometric": {
         "calibration_item": true,
@@ -29381,6 +29484,146 @@
       {
         "value": 5,
         "label": "Poor"
+      }
+    ],
+    "cahmi21_always_never_5pt": [
+      {
+        "value": 1,
+        "label": "Always"
+      },
+      {
+        "value": 2,
+        "label": "Most of the time"
+      },
+      {
+        "value": 3,
+        "label": "About half the time"
+      },
+      {
+        "value": 4,
+        "label": "Sometimes"
+      },
+      {
+        "value": 5,
+        "label": "Never"
+      }
+    ],
+    "cahmi21_binary_yesno": [
+      {
+        "value": 1,
+        "label": "Yes"
+      },
+      {
+        "value": 2,
+        "label": "No"
+      }
+    ],
+    "cahmi21_difficulty_3pt": [
+      {
+        "value": 1,
+        "label": "No difficulty"
+      },
+      {
+        "value": 2,
+        "label": "A little difficulty"
+      },
+      {
+        "value": 3,
+        "label": "A lot of difficulty"
+      }
+    ],
+    "cahmi21_color_knowledge_3pt": [
+      {
+        "value": 1,
+        "label": "Yes, all of them"
+      },
+      {
+        "value": 2,
+        "label": "Yes, some of them"
+      },
+      {
+        "value": 3,
+        "label": "No, none of them"
+      }
+    ],
+    "cahmi21_counting_ability_6pt": [
+      {
+        "value": 1,
+        "label": "This child cannot count"
+      },
+      {
+        "value": 2,
+        "label": "Up to five"
+      },
+      {
+        "value": 3,
+        "label": "Up to ten"
+      },
+      {
+        "value": 4,
+        "label": "Up to 20"
+      },
+      {
+        "value": 5,
+        "label": "Up to 50"
+      },
+      {
+        "value": 6,
+        "label": "Up to 100 or more"
+      }
+    ],
+    "cahmi21_letter_recognition_5pt": [
+      {
+        "value": 1,
+        "label": "All of them"
+      },
+      {
+        "value": 2,
+        "label": "Most of them"
+      },
+      {
+        "value": 3,
+        "label": "About half of them"
+      },
+      {
+        "value": 4,
+        "label": "Some of them"
+      },
+      {
+        "value": 5,
+        "label": "None of them"
+      }
+    ],
+    "cahmi21_pencil_grip_3pt": [
+      {
+        "value": 1,
+        "label": "Uses fingers to hold the pencil"
+      },
+      {
+        "value": 2,
+        "label": "Grips the pencil in their fist"
+      },
+      {
+        "value": 3,
+        "label": "This child cannot hold a pencil"
+      }
+    ],
+    "cahmi21_always_never_4pt": [
+      {
+        "value": 1,
+        "label": "Always"
+      },
+      {
+        "value": 2,
+        "label": "Usually"
+      },
+      {
+        "value": 3,
+        "label": "Sometimes"
+      },
+      {
+        "value": 4,
+        "label": "Never"
       }
     ]
   },

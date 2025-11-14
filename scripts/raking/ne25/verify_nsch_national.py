@@ -10,7 +10,7 @@ db = DatabaseManager()
 with db.get_connection() as conn:
     # National sample 0-5
     national = conn.execute("""
-        SELECT COUNT(*) FROM nsch_2023_raw WHERE SC_AGE_YEARS <= 5
+        SELECT COUNT(*) FROM nsch_2023 WHERE SC_AGE_YEARS <= 5
     """).fetchone()[0]
     
     print(f"[INFO] National NSCH 2023 children ages 0-5: {national:,}")

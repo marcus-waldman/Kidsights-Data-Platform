@@ -40,7 +40,7 @@ nsch_ne_care <- DBI::dbGetQuery(con, "
     2020 as survey_year,
     FIPSST, SC_AGE_YEARS, HHID, STRATUM, FWC,
     Care10hrs_20 as Care10hrs
-  FROM nsch_2020_raw
+  FROM nsch_2020
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -54,7 +54,7 @@ nsch_ne_care <- DBI::dbGetQuery(con, "
     2021 as survey_year,
     FIPSST, SC_AGE_YEARS, HHID, STRATUM, FWC,
     Care10hrs_21 as Care10hrs
-  FROM nsch_2021_raw
+  FROM nsch_2021
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -68,7 +68,7 @@ nsch_ne_care <- DBI::dbGetQuery(con, "
     2022 as survey_year,
     FIPSST, SC_AGE_YEARS, HHID, STRATUM, FWC,
     Care10hrs_22 as Care10hrs
-  FROM nsch_2022_raw
+  FROM nsch_2022
   WHERE FIPSST = 31
     AND SC_AGE_YEARS <= 5
     AND SC_AGE_YEARS NOT IN (90, 95, 96, 99)
@@ -148,21 +148,21 @@ con <- DBI::dbConnect(
 care_data <- DBI::dbGetQuery(con, "
   SELECT
     2020 as survey_year, HHID, Care10hrs_20 as Care10hrs
-  FROM nsch_2020_raw
+  FROM nsch_2020
   WHERE FIPSST = 31 AND SC_AGE_YEARS <= 5
 
   UNION ALL
 
   SELECT
     2021 as survey_year, HHID, Care10hrs_21 as Care10hrs
-  FROM nsch_2021_raw
+  FROM nsch_2021
   WHERE FIPSST = 31 AND SC_AGE_YEARS <= 5
 
   UNION ALL
 
   SELECT
     2022 as survey_year, HHID, Care10hrs_22 as Care10hrs
-  FROM nsch_2022_raw
+  FROM nsch_2022
   WHERE FIPSST = 31 AND SC_AGE_YEARS <= 5
 ")
 
@@ -180,9 +180,9 @@ care_data <- care_data %>%
 
 # Merge into bootstrap design variables
 boot_design_full$variables <- boot_design_full$variables %>%
-  dplyr::left_join(
+  safe_left_join(
     care_data %>% dplyr::select(survey_year, HHID, childcare_10hrs),
-    by = c("survey_year", "HHID")
+    by_vars = c("survey_year", "HHID")
   )
 
 # Filter to 2020-2022 with complete childcare data
