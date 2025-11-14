@@ -8,6 +8,11 @@ library(dplyr)
 library(ggplot2)
 library(jsonlite)
 library(DT)
+library(MASS)  # For ordered logit models (polr)
+library(patchwork)  # For combining plots
+
+# Load notes management functions (DuckDB backend)
+source("notes_helpers_db.R")
 
 cat("Loading data...\n")
 
@@ -127,64 +132,106 @@ study_colors <- c(
 )
 
 # ==============================================================================
-# Pre-compute Correlation Table
+# Load Precomputed Models
 # ==============================================================================
 
-cat("Computing age correlations for all items...\n")
+precomputed_models_path <- file.path("precomputed_models.rds")
 
-# Studies to include (no NSCH data)
-studies_for_corr <- c("NE20", "NE22", "NE25", "USA24")
+if (file.exists(precomputed_models_path)) {
+  cat("\nLoading precomputed models from disk...\n")
+  precomputed_models <- readRDS(precomputed_models_path)
+  cat(sprintf("  Loaded models for %d items\n", length(precomputed_models)))
+} else {
+  cat("\n[WARN] Precomputed models not found!\n")
+  cat("  Expected file: ", precomputed_models_path, "\n")
+  cat("  Please run: source('scripts/shiny/age_gradient_explorer/precompute_models.R')\n")
+  cat("  Initializing empty model list (app will have limited functionality)\n")
+  precomputed_models <- list()
+}
 
-# Filter out PS (Parenting Stress) items - expected to have negative correlations
+# ==============================================================================
+# Pre-compute Regression Coefficient Table
+# ==============================================================================
+
+cat("Extracting regression coefficients from precomputed models...\n")
+
+# Studies to include (all studies with calibration data)
+studies_for_coef <- c("NE20", "NE22", "NE25", "NSCH21", "NSCH22", "USA24")
+
+# Filter out PS (Parenting Stress) items - expected to have negative coefficients
 item_cols_filtered <- item_cols[!grepl("^PS", item_cols)]
 
 cat(sprintf("  Filtered out %d PS (Parenting Stress) items\n",
             length(item_cols) - length(item_cols_filtered)))
 
-# Initialize correlation matrix
-corr_matrix <- data.frame(
+# Initialize coefficient tables (full and no_influence)
+coef_table_full <- data.frame(
   Item = item_cols_filtered,
   stringsAsFactors = FALSE
 )
 
-# Calculate correlations for each study
-for (study_name in studies_for_corr) {
-  study_data <- calibration_data[calibration_data$study == study_name, ]
+coef_table_no_influence <- data.frame(
+  Item = item_cols_filtered,
+  stringsAsFactors = FALSE
+)
 
-  corr_values <- sapply(item_cols_filtered, function(item) {
-    valid_idx <- !is.na(study_data[[item]]) & !is.na(study_data$years)
-
-    if (sum(valid_idx) >= 30) {
-      cor(study_data$years[valid_idx], study_data[[item]][valid_idx],
-          use = "complete.obs")
-    } else {
-      NA_real_
-    }
-  })
-
-  corr_matrix[[study_name]] <- corr_values
+# Extract pooled coefficients
+cat("  Extracting pooled coefficients...\n")
+for (item in item_cols_filtered) {
+  if (!is.null(precomputed_models[[item]])) {
+    coef_table_full$Pooled[coef_table_full$Item == item] <-
+      precomputed_models[[item]]$pooled$beta_years
+    # Use 5% threshold for default "no influence" table
+    coef_table_no_influence$Pooled[coef_table_no_influence$Item == item] <-
+      precomputed_models[[item]]$reduced_5pct$beta_years
+  } else {
+    coef_table_full$Pooled[coef_table_full$Item == item] <- NA_real_
+    coef_table_no_influence$Pooled[coef_table_no_influence$Item == item] <- NA_real_
+  }
 }
 
-# Calculate pooled correlation (all studies combined)
-corr_matrix[["Pooled"]] <- sapply(item_cols_filtered, function(item) {
-  valid_idx <- !is.na(calibration_data[[item]]) & !is.na(calibration_data$years)
-
-  if (sum(valid_idx) >= 30) {
-    cor(calibration_data$years[valid_idx], calibration_data[[item]][valid_idx],
-        use = "complete.obs")
-  } else {
-    NA_real_
+# Extract study-specific coefficients
+cat("  Extracting study-specific coefficients...\n")
+for (study_name in studies_for_coef) {
+  for (item in item_cols_filtered) {
+    if (!is.null(precomputed_models[[item]]) &&
+        !is.null(precomputed_models[[item]]$study_specific[[study_name]])) {
+      coef_table_full[[study_name]][coef_table_full$Item == item] <-
+        precomputed_models[[item]]$study_specific[[study_name]]$full$beta_years
+      # Use 5% threshold for default "no influence" table
+      coef_table_no_influence[[study_name]][coef_table_no_influence$Item == item] <-
+        precomputed_models[[item]]$study_specific[[study_name]]$reduced_5pct$beta_years
+    } else {
+      coef_table_full[[study_name]][coef_table_full$Item == item] <- NA_real_
+      coef_table_no_influence[[study_name]][coef_table_no_influence$Item == item] <- NA_real_
+    }
   }
-})
+}
 
-cat(sprintf("  Computed correlations for %d items across %d studies + pooled\n",
-            nrow(corr_matrix), length(studies_for_corr)))
+cat(sprintf("  Extracted coefficients for %d items across %d studies + pooled\n",
+            nrow(coef_table_full), length(studies_for_coef)))
 
 # Debug: Check data structure
-cat(sprintf("  corr_matrix dimensions: %d rows x %d columns\n",
-            nrow(corr_matrix), ncol(corr_matrix)))
-cat(sprintf("  Column names: %s\n", paste(names(corr_matrix), collapse = ", ")))
-cat("  First 3 rows:\n")
-print(head(corr_matrix, 3))
+cat(sprintf("  coef_table_full dimensions: %d rows x %d columns\n",
+            nrow(coef_table_full), ncol(coef_table_full)))
+cat(sprintf("  Column names: %s\n", paste(names(coef_table_full), collapse = ", ")))
+cat("  First 3 rows (full model):\n")
+print(head(coef_table_full, 3))
+
+# ==============================================================================
+# Initialize Review Notes System (DuckDB Backend)
+# ==============================================================================
+
+cat("Initializing review notes database...\n")
+init_notes_db()
+
+# One-time migration: Import existing JSON notes into database
+# (will skip if JSON file doesn't exist or is empty)
+if (file.exists("item_review_notes.json")) {
+  cat("Importing existing notes from JSON...\n")
+  import_notes_from_json("item_review_notes.json")
+}
+
+notes_path <- NULL  # Not used with DB backend, kept for API compatibility
 
 cat("\nData loading complete!\n\n")
