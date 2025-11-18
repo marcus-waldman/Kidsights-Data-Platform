@@ -72,8 +72,9 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   3. Minimal data processing
 #'   4. Store raw data in DuckDB
 #'   5. Data transformation (geographic variables)
+#'   5.5. Data validation (detect unexpected data loss)
 #'   6. Eligibility validation
-#'   6.5. Authenticity screening & weighting (NEW)
+#'   6.5. Authenticity screening & weighting
 #'   7. Store transformed data
 #'   8. Generate variable metadata
 #'   9. Generate data dictionary
@@ -432,22 +433,31 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     transformation_start <- Sys.time()
 
     # Apply all transformations including geographic crosswalks (creates dob_match and other derived variables)
+    # NOTE: recode_it() already applies reverse coding internally, no need to call it again
     message("Applying all transformations (race, education, geographic, age, etc.)...")
     transformed_data <- recode_it(dat = validated_data, dict = combined_dictionary, what = "all")
 
-    # CRITICAL: Apply reverse coding for items where higher values = worse performance
-    # This affects 5 HRTL self-regulation items and ensures correct IRT calibration
-    message("Applying reverse coding to negatively-keyed items...")
-    source("R/transform/reverse_code_items.R")
-    transformed_data <- reverse_code_items(
-      dat = transformed_data,
-      codebook_path = "codebook/data/codebook.json",
-      lexicon_name = "ne25",
-      verbose = TRUE
-    )
-
     message(paste("Transformation completed:", nrow(transformed_data), "records"))
     message(paste("Variables after transformation:", ncol(transformed_data)))
+
+    # VALIDATION: Check for unexpected data loss during transformation
+    message("\n--- Step 5.5: Validating Transformation (Data Quality Check) ---")
+    source("R/utils/validate_transformation.R")
+
+    validation_result <- validate_transformation(
+      data_before = validated_data,
+      data_after = transformed_data,
+      max_loss_pct = 10,  # Flag items with >10% data loss
+      verbose = TRUE,
+      stop_on_error = TRUE  # Stop pipeline if critical data loss detected
+    )
+
+    if (!validation_result$passed) {
+      stop("Pipeline halted: Critical data loss detected during transformation. ",
+           "Review validation errors above.")
+    }
+
+    message("Data validation passed: No unexpected data loss detected")
 
     # Cache transformed data for debugging
     message("DEBUG: Caching transformed data...")
