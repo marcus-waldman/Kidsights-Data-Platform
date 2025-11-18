@@ -50,17 +50,25 @@ reverse_code_items <- function(dat,
     return(dat)
   }
 
-  cb <- jsonlite::fromJSON(codebook_path)
+  cb <- jsonlite::fromJSON(codebook_path, simplifyVector = FALSE)
 
-  if (verbose) cat(sprintf("[1/4] Loaded codebook from: %s\n", codebook_path))
+  if (verbose) cat(sprintf("[1/5] Loaded codebook from: %s\n", codebook_path))
 
   # Find reverse-coded items with specified lexicon
   reverse_items <- sapply(cb$items, function(item) {
     has_reverse <- FALSE
     has_lexicon <- FALSE
 
-    # Check for reverse flag
-    if ("scoring" %in% names(item) && !is.null(item$scoring)) {
+    # Check for reverse flag (priority order):
+    # 1. Study-specific: reverse_coded.{lexicon_name} = TRUE
+    if ("reverse_coded" %in% names(item) && !is.null(item$reverse_coded)) {
+      if (lexicon_name %in% names(item$reverse_coded)) {
+        has_reverse <- (item$reverse_coded[[lexicon_name]] == TRUE || item$reverse_coded[[lexicon_name]] == "TRUE")
+      }
+    }
+
+    # 2. Global fallback: scoring.reverse = TRUE (applies to all studies)
+    if (!has_reverse && "scoring" %in% names(item) && !is.null(item$scoring)) {
       if ("reverse" %in% names(item$scoring)) {
         has_reverse <- (item$scoring$reverse == TRUE || item$scoring$reverse == "TRUE")
       }
@@ -77,12 +85,12 @@ reverse_code_items <- function(dat,
   reverse_item_ids <- names(cb$items)[reverse_items]
 
   if (length(reverse_item_ids) == 0) {
-    if (verbose) cat(sprintf("[2/4] No reverse-coded items found for lexicon '%s'\n", lexicon_name))
+    if (verbose) cat(sprintf("[2/5] No reverse-coded items found for lexicon '%s'\n", lexicon_name))
     return(dat)
   }
 
   if (verbose) {
-    cat(sprintf("[2/4] Found %d reverse-coded items in codebook\n", length(reverse_item_ids)))
+    cat(sprintf("[2/5] Found %d reverse-coded items in codebook\n", length(reverse_item_ids)))
   }
 
   # Map codebook IDs to dataset variable names using lexicon
@@ -101,7 +109,7 @@ reverse_code_items <- function(dat,
   var_mapping <- var_mapping[!is.na(var_mapping)]
 
   if (verbose) {
-    cat(sprintf("[3/4] Mapped %d items to dataset variables\n", length(var_mapping)))
+    cat(sprintf("[3/5] Mapped %d items to dataset variables\n", length(var_mapping)))
   }
 
   # Find which variables actually exist in the dataset (case-insensitive matching)
@@ -125,7 +133,7 @@ reverse_code_items <- function(dat,
 
   if (length(vars_to_reverse) == 0) {
     if (verbose) {
-      cat(sprintf("[4/4] No reverse-coded variables found in dataset\n"))
+      cat(sprintf("[3/5] No reverse-coded variables found in dataset\n"))
       cat("        Variables expected but not found:\n")
       missing_vars <- setdiff(var_mapping, names(dat))
       for (i in 1:min(5, length(missing_vars))) {
@@ -136,7 +144,7 @@ reverse_code_items <- function(dat,
   }
 
   if (verbose) {
-    cat(sprintf("[4/4] Reverse-coding %d variables in dataset\n", length(vars_to_reverse)))
+    cat(sprintf("[3/5] Found %d variables to reverse-code\n", length(vars_to_reverse)))
     if (length(vars_to_reverse) <= 10) {
       cat("        Variables:\n")
       for (var in vars_to_reverse) {
@@ -145,8 +153,76 @@ reverse_code_items <- function(dat,
     }
   }
 
-  # Apply reverse coding: new_value = max(original) - original
+  # Extract valid response values for each item from codebook
+  # This prevents missing codes (e.g., 9) from inflating max_val calculation
+  if (verbose) cat("[4/5] Extracting valid response values from codebook\n")
+
+  valid_responses <- list()
+
+  for (item_id in names(cb$items)) {
+    tryCatch({
+      item <- cb$items[[item_id]]
+
+      # Get variable name for this lexicon
+      if (is.null(item$lexicons) || !lexicon_name %in% names(item$lexicons)) {
+        next
+      }
+
+      var_name <- item$lexicons[[lexicon_name]]
+      if (is.list(var_name)) var_name <- unlist(var_name)
+      if (is.null(var_name) || var_name == "" || length(var_name) == 0) {
+        next
+      }
+
+      # Store lowercase version for case-insensitive lookup
+      var_name <- tolower(var_name)
+
+      # Get response_set reference
+      response_ref <- NULL
+
+      if (!is.null(item$content) && is.list(item$content)) {
+        if (!is.null(item$content$response_options) && is.list(item$content$response_options)) {
+          if (lexicon_name %in% names(item$content$response_options)) {
+            response_ref <- item$content$response_options[[lexicon_name]]
+          }
+        }
+      }
+
+      # Extract valid values from response_set
+      if (!is.null(response_ref)) {
+        response_ref_char <- if (is.list(response_ref)) unlist(response_ref) else response_ref
+
+        if (length(response_ref_char) == 1 && is.character(response_ref_char)) {
+          if (grepl("^\\$ref:", response_ref_char)) {
+            response_ref_char <- sub("^\\$ref:", "", response_ref_char)
+          }
+
+          if (response_ref_char %in% names(cb$response_sets)) {
+            response_set <- cb$response_sets[[response_ref_char]]
+
+            # Extract values (response_set is a list of options)
+            valid_vals <- sapply(response_set, function(opt) {
+              val <- if (is.list(opt$value)) opt$value[[1]] else opt$value
+              as.numeric(val)
+            })
+
+            valid_responses[[var_name]] <- sort(unique(valid_vals))
+          }
+        }
+      }
+    }, error = function(e) {
+      # Skip items that cause errors
+    })
+  }
+
+  if (verbose) {
+    cat(sprintf("        Extracted valid responses for %d items\n", length(valid_responses)))
+  }
+
+  # Apply reverse coding: new_value = max(valid_values) - original
   # This preserves the scale range while flipping direction
+  if (verbose) cat("[5/5] Applying reverse coding transformations\n")
+
   dat_reversed <- dat
 
   for (var in vars_to_reverse) {
@@ -155,15 +231,38 @@ reverse_code_items <- function(dat,
     # Skip if all NA
     if (all(is.na(original_values))) next
 
-    # Calculate max of non-NA values
-    max_val <- max(original_values, na.rm = TRUE)
+    # Get valid response values for this variable
+    valid_vals <- valid_responses[[var]]
+
+    if (is.null(valid_vals) || length(valid_vals) == 0) {
+      # Fallback: use max of all non-NA values (old behavior)
+      max_val <- max(original_values, na.rm = TRUE)
+      if (verbose) {
+        cat(sprintf("        Warning: %s has no valid response set, using max(all values) = %.0f\n",
+                    var, max_val))
+      }
+    } else {
+      # Use max of valid response values only (excludes missing codes)
+      max_val <- max(valid_vals)
+    }
 
     # Reverse code: max - x
-    dat_reversed[[var]] <- ifelse(
-      is.na(original_values),
-      NA,  # Preserve NAs
-      max_val - original_values  # Reverse non-NA values
-    )
+    # Only reverse values that are in the valid set (or all values if no valid set)
+    if (!is.null(valid_vals) && length(valid_vals) > 0) {
+      # Set values outside valid range to NA first
+      dat_reversed[[var]] <- ifelse(
+        is.na(original_values) | !(original_values %in% valid_vals),
+        NA,  # Preserve NAs and invalidate out-of-range values
+        max_val - original_values  # Reverse valid values only
+      )
+    } else {
+      # Fallback: reverse all non-NA values
+      dat_reversed[[var]] <- ifelse(
+        is.na(original_values),
+        NA,
+        max_val - original_values
+      )
+    }
   }
 
   if (verbose) {
