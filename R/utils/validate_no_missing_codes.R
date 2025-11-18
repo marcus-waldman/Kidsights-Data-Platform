@@ -1,7 +1,7 @@
 #' Validate No Sentinel Missing Codes in Item Responses
 #'
 #' @description
-#' Checks transformed data for sentinel missing value codes (9, -9, 99, -99) that
+#' Checks transformed data for sentinel missing value codes (any value >= 90) that
 #' should have been converted to NA. Throws an error if any are found, preventing
 #' contaminated data from reaching downstream analyses or calibration datasets.
 #'
@@ -18,12 +18,12 @@
 #' no sentinel missing value codes remain in item responses. It:
 #'
 #' 1. Loads the codebook to identify which variables are items (have calibration_item=TRUE or lexicons)
-#' 2. Scans each item for common sentinel missing codes: 9, -9, 99, -99
+#' 2. Scans each item for ANY value >= 90 (covers NSCH codes: 90, 91, 95, 96, 99)
 #' 3. Reports any items with remaining missing codes
 #' 4. Optionally stops execution with detailed error message
 #'
 #' **Why This Matters:**
-#' - Missing codes like 9 ("Prefer not to answer") should NEVER reach IRT calibration
+#' - Missing codes like 9, 99 ("Prefer not to answer"), 95 ("Not ascertained") should NEVER reach IRT calibration
 #' - These values would be treated as substantive responses, contaminating theta estimates
 #' - This validation ensures codebook-based missing code conversion is working correctly
 #'
@@ -100,8 +100,9 @@ validate_no_missing_codes <- function(dat,
     cat(sprintf("[2/3] Identified %d item variables from codebook\n", length(item_vars)))
   }
 
-  # Sentinel missing codes to check for
-  sentinel_codes <- c(9, -9, 99, -99)
+  # Sentinel missing code threshold: ANY value >= 90
+  # This catches NSCH codes (90, 91, 95, 96, 99) and standard missing codes (99)
+  sentinel_threshold <- 90
 
   # Find which item variables exist in dataset (case-insensitive)
   dataset_names <- names(dat)
@@ -127,10 +128,11 @@ validate_no_missing_codes <- function(dat,
   }
 
   if (verbose) {
-    cat(sprintf("[3/3] Checking %d item variables for sentinel missing codes\n", length(items_to_check)))
+    cat(sprintf("[3/3] Checking %d item variables for sentinel missing codes (values >= %d)\n",
+                length(items_to_check), sentinel_threshold))
   }
 
-  # Check each item for sentinel codes
+  # Check each item for sentinel codes (any value >= threshold)
   violations <- list()
 
   for (item_var in items_to_check) {
@@ -139,16 +141,21 @@ validate_no_missing_codes <- function(dat,
     # Skip if all NA
     if (all(is.na(values))) next
 
-    # Check for each sentinel code
-    for (code in sentinel_codes) {
-      if (any(values == code, na.rm = TRUE)) {
-        n_violations <- sum(values == code, na.rm = TRUE)
+    # Find all values >= sentinel_threshold
+    sentinel_values <- values[!is.na(values) & values >= sentinel_threshold]
 
-        if (is.null(violations[[item_var]])) {
-          violations[[item_var]] <- list()
-        }
+    if (length(sentinel_values) > 0) {
+      # Get unique sentinel values found
+      unique_sentinels <- unique(sentinel_values)
 
-        violations[[item_var]][[as.character(code)]] <- n_violations
+      if (is.null(violations[[item_var]])) {
+        violations[[item_var]] <- list()
+      }
+
+      # Store count for each unique sentinel value
+      for (sentinel_val in unique_sentinels) {
+        n_violations <- sum(values == sentinel_val, na.rm = TRUE)
+        violations[[item_var]][[as.character(sentinel_val)]] <- n_violations
       }
     }
   }
@@ -157,14 +164,15 @@ validate_no_missing_codes <- function(dat,
   if (length(violations) == 0) {
     if (verbose) {
       cat("\n[OK] No sentinel missing codes found in any item responses\n")
-      cat(sprintf("      Checked %d items for codes: %s\n",
+      cat(sprintf("      Checked %d items for values >= %d\n",
                   length(items_to_check),
-                  paste(sentinel_codes, collapse = ", ")))
+                  sentinel_threshold))
     }
     return(dat)
   } else {
     # Build detailed error message
-    error_msg <- sprintf("\n[ERROR] Found sentinel missing codes in %d items:\n\n", length(violations))
+    error_msg <- sprintf("\n[ERROR] Found sentinel missing codes (>= %d) in %d items:\n\n",
+                         sentinel_threshold, length(violations))
 
     for (item_var in names(violations)) {
       codes_found <- violations[[item_var]]
@@ -176,7 +184,7 @@ validate_no_missing_codes <- function(dat,
       }
     }
 
-    error_msg <- paste0(error_msg, "\nThese values should have been converted to NA during transformation.\n")
+    error_msg <- paste0(error_msg, sprintf("\nThese values (>= %d) should have been converted to NA during transformation.\n", sentinel_threshold))
     error_msg <- paste0(error_msg, "Check that validate_item_responses() is working correctly.\n")
 
     if (stop_on_error) {
