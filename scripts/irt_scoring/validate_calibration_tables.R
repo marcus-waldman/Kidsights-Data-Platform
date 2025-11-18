@@ -98,13 +98,17 @@ cat(strrep("=", 80), "\n")
 cat("TEST 2: RECORD COUNTS\n")
 cat(strrep("=", 80), "\n\n")
 
+# Strict expected counts based on actual filtered data (tolerance: ±100-500 records)
+# These counts are based on historical data and should be stable
+# FAIL status if outside range (previously WARN)
+# NOTE: NSCH counts reflect filtering for "at least 2 item responses"
 expected_counts <- list(
-  "ne20_calibration" = c(min = 35000, max = 40000),
-  "ne22_calibration" = c(min = 2000, max = 3000),
-  "ne25_calibration" = c(min = 3000, max = 5000),
-  "nsch21_calibration" = c(min = 40000, max = 60000),
-  "nsch22_calibration" = c(min = 40000, max = 60000),
-  "usa24_calibration" = c(min = 1500, max = 2000)
+  "ne20_calibration" = c(min = 37500, max = 38700, expected = 38577),  # Historical NE2020
+  "ne22_calibration" = c(min = 2400, max = 2600, expected = 2500),     # Historical NE2022
+  "ne25_calibration" = c(min = 3487, max = 3527, expected = 3507),     # Current NE2025
+  "nsch21_calibration" = c(min = 18100, max = 19100, expected = 18634),  # NSCH 2021 (filtered for >=2 items)
+  "nsch22_calibration" = c(min = 19200, max = 20200, expected = 19740),  # NSCH 2022 (filtered for >=2 items)
+  "usa24_calibration" = c(min = 1550, max = 1650, expected = 1600)       # Historical USA2024
 )
 
 cat("Record counts by study:\n\n")
@@ -118,13 +122,16 @@ for (table in expected_tables) {
 
   expected <- expected_counts[[table]]
   in_range <- count >= expected["min"] && count <= expected["max"]
-  status <- ifelse(in_range, "[OK]", "[WARN]")
+  status <- ifelse(in_range, "[OK]", "[FAIL]")
 
   cat(sprintf("  %s: %s records %s\n", table, format(count, big.mark = ","), status))
   if (!in_range) {
-    cat(sprintf("    Expected: %s - %s\n",
+    cat(sprintf("    Expected: %s (range: %s - %s)\n",
+                format(expected["expected"], big.mark = ","),
                 format(expected["min"], big.mark = ","),
                 format(expected["max"], big.mark = ",")))
+    cat(sprintf("    Deviation: %+d records from expected\n",
+                count - expected["expected"]))
     counts_ok <- FALSE
   }
 
@@ -137,7 +144,11 @@ cat("\n")
 if (counts_ok) {
   cat("[OK] TEST 2 PASSED: All record counts in expected ranges\n\n")
 } else {
-  cat("[WARN] TEST 2 WARNING: Some counts outside expected ranges\n\n")
+  cat("[FAIL] TEST 2 FAILED: Some counts outside expected ranges\n")
+  cat("        This indicates potential data loss or unexpected data duplication.\n")
+  cat("        Investigate before proceeding with calibration.\n\n")
+  DBI::dbDisconnect(conn)
+  stop("Record count validation failed")
 }
 
 # =============================================================================

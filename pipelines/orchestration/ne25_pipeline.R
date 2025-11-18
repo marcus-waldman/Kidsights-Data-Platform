@@ -448,6 +448,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       data_before = validated_data,
       data_after = transformed_data,
       max_loss_pct = 10,  # Flag items with >10% data loss
+      lexicon_name = "ne25",  # Use NE25 lexicon for missing code identification
       verbose = TRUE,
       stop_on_error = TRUE  # Stop pipeline if critical data loss detected
     )

@@ -1,14 +1,16 @@
-#' Validate Data Transformation for Unexpected Data Loss
+#' Validate Calibration Data Transformation for Unexpected Data Loss
 #'
-#' Compares data before and after transformation to detect unexpected data loss
-#' that exceeds reasonable thresholds. Flags items where non-missing values
-#' decrease by more than expected from known missing codes.
+#' Compares calibration data before and after transformation to detect unexpected
+#' data loss that exceeds reasonable thresholds. Designed for multi-study IRT
+#' calibration datasets where different studies contribute different item sets.
 #'
 #' @param data_before Data frame before transformation
 #' @param data_after Data frame after transformation
+#' @param step_name Name of the transformation step (for reporting)
 #' @param max_loss_pct Maximum acceptable data loss percentage (default: 10%)
-#' @param lexicon_name Name of lexicon to use for missing code identification (default: "ne25")
-#' @param verbose Logical. Print detailed warnings? Default: TRUE
+#' @param lexicon_name Name of lexicon to use for missing code identification (default: "equate")
+#' @param study_column Name of study column for per-study breakdown (default: "study")
+#' @param verbose Logical. Print detailed output? Default: TRUE
 #' @param stop_on_error Logical. Stop execution if critical data loss detected? Default: TRUE
 #'
 #' @return List with validation results:
@@ -16,53 +18,65 @@
 #'   - warnings: Character vector of warning messages
 #'   - errors: Character vector of error messages
 #'   - item_summary: Data frame with per-item statistics
+#'   - study_summary: Data frame with per-study statistics (if study_column provided)
 #'
 #' @details
 #' This function checks for:
 #' 1. Row count changes (should be identical unless filtering)
 #' 2. Column-level data loss exceeding max_loss_pct
 #' 3. Items where non-null counts drop dramatically
+#' 4. Per-study data integrity (optional)
 #'
 #' Expected data loss sources:
 #' - Missing codes being set to NA (acceptable)
 #' - Invalid values being removed (acceptable if < max_loss_pct)
 #' - Transformation bugs (UNACCEPTABLE - triggers error)
 #'
+#' Multi-study considerations:
+#' - Not all items present in all studies (this is expected)
+#' - Different missing code conventions across studies (9, 99, -9)
+#' - Variable item coverage by study (NE25: 276 items, NSCH21: 28 items)
+#'
 #' @examples
 #' \dontrun{
-#' # Validate NE25 transformation
-#' validated_data <- readRDS("temp/pipeline_cache/step2_validated_data.rds")
-#' transformed_data <- readRDS("temp/pipeline_cache/step5_transformed_data.rds")
+#' # Validate wide format creation in IRT calibration pipeline
+#' historical_data <- readRDS("temp/historical_calibration_data.rds")
+#' calibration_wide <- DBI::dbReadTable(db$con, "calibration_dataset_2020_2025")
 #'
-#' validation <- validate_transformation(
-#'   data_before = validated_data,
-#'   data_after = transformed_data,
-#'   max_loss_pct = 10
+#' validation <- validate_calibration_transformation(
+#'   data_before = historical_data,
+#'   data_after = calibration_wide,
+#'   step_name = "wide_format_creation",
+#'   max_loss_pct = 10,
+#'   lexicon_name = "equate"
 #' )
 #'
 #' if (!validation$passed) {
-#'   stop("Data validation failed!")
+#'   stop("Calibration data validation failed!")
 #' }
 #' }
 #'
 #' @export
-validate_transformation <- function(data_before,
-                                     data_after,
-                                     max_loss_pct = 10,
-                                     lexicon_name = "ne25",
-                                     verbose = TRUE,
-                                     stop_on_error = TRUE) {
+validate_calibration_transformation <- function(data_before,
+                                                 data_after,
+                                                 step_name = "transformation",
+                                                 max_loss_pct = 10,
+                                                 lexicon_name = "equate",
+                                                 study_column = "study",
+                                                 verbose = TRUE,
+                                                 stop_on_error = TRUE) {
 
   if (verbose) {
     cat("\n")
     cat(strrep("=", 80), "\n")
-    cat("VALIDATING DATA TRANSFORMATION\n")
+    cat(sprintf("VALIDATING CALIBRATION DATA TRANSFORMATION: %s\n", toupper(step_name)))
     cat(strrep("=", 80), "\n\n")
   }
 
   warnings <- character()
   errors <- character()
   item_summary <- data.frame()
+  study_summary <- data.frame()
 
   # Load codebook to identify missing codes
   codebook_path <- "codebook/data/codebook.json"
@@ -116,22 +130,30 @@ validate_transformation <- function(data_before,
   }
 
   # Check 1: Row count validation
-  if (verbose) cat("[1/3] Validating row counts\n")
+  if (verbose) cat("[1/4] Validating row counts\n")
 
   n_before <- nrow(data_before)
   n_after <- nrow(data_after)
 
   if (n_before != n_after) {
+    loss_pct <- 100 * (n_before - n_after) / n_before
     msg <- sprintf("Row count changed: %d -> %d (%.1f%% loss)",
-                   n_before, n_after, 100 * (n_before - n_after) / n_before)
-    warnings <- c(warnings, msg)
-    if (verbose) cat(sprintf("      WARNING: %s\n", msg))
+                   n_before, n_after, loss_pct)
+
+    # Flag as error if >5% row loss
+    if (abs(loss_pct) > 5) {
+      errors <- c(errors, msg)
+      if (verbose) cat(sprintf("      ERROR: %s\n", msg))
+    } else {
+      warnings <- c(warnings, msg)
+      if (verbose) cat(sprintf("      WARNING: %s\n", msg))
+    }
   } else {
     if (verbose) cat(sprintf("      Row count: %d (unchanged) [OK]\n", n_before))
   }
 
   # Check 2: Column count validation
-  if (verbose) cat("\n[2/3] Validating column counts\n")
+  if (verbose) cat("\n[2/4] Validating column counts\n")
 
   n_cols_before <- ncol(data_before)
   n_cols_after <- ncol(data_after)
@@ -141,11 +163,13 @@ validate_transformation <- function(data_before,
     cat(sprintf("      Columns after: %d\n", n_cols_after))
     if (n_cols_after > n_cols_before) {
       cat(sprintf("      New columns added: %d [OK]\n", n_cols_after - n_cols_before))
+    } else if (n_cols_after < n_cols_before) {
+      cat(sprintf("      Columns removed: %d\n", n_cols_before - n_cols_after))
     }
   }
 
   # Check 3: Item-level data loss validation
-  if (verbose) cat("\n[3/3] Validating item-level data integrity\n")
+  if (verbose) cat("\n[3/4] Validating item-level data integrity\n")
 
   # Find common columns (case-insensitive)
   cols_before_lower <- tolower(names(data_before))
@@ -164,8 +188,10 @@ validate_transformation <- function(data_before,
     col_after <- col_map_after[col_lower]
 
     # Skip metadata columns
-    if (col_lower %in% c("record_id", "pid", "retrieved_date", "source_project",
-                         "extraction_id", "redcap_event_name")) {
+    if (col_lower %in% c("id", "pid", "record_id", "retrieved_date", "source_project",
+                         "extraction_id", "redcap_event_name", "study", "years",
+                         "wgt", "authenticity_weight", "studynum", "devflag",
+                         "maskflag", "cooksd_quantile", "lex_equate")) {
       next
     }
 
@@ -221,6 +247,63 @@ validate_transformation <- function(data_before,
     item_summary <- item_summary[order(-item_summary$loss_pct), ]
   }
 
+  # Check 4: Per-study breakdown (optional)
+  if (verbose) cat("\n[4/4] Validating per-study data integrity\n")
+
+  if (study_column %in% names(data_before) && study_column %in% names(data_after)) {
+    studies <- unique(c(data_before[[study_column]], data_after[[study_column]]))
+    studies <- studies[!is.na(studies)]
+
+    study_stats <- list()
+
+    for (study in studies) {
+      # Count records by study
+      n_before_study <- sum(data_before[[study_column]] == study, na.rm = TRUE)
+      n_after_study <- sum(data_after[[study_column]] == study, na.rm = TRUE)
+
+      if (n_before_study > 0) {
+        loss_count_study <- n_before_study - n_after_study
+        loss_pct_study <- 100 * loss_count_study / n_before_study
+
+        study_stats[[study]] <- data.frame(
+          study = study,
+          n_before = n_before_study,
+          n_after = n_after_study,
+          loss_count = loss_count_study,
+          loss_pct = loss_pct_study,
+          stringsAsFactors = FALSE
+        )
+
+        if (verbose) {
+          if (abs(loss_pct_study) < 1) {
+            cat(sprintf("      %s: %d records (%.1f%% change) [OK]\n",
+                        study, n_after_study, loss_pct_study))
+          } else {
+            cat(sprintf("      %s: %d -> %d (%.1f%% loss)\n",
+                        study, n_before_study, n_after_study, loss_pct_study))
+          }
+        }
+
+        # Flag if study loses >5% of records
+        if (loss_pct_study > 5) {
+          msg <- sprintf("Study %s lost %.1f%% of records (%d -> %d)",
+                         study, loss_pct_study, n_before_study, n_after_study)
+          warnings <- c(warnings, msg)
+        }
+      }
+    }
+
+    if (length(study_stats) > 0) {
+      study_summary <- do.call(rbind, study_stats)
+      rownames(study_summary) <- NULL
+    }
+  } else {
+    if (verbose) {
+      cat(sprintf("      Study column '%s' not found in data - skipping per-study validation\n",
+                  study_column))
+    }
+  }
+
   # Summary
   if (verbose) {
     cat("\n")
@@ -261,7 +344,8 @@ validate_transformation <- function(data_before,
 
   if (!passed && verbose) {
     cat("\n[VALIDATION FAILED]\n")
-    cat("One or more items lost >", max_loss_pct, "% of data during transformation.\n")
+    cat(sprintf("One or more items lost > %d%% of data during %s.\n",
+                max_loss_pct, step_name))
     cat("This likely indicates a transformation bug that needs investigation.\n\n")
   }
 
@@ -275,12 +359,14 @@ validate_transformation <- function(data_before,
     passed = passed,
     warnings = warnings,
     errors = errors,
-    item_summary = item_summary
+    item_summary = item_summary,
+    study_summary = study_summary
   )
 
   # Stop execution if critical errors and stop_on_error = TRUE
   if (!passed && stop_on_error) {
-    stop("Data validation failed: ", length(errors), " items with critical data loss. ",
+    stop(sprintf("Calibration data validation failed for '%s': %d items with critical data loss. ",
+                 step_name, length(errors)),
          "Set stop_on_error=FALSE to continue anyway.")
   }
 
