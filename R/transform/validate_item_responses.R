@@ -15,14 +15,14 @@
 #' 1. Loads the codebook and extracts valid response values from response_sets
 #' 2. Maps codebook item IDs to dataset variable names using specified lexicon
 #' 3. For each item, identifies values not in the valid response set
-#' 4. Sets invalid values to NA (preserving already-missing values)
+#' 4. Sets invalid values to NA (including missing value codes)
 #'
-#' **Important:** This includes missing value codes marked with `missing: true` in
-#' the response_set (e.g., -9 for "Don't Know"). Only values completely undefined
-#' in the codebook are set to NA.
+#' **Important:** Values marked with `missing: true` in the response_set are
+#' treated as INVALID and converted to NA. This ensures proper handling of
+#' sentinel missing codes like 9 ("Prefer not to answer"), -9 ("Don't Know"), etc.
 #'
-#' Example: If codebook defines {0, 1, 2, -9} where -9 is marked as missing,
-#' then value=9 would be set to NA, but value=-9 would be retained.
+#' Example: If codebook defines {0, 1, 9} where 9 is marked as missing: true,
+#' then both undefined values AND the 9 value will be set to NA.
 #'
 #' @examples
 #' \dontrun{
@@ -121,13 +121,26 @@ validate_item_responses <- function(dat,
           if (response_ref_char %in% names(cb$response_sets)) {
             response_set <- cb$response_sets[[response_ref_char]]
 
-            # Extract ALL values (including those marked as missing)
-            # We want to keep -9 if it's defined, but remove 9 if it's not defined
-            valid_vals <- sapply(response_set, function(opt) {
+            # Extract ONLY non-missing values
+            # Values marked with missing: true will be set to NA
+            valid_vals <- c()
+
+            for (opt in response_set) {
               # With simplifyVector=FALSE, opt$value might be a list
               val <- if (is.list(opt$value)) opt$value[[1]] else opt$value
-              as.numeric(val)
-            })
+
+              # Check if this value is marked as missing
+              is_missing <- FALSE
+              if (!is.null(opt$missing)) {
+                # Handle both logical and character "true"
+                is_missing <- (opt$missing == TRUE || opt$missing == "true")
+              }
+
+              # Only include non-missing values in valid set
+              if (!is_missing) {
+                valid_vals <- c(valid_vals, as.numeric(val))
+              }
+            }
 
             valid_responses[[var_name]] <- sort(unique(valid_vals))
           }

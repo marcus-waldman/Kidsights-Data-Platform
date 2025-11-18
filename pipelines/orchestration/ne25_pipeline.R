@@ -453,6 +453,17 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       stop_on_error = TRUE  # Stop pipeline if critical data loss detected
     )
 
+    # VALIDATION: Check for sentinel missing codes (9, -9, 99, -99)
+    message("\n--- Step 5.6: Validating No Missing Codes in Item Responses ---")
+    source("R/utils/validate_no_missing_codes.R")
+
+    transformed_data <- validate_no_missing_codes(
+      dat = transformed_data,
+      lexicon_name = "ne25",
+      verbose = TRUE,
+      stop_on_error = TRUE  # Stop pipeline if missing codes found
+    )
+
     if (!validation_result$passed) {
       stop("Pipeline halted: Critical data loss detected during transformation. ",
            "Review validation errors above.")
