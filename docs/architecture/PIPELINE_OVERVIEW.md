@@ -359,7 +359,18 @@ See [ADDING_NEW_STUDY.md](../imputation/ADDING_NEW_STUDY.md) for complete onboar
 ### Purpose
 Create Mplus-compatible calibration dataset combining historical studies and national benchmarks for Item Response Theory recalibration of Kidsights developmental/behavioral scales
 
-⚠️ **Development Status:** Pipeline under active validation following recent bug fixes. See "Data Quality Improvements" section below.
+⚠️ **Development Status:** Pipeline ready for production use - NSCH harmonization validated, data quality verified. See "Data Quality Improvements" section below for November 2025 bug fixes.
+
+**Primary Command:**
+```bash
+# Full pipeline (recommended)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R
+
+# Skip long format creation (faster, ~30 seconds saved)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+```
+
+**📖 Documentation:** See [CALIBRATION_PIPELINE_USAGE.md](../irt_scoring/CALIBRATION_PIPELINE_USAGE.md) for detailed usage guide.
 
 ### Architecture Diagram
 
@@ -388,10 +399,14 @@ NSCH National Benchmarks   │
 - **Lexicon-Based Harmonization:** Automatic item name mapping via codebook (ne25/cahmi21/cahmi22 → lex_equate)
 - **Historical Data Import:** One-time import from KidsightsPublic R package to DuckDB
 - **National Benchmarking:** Configurable NSCH sampling (default: 1,000 per year, ages 0-6)
+- **Dual Format Storage:**
+  - Wide format: `calibration_dataset_2020_2025` (47,084 records, 303 columns) for Mplus export
+  - Long format: `calibration_dataset_long` (1.3M rows, 9 columns) for QA analysis
+- **QA Masking System:** devflag/maskflag columns for data quality control and holdout samples
 - **Mplus Compatibility:** Space-delimited .dat format with missing as ".", no headers
-- **Production Performance:** 28 seconds execution time for full workflow
+- **Production Performance:** ~5-7 minutes for full pipeline (includes long format), ~3-5 minutes with --skip-long-format
 - **Comprehensive Validation:** 100% data integrity match with original historical data
-- **Interactive Workflow:** User prompts for NSCH sample size and output paths
+- **Automated Pipeline:** `run_calibration_pipeline.R` with command-line flags for workflow control
 
 ### Data Quality Improvements (November 2025)
 

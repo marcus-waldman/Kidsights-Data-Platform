@@ -21,7 +21,7 @@ This guide explains how to generate and export IRT calibration datasets for Mplu
 3. Validates all 6 calibration tables
 4. Exports combined dataset to `mplus/calibdat.dat`
 
-**Execution time:** ~3-5 minutes (depends on NE25 pipeline if tables don't exist)
+**Execution time:** ~5-7 minutes (includes long format creation, ~3-5 minutes with --skip-long-format)
 
 **Output:**
 - Database tables: `ne20_calibration`, `ne22_calibration`, `ne25_calibration`, `nsch21_calibration`, `nsch22_calibration`, `usa24_calibration`
@@ -128,16 +128,30 @@ If you want to create/update tables but skip the export step:
 
 **Use case:** Database maintenance, testing table creation without generating Mplus file.
 
+### Scenario 5: Skip Long Format Creation (Faster)
+
+If you don't need the long format dataset for QA analysis:
+
+```bash
+# Skip long format dataset creation (~30 seconds faster)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+```
+
+**Use case:** Faster iteration when only working with Mplus export, don't need Age Gradient Explorer's maskflag data.
+
+**Note:** Long format dataset (`calibration_dataset_long`) is used by Age Gradient Explorer for masking toggle feature. Skip only if you don't need QA masking functionality.
+
 ---
 
 ## Command-Line Options
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| *(no args)* | Full pipeline: create tables + validate + quality check + export | - |
+| *(no args)* | Full pipeline: create tables + validate + quality check + long format + export | - |
 | `--export-only` | Skip table creation and quality check, only export to .dat file | Off |
 | `--tables-only` | Create/update tables, skip quality check and export | Off |
 | `--skip-quality-check` | Skip data quality assessment (faster execution) | Off |
+| `--skip-long-format` | Skip long format dataset creation (saves ~30 seconds) | Off |
 | `--nsch-sample N` | Set NSCH sample size (per year) | 1000 |
 
 **Notes:**
@@ -240,7 +254,57 @@ quarto render calibration_quality_report.qmd
 
 **Execution time:** +2-3 minutes for quality check
 
-**Recent Bug Fixes (November 2025 - Issue #6):**
+### Step 2.6: Create Long Format Dataset (Optional)
+
+**What happens:**
+
+Creates `calibration_dataset_long` table with one row per participant-item observation.
+
+**Benefits:**
+- **Storage Efficiency:** ~20 MB vs 290+ MB for duplicated wide format
+- **Full NSCH Data:** Includes ALL NSCH records (787K holdout observations) not just sampled data
+- **QA Masking System:** devflag/maskflag columns for data quality control
+- **Age Gradient Explorer:** Required for masking toggle feature (compare original vs QA-cleaned data)
+
+**Table Structure:**
+```sql
+CREATE TABLE calibration_dataset_long (
+    id INTEGER,              -- Participant ID
+    years INTEGER,           -- Child age in years
+    study VARCHAR,           -- Study name (e.g., "NE25", "NSCH21")
+    studynum INTEGER,        -- Study number (1-6)
+    lex_equate VARCHAR,      -- Item name (harmonized lexicon)
+    y DOUBLE,                -- Item response value
+    cooksd_quantile DOUBLE,  -- Cook's D influence quantile (0-1)
+    maskflag INTEGER,        -- 0=original, 1=QA-cleaned (exclude this observation)
+    devflag INTEGER          -- 0=holdout (NSCH), 1=development (used for calibration)
+);
+```
+
+**Record Counts:**
+- Total: 1,316,391 rows
+- Development sample (devflag=1): 529,668 rows (used for IRT calibration)
+- Holdout sample (devflag=0): 786,723 rows (full NSCH data for external validation)
+
+**devflag System:**
+- `devflag=1`: Development sample (all non-NSCH + sampled NSCH) - used for Mplus calibration
+- `devflag=0`: Holdout sample (unsampled NSCH records) - reserved for external validation
+
+**maskflag System:**
+- `maskflag=0`: Original data (keep observation)
+- `maskflag=1`: QA-cleaned (exclude observation due to NE25 issues or Cook's D influence)
+
+**To skip long format creation:**
+```bash
+# Faster execution (~30 seconds saved)
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+```
+
+**Execution time:** +30 seconds for long format creation
+
+**Script:** `scripts/irt_scoring/create_calibration_long.R`
+
+**Recent Bug Fixes (November 2025 - Issue #6):
 
 Three critical data quality issues were identified and fixed in the calibration pipeline:
 
@@ -273,7 +337,7 @@ Three critical data quality issues were identified and fixed in the calibration 
 
 **What happens:**
 
-Runs `export_calibration_dat()` to create Mplus-compatible .dat file:
+Runs `export_calibration_dat()` to create Mplus-compatible .dat file from wide format tables:
 
 1. **Load study tables** from database
 2. **Sample NSCH data** (n=1,000 per year by default)
@@ -293,6 +357,37 @@ id years item_ACE01 item_ACE02 ... item_cahmi16
 - Missing values: "." (not NA)
 - Integer IDs only (no character IDs)
 - Column order: id, years, then items (alphabetical)
+
+**Alternative: Export from Long Format**
+
+The long format table can be converted to wide format for custom Mplus exports:
+
+```r
+library(duckdb)
+conn <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
+
+# Convert long to wide for specific items (development sample only)
+wide_custom <- dbGetQuery(conn, "
+  SELECT
+    id,
+    years,
+    MAX(CASE WHEN lex_equate = 'DD221' THEN y END) as DD221,
+    MAX(CASE WHEN lex_equate = 'EG44_2' THEN y END) as EG44_2,
+    MAX(CASE WHEN lex_equate = 'PS001' THEN y END) as PS001
+  FROM calibration_dataset_long
+  WHERE devflag = 1  -- Development sample only
+  GROUP BY id, years
+")
+
+# Export to Mplus format
+write.table(wide_custom, "mplus/custom_dat.dat",
+            row.names = FALSE, col.names = FALSE,
+            quote = FALSE, na = ".")
+
+dbDisconnect(conn)
+```
+
+**Use case:** Custom item subsets, maskflag filtering, or holdout sample exports.
 
 ---
 
@@ -500,6 +595,93 @@ CREATE TABLE {study}_calibration (
 - Encodes metadata (study, year, source) in ID
 - Avoids floating-point precision loss
 - Fits in R integer range (up to 2.1 billion)
+
+### Combined Long Format Table (Optional)
+
+**Table:** `calibration_dataset_long`
+
+**Purpose:** Stores all participant-item observations in long format for QA analysis and Age Gradient Explorer.
+
+**Schema:**
+
+```sql
+CREATE TABLE calibration_dataset_long (
+    id INTEGER,              -- Participant ID (YYFFFSNNNNNN format)
+    years INTEGER,           -- Child age in years
+    study VARCHAR,           -- Study name: NE20, NE22, NE25, NSCH21, NSCH22, USA24
+    studynum INTEGER,        -- Study number: 1-6
+    lex_equate VARCHAR,      -- Item name (harmonized lexicon from codebook)
+    y DOUBLE,                -- Item response value
+    cooksd_quantile DOUBLE,  -- Cook's D influence diagnostic (0-1 quantile)
+    maskflag INTEGER,        -- QA masking: 0=keep, 1=exclude
+    devflag INTEGER          -- Sample: 0=holdout, 1=development
+);
+```
+
+**Record Counts by Study:**
+
+| Study | Total Rows | Development (devflag=1) | Holdout (devflag=0) |
+|-------|-----------|------------------------|---------------------|
+| NE20  | 91,342    | 91,342                 | 0                   |
+| NE22  | 5,914     | 5,914                  | 0                   |
+| NE25  | 8,531     | 8,531                  | 0                   |
+| NSCH21| 503,881   | 195,158                | 308,723             |
+| NSCH22| 480,449   | 202,430                | 278,019             |
+| USA24 | 3,893     | 3,893                  | 0                   |
+| **Total** | **1,316,391** | **529,668** | **786,723** |
+
+**Notes:**
+- One row per participant-item observation (e.g., participant 200311000001 × 276 items = 276 rows)
+- Development sample includes ALL Nebraska/USA24 data + 1,000 NSCH participants per year
+- Holdout sample contains remaining NSCH participants not sampled for calibration
+- cooksd_quantile computed via `compute_influence_points()` function
+- maskflag identifies observations excluded due to data quality issues
+
+**Why Long Format:**
+- **Storage:** ~20 MB vs 290+ MB for duplicated wide format across all NSCH records
+- **Flexibility:** Easy to filter, aggregate, and analyze specific items or participants
+- **QA Integration:** Age Gradient Explorer uses maskflag for masking toggle feature
+- **Full Data:** Preserves ALL NSCH observations, not just sampled subset
+
+**Query Examples:**
+
+```r
+# Get all observations for a specific item
+dbGetQuery(conn, "
+  SELECT id, years, study, y, maskflag
+  FROM calibration_dataset_long
+  WHERE lex_equate = 'DD221'
+  ORDER BY years, y
+")
+
+# Count observations by study and mask status
+dbGetQuery(conn, "
+  SELECT
+    study,
+    COUNT(*) as total_obs,
+    SUM(CASE WHEN maskflag = 0 THEN 1 ELSE 0 END) as original_obs,
+    SUM(CASE WHEN maskflag = 1 THEN 1 ELSE 0 END) as masked_obs
+  FROM calibration_dataset_long
+  GROUP BY study
+  ORDER BY study
+")
+
+# Convert to wide format for specific items
+dbGetQuery(conn, "
+  SELECT
+    id, years, study,
+    MAX(CASE WHEN lex_equate = 'DD221' THEN y END) as DD221,
+    MAX(CASE WHEN lex_equate = 'EG44_2' THEN y END) as EG44_2
+  FROM calibration_dataset_long
+  WHERE devflag = 1  -- Development sample only
+  GROUP BY id, years, study
+")
+```
+
+**To skip creation:**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+```
 
 ---
 

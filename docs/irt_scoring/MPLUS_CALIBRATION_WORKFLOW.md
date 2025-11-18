@@ -103,37 +103,74 @@ DBI::dbDisconnect(conn)
 # - nsch_2022_raw
 ```
 
-### 1.2 Run Calibration Dataset Preparation
+### 1.2 Run Calibration Pipeline
 
-**Interactive Mode (Recommended for First Run):**
+**Full Pipeline (Recommended):**
 ```bash
-"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R
 ```
 
-**Prompts:**
-1. **NSCH sample size:** Enter `1000` (recommended) or `all` for complete datasets
-2. **Output .dat file path:** Press Enter for default (`mplus/calibdat.dat`)
+**Skip Long Format (Faster):**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+```
 
 **Expected Output:**
 ```
-STEP 10: SUMMARY REPORT
-================================================================================
+[1/6] Creating/updating calibration tables...
+  ✓ Created ne20_calibration (37,546 records)
+  ✓ Created ne22_calibration (2,431 records)
+  ✓ Created ne25_calibration (3,507 records)
+  ✓ Created nsch21_calibration (20,719 records - full data)
+  ✓ Created nsch22_calibration (19,741 records - full data)
+  ✓ Created usa24_calibration (1,600 records)
 
-Study Record Counts:
-  NE20   (study_num=1):  37,546 records ( 79.7%)
-  NE22   (study_num=2):   2,431 records (  5.2%)
-  NE25   (study_num=3):   3,507 records (  7.4%)
-  NSCH21 (study_num=5):   1,000 records (  2.1%)
-  NSCH22 (study_num=6):   1,000 records (  2.1%)
-  USA24  (study_num=7):   1,600 records (  3.4%)
-  TOTAL                  47,084 records (100.0%)
+[2/6] Running quality checks...
+  ✓ All validation tests passed
 
-Output Files:
-  Mplus .dat file: mplus/calibdat.dat (38.71 MB)
-  DuckDB table: calibration_dataset_2020_2025
+[3/6] Creating long format dataset...
+  - Development sample: 529,668 rows (devflag=1)
+  - Holdout sample: 786,723 rows (devflag=0)
+  - Total: 1,316,391 rows
+  ✓ Created calibration_dataset_long
+
+[4/6] Exporting to Mplus format...
+  - Sampling NSCH: 1,000 records per year
+  - Combined dataset: 47,084 records
+  ✓ Exported to mplus/calibdat.dat (38.71 MB)
+
+[5/6] Validating output...
+  ✓ Mplus compatibility verified
+
+[6/6] Summary statistics:
+  Study Record Counts (in Mplus export):
+    NE20   (study_num=1):  37,546 records ( 79.7%)
+    NE22   (study_num=2):   2,431 records (  5.2%)
+    NE25   (study_num=3):   3,507 records (  7.4%)
+    NSCH21 (study_num=5):   1,000 records (  2.1%)
+    NSCH22 (study_num=6):   1,000 records (  2.1%)
+    USA24  (study_num=7):   1,600 records (  3.4%)
+    TOTAL                  47,084 records (100.0%)
+
+  Database Tables Created:
+    - calibration_dataset_2020_2025 (wide format, 47,084 records)
+    - calibration_dataset_long (long format, 1,316,391 rows)
+
+  Output Files:
+    - mplus/calibdat.dat (38.71 MB)
 ```
 
-**Execution Time:** ~28 seconds
+**Execution Time:** ~5-7 minutes (full pipeline), ~3-5 minutes (--skip-long-format)
+
+**Long Format Benefits:**
+- Includes full NSCH holdout sample (786K rows) for external validation
+- devflag: 0=holdout, 1=development (used for calibration)
+- maskflag: 0=original, 1=QA-cleaned (excluded observations)
+- Required for Age Gradient Explorer's masking toggle feature
+
+**Legacy Command (Deprecated):**
+
+The old `prepare_calibration_dataset.R` script still works but is no longer documented. Use `run_calibration_pipeline.R` for new workflows.
 
 ### 1.3 Validate Output
 
