@@ -6,11 +6,13 @@
 #
 # This pipeline:
 #   1. Creates/updates study-specific calibration tables (NE20, NE22, USA24, NE25, NSCH21, NSCH22)
-#   2. Combines tables and exports to Mplus .dat format
-#   3. Validates output and reports summary statistics
+#   2. Validates calibration data quality
+#   3. Creates long format dataset with QA masking (NEW in v3.5)
+#   4. Exports to Mplus .dat format
+#   5. Reports summary statistics
 #
 # Usage:
-#   # Full pipeline (create tables + export)
+#   # Full pipeline (create tables + long format + export)
 #   Rscript scripts/irt_scoring/run_calibration_pipeline.R
 #
 #   # Skip table creation, only export (faster if tables exist)
@@ -18,6 +20,9 @@
 #
 #   # Create tables only (no export)
 #   Rscript scripts/irt_scoring/run_calibration_pipeline.R --tables-only
+#
+#   # Skip long format creation (faster)
+#   Rscript scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
 #
 #   # Custom NSCH sample size
 #   Rscript scripts/irt_scoring/run_calibration_pipeline.R --nsch-sample 5000
@@ -38,6 +43,7 @@ args <- commandArgs(trailingOnly = TRUE)
 export_only <- "--export-only" %in% args
 tables_only <- "--tables-only" %in% args
 skip_quality_check <- "--skip-quality-check" %in% args
+skip_long_format <- "--skip-long-format" %in% args
 nsch_sample_size <- 1000  # Default sample size
 
 # Parse NSCH sample size
@@ -52,6 +58,7 @@ cat(sprintf("  Mode: %s\n",
                    ifelse(tables_only, "TABLES ONLY", "FULL PIPELINE"))))
 cat(sprintf("  NSCH sample size: %d per year\n", nsch_sample_size))
 cat(sprintf("  Quality check: %s\n", ifelse(skip_quality_check, "SKIPPED", "ENABLED")))
+cat(sprintf("  Long format creation: %s\n", ifelse(skip_long_format, "SKIPPED", "ENABLED")))
 cat(sprintf("  Database: data/duckdb/kidsights_local.duckdb\n"))
 cat(sprintf("  Output: mplus/calibdat.dat\n\n"))
 
@@ -136,6 +143,34 @@ if (!export_only && !tables_only && !skip_quality_check) {
 }
 
 # =============================================================================
+# Step 2.6: Create Long Format Dataset with QA Masking
+# =============================================================================
+
+if (!export_only && !tables_only && !skip_long_format) {
+  cat(strrep("=", 80), "\n")
+  cat("STEP 2.6: CREATE LONG FORMAT DATASET\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("Creating long format calibration dataset with:\n")
+  cat("  - ALL NSCH data (development + holdout for external validation)\n")
+  cat("  - Cook's D influence point detection\n")
+  cat("  - QA masking flags (NE25 removal + influence points)\n\n")
+
+  source("scripts/irt_scoring/create_calibration_long.R")
+
+  cat("\n[OK] Long format dataset created: calibration_dataset_long\n")
+  cat("     - 1.39M rows × 9 columns (id, years, study, studynum, lex_equate, y, cooksd_quantile, maskflag, devflag)\n")
+  cat("     - Development sample: devflag=1\n")
+  cat("     - NSCH holdout: devflag=0\n")
+  cat("     - QA cleaned: maskflag=1\n\n")
+} else if (!export_only && !tables_only && skip_long_format) {
+  cat(strrep("=", 80), "\n")
+  cat("STEP 2.6: CREATE LONG FORMAT DATASET (SKIPPED)\n")
+  cat(strrep("=", 80), "\n\n")
+  cat("[INFO] Long format creation skipped (--skip-long-format flag)\n\n")
+}
+
+# =============================================================================
 # Step 3: Export Calibration Dataset
 # =============================================================================
 
@@ -171,7 +206,8 @@ if (!tables_only) {
   cat("  - mplus/calibdat.dat (Mplus-compatible dataset)\n\n")
 }
 
-cat("Calibration Tables in Database:\n")
+cat("Calibration Tables in Database:\n\n")
+cat("Study-Specific Tables (Wide Format):\n")
 cat("  - ne20_calibration   (37,546 records - Nebraska 2020)\n")
 cat("  - ne22_calibration   (2,431 records  - Nebraska 2022)\n")
 cat("  - ne25_calibration   (3,507 records  - Nebraska 2025)\n")
@@ -179,9 +215,19 @@ cat("  - nsch21_calibration (20,719 records - NSCH 2021, ALL data)\n")
 cat("  - nsch22_calibration (19,741 records - NSCH 2022, ALL data)\n")
 cat("  - usa24_calibration  (1,600 records  - USA 2024)\n\n")
 
+cat("Long Format Table (NEW):\n")
+cat("  - calibration_dataset_long (1,390,768 rows)\n")
+cat("    * Includes ALL NSCH data (development + holdout)\n")
+cat("    * QA masking flags (maskflag: 0=original, 1=cleaned)\n")
+cat("    * Dev/holdout split (devflag: 1=development, 0=NSCH holdout)\n")
+cat("    * Cook's D influence quantiles for each item\n\n")
+
 cat("Next Steps:\n")
-cat("  1. Review output: mplus/calibdat.dat\n")
-cat("  2. Create Mplus .inp file: See docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md\n")
-cat("  3. Run Mplus calibration: mplus calibration.inp\n\n")
+cat("  1. Review output: mplus/calibdat.dat (wide format export)\n")
+cat("  2. OR export from long format (QA cleaned):\n")
+cat("     See docs/irt_scoring/calibration_qa_cleanup_summary.md for query examples\n")
+cat("  3. Create Mplus .inp file: See docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md\n")
+cat("  4. Run Mplus calibration: mplus calibration.inp\n")
+cat("  5. Validate with NSCH holdout: Query calibration_dataset_long WHERE devflag=0\n\n")
 
 cat("[OK] IRT Calibration Pipeline completed successfully\n\n")

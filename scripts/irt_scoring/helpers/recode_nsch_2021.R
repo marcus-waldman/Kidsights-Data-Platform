@@ -89,8 +89,21 @@ recode_nsch_2021 <- function(codebook_path = "codebook/data/codebook.json",
   for (item_id in names(codebook$items)) {
     item <- codebook$items[[item_id]]
     cahmi21_val <- item$lexicons$cahmi21
-    if (!is.null(cahmi21_val) && length(cahmi21_val) == 1 && nchar(cahmi21_val) > 0) {
-      cahmi21_mappings[[cahmi21_val]] <- item$lexicons$equate
+
+    if (!is.null(cahmi21_val)) {
+      equate_name <- item$lexicons$equate
+
+      # Handle both single values and arrays
+      if (is.list(cahmi21_val) && length(cahmi21_val) > 0) {
+        # Array lexicon (historical naming variations across NSCH years)
+        # Use LAST element (most recent naming convention for NSCH 2021)
+        cahmi21_val <- cahmi21_val[[length(cahmi21_val)]]
+      }
+
+      # Map the variable name to equate name
+      if (is.character(cahmi21_val) && nchar(cahmi21_val) > 0) {
+        cahmi21_mappings[[cahmi21_val]] <- equate_name
+      }
     }
   }
 

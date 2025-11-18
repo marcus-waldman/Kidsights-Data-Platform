@@ -3331,7 +3331,10 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "reverse_coded": {
+        "ne25": true
+      }
     },
     "AA57": {
       "id": 37,
@@ -3613,7 +3616,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -4098,14 +4101,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "motor",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "motor",
           "studies": [
@@ -4122,7 +4117,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": true,
+        "calibration_item": false,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -4130,15 +4125,19 @@
             "thresholds": [],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration per Age Gradient Explorer review (November 2025). NE25 data quality issues identified. Item removed from domains.kidsights and marked as non-calibration item."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
-      },
-      "instruments": [
-        "Kidsights Measurement Tool"
-      ]
+        "modified_date": "2025-11-17"
+      }
     },
     "AA202": {
       "id": 12,
@@ -4159,14 +4158,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "motor",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "motor",
           "studies": [
@@ -4183,7 +4174,7 @@
         "reverse": false
       },
       "psychometric": {
-        "calibration_item": true,
+        "calibration_item": false,
         "irt_parameters": {
           "NE25": {
             "factors": [
@@ -4197,15 +4188,19 @@
             ],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration per Age Gradient Explorer review (November 2025). NE25 data quality issues identified. Item removed from domains.kidsights and marked as non-calibration item."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
-      },
-      "instruments": [
-        "Kidsights Measurement Tool"
-      ]
+        "modified_date": "2025-11-17"
+      }
     },
     "AA203": {
       "id": 13,
@@ -10790,14 +10785,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "health",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "health",
           "studies": [
@@ -10818,7 +10805,7 @@
         }
       },
       "psychometric": {
-        "calibration_item": true,
+        "calibration_item": false,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -10826,11 +10813,18 @@
             "thresholds": [],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration (November 2025). Health/dental measures are not developmental items and should not be included in Kidsights IRT calibration. Retained in codebook for NSCH/CAHMI tracking with domains.cahmi and domains.hrtl22."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-11-17"
       },
       "instruments": [
         "Healthy and Ready to Learn"
@@ -10850,6 +10844,9 @@
             "emerging": 2
           }
         }
+      },
+      "reverse_coded": {
+        "ne25": true
       }
     },
     "CQR014X": {
@@ -10875,14 +10872,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "health",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "health",
           "studies": [
@@ -10903,7 +10892,7 @@
         }
       },
       "psychometric": {
-        "calibration_item": true,
+        "calibration_item": false,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -10911,15 +10900,25 @@
             "thresholds": [],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration (November 2025). Health/dental measures are not developmental items and should not be included in Kidsights IRT calibration. Retained in codebook for NSCH/CAHMI tracking with domains.cahmi and domains.hrtl22."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-11-17"
       },
       "instruments": [
         "Healthy and Ready to Learn"
-      ]
+      ],
+      "reverse_coded": {
+        "ne25": true
+      }
     },
     "DD10": {
       "id": 116,
@@ -12249,7 +12248,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -12269,7 +12268,7 @@
         72
       ],
       "scoring": {
-        "reverse": true,
+        "reverse": false,
         "reverse_by_study": {
           "cahmi21": true
         }
@@ -12334,7 +12333,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -15502,7 +15501,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -15613,7 +15612,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -15677,7 +15676,10 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "reverse_coded": {
+        "ne25": false
+      }
     },
     "EG16b": {
       "id": 149,
@@ -15708,7 +15710,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -15803,7 +15805,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -17942,7 +17944,8 @@
             "NE20",
             "NE22",
             "NE25"
-          ]
+          ],
+          "value": "psychosocial_problems_general"
         },
         "cahmi": {
           "value": "self_regulation",
@@ -18024,7 +18027,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -18135,7 +18138,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -18243,7 +18246,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -18323,7 +18326,8 @@
             "NE20",
             "NE22",
             "NE25"
-          ]
+          ],
+          "value": "psychosocial_problems_general"
         },
         "cahmi": {
           "value": "self_regulation",
@@ -18402,7 +18406,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -19801,7 +19805,10 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "reverse_coded": {
+        "ne25": true
+      }
     },
     "EG30e": {
       "id": 197,
@@ -19891,7 +19898,10 @@
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "reverse_coded": {
+        "ne25": true
+      }
     },
     "EG30f": {
       "id": 198,
@@ -21243,7 +21253,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -21358,7 +21368,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -21736,7 +21746,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -21757,7 +21767,7 @@
         72
       ],
       "scoring": {
-        "reverse": true,
+        "reverse": false,
         "equate_group": 39,
         "reverse_by_study": {
           "cahmi22": false
@@ -22105,7 +22115,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "coglan",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -22198,7 +22208,7 @@
       },
       "domains": {
         "kidsights": {
-          "value": "socemo",
+          "value": "psychosocial_problems_general",
           "studies": [
             "NE20",
             "NE22",
@@ -22218,7 +22228,7 @@
         72
       ],
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": 41
       },
       "psychometric": {
@@ -23004,7 +23014,7 @@
         72
       ],
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": 44
       },
       "psychometric": {
@@ -24536,14 +24546,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "health",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "health",
           "studies": [
@@ -24572,11 +24574,18 @@
             "thresholds": [],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration (November 2025). Health/dental measures are not developmental items and should not be included in Kidsights IRT calibration. Retained in codebook for NSCH/CAHMI tracking with domains.cahmi and domains.hrtl22."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-11-17"
       },
       "instruments": [
         "Kidsights Measurement Tool"
@@ -24605,14 +24614,6 @@
         }
       },
       "domains": {
-        "kidsights": {
-          "value": "health",
-          "studies": [
-            "NE20",
-            "NE22",
-            "NE25"
-          ]
-        },
         "cahmi": {
           "value": "health",
           "studies": [
@@ -24633,7 +24634,7 @@
         }
       },
       "psychometric": {
-        "calibration_item": true,
+        "calibration_item": false,
         "irt_parameters": {
           "NE25": {
             "factors": [],
@@ -24641,11 +24642,18 @@
             "thresholds": [],
             "param_constraints": []
           }
-        }
+        },
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration (November 2025). Health/dental measures are not developmental items and should not be included in Kidsights IRT calibration. Retained in codebook for NSCH/CAHMI tracking with domains.cahmi and domains.hrtl22."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-11-17"
       },
       "instruments": [
         "Kidsights Measurement Tool"
@@ -24699,7 +24707,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -24756,7 +24764,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -24813,7 +24821,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -24870,7 +24878,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -24927,7 +24935,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -24984,7 +24992,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25041,7 +25049,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25098,7 +25106,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25155,7 +25163,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25212,7 +25220,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25269,7 +25277,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25326,7 +25334,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25383,7 +25391,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25440,7 +25448,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25497,7 +25505,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25554,7 +25562,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25611,7 +25619,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25668,7 +25676,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25725,7 +25733,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25782,7 +25790,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25839,7 +25847,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25896,7 +25904,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -25953,7 +25961,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26010,7 +26018,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26067,7 +26075,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26124,7 +26132,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26181,7 +26189,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26238,7 +26246,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26295,7 +26303,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26352,7 +26360,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26409,7 +26417,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26466,7 +26474,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26523,7 +26531,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26580,7 +26588,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26637,7 +26645,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26694,7 +26702,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26751,7 +26759,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26808,7 +26816,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26865,7 +26873,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26922,7 +26930,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -26979,7 +26987,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27036,7 +27044,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27093,7 +27101,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27150,7 +27158,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27207,7 +27215,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27264,7 +27272,7 @@
         }
       },
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": "GSED_PF"
       },
       "psychometric": {
@@ -27359,11 +27367,18 @@
         }
       },
       "psychometric": {
-        "calibration_item": false
+        "calibration_item": false,
+        "notes": [
+          {
+            "type": "exclusion",
+            "date": "2025-11-17",
+            "note": "Excluded from Kidsights calibration (November 2025). Health/dental measures are not developmental items and should not be included in Kidsights IRT calibration. Retained in codebook for NSCH/CAHMI tracking with domains.cahmi and domains.hrtl22."
+          }
+        ]
       },
       "metadata": {
         "added_date": "2025-11-13",
-        "modified_date": "2025-11-13",
+        "modified_date": "2025-11-17",
         "notes": "Composite variable derived from HCABILITY and HCEXTENT for HRTL22 scoring"
       }
     }

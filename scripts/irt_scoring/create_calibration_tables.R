@@ -209,14 +209,37 @@ create_calibration_tables <- function(
 
       cat(sprintf("      Created integer IDs: 250311000001 to 250311%06d\n", nrow(ne25_data)))
 
-      # Remove metadata columns
-      metadata_cols <- c("pid", "record_id", "redcap_event_name", "eligible",
-                         "authentic", "survey_date", "child_dob")
-      ne25_calibration <- ne25_calibration %>%
-        dplyr::select(-dplyr::any_of(metadata_cols)) %>%
-        dplyr::relocate(id, years)
+      # Select only calibration-relevant columns using codebook
+      # Get list of valid calibration items (items with domains.kidsights)
+      all_items <- names(cb$items)
+      valid_items <- character()
 
-      cat(sprintf("      Selected %d columns for calibration\n", ncol(ne25_calibration)))
+      for (item_id in all_items) {
+        item_info <- cb$items[[item_id]]
+        if (!is.null(item_info$domains$kidsights)) {
+          valid_items <- c(valid_items, item_id)
+        }
+      }
+
+      # Identify which valid items exist in the dataset
+      dataset_cols <- names(ne25_calibration)
+      item_cols <- intersect(valid_items, dataset_cols)
+
+      # Required columns
+      required_cols <- c("id", "years")
+
+      # Optional columns (include if they exist)
+      optional_cols <- c("authenticity_weight")
+      optional_cols <- intersect(optional_cols, dataset_cols)
+
+      # Select only these columns
+      cols_to_keep <- c(required_cols, optional_cols, item_cols)
+      ne25_calibration <- ne25_calibration %>%
+        dplyr::select(dplyr::all_of(cols_to_keep))
+
+      cat(sprintf("      Selected %d columns for calibration (%d items + %d metadata)\n",
+                  ncol(ne25_calibration), length(item_cols),
+                  length(required_cols) + length(optional_cols)))
 
       cat("\n[4/6] Creating ne25_calibration table\n")
 

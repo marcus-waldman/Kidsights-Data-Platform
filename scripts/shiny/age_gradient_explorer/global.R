@@ -35,10 +35,20 @@ calibration_data <- dbGetQuery(conn, "
   SELECT * FROM calibration_dataset_2020_2025
 ")
 
-dbDisconnect(conn)
-
 cat(sprintf("  Loaded %d records from calibration_dataset_2020_2025\n",
             nrow(calibration_data)))
+
+# Load maskflag data from long format table
+cat("  Loading maskflag data from calibration_dataset_long...\n")
+maskflag_data <- dbGetQuery(conn, "
+  SELECT id, lex_equate, maskflag
+  FROM calibration_dataset_long
+  WHERE maskflag = 1
+")
+
+cat(sprintf("    Loaded %d masked observations\n", nrow(maskflag_data)))
+
+dbDisconnect(conn)
 
 # Extract metadata columns
 metadata_cols <- c("study", "studynum", "id", "years")

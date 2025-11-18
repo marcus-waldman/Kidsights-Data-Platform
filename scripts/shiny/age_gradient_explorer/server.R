@@ -64,12 +64,26 @@ function(input, output, session) {
   filtered_data <- reactive({
     req(input$item_selected)
     req(length(input$studies_selected) > 0)
+    req(input$maskflag_mode)
 
     # Extract item response data
     data <- calibration_data %>%
       dplyr::filter(study %in% input$studies_selected) %>%
       dplyr::select(study, id, years, response = !!sym(input$item_selected)) %>%
       dplyr::filter(!is.na(response))
+
+    # Apply maskflag filtering
+    if (input$maskflag_mode == "after") {
+      # Exclude observations with maskflag=1
+      masked_ids <- maskflag_data %>%
+        dplyr::filter(lex_equate == input$item_selected, maskflag == 1) %>%
+        dplyr::pull(id)
+
+      if (length(masked_ids) > 0) {
+        data <- data %>% dplyr::filter(!(id %in% masked_ids))
+      }
+    }
+    # If "before", no filtering needed (use all data)
 
     # Exclude influence points if toggle is checked
     if (input$exclude_influence_points) {
@@ -135,12 +149,27 @@ function(input, output, session) {
       return(list(
         description = "No description available",
         instruments = NULL,
-        expected_categories = NULL
+        expected_categories = NULL,
+        full_entry = NULL
       ))
     }
 
-    # Use if statements instead of %||% (not in base R)
-    desc <- if (!is.null(item$content$description)) item$content$description else "No description available"
+    # Extract description from stems (codebook uses stems, not description)
+    desc <- "No description available"
+    if (!is.null(item$content$stems)) {
+      if (!is.null(item$content$stems$combined)) {
+        desc <- item$content$stems$combined
+      } else if (!is.null(item$content$stems$ne25)) {
+        desc <- item$content$stems$ne25
+      } else if (length(item$content$stems) > 0) {
+        # Get first available stem
+        first_stem <- item$content$stems[[1]]
+        if (is.character(first_stem)) {
+          desc <- first_stem
+        }
+      }
+    }
+
     instr <- if (!is.null(item$instruments)) item$instruments else NULL
     exp_cat <- if (!is.null(item$psychometric$expected_categories)) item$psychometric$expected_categories else NULL
 
@@ -196,6 +225,7 @@ function(input, output, session) {
 
   output$summary_stats <- renderText({
     req(nrow(filtered_data()) > 0)
+    req(input$maskflag_mode)
 
     data <- filtered_data()
 
@@ -211,11 +241,28 @@ function(input, output, session) {
     n_missing <- sum(is.na(full_data[[input$item_selected]]))
     pct_missing <- (n_missing / n_total) * 100
 
-    paste0(
+    # Calculate number of masked observations
+    masked_ids <- maskflag_data %>%
+      dplyr::filter(lex_equate == input$item_selected, maskflag == 1) %>%
+      dplyr::pull(id)
+
+    # Count masked obs in selected studies
+    n_masked <- calibration_data %>%
+      dplyr::filter(study %in% input$studies_selected, id %in% masked_ids) %>%
+      nrow()
+
+    stats_text <- paste0(
       "n observations: ", n_obs, "\n",
       "Age range: ", round(age_min, 2), " - ", round(age_max, 2), " years\n",
       "% missing: ", round(pct_missing, 1), "%"
     )
+
+    # Add masked count if in "after" mode
+    if (input$maskflag_mode == "after" && n_masked > 0) {
+      stats_text <- paste0(stats_text, "\nn masked: ", n_masked)
+    }
+
+    stats_text
   })
 
   # ============================================================================
@@ -225,11 +272,77 @@ function(input, output, session) {
   output$item_description <- renderUI({
     req(input$item_selected)
 
-    description <- item_metadata()$description
+    metadata <- item_metadata()
+    description <- metadata$description
+    item_info <- metadata$full_entry
+
+    # Extract domain from codebook
+    domain_text <- ""
+
+    if (!is.null(item_info)) {
+      if (!is.null(item_info$domains)) {
+        if (!is.null(item_info$domains$kidsights)) {
+          if (!is.null(item_info$domains$kidsights$value)) {
+            domain_value <- item_info$domains$kidsights$value
+
+            # Format domain name
+            domain_formatted <- switch(
+              domain_value,
+              "coglan" = "Cognitive/Language",
+              "motor" = "Motor",
+              "socemo" = "Social-Emotional",
+              "psychosocial_problems_general" = "Psychosocial Problems",
+              domain_value  # fallback to raw value
+            )
+
+            domain_text <- paste0(" | <strong>Domain:</strong> ", domain_formatted)
+          }
+        }
+      }
+    }
+
+    # Extract response set
+    response_html <- ""
+
+    if (!is.null(item_info)) {
+      if (!is.null(item_info$content$response_options)) {
+        # Try ne25 first, then combined, then first available
+        response_set_id <- NULL
+
+        if (!is.null(item_info$content$response_options$ne25)) {
+          response_set_id <- item_info$content$response_options$ne25
+        } else if (!is.null(item_info$content$response_options$combined)) {
+          response_set_id <- item_info$content$response_options$combined
+        } else if (length(item_info$content$response_options) > 0) {
+          response_set_id <- item_info$content$response_options[[1]]
+        }
+
+        # Look up response set in codebook
+        if (!is.null(response_set_id) && !is.null(codebook$response_sets[[response_set_id]])) {
+          response_set <- codebook$response_sets[[response_set_id]]
+
+          # Build HTML list
+          response_items <- c()
+          for (i in seq_along(response_set)) {
+            opt <- response_set[[i]]
+            missing_tag <- if (!is.null(opt$missing) && opt$missing) " <span style='color: #999;'>(missing)</span>" else ""
+            response_items <- c(response_items, paste0("<li><strong>", opt$value, ":</strong> ", opt$label, missing_tag, "</li>"))
+          }
+
+          response_html <- paste0(
+            "<p style='margin-top: 10px; margin-bottom: 5px;'><strong>Response Options:</strong></p>",
+            "<ul style='margin-top: 0px; padding-left: 20px;'>",
+            paste(response_items, collapse = ""),
+            "</ul>"
+          )
+        }
+      }
+    }
 
     HTML(paste0(
       "<h4>", input$item_selected, "</h4>",
-      "<p><em>", description, "</em></p>"
+      "<p><em>", description, domain_text, "</em></p>",
+      response_html
     ))
   })
 

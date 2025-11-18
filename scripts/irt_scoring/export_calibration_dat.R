@@ -213,6 +213,15 @@ export_calibration_dat <- function(
       cat(sprintf("      Loaded %d records\n", nrow(study_data)))
     }
 
+    # Convert Date/POSIXct columns to numeric (MplusAutomation requirement)
+    for (col in names(study_data)) {
+      if (inherits(study_data[[col]], "Date")) {
+        study_data[[col]] <- as.numeric(study_data[[col]])
+      } else if (inherits(study_data[[col]], "POSIXct") || inherits(study_data[[col]], "POSIXt")) {
+        study_data[[col]] <- as.numeric(study_data[[col]])
+      }
+    }
+
     # Add study_num column (all IDs are numeric following YYFFFS.RRRRRRRRRRRR convention)
     study_data <- study_data %>%
       dplyr::mutate(study_num = study_num) %>%

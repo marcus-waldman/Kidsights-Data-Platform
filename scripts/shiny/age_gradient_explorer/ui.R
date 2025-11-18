@@ -166,6 +166,20 @@ fluidPage(
           # Quality Flag Warning
           uiOutput("quality_flag_warning"),
 
+          # Masking Toggle
+          radioButtons(
+            "maskflag_mode",
+            label = "Data Masking:",
+            choices = c(
+              "Before Masking (original data)" = "before",
+              "After Masking (QA cleaned)" = "after"
+            ),
+            selected = "after",
+            inline = TRUE
+          ),
+          p(style = "font-size: 11px; color: #666; margin-top: -10px; margin-bottom: 15px;",
+            em("After Masking excludes NE25 problematic observations and Cook's D influence points.")),
+
           # Age Gradient Plot
           plotOutput("age_gradient_plot", height = "600px"),
 

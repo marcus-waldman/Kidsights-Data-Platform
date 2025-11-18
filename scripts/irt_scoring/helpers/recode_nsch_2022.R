@@ -91,8 +91,21 @@ recode_nsch_2022 <- function(codebook_path = "codebook/data/codebook.json",
   for (item_id in names(codebook$items)) {
     item <- codebook$items[[item_id]]
     cahmi22_val <- item$lexicons$cahmi22
-    if (!is.null(cahmi22_val) && length(cahmi22_val) == 1 && nchar(cahmi22_val) > 0) {
-      cahmi22_mappings[[cahmi22_val]] <- item$lexicons$equate
+
+    if (!is.null(cahmi22_val)) {
+      equate_name <- item$lexicons$equate
+
+      # Handle both single values and arrays
+      if (is.list(cahmi22_val) && length(cahmi22_val) > 0) {
+        # Array lexicon (e.g., ["BOUNCEBALL", "BOUNCEABALL"])
+        # Use LAST element (most recent naming convention for NSCH 2022)
+        cahmi22_val <- cahmi22_val[[length(cahmi22_val)]]
+      }
+
+      # Map the variable name to equate name
+      if (is.character(cahmi22_val) && nchar(cahmi22_val) > 0) {
+        cahmi22_mappings[[cahmi22_val]] <- equate_name
+      }
     }
   }
 
