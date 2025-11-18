@@ -67,12 +67,14 @@ python -m python.imputation.helpers
 
 **IRT Calibration Pipeline:**
 ```bash
-# Interactive workflow (prompts for NSCH sample size and output path)
-"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+# Full pipeline (create tables + long format + export to Mplus)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R
 
-# Or source in R session
-source("scripts/irt_scoring/prepare_calibration_dataset.R")
-prepare_calibration_dataset()
+# Skip long format creation (faster, ~30 seconds saved)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+
+# Skip quality checks (use with caution)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-quality-check
 ```
 
 ### Key Requirements
@@ -312,12 +314,17 @@ print(f"Total records: {result[0][0]}")
 
 ### Create IRT Calibration Dataset
 ```bash
-# Prepare calibration dataset for Mplus (interactive)
-"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=scripts/irt_scoring/prepare_calibration_dataset.R
+# Run full calibration pipeline
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R
 
 # Outputs:
-#   - mplus/calibdat.dat (38.71 MB, 47,084 records, 419 columns)
-#   - DuckDB table: calibration_dataset_2020_2025
+#   - Wide format table: calibration_dataset_2020_2025 (47,084 records, 303 columns)
+#   - Long format table: calibration_dataset_long (1,316,391 rows, 9 columns)
+#   - Mplus export: mplus/calibdat.dat (38.71 MB, 47,084 records, 419 columns)
+#   - Execution time: ~5-7 minutes with long format, ~3-5 minutes without
+
+# Skip long format creation (faster iteration)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
 ```
 
 ### Launch Quality Assurance Tools
@@ -328,13 +335,22 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 
 **Purpose:** Mandatory visual inspection of age-response gradients before Mplus calibration
 
-**Prerequisites:** Calibration dataset created (`calibration_dataset_2020_2025` table)
+**Prerequisites:**
+- Calibration dataset created (`calibration_dataset_2020_2025` and `calibration_dataset_long` tables)
+- Precomputed models recommended (run `source("scripts/shiny/age_gradient_explorer/precompute_models.R")`)
 
 **What it does:**
 - Box plots showing age distributions at each response level
 - GAM smoothing for non-linear developmental trends
 - Quality flag warnings (negative correlations, category mismatches)
 - Multi-study filtering (6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+
+**New features (v3.0+):**
+- Configurable influence threshold slider (1-5% Cook's D quantile)
+- Database-backed review notes with JSON export
+- Domain labels in item dropdown (Cognitive/Language, Motor, Social-Emotional, Psychosocial Problems)
+- Masking toggle to compare original vs QA-cleaned data (Issue #11: partial implementation)
+- Response options display below item stem (Issue #11: partial implementation)
 
 ### Quick Debugging
 1. **Database:** `python -c "from python.db.connection import DatabaseManager; print(DatabaseManager().test_connection())"`
@@ -473,9 +489,16 @@ pip install pyreadstat
 - **Historical Data:** 41,577 records from KidsightsPublic package (NE20, NE22, USA24)
 - **Mplus Compatibility:** Space-delimited .dat format, 38.71 MB output file
 - **Performance:** 28 seconds execution time
-- **Database:** `calibration_dataset_2020_2025` table (303 columns: id, study, years, wgt + 299 items)
+- **Database Tables:**
+  - `calibration_dataset_2020_2025` (wide format): 303 columns (id, study, years, wgt + 299 items), 47,084 records
+  - `calibration_dataset_long` (long format): 9 columns (id, years, study, studynum, lex_equate, y, cooksd_quantile, maskflag, devflag), 1,316,391 rows
+  - Long format benefits: Full NSCH data (787K holdout rows), devflag/maskflag QA system, storage efficiency (~20 MB vs 290+ MB)
 - **Weighted Estimation:** wgt column (1.0 for all studies, authenticity_weight 0.42-1.96 for NE25 inauthentic responses)
 - **Output:** `mplus/calibdat.dat` ready for weighted graded response model IRT calibration
+- **QA Masking System:**
+  - `devflag`: 0=holdout (NSCH), 1=development (used for calibration)
+  - `maskflag`: 0=original data, 1=QA-cleaned (excluded observations from NE25 issues or Cook's D influence)
+  - Age Gradient Explorer uses maskflag to toggle between original and cleaned data views
 - **MODEL Syntax Generation:** Automated Mplus syntax generation from codebook constraints
   - 5 constraint types: complete equality, slope-only, threshold ordering, simplex, 1-PL/Rasch
   - Outputs: Excel review file (MODEL, CONSTRAINT, PRIOR sheets) + optional complete .inp file
@@ -487,6 +510,7 @@ pip install pyreadstat
   - **Issue #6 - Syntax Generator Indexing:** Fixed `write_syntax2.R` to use category lookup instead of positional indexing (prevents incorrect threshold counts like EG16c showing 4 thresholds for dichotomous data). Commit: 37d2034
   - **Issue #8 - NSCH Negative Age Correlations (RESOLVED):** Fixed study-specific reverse coding for 14 NSCH items by adding `cahmi22: true` to `codebook.json`. Reduced NSCH negative correlations from 15 to 4 items (73% reduction). Systematic strong negatives (r ≈ -0.82) completely eliminated. Remaining 4 items show weak correlations (r = -0.03 to -0.21) likely due to NSCH age-routing design.
 - **Development Status:** Pipeline ready for production use - NSCH harmonization validated, data quality verified
+- **QA Cleanup Documentation:** See [docs/irt_scoring/calibration_qa_cleanup_summary.md](docs/irt_scoring/calibration_qa_cleanup_summary.md) for detailed documentation of bug fixes, data cleaning workflow, long format dataset, and masking system
 - **Quality Assurance Tools:** Age-Response Gradient Explorer Shiny app (production-ready, REQUIRED)
   - Mandatory pre-calibration visual inspection of 308 developmental items
   - Box plots + GAM smoothing across 6 calibration studies

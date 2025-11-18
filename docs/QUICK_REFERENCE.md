@@ -248,17 +248,18 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 **Purpose:** Create Mplus-compatible calibration dataset for psychometric recalibration of developmental/behavioral items
 
 ```bash
-# One-time: Import historical data (NE20, NE22, USA24)
+# Full pipeline (recommended): Create tables + long format + Mplus export
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R
+
+# Skip long format (faster iteration, ~30 seconds saved)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-long-format
+
+# Skip quality checks (use with caution)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/irt_scoring/run_calibration_pipeline.R --skip-quality-check
+
+# One-time: Import historical data (NE20, NE22, USA24) - only if starting fresh
 "C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
   --file=scripts/irt_scoring/import_historical_calibration.R
-
-# Interactive: Prepare calibration dataset
-"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore \
-  --file=scripts/irt_scoring/prepare_calibration_dataset.R
-
-# Standalone: Create NE25 calibration table (outside pipeline)
-"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" \
-  scripts/irt_scoring/create_ne25_calibration_table.R
 ```
 
 **Note:** NE25 calibration table is automatically created by NE25 pipeline (Step 11) - manual execution rarely needed
@@ -266,12 +267,17 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 **What it does:**
 - Combines 6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24
 - Harmonizes 416 items via lexicon mappings (ne25/cahmi21/cahmi22 → lex_equate)
-- Creates Mplus .dat file (space-delimited, missing as ".")
-- Stores in `calibration_dataset_2020_2025` table with indexes
+- Creates two database tables:
+  - `calibration_dataset_2020_2025` (wide format): 47,084 records × 303 columns
+  - `calibration_dataset_long` (long format): 1,316,391 rows × 9 columns
+- Exports Mplus .dat file (space-delimited, missing as ".")
+- Computes Cook's D influence diagnostics for QA masking
 
-**Timing:** ~30 seconds
+**Timing:** ~5-7 minutes (full pipeline), ~3-5 minutes (with --skip-long-format)
 
-**Output:** 47,084 records × 419 columns (~38 MB)
+**Output:**
+- Wide format: 47,084 records × 419 columns (~38 MB) for Mplus
+- Long format: 1.3M rows for QA analysis (~20 MB, includes full NSCH holdout sample)
 
 **⚠️ REQUIRED NEXT STEP:** After creating the calibration dataset, you MUST run the Age-Response Gradient Explorer for visual quality assurance before proceeding to Mplus calibration.
 
@@ -303,22 +309,37 @@ See [Interactive Tools](#interactive-tools) section for detailed QA checklist.
 library(duckdb)
 conn <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
 
-# Study distribution
+# Study distribution (wide format)
 DBI::dbGetQuery(conn, "
   SELECT study_num, COUNT(*) as n
   FROM calibration_dataset_2020_2025
   GROUP BY study_num
 ")
 
-# Item coverage by study (top 5 items)
+# Long format: Record counts by study and dev/mask flags
 DBI::dbGetQuery(conn, "
   SELECT
-    study_num,
-    COUNT(CASE WHEN NOM046X IS NOT NULL THEN 1 END) as NOM046X_n,
-    COUNT(CASE WHEN PS001 IS NOT NULL THEN 1 END) as PS001_n,
-    COUNT(CASE WHEN PS020 IS NOT NULL THEN 1 END) as PS020_n
-  FROM calibration_dataset_2020_2025
-  GROUP BY study_num
+    study,
+    COUNT(DISTINCT id) as n_participants,
+    COUNT(*) as n_observations,
+    SUM(CASE WHEN devflag = 1 THEN 1 ELSE 0 END) as n_development,
+    SUM(CASE WHEN devflag = 0 THEN 1 ELSE 0 END) as n_holdout,
+    SUM(CASE WHEN maskflag = 1 THEN 1 ELSE 0 END) as n_masked
+  FROM calibration_dataset_long
+  GROUP BY study
+  ORDER BY study
+")
+
+# Long format: Convert to wide format for specific item
+DBI::dbGetQuery(conn, "
+  SELECT
+    id, years, study,
+    MAX(CASE WHEN lex_equate = 'DD221' THEN y END) as DD221,
+    MAX(CASE WHEN lex_equate = 'EG44_2' THEN y END) as EG44_2
+  FROM calibration_dataset_long
+  WHERE lex_equate IN ('DD221', 'EG44_2')
+  GROUP BY id, years, study
+  LIMIT 10
 ")
 
 # Age distribution by study

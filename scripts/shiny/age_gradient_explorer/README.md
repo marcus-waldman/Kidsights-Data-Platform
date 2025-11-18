@@ -517,13 +517,17 @@ source("scripts/shiny/age_gradient_explorer/precompute_models.R")
 
 ## Recent Updates
 
-**Version 3.0.0 (November 2025):**
+**Version 3.1.0 (November 2025):**
 - **NEW:** Configurable influence point threshold slider (1-5%)
 - **NEW:** Database-backed review notes system with version history
 - **NEW:** Collapsible version history (hidden by default)
 - **NEW:** Database connection management (Test/Close buttons)
+- **NEW:** Domain labels in item dropdown (Cognitive/Language, Motor, Social-Emotional, Psychosocial Problems)
+- **NEW:** Masking toggle to compare original vs QA-cleaned data (Issue #11: partial implementation)
+- **NEW:** Response options display below item stem (Issue #11: partial implementation)
 - **CHANGED:** Ordinal items now use linear regression instead of ordered logit
 - **CHANGED:** Precomputed models now include 5 reduced model variants per item
+- **CHANGED:** Now uses `calibration_dataset_long` table for maskflag data
 - **IMPROVED:** Automatic notes migration from JSON to DuckDB
 - **IMPROVED:** Real-time database status indicator
 
