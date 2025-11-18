@@ -6,10 +6,12 @@
 #
 # This pipeline:
 #   1. Creates/updates study-specific calibration tables (NE20, NE22, USA24, NE25, NSCH21, NSCH22)
-#   2. Validates calibration data quality
-#   3. Creates long format dataset with QA masking (NEW in v3.5)
-#   4. Exports to Mplus .dat format
-#   5. Reports summary statistics
+#   2. Validates calibration tables (record counts, age ranges, item coverage)
+#   3. Validates for sentinel missing codes (values >= 90) - MANDATORY
+#   4. Validates calibration data quality (category mismatches, negative correlations)
+#   5. Creates long format dataset with QA masking (NEW in v3.5)
+#   6. Exports to Mplus .dat format
+#   7. Reports summary statistics
 #
 # Usage:
 #   # Full pipeline (create tables + long format + export)
@@ -141,6 +143,33 @@ if (!export_only && !tables_only) {
   cat("Running validation checks...\n\n")
   source("scripts/irt_scoring/validate_calibration_tables.R")
   cat("\n")
+}
+
+# =============================================================================
+# Step 2.4: Sentinel Missing Code Validation (MANDATORY)
+# =============================================================================
+
+if (!export_only && !tables_only) {
+  cat(strrep("=", 80), "\n")
+  cat("STEP 2.4: SENTINEL MISSING CODE VALIDATION (MANDATORY)\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("Checking ALL calibration tables for sentinel missing codes (values >= 90)...\n")
+  cat("This validates:\n")
+  cat("  - Historical data (NE20, NE22, USA24)\n")
+  cat("  - NSCH transformations (NSCH21, NSCH22)\n")
+  cat("  - Current study (NE25)\n\n")
+
+  source("scripts/irt_scoring/validate_calibration_sentinel_codes.R")
+
+  validate_calibration_sentinel_codes(
+    db_path = "data/duckdb/kidsights_local.duckdb",
+    codebook_path = "codebook/data/codebook.json",
+    verbose = TRUE,
+    stop_on_error = TRUE  # STOP pipeline if contamination detected
+  )
+
+  cat("\n[OK] All calibration tables are clean (no values >= 90)\n\n")
 }
 
 # =============================================================================
