@@ -5,14 +5,27 @@
 #' This script implements LOOCV to build an out-of-sample distribution of
 #' average log-posterior values for authentic participants.
 #'
+#' COMBINED FUNCTIONALITY (replaces 02_fit_full_model.R):
+#'   - Fits full N=2,635 model and saves artifacts for diagnostic plots
+#'   - Runs LOOCV with warm-start initialization for efficiency
+#'   - Eliminates redundant full model fit (saves ~48 seconds)
+#'
 #' WARM-START STRATEGY (enables ~4.5 minute execution with 16 cores):
 #'   1. Fit full N=2,635 model ONCE → extract all parameters (including eta_correlation)
+#'      → Save to results/full_model_params.rds and results/full_model_eta_lookup.rds
 #'   2. For each iteration i:
 #'      a. Use create_warm_start() to initialize eta_std and L_Omega for LKJ model
 #'      b. Fit N-1 model with proper LKJ initialization [39x speedup!]
 #'      c. Extract item parameters AND eta_correlation from N-1 fit
 #'      d. Fit holdout model (fixed items + correlation, estimate eta_i)
 #'      e. Extract log_posterior and avg_logpost = log_posterior / n_items
+#'
+#' OUTPUTS:
+#'   - results/full_model_params.rds: Full model parameters (for diagnostic plots)
+#'   - results/full_model_eta_lookup.rds: Eta estimates by (pid, record_id)
+#'   - results/loocv_authentic_results.rds: LOOCV results with lz values
+#'   - results/loocv_distribution_params.rds: Mean/SD for standardization
+#'   - results/loocv_summary_stats.rds: Summary statistics
 #'
 #' CRITICAL: Saves BOTH log_posterior AND avg_logpost for re-analysis flexibility
 #'
@@ -125,6 +138,48 @@ cat(sprintf("      Extracted: eta_std(%d x %d), tau(%d), beta1(%d), delta(%.3f, 
             nrow(eta_std_matrix), ncol(eta_std_matrix), length(tau_full), length(beta1_full),
             delta_full[1], delta_full[2], eta_correlation_full))
 
+# --------------------------------------------------
+# Step 2b: Save full model artifacts for diagnostics
+# --------------------------------------------------
+
+cat("\n[Step 2b/3] Saving full model artifacts for diagnostic plots...\n")
+
+# Create results directory if needed
+dir.create("results", showWarnings = FALSE, recursive = TRUE)
+
+# Extract eta (transformed) from fit_full
+eta_names <- names(params_full)[grepl("^eta\\[", names(params_full))]
+eta_values <- params_full[eta_names]
+eta_matrix <- matrix(eta_values, nrow = N, ncol = 2, byrow = TRUE)
+
+# Create structured parameter list (compatible with 02_fit_full_model.R output)
+params_full_structured <- list(
+  tau = unname(tau_full),
+  beta1 = unname(beta1_full),
+  delta = unname(delta_full),
+  eta_correlation = unname(eta_correlation_full),
+  eta = eta_matrix,
+  eta_psychosocial = eta_matrix[, 1],
+  eta_developmental = eta_matrix[, 2]
+)
+
+# Save parameters
+saveRDS(params_full_structured, "results/full_model_params.rds")
+cat("      Saved: results/full_model_params.rds\n")
+
+# Create eta lookup table with (pid, record_id) mapping
+eta_full_lookup <- data.frame(
+  pid = pids_full,
+  record_id = record_ids_full,
+  authenticity_eta_psychosocial = eta_matrix[, 1],
+  authenticity_eta_developmental = eta_matrix[, 2]
+)
+
+saveRDS(eta_full_lookup, "results/full_model_eta_lookup.rds")
+cat("      Saved: results/full_model_eta_lookup.rds\n")
+cat(sprintf("      eta_full lookup: %d participants (pid, record_id, eta_psych, eta_dev)\n",
+            nrow(eta_full_lookup)))
+
 # ============================================================================
 # PHASE 3: DEFINE LOOCV ITERATION FUNCTION
 # ============================================================================
@@ -198,7 +253,7 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
     object = main_model,
     data = stan_data_loo,
     init = init_warmstart,
-    iter = 1000,
+    iter = 100000,
     algorithm = "LBFGS",
     verbose = TRUE,
     history_size = 50, 

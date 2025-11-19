@@ -126,7 +126,7 @@ compute_authenticity_weights <- function(data,
   eta_full_file <- file.path(cache_dir, "full_model_eta_lookup.rds")
   if (!file.exists(eta_full_file)) {
     stop(paste0("Full model eta lookup not found: ", eta_full_file, "\n",
-                "Run scripts/authenticity_screening/02_fit_full_model.R first."))
+                "Run scripts/authenticity_screening/03_run_loocv.R first (saves full model artifacts)."))
   }
 
   eta_full_lookup_authentic <- readRDS(eta_full_file)
@@ -183,7 +183,7 @@ compute_authenticity_weights <- function(data,
 
   if (!file.exists(params_file)) {
     stop(paste0("Full model parameters not found: ", params_file, "\n",
-                "Run scripts/authenticity_screening/02_fit_full_model.R first."))
+                "Run scripts/authenticity_screening/03_run_loocv.R first (saves full model artifacts)."))
   }
 
   params_full <- readRDS(params_file)
