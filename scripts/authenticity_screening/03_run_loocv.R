@@ -6,12 +6,12 @@
 #' average log-posterior values for authentic participants.
 #'
 #' WARM-START STRATEGY (enables ~4.5 minute execution with 16 cores):
-#'   1. Fit full N=2,635 model ONCE → extract all parameters
+#'   1. Fit full N=2,635 model ONCE → extract all parameters (including eta_correlation)
 #'   2. For each iteration i:
-#'      a. Create eta_init = eta[-i] - mean(eta[-i])  [satisfies sum-to-zero]
-#'      b. Fit N-1 model with init={eta_init, tau, beta1, delta} [39x speedup!]
-#'      c. Extract item parameters from N-1 fit
-#'      d. Fit holdout model (fixed items, estimate eta_i)
+#'      a. Use create_warm_start() to initialize eta_std and L_Omega for LKJ model
+#'      b. Fit N-1 model with proper LKJ initialization [39x speedup!]
+#'      c. Extract item parameters AND eta_correlation from N-1 fit
+#'      d. Fit holdout model (fixed items + correlation, estimate eta_i)
 #'      e. Extract log_posterior and avg_logpost = log_posterior / n_items
 #'
 #' CRITICAL: Saves BOTH log_posterior AND avg_logpost for re-analysis flexibility
@@ -27,6 +27,9 @@ library(dplyr)
 library(future)
 library(furrr)
 library(progressr)
+
+# Load helper functions for LKJ warm-start initialization
+source("R/authenticity/stan_interface.R")
 
 cat("\n")
 cat("================================================================================\n")
@@ -53,6 +56,7 @@ cat("\n=== PHASE 1: DATA LOADING AND MODEL COMPILATION ===\n\n")
 cat("[Step 1/3] Loading Stan data...\n")
 stan_data_full <- readRDS("data/temp/stan_data_authentic.rds")
 pids_full <- attr(stan_data_full, "pid")
+record_ids_full <- attr(stan_data_full, "record_id")
 N <- stan_data_full$N
 J <- stan_data_full$J
 M <- stan_data_full$M
@@ -80,10 +84,17 @@ start_time_full <- Sys.time()
 fit_full <- rstan::optimizing(
   object = main_model,
   data = stan_data_full,
-  seed = 12345,
+  init = 0,
   iter = 10000,
   algorithm = "LBFGS",
-  verbose = FALSE
+  verbose = TRUE, 
+  refresh = 100,
+  history_size = 50, 
+  tol_obj = 1e-12, 
+  tol_rel_obj = 1, 
+  tol_grad = 1e-8,
+  tol_rel_grad = 1e3, 
+  tol_param = 1e-8
 )
 
 end_time_full <- Sys.time()
@@ -98,17 +109,21 @@ cat(sprintf("      [OK] Full model fitted in %.1f seconds (%.2f minutes)\n",
 
 # Extract ALL parameters for warm-start initialization
 params_full <- fit_full$par
-eta_full <- params_full[grepl("^eta\\[", names(params_full))]
 tau_full <- params_full[grepl("^tau\\[", names(params_full))]
 beta1_full <- params_full[grepl("^beta1\\[", names(params_full))]
-delta_full <- params_full["delta"]
+delta_full <- params_full[grepl("^delta\\[", names(params_full))]  # Now 2-element vector
+eta_correlation_full <- params_full["eta_correlation"]
 
-cat(sprintf("      Extracted: eta(%d), tau(%d), beta1(%d), delta(%.3f)\n",
-            length(eta_full), length(tau_full), length(beta1_full), delta_full))
+# Extract eta_std as N x 2 matrix (for LKJ model)
+# CRITICAL: rstan returns both eta (transformed) and eta_std (parameter)
+# We need eta_std for warm-start initialization, NOT eta!
+# Stan stores matrix in row-major order, so use byrow=TRUE
+eta_std_names <- names(params_full)[grepl("^eta_std\\[", names(params_full))]
+eta_std_matrix <- matrix(params_full[eta_std_names], nrow = N, ncol = 2, byrow = TRUE)
 
-# Verify sum-to-zero constraint
-cat(sprintf("      Full eta: sum=%.6f (sum-to-zero constraint verified)\n",
-            sum(eta_full)))
+cat(sprintf("      Extracted: eta_std(%d x %d), tau(%d), beta1(%d), delta(%.3f, %.3f), eta_corr(%.3f)\n",
+            nrow(eta_std_matrix), ncol(eta_std_matrix), length(tau_full), length(beta1_full),
+            delta_full[1], delta_full[2], eta_correlation_full))
 
 # ============================================================================
 # PHASE 3: DEFINE LOOCV ITERATION FUNCTION
@@ -116,22 +131,25 @@ cat(sprintf("      Full eta: sum=%.6f (sum-to-zero constraint verified)\n",
 
 cat("\n=== PHASE 3: LOOCV ITERATION FUNCTION ===\n\n")
 
-#' Run a single LOOCV iteration with centered eta warm-start
+#' Run a single LOOCV iteration with LKJ warm-start
 #'
 #' @param i Index of participant to hold out (1 to N)
 #' @param stan_data_full Full Stan data list
 #' @param pids_full Vector of participant IDs
-#' @param eta_full Full N eta parameters
+#' @param record_ids_full Vector of record IDs
+#' @param eta_std_matrix Full N x 2 eta_std matrix (for LKJ model)
 #' @param tau_full Full N tau parameters
 #' @param beta1_full Full N beta1 parameters
 #' @param delta_full Full N delta parameter
+#' @param eta_correlation_full Correlation between dimensions from full model
 #' @param main_model Compiled main Stan model
 #' @param holdout_model Compiled holdout Stan model
 #'
-#' @return List with (i, pid, log_posterior, avg_logpost, n_items, eta_est,
-#'                     converged_main, converged_holdout)
-run_loocv_iteration <- function(i, stan_data_full, pids_full,
-                                 eta_full, tau_full, beta1_full, delta_full,
+#' @return List with (i, pid, record_id, log_posterior, avg_logpost, n_items,
+#'                     authenticity_eta_holdout, converged_main, converged_holdout)
+run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
+                                 eta_std_matrix, tau_full, beta1_full, delta_full,
+                                 eta_correlation_full,
                                  main_model, holdout_model) {
 
   # --------------------------------------------------
@@ -140,8 +158,9 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
 
   mask_loo <- stan_data_full$ivec != i
   ivec_loo <- stan_data_full$ivec[mask_loo]
-  ivec_loo_reindexed <- as.integer(as.factor(ivec_loo))
-
+  ivec_loo_reindexed <- ivec_loo
+  if(i<N){ivec_loo_reindexed[ivec_loo>i] = ivec_loo_reindexed[ivec_loo>i] - 1}
+  
   stan_data_loo <- list(
     M = sum(mask_loo),
     N = stan_data_full$N - 1,
@@ -150,23 +169,25 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
     ivec = ivec_loo_reindexed,
     jvec = stan_data_full$jvec[mask_loo],
     age = stan_data_full$age[-i],
-    K = stan_data_full$K
+    K = stan_data_full$K,
+    dimension = stan_data_full$dimension
   )
 
   # --------------------------------------------------
-  # Step 2: Create CENTERED eta for warm-start
+  # Step 2: Create LKJ warm-start initialization
   # --------------------------------------------------
 
-  # Extract eta[-i] and center to satisfy sum-to-zero constraint
-  eta_loo <- eta_full[-i]
-  eta_loo_centered <- eta_loo - mean(eta_loo)
+  # Since we have eta_std directly from rstan, just exclude person i
+  # and construct L_Omega from correlation
+  rho <- eta_correlation_full
+  L_Omega <- matrix(c(1, 0, rho, sqrt(1 - rho^2)), nrow = 2, ncol = 2, byrow = TRUE)
 
-  # Create initialization list
   init_warmstart <- list(
-    eta = eta_loo_centered,  # CENTERED eta (satisfies sum_to_zero_vector)
-    tau = tau_full,
-    beta1 = beta1_full,
-    delta = delta_full
+    tau = unname(tau_full),
+    beta1 = unname(beta1_full),
+    delta = unname(delta_full),
+    eta_std = unname(eta_std_matrix[-i, ]),  # Exclude person i
+    L_Omega = unname(L_Omega)
   )
 
   # --------------------------------------------------
@@ -177,10 +198,16 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
     object = main_model,
     data = stan_data_loo,
     init = init_warmstart,
-    seed = 12345 + i,
-    iter = 10000,
+    iter = 1000,
     algorithm = "LBFGS",
-    verbose = FALSE
+    verbose = TRUE,
+    history_size = 50, 
+    refresh = 100,
+    tol_obj = 1e-12, 
+    tol_rel_obj = 1, 
+    tol_grad = 1e-8,
+    tol_rel_grad = 1e3, 
+    tol_param = 1e-8
   )
 
   # Robust convergence check (handle optimizer creation failures)
@@ -192,12 +219,14 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
     return(list(
       i = i,
       pid = pids_full[i],
+      record_id = record_ids_full[i],
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = NA_integer_,
-      eta_est = NA_real_,
+      authenticity_eta_holdout = NA_real_,
       converged_main = FALSE,
-      converged_holdout = FALSE
+      converged_holdout = FALSE,
+      param_diff = NULL  # No param_diff when main model fails
     ))
   }
 
@@ -208,7 +237,21 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
   params_loo <- fit_loo$par
   tau_loo <- params_loo[grepl("^tau\\[", names(params_loo))]
   beta1_loo <- params_loo[grepl("^beta1\\[", names(params_loo))]
-  delta_loo <- params_loo["delta"]
+  delta_loo <- params_loo[grepl("^delta\\[", names(params_loo))]  # Now 2-element vector
+  eta_correlation_loo <- params_loo["eta_correlation"]
+
+  # --------------------------------------------------
+  # Step 4b: Compute parameter differences for jackknife Hessian
+  # --------------------------------------------------
+
+  # Calculate differences (N-1 estimates vs full N estimates)
+  # These will be used to construct empirical covariance → Hessian approximation
+  param_diff <- list(
+    beta1_diff = unname(beta1_loo - beta1_full),
+    tau_diff = unname(tau_loo - tau_full),
+    delta_diff = unname(delta_loo - delta_full),
+    eta_corr_diff = unname(eta_correlation_loo - eta_correlation_full)
+  )
 
   # --------------------------------------------------
   # Step 5: Extract held-out person's data
@@ -230,6 +273,8 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
     beta1 = beta1_loo,
     delta = delta_loo,
     K = stan_data_full$K,
+    dimension = stan_data_full$dimension,
+    eta_correlation = eta_correlation_loo,
     M_holdout = M_holdout,
     j_holdout = j_holdout,
     y_holdout = y_holdout,
@@ -239,9 +284,8 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
   fit_holdout <- rstan::optimizing(
     object = holdout_model,
     data = stan_data_holdout,
-    seed = 54321 + i,
     iter = 10000,
-    algorithm = "LBFGS",
+    algorithm = "BFGS",
     verbose = FALSE
   )
 
@@ -254,12 +298,14 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
     return(list(
       i = i,
       pid = pids_full[i],
+      record_id = record_ids_full[i],
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = M_holdout,
-      eta_est = NA_real_,
+      authenticity_eta_holdout = NA_real_,
       converged_main = TRUE,
-      converged_holdout = FALSE
+      converged_holdout = FALSE,
+      param_diff = param_diff  # Keep param_diff (main model succeeded)
     ))
   }
 
@@ -278,17 +324,27 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full,
   return(list(
     i = i,
     pid = pids_full[i],
+    record_id = record_ids_full[i],
     log_posterior = log_posterior,  # RAW log-posterior (for re-analysis)
     avg_logpost = avg_logpost,      # Per-item average (for standardization)
     n_items = M_holdout,
-    eta_est = eta_est,
+    authenticity_eta_holdout = eta_est,
     converged_main = TRUE,
-    converged_holdout = TRUE
+    converged_holdout = TRUE,
+    param_diff = param_diff         # For jackknife Hessian & Cook's D
   ))
 }
 
 cat("[OK] LOOCV iteration function defined\n")
-cat("      Uses centered eta warm-start (39x speedup)\n")
+cat("      Uses LKJ warm-start with eta_std and L_Omega initialization\n")
+
+# ============================================================================
+# CLAUDE TEST A SINGLE ITERATION HERE
+# ============================================================================
+run_loocv_iteration(1010, stan_data_full, pids_full, record_ids_full,
+                    eta_std_matrix, tau_full, beta1_full, delta_full,
+                    eta_correlation_full,
+                    main_model, holdout_model)
 
 # ============================================================================
 # PHASE 4: RUN LOOCV IN PARALLEL WITH PROGRESS BAR
@@ -320,10 +376,12 @@ loocv_results <- with_progress({
         i = i,
         stan_data_full = stan_data_full,
         pids_full = pids_full,
-        eta_full = eta_full,
+        record_ids_full = record_ids_full,
+        eta_std_matrix = eta_std_matrix,
         tau_full = tau_full,
         beta1_full = beta1_full,
         delta_full = delta_full,
+        eta_correlation_full = eta_correlation_full,
         main_model = main_model,
         holdout_model = holdout_model
       )

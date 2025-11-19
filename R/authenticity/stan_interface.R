@@ -100,19 +100,30 @@ fit_authenticity_glmm <- function(stan_data,
 #' Extract parameter estimates from fitted model
 #'
 #' @param fit cmdstan_optimize object
-#' @return List with tau, beta1, delta, sigma, eta
+#' @return List with tau, beta1, delta, eta_correlation, eta (matrix N x 2)
 #' @export
 extract_parameters <- function(fit) {
 
   # Get parameter draws as data frame
   draws_df <- fit$draws(format = "df")
 
+  # Extract correlation
+  eta_correlation <- as.numeric(draws_df$eta_correlation[1])
+
+  # Extract eta matrix (N x 2)
+  eta_values <- as.numeric(draws_df[1, grepl("^eta\\[", names(draws_df))])
+  N <- length(eta_values) / 2
+  eta <- matrix(eta_values, nrow = N, ncol = 2, byrow = TRUE)
+
   # Extract vectors/scalars
   params <- list(
     tau = as.numeric(draws_df[1, grepl("^tau\\[", names(draws_df))]),
     beta1 = as.numeric(draws_df[1, grepl("^beta1\\[", names(draws_df))]),
-    delta = as.numeric(draws_df$delta[1]),
-    eta = as.numeric(draws_df[1, grepl("^eta\\[", names(draws_df))])
+    delta = as.numeric(draws_df[1, grepl("^delta\\[", names(draws_df))]),  # Now 2-element vector
+    eta_correlation = eta_correlation,
+    eta = eta,
+    eta_psychosocial = eta[, 1],
+    eta_developmental = eta[, 2]
   )
 
   return(params)
@@ -133,7 +144,7 @@ extract_log_lik <- function(fit) {
   return(log_lik)
 }
 
-#' Create starting values for Stan model
+#' Create starting values for Stan model (Two-Dimensional LKJ with Correlation)
 #'
 #' Conservative initial values to avoid numerical issues
 #'
@@ -146,15 +157,12 @@ create_init_values <- function(J, N, seed = 123) {
 
   set.seed(seed)
 
-  # Create sum-to-zero person effects
-  eta_init <- rnorm(N, 0, 0.1)
-  eta_init <- eta_init - mean(eta_init)  # Enforce sum-to-zero
-
   init <- list(
-    tau = rnorm(J, 0, 0.5),      # More conservative threshold spread
-    beta1 = rnorm(J, 0, 0.1),    # Smaller age effects initially
-    delta = 0.5,                  # Fixed moderate spacing
-    eta = eta_init                # Sum-to-zero person effects
+    tau = rnorm(J, 0, 0.5),                    # More conservative threshold spread
+    beta1 = rnorm(J, 0, 0.1),                  # Smaller age effects initially
+    delta = c(0.5, 0.5),                       # Fixed moderate spacing (dimension-specific)
+    eta_std = matrix(rnorm(N * 2, 0, 0.1), nrow = N, ncol = 2),  # Standardized person effects
+    L_Omega = diag(2)                           # Identity (no correlation initially)
   )
 
   return(init)
@@ -168,16 +176,26 @@ create_init_values <- function(J, N, seed = 123) {
 #' @export
 create_warm_start <- function(params, exclude_person = NULL) {
 
+  # Reconstruct L_Omega from correlation
+  # For 2x2 matrix: L_Omega = [[1, 0], [rho, sqrt(1-rho^2)]]
+  rho <- params$eta_correlation
+  L_Omega <- matrix(c(1, 0, rho, sqrt(1 - rho^2)), nrow = 2, ncol = 2, byrow = TRUE)
+
+  # Get eta_std by inverting the transformation
+  # eta = eta_std * L_Omega', so eta_std = eta * inv(L_Omega')
+  eta_std <- params$eta %*% solve(t(L_Omega))
+
   init <- list(
     tau = params$tau,
     beta1 = params$beta1,
     delta = params$delta,
-    eta = params$eta
+    eta_std = eta_std,
+    L_Omega = L_Omega
   )
 
-  # If excluding a person, remove their eta
+  # If excluding a person, remove their row from eta_std
   if (!is.null(exclude_person)) {
-    init$eta <- init$eta[-exclude_person]
+    init$eta_std <- init$eta_std[-exclude_person, ]
   }
 
   return(init)

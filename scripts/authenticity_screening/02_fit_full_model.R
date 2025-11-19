@@ -65,7 +65,8 @@ fit_full <- fit_authenticity_glmm(
   init_values = init_full,
   algorithm = "lbfgs",
   max_iterations = 10000,
-  refresh = 500
+  history_size = 50, 
+  refresh = 20
 )
 
 # Check convergence
@@ -79,12 +80,52 @@ if (fit_full$return_codes() == 0) {
 # Extract parameters
 params_full <- extract_parameters(fit_full)
 
-cat("\nParameter estimates (full model):\n")
-cat("  delta (threshold spacing):", sprintf("%.3f", params_full$delta), "\n")
-cat("  eta SD (empirical person variation):", sprintf("%.3f", sd(params_full$eta)), "\n")
-cat("  tau range:", sprintf("[%.2f, %.2f]", min(params_full$tau), max(params_full$tau)), "\n")
-cat("  beta1 range:", sprintf("[%.2f, %.2f]", min(params_full$beta1), max(params_full$beta1)), "\n")
-cat("  eta range:", sprintf("[%.2f, %.2f]", min(params_full$eta), max(params_full$eta)), "\n")
+cat("\n=== PARAMETER ESTIMATES (FULL MODEL) ===\n\n")
+
+# Correlation between dimensions
+cat("Correlation Between Dimensions:\n")
+cat(sprintf("  eta_correlation (LKJ): %.3f\n", params_full$eta_correlation))
+cor_strength <- ifelse(abs(params_full$eta_correlation) < 0.3, "weak",
+                       ifelse(abs(params_full$eta_correlation) < 0.7, "moderate", "strong"))
+cat(sprintf("  Strength: %s\n", cor_strength))
+cat("  (LKJ(1) prior is uniform over all correlations)\n")
+
+# Threshold parameters
+cat("\nThreshold Parameters:\n")
+cat(sprintf("  delta[1] (psychosocial spacing): %.3f\n", params_full$delta[1]))
+cat(sprintf("  delta[2] (developmental spacing): %.3f\n", params_full$delta[2]))
+cat(sprintf("  tau (first thresholds): range [%.2f, %.2f]\n",
+            min(params_full$tau), max(params_full$tau)))
+
+# Age effects
+cat("\nAge Effects:\n")
+cat(sprintf("  beta1 (age slopes): range [%.2f, %.2f]\n",
+            min(params_full$beta1), max(params_full$beta1)))
+cat(sprintf("    Mean: %.3f\n", mean(params_full$beta1)))
+cat(sprintf("    Positive slopes: %d/%d (%.1f%%)\n",
+            sum(params_full$beta1 > 0), length(params_full$beta1),
+            100 * sum(params_full$beta1 > 0) / length(params_full$beta1)))
+
+# Person random effects (Psychosocial)
+cat("\nPerson Random Effects (Psychosocial):\n")
+cat(sprintf("  eta[, 1]: N=%d\n", length(params_full$eta_psychosocial)))
+cat(sprintf("    Range: [%.2f, %.2f]\n",
+            min(params_full$eta_psychosocial), max(params_full$eta_psychosocial)))
+cat(sprintf("    SD:    %.3f (target: 1.0 for standard normal marginal)\n", sd(params_full$eta_psychosocial)))
+
+# Person random effects (Developmental)
+cat("\nPerson Random Effects (Developmental):\n")
+cat(sprintf("  eta[, 2]: N=%d\n", length(params_full$eta_developmental)))
+cat(sprintf("    Range: [%.2f, %.2f]\n",
+            min(params_full$eta_developmental), max(params_full$eta_developmental)))
+cat(sprintf("    SD:    %.3f (target: 1.0 for standard normal marginal)\n", sd(params_full$eta_developmental)))
+
+# Empirical correlation check
+cat("\nEmpirical Correlation Check:\n")
+cor_eta_empirical <- cor(params_full$eta_psychosocial, params_full$eta_developmental)
+cat(sprintf("  Empirical cor(eta[,1], eta[,2]): %.3f\n", cor_eta_empirical))
+cat(sprintf("  Estimated eta_correlation: %.3f\n", params_full$eta_correlation))
+cat(sprintf("  Difference: %.3f (should be near 0)\n", abs(cor_eta_empirical - params_full$eta_correlation)))
 
 # ============================================================================
 # STEP 5: SAVE RESULTS
@@ -100,6 +141,22 @@ cat("      Saved: results/full_model_fit.rds\n")
 saveRDS(params_full, "results/full_model_params.rds")
 cat("      Saved: results/full_model_params.rds\n")
 
+# Create eta_full lookup with (pid, record_id) mapping
+pids_full <- attr(stan_data_full, "pid")
+record_ids_full <- attr(stan_data_full, "record_id")
+
+eta_full_lookup <- data.frame(
+  pid = pids_full,
+  record_id = record_ids_full,
+  authenticity_eta_psychosocial = params_full$eta_psychosocial,
+  authenticity_eta_developmental = params_full$eta_developmental
+)
+
+saveRDS(eta_full_lookup, "results/full_model_eta_lookup.rds")
+cat("      Saved: results/full_model_eta_lookup.rds\n")
+cat(sprintf("      eta_full lookup: %d participants (pid, record_id, eta_psych, eta_dev)\n",
+            nrow(eta_full_lookup)))
+
 # Extract and save log-likelihoods
 log_lik_full <- extract_log_lik(fit_full)
 saveRDS(log_lik_full, "results/full_model_log_lik.rds")
@@ -114,7 +171,15 @@ cat("Summary:\n")
 cat("  Full model: FITTED (N=", stan_data_full$N, ", J=", stan_data_full$J, ", M=", stan_data_full$M, ")\n", sep = "")
 cat("  Convergence: ", ifelse(fit_full$return_codes() == 0, "SUCCESS", "CHECK WARNINGS"), "\n", sep = "")
 cat("\nKey parameters:\n")
-cat("  Threshold spacing (delta):", sprintf("%.3f", params_full$delta), "\n")
-cat("  Person variation (eta SD):", sprintf("%.3f", sd(params_full$eta)), "\n")
+cat("  Estimated correlation:", sprintf("%.3f (%s)", params_full$eta_correlation, cor_strength), "\n")
+cat("  Threshold spacing (delta[1]):", sprintf("%.3f", params_full$delta[1]), "\n")
+cat("  Threshold spacing (delta[2]):", sprintf("%.3f", params_full$delta[2]), "\n")
+cat("  Person variation (eta[,1] SD):", sprintf("%.3f (target: 1.0)", sd(params_full$eta_psychosocial)), "\n")
+cat("  Person variation (eta[,2] SD):", sprintf("%.3f (target: 1.0)", sd(params_full$eta_developmental)), "\n")
+cat("  Empirical correlation:", sprintf("%.3f", cor_eta_empirical), "\n")
 cat("\n[OK] Phase 2 model fitting complete!\n")
+cat("\nModel notes:\n")
+cat("  - LKJ(1) prior is uniform over all correlations (non-informative)\n")
+cat("  - Marginal variances fixed at 1 (standard normal)\n")
+cat("  - Correlation estimated from data with flat prior\n")
 cat("\nNext: Proceed to Phase 3 (LOOCV for out-of-sample lz distribution)\n")

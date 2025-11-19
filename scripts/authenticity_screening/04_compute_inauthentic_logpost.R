@@ -42,6 +42,7 @@ stan_data_inauthentic <- readRDS("data/temp/stan_data_inauthentic.rds")
 
 # Extract metadata
 inauthentic_pids <- attr(stan_data_inauthentic, "pid")
+inauthentic_record_ids <- attr(stan_data_inauthentic, "record_id")
 item_mapping <- attr(stan_data_inauthentic, "item_names")
 
 cat(sprintf("      Found %d inauthentic participants\n", length(inauthentic_pids)))
@@ -75,10 +76,16 @@ cat("      [OK] Full model fitted\n")
 params_full <- fit_full$par
 tau_full <- params_full[grepl("^tau\\[", names(params_full))]
 beta1_full <- params_full[grepl("^beta1\\[", names(params_full))]
-delta_full <- params_full["delta"]
+delta_full <- params_full[grepl("^delta\\[", names(params_full))]  # Now 2-element vector
+eta_correlation_full <- params_full["eta_correlation"]
 
-cat(sprintf("      Extracted: tau(%d), beta1(%d), delta(%.3f)\n",
-            length(tau_full), length(beta1_full), delta_full))
+# Get dimension and K from authentic stan_data (same structure as inauthentic)
+dimension <- stan_data_authentic$dimension
+K <- stan_data_authentic$K
+J <- stan_data_authentic$J
+
+cat(sprintf("      Extracted: tau(%d), beta1(%d), delta(%.3f, %.3f), eta_corr(%.3f)\n",
+            length(tau_full), length(beta1_full), delta_full[1], delta_full[2], eta_correlation_full))
 
 # ============================================================================
 # PHASE 2: COMPILE HOLDOUT MODEL
@@ -128,10 +135,12 @@ for (p in 1:N) {
     # No item responses
     results_list[[p]] <- list(
       pid = inauthentic_pids[p],
+      record_id = inauthentic_record_ids[p],
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = 0,
-      eta_est = NA_real_,
+      authenticity_eta_full = NA_real_,
+      authenticity_eta_holdout = NA_real_,
       sufficient_data = FALSE,
       converged = FALSE
     )
@@ -145,6 +154,8 @@ for (p in 1:N) {
     beta1 = beta1_full,
     delta = delta_full,
     K = K,
+    dimension = dimension,
+    eta_correlation = eta_correlation_full,
     M_holdout = n_items,
     j_holdout = j_i,
     y_holdout = y_i,
@@ -169,10 +180,12 @@ for (p in 1:N) {
   if (!converged) {
     results_list[[p]] <- list(
       pid = inauthentic_pids[p],
+      record_id = inauthentic_record_ids[p],
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = n_items,
-      eta_est = NA_real_,
+      authenticity_eta_full = NA_real_,
+      authenticity_eta_holdout = NA_real_,
       sufficient_data = sufficient_data,
       converged = FALSE
     )
@@ -186,10 +199,12 @@ for (p in 1:N) {
 
   results_list[[p]] <- list(
     pid = inauthentic_pids[p],
+    record_id = inauthentic_record_ids[p],
     log_posterior = log_posterior,
     avg_logpost = avg_logpost,
     n_items = n_items,
-    eta_est = eta_est,
+    authenticity_eta_full = eta_est,       # Same as holdout for inauthentic
+    authenticity_eta_holdout = eta_est,    # Estimated using full model params
     sufficient_data = sufficient_data,
     converged = TRUE
   )

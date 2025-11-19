@@ -84,6 +84,13 @@ for (item_id in names(cb$items)) {
         }
       }
 
+      # Extract domain.kidsights.value (if present)
+      domain_value <- NA
+      if (!is.null(item$domains) && !is.null(item$domains$kidsights)) {
+        domain_value <- item$domains$kidsights$value
+        if (is.list(domain_value)) domain_value <- unlist(domain_value)
+      }
+
       # Store metadata
       item_metadata[[equate_name]] <- list(
         item_id = item_id,
@@ -92,7 +99,8 @@ for (item_id in names(cb$items)) {
         n_categories = n_categories,
         response_set = response_set_name,
         item_type = ifelse(is.na(n_categories), "unknown",
-                          ifelse(n_categories == 2, "binary", "polytomous"))
+                          ifelse(n_categories == 2, "binary", "polytomous")),
+        domain_value = domain_value
       )
     }
   }
@@ -122,15 +130,37 @@ items_df <- items_df %>%
 
 cat(sprintf("      Validated items: %d\n", nrow(items_df)))
 
-# Exclude PS items (psychosocial items with sentinel values)
-# These items have been fixed in the codebook but excluded from authenticity model
-cat("\n      Excluding PS items (psychosocial)...\n")
+# Filter to items with domain.kidsights.value (required for two-dimensional model)
+cat("\n      Filtering to items with domain.kidsights.value...\n")
+items_before <- nrow(items_df)
 items_df <- items_df %>%
-  dplyr::filter(!grepl("^PS", equate_name))
+  dplyr::filter(!is.na(domain_value) & domain_value != "")
 
-cat(sprintf("      Using %d items for authenticity model (excluding PS items)\n", nrow(items_df)))
-cat(sprintf("        Binary: %d\n", sum(items_df$item_type == "binary")))
-cat(sprintf("        Polytomous: %d\n", sum(items_df$item_type == "polytomous")))
+cat(sprintf("      Items with domain assignment: %d / %d\n", nrow(items_df), items_before))
+
+# Create dimension indicator based on domain value
+# 1 = psychosocial_problems_general
+# 2 = developmental (motor, cognitive, language, socioemotional)
+items_df <- items_df %>%
+  dplyr::mutate(
+    dimension = dplyr::if_else(
+      grepl("psychosocial", domain_value, ignore.case = TRUE),
+      1L,
+      2L
+    )
+  )
+
+# Summary by dimension
+cat("\n      Items by dimension:\n")
+dim_summary <- items_df %>%
+  dplyr::count(dimension, domain_value)
+print(dim_summary)
+
+cat(sprintf("\n      Using %d items for two-dimensional authenticity model:\n", nrow(items_df)))
+cat(sprintf("        Dimension 1 (Psychosocial): %d items\n", sum(items_df$dimension == 1)))
+cat(sprintf("        Dimension 2 (Developmental): %d items\n", sum(items_df$dimension == 2)))
+cat(sprintf("        Binary items: %d\n", sum(items_df$item_type == "binary")))
+cat(sprintf("        Polytomous items: %d\n", sum(items_df$item_type == "polytomous")))
 
 # ============================================================================
 # STEP 2: LOAD TRAINING AND TEST DATA FROM DATABASE
@@ -195,7 +225,7 @@ cat("\n[Step 4/6] Vectorizing authentic data to Stan format...\n")
 
 # Extract item columns + metadata
 authentic_items <- authentic_data %>%
-  dplyr::select(pid, age_years, dplyr::all_of(items_df$ne25_name))
+  dplyr::select(pid, record_id, age_years, dplyr::all_of(items_df$ne25_name))
 
 # Create long format vectors
 yvec <- c()
@@ -205,6 +235,7 @@ age_vec <- c()
 
 # Create person index mapping
 person_ids <- authentic_items$pid
+record_ids <- authentic_items$record_id
 N <- length(person_ids)
 
 # Create item index mapping
@@ -244,6 +275,9 @@ if (any(is.na(K))) {
   stop("ERROR: Validated items should not have NA categories!")
 }
 
+# Create dimension vector (1=psychosocial, 2=developmental)
+dimension <- items_df$dimension
+
 # Create Stan data list (only numeric data for Stan)
 stan_data_authentic <- list(
   M = M,
@@ -253,11 +287,13 @@ stan_data_authentic <- list(
   ivec = as.integer(ivec),
   jvec = as.integer(jvec),
   age = authentic_items$age_years,
-  K = as.integer(K)
+  K = as.integer(K),
+  dimension = as.integer(dimension)
 )
 
 # Store metadata separately (not passed to Stan)
 attr(stan_data_authentic, "pid") <- person_ids
+attr(stan_data_authentic, "record_id") <- record_ids
 attr(stan_data_authentic, "item_names") <- items_df$equate_name
 
 cat("\n      Data structure:\n")
@@ -313,7 +349,8 @@ stan_data_inauthentic <- list(
   ivec = as.integer(ivec_inauth),
   jvec = as.integer(jvec_inauth),
   age = inauthentic_items$age_years,
-  K = as.integer(K)
+  K = as.integer(K),
+  dimension = as.integer(dimension)
 )
 
 # Store metadata separately

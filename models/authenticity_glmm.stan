@@ -1,30 +1,40 @@
 /**
- * Authenticity Screening GLMM
+ * Authenticity Screening GLMM - Two-Dimensional IRT Model with LKJ(1) Prior
  *
- * Generalized linear mixed model for screening false negatives in authenticity
- * validation using item response patterns and age.
+ * Allows correlation between psychosocial and developmental dimensions
+ * using a non-informative LKJ(1) prior (uniform over all correlations).
  *
  * Model:
- *   P(y_ij = k) = logit^-1(tau_right + lp) - logit^-1(tau_left + lp)
+ *   P(y_ij = k) = logit^-1(tau_right - lp) - logit^-1(tau_left - lp)
  *
  *   where:
  *     tau_left = -Inf if k=0, else tau[j] + (k-1)*delta
  *     tau_right = +Inf if k=K[j]-1, else tau[j] + k*delta
- *     lp = beta1[j] * age[i] + alpha*eta[i]
+ *     lp = beta1[j] * age[i] + eta[i, d]
+ *     d = 1 if dimension[j]=1 (psychosocial), else 2 (developmental)
  *
  * Parameters:
  *   tau[j]: First threshold (0->1) for item j
  *   beta1[j]: Age slope for item j
- *   delta: Threshold spacing (positive, shared across items)
- *   sigma: Person random effect SD
- *   eta[i]: Person random effect
+ *   delta[d]: Threshold spacing (positive, dimension-specific: d=1 psychosocial, d=2 developmental)
+ *   eta[i, 1]: Person random effect for psychosocial dimension ~ N(0, 1) marginally
+ *   eta[i, 2]: Person random effect for developmental dimension ~ N(0, 1) marginally
+ *   L_Omega: Cholesky factor of correlation matrix (2x2)
  *
  * Priors:
  *   tau ~ N(0, 5)
  *   beta1 ~ N(0, 2)
- *   delta ~ student_t(3, 0, 1) [0, Inf]
- *   sigma ~ student_t(3, 0, 1) [0, Inf]
- *   eta ~ N(0, sigma)
+ *   delta ~ student_t(3, 0, 1) [0, Inf] (vectorized, applies to both dimensions)
+ *   L_Omega ~ lkj_corr_cholesky(1)  [uniform over all correlations]
+ *   eta_std ~ N(0, 1) [standardized, then transformed to correlated with var=1]
+ *
+ * Design Notes:
+ *   - LKJ(1) prior is uniform over all correlations (non-informative)
+ *   - LKJ(10) would concentrate probability near correlation = 0 (favors independence)
+ *   - Marginal distributions are EXACTLY standard normal: eta[i,d] ~ N(0, 1)
+ *   - Only correlation is estimated, not variances (fixed at 1)
+ *   - Use non-centered parameterization (eta_std) for better sampling efficiency
+ *   - Correlation matrix extracted in generated quantities
  */
 
 data {
@@ -38,26 +48,41 @@ data {
 
   vector[N] age;               // Age in years for each person
   array[J] int<lower=2> K;     // Number of categories for each item
+  array[J] int<lower=1, upper=2> dimension;  // Dimension assignment: 1=psychosocial, 2=developmental
 }
 
 parameters {
   vector[J] tau;               // First threshold for each item
-  vector[J] beta1;             // Age slope for each item
+  vector[J] beta1;             // Age slope for item j
 
-  real<lower=0> delta;         // Threshold spacing (positive)
-  sum_to_zero_vector[N] eta;
+  vector<lower=0>[2] delta;    // Threshold spacing (positive, dimension-specific)
+
+  // Correlated person effects (multivariate normal with unit variance)
+  matrix[N, 2] eta_std;        // Standardized (uncorrelated) person effects
+  cholesky_factor_corr[2] L_Omega;  // Cholesky factor of correlation matrix
 }
 
 transformed parameters {
+  matrix[N, 2] eta;  // Correlated person effects with marginal variance = 1
+
+  // Transform standardized effects to correlated effects
+  // eta ~ MVN(0, Omega) where Omega is the correlation matrix (diagonal = 1)
+  eta = eta_std * L_Omega';
 }
 
 model {
-  // Priors
+
+  // Priors on item parameters
   tau ~ normal(0, 5);
   beta1 ~ normal(0, 2);
   delta ~ student_t(3, 0, 1);
-  eta ~ std_normal();
-  
+
+  // Prior on correlation matrix
+  L_Omega ~ lkj_corr_cholesky(1);  // Uniform over all correlations (eta=1, non-informative)
+
+  // Standardized person effects (uncorrelated, unit variance)
+  to_vector(eta_std) ~ std_normal();
+
   // Likelihood
   for (m in 1:M) {
     int i = ivec[m];      // Person index
@@ -65,8 +90,11 @@ model {
     int y = yvec[m];      // Response value
     int k_max = K[j] - 1; // Maximum response value for this item
 
+    // Select eta based on item's dimension (1=psychosocial, 2=developmental)
+    real eta_d = (dimension[j] == 1) ? eta[i, 1] : eta[i, 2];
+
     // Linear predictor
-    real lp = beta1[j] * age[i] + eta[i];
+    real lp = beta1[j] * age[i] + eta_d;
 
     // Calculate probability (simplified to avoid infinities)
     real p;
@@ -78,13 +106,13 @@ model {
 
     } else if (y == k_max) {
       // Highest category: p_right = 1, so p = 1 - p_left
-      real tau_left = tau[j] + (y - 1) * delta;
+      real tau_left = tau[j] + (y - 1) * delta[dimension[j]];
       p = 1 - inv_logit(tau_left - lp);
 
     } else {
       // Interior category: p = p_right - p_left
-      real tau_left = tau[j] + (y - 1) * delta;
-      real tau_right = tau[j] + y * delta;
+      real tau_left = tau[j] + (y - 1) * delta[dimension[j]];
+      real tau_right = tau[j] + y * delta[dimension[j]];
       p = inv_logit(tau_right - lp) - inv_logit(tau_left - lp);
     }
 
@@ -97,6 +125,12 @@ model {
 }
 
 generated quantities {
+  // Reconstruct correlation matrix from Cholesky factor
+  corr_matrix[2] Omega = L_Omega * L_Omega';
+
+  // Extract correlation between dimensions
+  real eta_correlation = Omega[1, 2];
+
   // Person-level log-likelihood for lz calculation
   vector[N] log_lik;
 
@@ -110,7 +144,10 @@ generated quantities {
     int y = yvec[m];
     int k_max = K[j] - 1;
 
-    real lp = beta1[j] * age[i] + eta[i];
+    // Select eta based on item's dimension
+    real eta_d = (dimension[j] == 1) ? eta[i, 1] : eta[i, 2];
+
+    real lp = beta1[j] * age[i] + eta_d;
 
     // Calculate probability (simplified to avoid infinities)
     real p;
@@ -120,12 +157,12 @@ generated quantities {
       p = inv_logit(tau_right - lp);
 
     } else if (y == k_max) {
-      real tau_left = tau[j] + (y - 1) * delta;
+      real tau_left = tau[j] + (y - 1) * delta[dimension[j]];
       p = 1 - inv_logit(tau_left - lp);
 
     } else {
-      real tau_left = tau[j] + (y - 1) * delta;
-      real tau_right = tau[j] + y * delta;
+      real tau_left = tau[j] + (y - 1) * delta[dimension[j]];
+      real tau_right = tau[j] + y * delta[dimension[j]];
       p = inv_logit(tau_right - lp) - inv_logit(tau_left - lp);
     }
 
