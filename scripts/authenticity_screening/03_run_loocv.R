@@ -168,16 +168,17 @@ saveRDS(params_full_structured, "results/full_model_params.rds")
 cat("      Saved: results/full_model_params.rds\n")
 
 # Create eta lookup table with (pid, record_id) mapping
+# Note: Holdout eta will be added after LOOCV completes
 eta_full_lookup <- data.frame(
   pid = pids_full,
   record_id = record_ids_full,
-  authenticity_eta_psychosocial = eta_matrix[, 1],
-  authenticity_eta_developmental = eta_matrix[, 2]
+  authenticity_eta_psychosocial_full = eta_matrix[, 1],
+  authenticity_eta_developmental_full = eta_matrix[, 2]
 )
 
 saveRDS(eta_full_lookup, "results/full_model_eta_lookup.rds")
 cat("      Saved: results/full_model_eta_lookup.rds\n")
-cat(sprintf("      eta_full lookup: %d participants (pid, record_id, eta_psych, eta_dev)\n",
+cat(sprintf("      eta_full lookup: %d participants (pid, record_id, eta_psych_full, eta_dev_full)\n",
             nrow(eta_full_lookup)))
 
 # ============================================================================
@@ -252,7 +253,7 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
   fit_loo <- rstan::optimizing(
     object = main_model,
     data = stan_data_loo,
-    init = init_warmstart,
+    init = 0,
     iter = 100000,
     algorithm = "LBFGS",
     verbose = TRUE,
@@ -278,7 +279,8 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = NA_integer_,
-      authenticity_eta_holdout = NA_real_,
+      authenticity_eta_psychosocial_holdout = NA_real_,
+      authenticity_eta_developmental_holdout = NA_real_,
       converged_main = FALSE,
       converged_holdout = FALSE,
       param_diff = NULL  # No param_diff when main model fails
@@ -357,7 +359,8 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = M_holdout,
-      authenticity_eta_holdout = NA_real_,
+      authenticity_eta_psychosocial_holdout = NA_real_,
+      authenticity_eta_developmental_holdout = NA_real_,
       converged_main = TRUE,
       converged_holdout = FALSE,
       param_diff = param_diff  # Keep param_diff (main model succeeded)
@@ -365,15 +368,19 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
   }
 
   # --------------------------------------------------
-  # Step 7: Extract log posterior and calculate average
+  # Step 7: Extract log posterior and 2D eta estimates
   # --------------------------------------------------
 
   log_posterior <- fit_holdout$par["log_posterior"]
-  eta_est <- fit_holdout$par["eta_holdout"]
+
+  # Extract 2D eta from holdout model
+  eta_psychosocial_holdout <- fit_holdout$par["eta_psychosocial_holdout"]
+  eta_developmental_holdout <- fit_holdout$par["eta_developmental_holdout"]
+
   avg_logpost <- log_posterior / M_holdout
 
   # --------------------------------------------------
-  # Step 8: Return results
+  # Step 8: Return results with 2D eta
   # --------------------------------------------------
 
   return(list(
@@ -383,7 +390,8 @@ run_loocv_iteration <- function(i, stan_data_full, pids_full, record_ids_full,
     log_posterior = log_posterior,  # RAW log-posterior (for re-analysis)
     avg_logpost = avg_logpost,      # Per-item average (for standardization)
     n_items = M_holdout,
-    authenticity_eta_holdout = eta_est,
+    authenticity_eta_psychosocial_holdout = eta_psychosocial_holdout,  # Dimension 1 (LOOCV)
+    authenticity_eta_developmental_holdout = eta_developmental_holdout, # Dimension 2 (LOOCV)
     converged_main = TRUE,
     converged_holdout = TRUE,
     param_diff = param_diff         # For jackknife Hessian & Cook's D
@@ -396,10 +404,15 @@ cat("      Uses LKJ warm-start with eta_std and L_Omega initialization\n")
 # ============================================================================
 # CLAUDE TEST A SINGLE ITERATION HERE
 # ============================================================================
-run_loocv_iteration(1010, stan_data_full, pids_full, record_ids_full,
-                    eta_std_matrix, tau_full, beta1_full, delta_full,
-                    eta_correlation_full,
-                    main_model, holdout_model)
+# t1 = proc.time()
+# 
+# run_loocv_iteration(1010, stan_data_full, pids_full, record_ids_full,
+#                     eta_std_matrix, tau_full, beta1_full, delta_full,
+#                     eta_correlation_full,
+#                     main_model, holdout_model)
+# 
+# dt = (proc.time() - t1)
+# (2635*dt)/(16*3600)
 
 # ============================================================================
 # PHASE 4: RUN LOOCV IN PARALLEL WITH PROGRESS BAR
@@ -548,8 +561,46 @@ summary_stats <- loocv_df %>%
 saveRDS(summary_stats, "results/loocv_summary_stats.rds")
 cat("      Saved: results/loocv_summary_stats.rds\n")
 
+cat("\n[Step 5/5] Merging holdout 2D eta into full model eta lookup...\n")
+
+# Extract holdout 2D eta from LOOCV results
+eta_holdout_df <- loocv_df %>%
+  dplyr::select(pid, record_id,
+                authenticity_eta_psychosocial_holdout,
+                authenticity_eta_developmental_holdout)
+
+# Load full model eta lookup
+eta_full_lookup <- readRDS("results/full_model_eta_lookup.rds")
+
+# Merge full and holdout eta
+eta_complete_lookup <- eta_full_lookup %>%
+  dplyr::left_join(eta_holdout_df, by = c("pid", "record_id"))
+
+# Save complete lookup with 4 eta columns
+saveRDS(eta_complete_lookup, "results/full_model_eta_lookup.rds")
+cat("      Saved: results/full_model_eta_lookup.rds (updated with holdout eta)\n")
+cat(sprintf("      Complete eta lookup: %d participants × 6 columns\n",
+            nrow(eta_complete_lookup)))
+cat("        Columns: pid, record_id, eta_psych_full, eta_dev_full, eta_psych_holdout, eta_dev_holdout\n")
+
 # ============================================================================
-# PHASE 6: SUMMARY REPORT
+# PHASE 6: COMPUTE COOK'S D INFLUENCE DIAGNOSTICS
+# ============================================================================
+
+cat("\n=== PHASE 6: COOK'S D INFLUENCE DIAGNOSTICS ===\n\n")
+
+cat("[Step 1/1] Computing Cook's D for authentic participants...\n")
+cat("      This uses jackknife covariance from LOOCV parameter differences.\n")
+cat("      Computing influence diagnostics (D×N metric)...\n\n")
+
+# Source and run Cook's D computation
+source("scripts/authenticity_screening/compute_cooks_d.R")
+
+cat("\n[OK] Cook's D computation complete\n")
+cat("      Results saved to: results/loocv_cooks_d.rds\n")
+
+# ============================================================================
+# PHASE 7: SUMMARY REPORT
 # ============================================================================
 
 cat("\n")

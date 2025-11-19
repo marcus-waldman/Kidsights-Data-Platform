@@ -35,7 +35,7 @@ cat("\n")
 cat("=== PHASE 1: LOAD LOOCV RESULTS ===\n\n")
 
 cat("[Step 1/2] Loading LOOCV results...\n")
-loocv_results <- readRDS("results/loocv_results.rds")
+loocv_results <- readRDS("results/loocv_authentic_results.rds")
 
 N <- nrow(loocv_results)
 cat(sprintf("      Loaded: %d LOOCV iterations\n", N))

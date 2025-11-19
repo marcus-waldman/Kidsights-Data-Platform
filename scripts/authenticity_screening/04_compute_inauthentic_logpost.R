@@ -139,8 +139,10 @@ for (p in 1:N) {
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = 0,
-      authenticity_eta_full = NA_real_,
-      authenticity_eta_holdout = NA_real_,
+      authenticity_eta_psychosocial_full = NA_real_,
+      authenticity_eta_developmental_full = NA_real_,
+      authenticity_eta_psychosocial_holdout = NA_real_,
+      authenticity_eta_developmental_holdout = NA_real_,
       sufficient_data = FALSE,
       converged = FALSE
     )
@@ -184,17 +186,23 @@ for (p in 1:N) {
       log_posterior = NA_real_,
       avg_logpost = NA_real_,
       n_items = n_items,
-      authenticity_eta_full = NA_real_,
-      authenticity_eta_holdout = NA_real_,
+      authenticity_eta_psychosocial_full = NA_real_,
+      authenticity_eta_developmental_full = NA_real_,
+      authenticity_eta_psychosocial_holdout = NA_real_,
+      authenticity_eta_developmental_holdout = NA_real_,
       sufficient_data = sufficient_data,
       converged = FALSE
     )
     next
   }
 
-  # Extract results
+  # Extract results including 2D eta
   log_posterior <- fit_holdout$par["log_posterior"]
-  eta_est <- fit_holdout$par["eta_holdout"]
+
+  # Extract 2D eta from holdout model
+  eta_psychosocial_holdout <- fit_holdout$par["eta_psychosocial_holdout"]
+  eta_developmental_holdout <- fit_holdout$par["eta_developmental_holdout"]
+
   avg_logpost <- log_posterior / n_items
 
   results_list[[p]] <- list(
@@ -203,8 +211,10 @@ for (p in 1:N) {
     log_posterior = log_posterior,
     avg_logpost = avg_logpost,
     n_items = n_items,
-    authenticity_eta_full = eta_est,       # Same as holdout for inauthentic
-    authenticity_eta_holdout = eta_est,    # Estimated using full model params
+    authenticity_eta_psychosocial_full = eta_psychosocial_holdout,     # Dim 1
+    authenticity_eta_developmental_full = eta_developmental_holdout,   # Dim 2
+    authenticity_eta_psychosocial_holdout = eta_psychosocial_holdout,  # Same as full
+    authenticity_eta_developmental_holdout = eta_developmental_holdout, # Same as full
     sufficient_data = sufficient_data,
     converged = TRUE
   )
