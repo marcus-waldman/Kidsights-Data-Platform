@@ -235,9 +235,9 @@ convert_csv_row_to_json <- function(item_row) {
     item$content$response_options$ne20 <- detect_response_set_or_parse(item_row$resp_opts20)
   }
 
-  # Migrate param_constraints to NE25 constraints if present
+  # Migrate param_constraints to NE25 param_constraints if present
   if (!is.na(item$psychometric$param_constraints) && "NE25" %in% item$studies) {
-    item$psychometric$irt_parameters$NE25$constraints <- list(item$psychometric$param_constraints)
+    item$psychometric$irt_parameters$NE25$param_constraints <- list(item$psychometric$param_constraints)
   }
 
   # Remove NA values to keep JSON clean

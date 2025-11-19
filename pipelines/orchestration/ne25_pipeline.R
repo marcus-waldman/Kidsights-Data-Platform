@@ -679,30 +679,25 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     }
 
     # ===========================================================================
-    # STEP 11: CREATE NE25 CALIBRATION TABLE
+    # STEP 11: CREATE NE25 CALIBRATION TABLE (REMOVED)
+    # ===========================================================================
+    #
+    # NOTE: This step was removed to establish single source of truth.
+    #
+    # OLD ARCHITECTURE (confusing):
+    #   - NE25 Pipeline → ne25_transformed → ne25_calibration (intermediate table)
+    #   - Calibration Pipeline → reads ne25_calibration
+    #
+    # NEW ARCHITECTURE (clean):
+    #   - NE25 Pipeline → ne25_transformed (stops here)
+    #   - Calibration Pipeline → reads ne25_transformed directly
+    #
+    # The calibration_dataset_long table is now the ONLY calibration table,
+    # created by scripts/irt_scoring/create_calibration_long.R
     # ===========================================================================
 
-    message("\n--- Step 11: Creating NE25 Calibration Table ---")
-    calibration_start <- Sys.time()
-
-    source("scripts/irt_scoring/create_ne25_calibration_table.R")
-
-    tryCatch({
-      create_ne25_calibration_table(
-        codebook_path = "codebook/data/codebook.json",
-        db_path = "data/duckdb/kidsights_local.duckdb",
-        verbose = TRUE
-      )
-      message("NE25 calibration table created successfully")
-    }, error = function(e) {
-      warning(paste("Calibration table creation failed:", e$message))
-      message("Pipeline will continue, but calibration table is unavailable")
-    })
-
-    calibration_time <- as.numeric(Sys.time() - calibration_start)
-    metrics$calibration_table_duration <- calibration_time
-    message(paste("Calibration table creation completed in",
-                  round(calibration_time, 2), "seconds"))
+    message("\n--- Step 11: NE25 Calibration Table (skipped - handled by calibration pipeline) ---")
+    metrics$calibration_table_duration <- 0
 
     # Calculate final metrics
     metrics$end_time <- Sys.time()

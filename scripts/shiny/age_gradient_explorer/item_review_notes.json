@@ -1,0 +1,4570 @@
+{
+  "AA4": {
+    "current": {
+      "timestamp": "2025-11-14 12:50:39",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:11:57",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% influence points"
+      },
+      {
+        "timestamp": "2025-11-14 12:11:57",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% influence points"
+      },
+      {
+        "timestamp": "2025-11-14 12:50:39",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% influence points"
+      }
+    ]
+  },
+  "AA5": {
+    "current": {
+      "timestamp": "2025-11-14 12:51:26",
+      "reviewer": "marcu",
+      "note": "Exclude top 3% influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:12:32",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% influence points"
+      },
+      {
+        "timestamp": "2025-11-14 12:12:32",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% influence points"
+      },
+      {
+        "timestamp": "2025-11-14 12:51:26",
+        "reviewer": "marcu",
+        "note": "Exclude top 3% influence points"
+      }
+    ]
+  },
+  "AA6": {
+    "current": {
+      "timestamp": "2025-11-14 12:53:51",
+      "reviewer": "marcu",
+      "note": "Exclude all NE25 responses. Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:53:51",
+        "reviewer": "marcu",
+        "note": "Exclude all NE25 responses. Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "AA7": {
+    "current": {
+      "timestamp": "2025-11-14 12:54:30",
+      "reviewer": "marcu",
+      "note": "Delete all NE25 responses. Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:54:30",
+        "reviewer": "marcu",
+        "note": "Delete all NE25 responses. Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "AA9": {
+    "current": {
+      "timestamp": "2025-11-14 12:54:51",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:54:51",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "AA11": {
+    "current": {
+      "timestamp": "2025-11-14 12:55:41",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:55:41",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "AA12": {
+    "current": {
+      "timestamp": "2025-11-14 12:56:06",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:56:06",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "AA13": {
+    "current": {
+      "timestamp": "2025-11-14 12:56:34",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5 % of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:56:34",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5 % of influence points"
+      }
+    ]
+  },
+  "AA14": {
+    "current": {
+      "timestamp": "2025-11-14 12:56:51",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:56:51",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA15": {
+    "current": {
+      "timestamp": "2025-11-14 12:57:18",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:57:18",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "AA17": {
+    "current": {
+      "timestamp": "2025-11-14 12:57:51",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:57:51",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA19": {
+    "current": {
+      "timestamp": "2025-11-14 12:58:14",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:58:14",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "AA20": {
+    "current": {
+      "timestamp": "2025-11-14 12:58:38",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:58:38",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA21": {
+    "current": {
+      "timestamp": "2025-11-14 12:59:02",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 12:59:02",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA24": {
+    "current": {
+      "timestamp": "2025-11-14 13:00:14",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:00:14",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA26": {
+    "current": {
+      "timestamp": "2025-11-14 13:06:36",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:02:25",
+        "reviewer": "marcu",
+        "note": "Exclude NE25 responses. Exclude the top 5% of influence points"
+      },
+      {
+        "timestamp": "2025-11-14 13:02:25",
+        "reviewer": "marcu",
+        "note": "Exclude NE25 responses. Exclude the top 5% of influence points"
+      },
+      {
+        "timestamp": "2025-11-14 13:06:36",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points"
+      }
+    ]
+  },
+  "AA27": {
+    "current": {
+      "timestamp": "2025-11-14 13:03:14",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:03:14",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA28": {
+    "current": {
+      "timestamp": "2025-11-14 13:03:50",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:03:50",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA29": {
+    "current": {
+      "timestamp": "2025-11-14 13:04:37",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:04:37",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "AA30": {
+    "current": {
+      "timestamp": "2025-11-14 13:05:59",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:05:59",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "AA31": {
+    "current": {
+      "timestamp": "2025-11-14 13:07:34",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:07:34",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA34": {
+    "current": {
+      "timestamp": "2025-11-14 13:07:57",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:07:57",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "AA36": {
+    "current": {
+      "timestamp": "2025-11-14 13:08:26",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:08:26",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "AA38": {
+    "current": {
+      "timestamp": "2025-11-14 13:09:11",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:09:11",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA41": {
+    "current": {
+      "timestamp": "2025-11-14 13:09:35",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:09:35",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA43": {
+    "current": {
+      "timestamp": "2025-11-14 13:09:47",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:09:47",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA46": {
+    "current": {
+      "timestamp": "2025-11-14 13:10:55",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:10:55",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA47": {
+    "current": {
+      "timestamp": "2025-11-14 13:11:11",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:11:11",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA49": {
+    "current": {
+      "timestamp": "2025-11-14 13:11:45",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:11:45",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA50": {
+    "current": {
+      "timestamp": "2025-11-14 13:12:42",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:12:42",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "AA54": {
+    "current": {
+      "timestamp": "2025-11-14 13:13:20",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:13:20",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA55": {
+    "current": {
+      "timestamp": "2025-11-14 13:13:34",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:13:34",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA56": {
+    "current": {
+      "timestamp": "2025-11-14 13:21:46",
+      "reviewer": "marcu",
+      "note": "Modify  domains.kidsights field from the json codebook to psychosocial_problems_general. Modify scoring.reverse to \"true\""
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:16:05",
+        "reviewer": "marcu",
+        "note": "Exclude item from Kidsights scale by removing domains.kidsights field from the json codebook."
+      },
+      {
+        "timestamp": "2025-11-14 13:16:05",
+        "reviewer": "marcu",
+        "note": "Exclude item from Kidsights scale by removing domains.kidsights field from the json codebook."
+      },
+      {
+        "timestamp": "2025-11-14 13:21:46",
+        "reviewer": "marcu",
+        "note": "Modify  domains.kidsights field from the json codebook to psychosocial_problems_general. Modify scoring.reverse to \"true\""
+      }
+    ]
+  },
+  "AA57": {
+    "current": {
+      "timestamp": "2025-11-14 13:22:44",
+      "reviewer": "marcu",
+      "note": "Modify  domains.kidsights field from the json codebook to psychosocial_problems_general. Modify scoring.reverse to \"true\""
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:22:44",
+        "reviewer": "marcu",
+        "note": "Modify  domains.kidsights field from the json codebook to psychosocial_problems_general. Modify scoring.reverse to \"true\""
+      }
+    ]
+  },
+  "AA60": {
+    "current": {
+      "timestamp": "2025-11-14 13:23:53",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:23:53",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA65": {
+    "current": {
+      "timestamp": "2025-11-14 13:25:00",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:25:00",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "AA68": {
+    "current": {
+      "timestamp": "2025-11-14 13:28:10",
+      "reviewer": "marcu",
+      "note": "Keep only NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:28:10",
+        "reviewer": "marcu",
+        "note": "Keep only NE25 response data."
+      }
+    ]
+  },
+  "AA69": {
+    "current": {
+      "timestamp": "2025-11-14 13:29:58",
+      "reviewer": "marcu",
+      "note": "Keep only NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:29:58",
+        "reviewer": "marcu",
+        "note": "Keep only NE25 response data."
+      }
+    ]
+  },
+  "AA71": {
+    "current": {
+      "timestamp": "2025-11-14 13:30:49",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:30:49",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "AA72": {
+    "current": {
+      "timestamp": "2025-11-14 13:32:04",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:32:04",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA102": {
+    "current": {
+      "timestamp": "2025-11-14 13:34:17",
+      "reviewer": "marcu",
+      "note": "Looks good."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:34:17",
+        "reviewer": "marcu",
+        "note": "Looks good."
+      }
+    ]
+  },
+  "AA104": {
+    "current": {
+      "timestamp": "2025-11-14 13:36:16",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:36:16",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "AA201": {
+    "current": {
+      "timestamp": "2025-11-14 13:39:01",
+      "reviewer": "marcu",
+      "note": "Remove item from calibration dataset. Remove domains.kidsights. Remove mention of \"Kidsights Measurement Tool\" in \"instruments\" field."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:39:01",
+        "reviewer": "marcu",
+        "note": "Remove item from calibration dataset. Remove domains.kidsights. Remove mention of \"Kidsights Measurement Tool\" in \"instruments\" field."
+      }
+    ]
+  },
+  "AA202": {
+    "current": {
+      "timestamp": "2025-11-14 13:41:58",
+      "reviewer": "marcu",
+      "note": "Remove item from calibration dataset. Remove domains.kidsights. Remove mention of \"Kidsights Measurement Tool\" in \"instruments\" field."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:41:58",
+        "reviewer": "marcu",
+        "note": "Remove item from calibration dataset. Remove domains.kidsights. Remove mention of \"Kidsights Measurement Tool\" in \"instruments\" field."
+      }
+    ]
+  },
+  "AA203": {
+    "current": {
+      "timestamp": "2025-11-14 13:42:40",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:42:40",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "AA205": {
+    "current": {
+      "timestamp": "2025-11-14 13:43:45",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:43:45",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "BB5": {
+    "current": {
+      "timestamp": "2025-11-14 13:44:24",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:44:24",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "BB6": {
+    "current": {
+      "timestamp": "2025-11-14 13:45:02",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:45:02",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "BB201": {
+    "current": {
+      "timestamp": "2025-11-14 13:45:46",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:45:46",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC4": {
+    "current": {
+      "timestamp": "2025-11-14 13:46:05",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:46:05",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC5": {
+    "current": {
+      "timestamp": "2025-11-14 13:47:52",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:47:52",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC6": {
+    "current": {
+      "timestamp": "2025-11-14 13:48:09",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:48:09",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC8": {
+    "current": {
+      "timestamp": "2025-11-14 13:48:33",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:48:33",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC9": {
+    "current": {
+      "timestamp": "2025-11-14 13:48:54",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:48:54",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC10": {
+    "current": {
+      "timestamp": "2025-11-14 13:49:23",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:49:23",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC11": {
+    "current": {
+      "timestamp": "2025-11-14 13:49:54",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of children."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:49:54",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of children."
+      }
+    ]
+  },
+  "CC12": {
+    "current": {
+      "timestamp": "2025-11-14 13:50:15",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:50:15",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC13": {
+    "current": {
+      "timestamp": "2025-11-14 13:50:27",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:50:27",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC14": {
+    "current": {
+      "timestamp": "2025-11-14 13:50:46",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:50:46",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC15": {
+    "current": {
+      "timestamp": "2025-11-14 13:51:04",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:51:04",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC16": {
+    "current": {
+      "timestamp": "2025-11-14 13:51:18",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:51:18",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC17": {
+    "current": {
+      "timestamp": "2025-11-14 13:51:39",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:51:39",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC18": {
+    "current": {
+      "timestamp": "2025-11-14 13:52:05",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:52:05",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC19": {
+    "current": {
+      "timestamp": "2025-11-14 13:52:18",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:52:18",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC20": {
+    "current": {
+      "timestamp": "2025-11-14 13:53:33",
+      "reviewer": "marcu",
+      "note": "Exclude NE25 responses. Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:53:33",
+        "reviewer": "marcu",
+        "note": "Exclude NE25 responses. Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC21": {
+    "current": {
+      "timestamp": "2025-11-14 13:53:52",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:53:52",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC25": {
+    "current": {
+      "timestamp": "2025-11-14 13:54:20",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:54:20",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC26": {
+    "current": {
+      "timestamp": "2025-11-14 13:54:55",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:54:55",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC27": {
+    "current": {
+      "timestamp": "2025-11-14 13:55:25",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:55:25",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC28": {
+    "current": {
+      "timestamp": "2025-11-14 13:56:04",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:56:04",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC29": {
+    "current": {
+      "timestamp": "2025-11-14 13:56:28",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:56:28",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC30": {
+    "current": {
+      "timestamp": "2025-11-14 13:56:57",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:56:57",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC31": {
+    "current": {
+      "timestamp": "2025-11-14 13:57:32",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:57:32",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC32": {
+    "current": {
+      "timestamp": "2025-11-14 13:57:46",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:57:46",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC33": {
+    "current": {
+      "timestamp": "2025-11-14 13:57:58",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:57:58",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC34": {
+    "current": {
+      "timestamp": "2025-11-14 13:59:12",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:59:12",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC35": {
+    "current": {
+      "timestamp": "2025-11-14 13:59:26",
+      "reviewer": "marcu",
+      "note": "Exclude the top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:59:26",
+        "reviewer": "marcu",
+        "note": "Exclude the top 1% of influence points."
+      }
+    ]
+  },
+  "CC36": {
+    "current": {
+      "timestamp": "2025-11-14 13:59:51",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 13:59:51",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC37": {
+    "current": {
+      "timestamp": "2025-11-14 14:00:22",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:00:22",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC39": {
+    "current": {
+      "timestamp": "2025-11-14 14:00:28",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:00:28",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC40": {
+    "current": {
+      "timestamp": "2025-11-14 14:00:48",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:00:48",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC41": {
+    "current": {
+      "timestamp": "2025-11-14 14:01:27",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:01:27",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC42": {
+    "current": {
+      "timestamp": "2025-11-14 14:01:41",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:01:41",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC43": {
+    "current": {
+      "timestamp": "2025-11-14 14:01:53",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:01:53",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC45": {
+    "current": {
+      "timestamp": "2025-11-14 14:02:03",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:02:03",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC46": {
+    "current": {
+      "timestamp": "2025-11-14 14:02:23",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:02:23",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC48": {
+    "current": {
+      "timestamp": "2025-11-14 14:02:36",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:02:36",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC50": {
+    "current": {
+      "timestamp": "2025-11-14 14:02:54",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:02:54",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC51": {
+    "current": {
+      "timestamp": "2025-11-14 14:03:04",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:03:04",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC52": {
+    "current": {
+      "timestamp": "2025-11-14 14:03:16",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:03:16",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC53": {
+    "current": {
+      "timestamp": "2025-11-14 14:03:39",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:03:39",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC54": {
+    "current": {
+      "timestamp": "2025-11-14 14:03:51",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:03:51",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC56": {
+    "current": {
+      "timestamp": "2025-11-14 14:04:01",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:04:01",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC60": {
+    "current": {
+      "timestamp": "2025-11-14 14:06:36",
+      "reviewer": "marcu",
+      "note": "Keep only NE25 responses. "
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:06:36",
+        "reviewer": "marcu",
+        "note": "Keep only NE25 responses. "
+      }
+    ]
+  },
+  "CC61": {
+    "current": {
+      "timestamp": "2025-11-14 14:07:03",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:07:03",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "CC62": {
+    "current": {
+      "timestamp": "2025-11-14 14:07:18",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:07:18",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "CC64": {
+    "current": {
+      "timestamp": "2025-11-14 14:07:27",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:07:27",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC65": {
+    "current": {
+      "timestamp": "2025-11-14 14:08:33",
+      "reviewer": "marcu",
+      "note": "Exclude the top 2% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:08:33",
+        "reviewer": "marcu",
+        "note": "Exclude the top 2% of influence points."
+      }
+    ]
+  },
+  "CC66": {
+    "current": {
+      "timestamp": "2025-11-14 14:09:51",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:09:51",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC67": {
+    "current": {
+      "timestamp": "2025-11-14 14:10:35",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:10:35",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC68": {
+    "current": {
+      "timestamp": "2025-11-14 14:11:36",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:11:36",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "CC69": {
+    "current": {
+      "timestamp": "2025-11-14 14:11:58",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:11:58",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC71": {
+    "current": {
+      "timestamp": "2025-11-14 14:13:05",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:13:05",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC72": {
+    "current": {
+      "timestamp": "2025-11-14 14:13:24",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:13:24",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC74": {
+    "current": {
+      "timestamp": "2025-11-14 14:13:36",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:13:36",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC75": {
+    "current": {
+      "timestamp": "2025-11-14 14:14:02",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:14:02",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC76": {
+    "current": {
+      "timestamp": "2025-11-14 14:14:35",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:14:35",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC78": {
+    "current": {
+      "timestamp": "2025-11-14 14:15:04",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:15:04",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC79y": {
+    "current": {
+      "timestamp": "2025-11-14 14:16:33",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:15:34",
+        "reviewer": "marcu",
+        "note": "Keep only NE25 responses."
+      },
+      {
+        "timestamp": "2025-11-14 14:15:34",
+        "reviewer": "marcu",
+        "note": "Keep only NE25 responses."
+      },
+      {
+        "timestamp": "2025-11-14 14:16:33",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC80": {
+    "current": {
+      "timestamp": "2025-11-14 14:17:11",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:17:11",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC83": {
+    "current": {
+      "timestamp": "2025-11-14 14:18:07",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:18:07",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CC84": {
+    "current": {
+      "timestamp": "2025-11-14 14:18:30",
+      "reviewer": "marcu",
+      "note": "no changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:18:30",
+        "reviewer": "marcu",
+        "note": "no changes."
+      }
+    ]
+  },
+  "CC85": {
+    "current": {
+      "timestamp": "2025-11-14 14:19:08",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:19:08",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC87": {
+    "current": {
+      "timestamp": "2025-11-14 14:19:21",
+      "reviewer": "marcu",
+      "note": "Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:19:21",
+        "reviewer": "marcu",
+        "note": "Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "CC89": {
+    "current": {
+      "timestamp": "2025-11-14 14:19:48",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:19:48",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "CQFA002": {
+    "current": {
+      "timestamp": "2025-11-14 14:37:02",
+      "reviewer": "marcu",
+      "note": "scoring.reverse filed in codebook json file needs to be set to True."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:20:14",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:20:14",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:37:02",
+        "reviewer": "marcu",
+        "note": "scoring.reverse filed in codebook json file needs to be set to True."
+      }
+    ]
+  },
+  "CQR014X": {
+    "current": {
+      "timestamp": "2025-11-14 14:36:41",
+      "reviewer": "marcu",
+      "note": "scoring.reverse filed in codebook json file needs to be set to True."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:20:33",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:20:33",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:36:41",
+        "reviewer": "marcu",
+        "note": "scoring.reverse filed in codebook json file needs to be set to True."
+      }
+    ]
+  },
+  "DD10": {
+    "current": {
+      "timestamp": "2025-11-14 14:38:08",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:38:08",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "DD15": {
+    "current": {
+      "timestamp": "2025-11-14 14:39:44",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:39:44",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "DD16": {
+    "current": {
+      "timestamp": "2025-11-14 14:40:04",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:40:04",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "DD19": {
+    "current": {
+      "timestamp": "2025-11-14 14:40:18",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:40:18",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "DD25": {
+    "current": {
+      "timestamp": "2025-11-14 14:40:57",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:40:57",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD30": {
+    "current": {
+      "timestamp": "2025-11-14 14:41:16",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:41:16",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD32": {
+    "current": {
+      "timestamp": "2025-11-14 14:41:33",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:41:33",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD36": {
+    "current": {
+      "timestamp": "2025-11-14 14:42:00",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:42:00",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD39": {
+    "current": {
+      "timestamp": "2025-11-14 14:42:12",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:42:12",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD44": {
+    "current": {
+      "timestamp": "2025-11-14 14:42:53",
+      "reviewer": "marcu",
+      "note": "Remove item."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:42:53",
+        "reviewer": "marcu",
+        "note": "Remove item."
+      }
+    ]
+  },
+  "DD103": {
+    "current": {
+      "timestamp": "2025-11-14 14:43:23",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:43:23",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "DD201": {
+    "current": {
+      "timestamp": "2025-11-14 14:44:52",
+      "reviewer": "marcu",
+      "note": "Remove top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:44:12",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:44:12",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 14:44:52",
+        "reviewer": "marcu",
+        "note": "Remove top 1% of influence points."
+      }
+    ]
+  },
+  "DD203": {
+    "current": {
+      "timestamp": "2025-11-14 14:45:07",
+      "reviewer": "marcu",
+      "note": "Remove top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:45:07",
+        "reviewer": "marcu",
+        "note": "Remove top 1% of influence points."
+      }
+    ]
+  },
+  "DD205": {
+    "current": {
+      "timestamp": "2025-11-14 14:45:24",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:45:24",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "DD207": {
+    "current": {
+      "timestamp": "2025-11-14 14:46:58",
+      "reviewer": "marcu",
+      "note": "No changes. However, we need to investigate why only NE25 data is showing up and not also NSCH22. Mayble it is actually only present in NSCH21 and not 22? "
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:46:28",
+        "reviewer": "marcu",
+        "note": "No changes. However, we need to investigate why only NE25 data is showing up and not also NSCH 22. "
+      },
+      {
+        "timestamp": "2025-11-14 14:46:28",
+        "reviewer": "marcu",
+        "note": "No changes. However, we need to investigate why only NE25 data is showing up and not also NSCH 22. "
+      },
+      {
+        "timestamp": "2025-11-14 14:46:58",
+        "reviewer": "marcu",
+        "note": "No changes. However, we need to investigate why only NE25 data is showing up and not also NSCH22. Mayble it is actually only present in NSCH21 and not 22? "
+      }
+    ]
+  },
+  "DD221": {
+    "current": {
+      "timestamp": "2025-11-14 14:48:20",
+      "reviewer": "marcu",
+      "note": "Move to psychosocial problems scale and exclude from kidsights scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:48:20",
+        "reviewer": "marcu",
+        "note": "Move to psychosocial problems scale and exclude from kidsights scale."
+      }
+    ]
+  },
+  "DD299": {
+    "current": {
+      "timestamp": "2025-11-14 14:48:47",
+      "reviewer": "marcu",
+      "note": "Move to psychosocial problems scale and exclude to kidsights scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:48:47",
+        "reviewer": "marcu",
+        "note": "Move to psychosocial problems scale and exclude to kidsights scale."
+      }
+    ]
+  },
+  "EG1_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:49:19",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:49:19",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG1_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:49:37",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:49:37",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG2_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:50:10",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:50:10",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG2_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:50:43",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:50:43",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG3_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:51:20",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:51:20",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG3_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:51:50",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:51:50",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG4a_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:52:48",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:52:48",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG4a_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:54:47",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:54:47",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG4b_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:55:40",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:55:40",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG4b_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:55:57",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:55:57",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG5a": {
+    "current": {
+      "timestamp": "2025-11-14 14:56:13",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:56:13",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG5b": {
+    "current": {
+      "timestamp": "2025-11-14 14:58:05",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:58:05",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG6_1": {
+    "current": {
+      "timestamp": "2025-11-14 14:59:40",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:59:40",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG6_2": {
+    "current": {
+      "timestamp": "2025-11-14 14:59:46",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 14:59:46",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG7_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:00:12",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:00:12",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG7_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:00:26",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:00:26",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG8_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:00:41",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:00:41",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG8_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:00:50",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:00:50",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG9b": {
+    "current": {
+      "timestamp": "2025-11-14 15:01:20",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:01:20",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points"
+      }
+    ]
+  },
+  "EG9a": {
+    "current": {
+      "timestamp": "2025-11-14 15:01:42",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:01:42",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG10b": {
+    "current": {
+      "timestamp": "2025-11-14 15:02:46",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:02:46",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG10a": {
+    "current": {
+      "timestamp": "2025-11-14 15:02:53",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:02:53",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG11_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:03:20",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:03:20",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG11_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:03:34",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:03:34",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG12b": {
+    "current": {
+      "timestamp": "2025-11-14 15:04:28",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:04:28",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG12a": {
+    "current": {
+      "timestamp": "2025-11-14 15:04:50",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:04:50",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG13a": {
+    "current": {
+      "timestamp": "2025-11-14 15:06:41",
+      "reviewer": "marcu",
+      "note": "Exclude NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:06:41",
+        "reviewer": "marcu",
+        "note": "Exclude NE25 response data."
+      }
+    ]
+  },
+  "EG13b": {
+    "current": {
+      "timestamp": "2025-11-14 15:06:58",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:06:58",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG14a": {
+    "current": {
+      "timestamp": "2025-11-14 15:07:35",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:07:35",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG14b": {
+    "current": {
+      "timestamp": "2025-11-14 15:07:46",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:07:46",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG15_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:09:48",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:09:48",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG15_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:10:04",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:10:04",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG16a_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:14:46",
+      "reviewer": "marcu",
+      "note": "Remove NE25 responses."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:11:45",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:11:45",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:14:46",
+        "reviewer": "marcu",
+        "note": "Remove NE25 responses."
+      }
+    ]
+  },
+  "EG16a_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:17:19",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:11:54",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:11:54",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:15:02",
+        "reviewer": "marcu",
+        "note": "Remove NE25 responses"
+      },
+      {
+        "timestamp": "2025-11-14 15:15:02",
+        "reviewer": "marcu",
+        "note": "Remove NE25 responses"
+      },
+      {
+        "timestamp": "2025-11-14 15:17:19",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG16b": {
+    "current": {
+      "timestamp": "2025-11-14 15:18:22",
+      "reviewer": "marcu",
+      "note": "Remove NE25 responses."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:18:22",
+        "reviewer": "marcu",
+        "note": "Remove NE25 responses."
+      }
+    ]
+  },
+  "EG16c": {
+    "current": {
+      "timestamp": "2025-11-14 15:19:46",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:19:46",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG17a": {
+    "current": {
+      "timestamp": "2025-11-14 15:20:31",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:20:31",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points"
+      }
+    ]
+  },
+  "EG17b": {
+    "current": {
+      "timestamp": "2025-11-14 15:21:10",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:21:10",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG18a": {
+    "current": {
+      "timestamp": "2025-11-14 15:23:26",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:22:08",
+        "reviewer": "marcu",
+        "note": "Move to psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 15:22:08",
+        "reviewer": "marcu",
+        "note": "Move to psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 15:23:26",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG18b": {
+    "current": {
+      "timestamp": "2025-11-14 15:23:52",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:23:52",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG19_b": {
+    "current": {
+      "timestamp": "2025-11-14 15:24:11",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:24:11",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG19a_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:24:43",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:24:43",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG19a_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:25:08",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:25:08",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG19a_3": {
+    "current": {
+      "timestamp": "2025-11-14 15:25:26",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:25:26",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG19a_4": {
+    "current": {
+      "timestamp": "2025-11-14 15:26:16",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:26:16",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG20a": {
+    "current": {
+      "timestamp": "2025-11-14 15:26:49",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:26:49",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG20b_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:27:10",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:27:10",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG20b_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:27:17",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:27:17",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG20c": {
+    "current": {
+      "timestamp": "2025-11-14 15:28:01",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:28:01",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG20d": {
+    "current": {
+      "timestamp": "2025-11-14 15:28:11",
+      "reviewer": "marcu",
+      "note": "No Changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:28:11",
+        "reviewer": "marcu",
+        "note": "No Changes."
+      }
+    ]
+  },
+  "EG20e_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:28:31",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:28:31",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG20e_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:28:41",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:28:41",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG21a": {
+    "current": {
+      "timestamp": "2025-11-14 15:32:01",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points. Remove NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:29:16",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:29:16",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:32:01",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points. Remove NE25 response data."
+      }
+    ]
+  },
+  "EG21b": {
+    "current": {
+      "timestamp": "2025-11-14 15:33:08",
+      "reviewer": "marcu",
+      "note": " Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:30:17",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:30:17",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:30:53",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data. Exclude top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:30:53",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data. Exclude top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:33:08",
+        "reviewer": "marcu",
+        "note": " Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG22_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:34:35",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:34:35",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG22_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:34:56",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:34:56",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG23a": {
+    "current": {
+      "timestamp": "2025-11-14 15:35:08",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:35:08",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG23b": {
+    "current": {
+      "timestamp": "2025-11-14 15:35:46",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:35:46",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG24a": {
+    "current": {
+      "timestamp": "2025-11-14 15:36:15",
+      "reviewer": "marcu",
+      "note": "Move this to the psychosocial problems scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:36:01",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:36:01",
+        "reviewer": "marcu",
+        "note": "No changes."
+      },
+      {
+        "timestamp": "2025-11-14 15:36:15",
+        "reviewer": "marcu",
+        "note": "Move this to the psychosocial problems scale."
+      }
+    ]
+  },
+  "EG24b": {
+    "current": {
+      "timestamp": "2025-11-14 15:36:33",
+      "reviewer": "marcu",
+      "note": "Move this to the psychosocial problems scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:36:33",
+        "reviewer": "marcu",
+        "note": "Move this to the psychosocial problems scale."
+      }
+    ]
+  },
+  "EG25a": {
+    "current": {
+      "timestamp": "2025-11-14 15:39:08",
+      "reviewer": "marcu",
+      "note": "This need to be moved to the psychosocial problems scale. The the json codebook field scoring.reverse needs to be set to true."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:39:08",
+        "reviewer": "marcu",
+        "note": "This need to be moved to the psychosocial problems scale. The the json codebook field scoring.reverse needs to be set to true."
+      }
+    ]
+  },
+  "EG25b": {
+    "current": {
+      "timestamp": "2025-11-14 15:40:53",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:40:53",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale."
+      }
+    ]
+  },
+  "EG26a": {
+    "current": {
+      "timestamp": "2025-11-14 15:41:19",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:41:19",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale"
+      }
+    ]
+  },
+  "EG26b": {
+    "current": {
+      "timestamp": "2025-11-14 15:43:06",
+      "reviewer": "marcu",
+      "note": "Move the the psychosocial problems scale. The json codebook field scoring.reverse needs to be set to false"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:43:06",
+        "reviewer": "marcu",
+        "note": "Move the the psychosocial problems scale. The json codebook field scoring.reverse needs to be set to false"
+      }
+    ]
+  },
+  "EG27a": {
+    "current": {
+      "timestamp": "2025-11-14 15:43:44",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:43:44",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG27b_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:43:51",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:43:51",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG27b_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:43:57",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:43:57",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG27b_3": {
+    "current": {
+      "timestamp": "2025-11-14 15:44:12",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:44:12",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG28a": {
+    "current": {
+      "timestamp": "2025-11-14 15:44:23",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:44:23",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG28b": {
+    "current": {
+      "timestamp": "2025-11-14 15:44:32",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:44:32",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG28c": {
+    "current": {
+      "timestamp": "2025-11-14 15:44:44",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:44:44",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG29a": {
+    "current": {
+      "timestamp": "2025-11-14 15:46:23",
+      "reviewer": "marcu",
+      "note": "In the json codebook file the scoring.reverse field needs to be set to true. Exclude the top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:46:23",
+        "reviewer": "marcu",
+        "note": "In the json codebook file the scoring.reverse field needs to be set to true. Exclude the top 5% of influence points."
+      }
+    ]
+  },
+  "EG29b": {
+    "current": {
+      "timestamp": "2025-11-14 15:46:57",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:46:57",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG29c": {
+    "current": {
+      "timestamp": "2025-11-14 15:47:55",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points. Remove NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:47:48",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% ofinfluence points. Remove NE25 response data."
+      },
+      {
+        "timestamp": "2025-11-14 15:47:48",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% ofinfluence points. Remove NE25 response data."
+      },
+      {
+        "timestamp": "2025-11-14 15:47:55",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points. Remove NE25 response data."
+      }
+    ]
+  },
+  "EG30a": {
+    "current": {
+      "timestamp": "2025-11-14 15:49:15",
+      "reviewer": "marcu",
+      "note": "Investigate why the NSCH22 data isn't showing up on the plot. Does this data only exist for NSCH21 and so does the codebook need to reflect that?"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:49:12",
+        "reviewer": "marcu",
+        "note": "Investigate why the NSCH22 data isn't showing up on the plot. Does this data only exist for NSCH21 and so does the codebook need to reflect that?"
+      },
+      {
+        "timestamp": "2025-11-14 15:49:12",
+        "reviewer": "marcu",
+        "note": "Investigate why the NSCH22 data isn't showing up on the plot. Does this data only exist for NSCH21 and so does the codebook need to reflect that?"
+      },
+      {
+        "timestamp": "2025-11-14 15:49:15",
+        "reviewer": "marcu",
+        "note": "Investigate why the NSCH22 data isn't showing up on the plot. Does this data only exist for NSCH21 and so does the codebook need to reflect that?"
+      }
+    ]
+  },
+  "EG30b": {
+    "current": {
+      "timestamp": "2025-11-14 15:49:46",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:49:46",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG30c": {
+    "current": {
+      "timestamp": "2025-11-14 15:50:03",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:50:03",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG30e": {
+    "current": {
+      "timestamp": "2025-11-14 15:50:53",
+      "reviewer": "marcu",
+      "note": "Remove NE25 data. Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:50:51",
+        "reviewer": "marcu",
+        "note": "Remove NE25 data. Remove top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:50:51",
+        "reviewer": "marcu",
+        "note": "Remove NE25 data. Remove top 5% of influence points."
+      },
+      {
+        "timestamp": "2025-11-14 15:50:53",
+        "reviewer": "marcu",
+        "note": "Remove NE25 data. Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG30f": {
+    "current": {
+      "timestamp": "2025-11-14 15:51:16",
+      "reviewer": "marcu",
+      "note": "Remove top 25% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:51:16",
+        "reviewer": "marcu",
+        "note": "Remove top 25% of influence points."
+      }
+    ]
+  },
+  "EG31a_1": {
+    "current": {
+      "timestamp": "2025-11-14 15:53:29",
+      "reviewer": "marcu",
+      "note": "Keep NE25 responses only. Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:53:04",
+        "reviewer": "marcu",
+        "note": "Keep NE25 responses only."
+      },
+      {
+        "timestamp": "2025-11-14 15:53:04",
+        "reviewer": "marcu",
+        "note": "Keep NE25 responses only."
+      },
+      {
+        "timestamp": "2025-11-14 15:53:29",
+        "reviewer": "marcu",
+        "note": "Keep NE25 responses only. Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG31a_2": {
+    "current": {
+      "timestamp": "2025-11-14 15:53:40",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:53:40",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG31b": {
+    "current": {
+      "timestamp": "2025-11-14 15:53:54",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:53:54",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "EG32a": {
+    "current": {
+      "timestamp": "2025-11-14 15:54:41",
+      "reviewer": "marcu",
+      "note": "Investigate why NSCH22 data isn't appearing and being plotted."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:54:41",
+        "reviewer": "marcu",
+        "note": "Investigate why NSCH22 data isn't appearing and being plotted."
+      }
+    ]
+  },
+  "EG32b": {
+    "current": {
+      "timestamp": "2025-11-14 15:55:20",
+      "reviewer": "marcu",
+      "note": "Remove NE25 response data"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:55:20",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data"
+      }
+    ]
+  },
+  "EG33a": {
+    "current": {
+      "timestamp": "2025-11-14 15:57:11",
+      "reviewer": "marcu",
+      "note": "Investigate why NSCH22 data is not being plotted. Remove top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:55:49",
+        "reviewer": "marcu",
+        "note": "Investigate why NSCH22 data is not being plotted."
+      },
+      {
+        "timestamp": "2025-11-14 15:55:49",
+        "reviewer": "marcu",
+        "note": "Investigate why NSCH22 data is not being plotted."
+      },
+      {
+        "timestamp": "2025-11-14 15:57:11",
+        "reviewer": "marcu",
+        "note": "Investigate why NSCH22 data is not being plotted. Remove top 5% of influence points."
+      }
+    ]
+  },
+  "EG33b": {
+    "current": {
+      "timestamp": "2025-11-14 15:56:52",
+      "reviewer": "marcu",
+      "note": "Remove top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:56:52",
+        "reviewer": "marcu",
+        "note": "Remove top 5% of influence points"
+      }
+    ]
+  },
+  "EG34a": {
+    "current": {
+      "timestamp": "2025-11-14 15:58:01",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:57:30",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      },
+      {
+        "timestamp": "2025-11-14 15:57:30",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      },
+      {
+        "timestamp": "2025-11-14 15:58:01",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG34b": {
+    "current": {
+      "timestamp": "2025-11-14 15:58:10",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:58:10",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG35a": {
+    "current": {
+      "timestamp": "2025-11-14 15:58:58",
+      "reviewer": "marcu",
+      "note": "Exclude top 5 % of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:58:58",
+        "reviewer": "marcu",
+        "note": "Exclude top 5 % of influence points."
+      }
+    ]
+  },
+  "EG35b": {
+    "current": {
+      "timestamp": "2025-11-14 15:59:12",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:59:12",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "EG36b": {
+    "current": {
+      "timestamp": "2025-11-14 15:59:34",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:59:34",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG36a": {
+    "current": {
+      "timestamp": "2025-11-14 15:59:46",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 15:59:46",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG37_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:00:05",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:00:05",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale."
+      }
+    ]
+  },
+  "EG37_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:00:46",
+      "reviewer": "marcu",
+      "note": "Remove NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:00:46",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data."
+      }
+    ]
+  },
+  "EG38a": {
+    "current": {
+      "timestamp": "2025-11-14 16:01:14",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:01:14",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG38b": {
+    "current": {
+      "timestamp": "2025-11-14 16:01:30",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:01:30",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG38c": {
+    "current": {
+      "timestamp": "2025-11-14 16:01:37",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:01:37",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG39a": {
+    "current": {
+      "timestamp": "2025-11-14 16:08:20",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale. scoring.reverse field in the json codebook needs to be set to false"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:08:20",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale. scoring.reverse field in the json codebook needs to be set to false"
+      }
+    ]
+  },
+  "EG39b": {
+    "current": {
+      "timestamp": "2025-11-14 16:09:26",
+      "reviewer": "marcu",
+      "note": "Remove NE25 response data."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:09:26",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data."
+      }
+    ]
+  },
+  "EG40_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:10:00",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:09:41",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data"
+      },
+      {
+        "timestamp": "2025-11-14 16:09:41",
+        "reviewer": "marcu",
+        "note": "Remove NE25 response data"
+      },
+      {
+        "timestamp": "2025-11-14 16:10:00",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG40_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:10:06",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:10:06",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG41_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:13:15",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:12:41",
+        "reviewer": "marcu",
+        "note": "Remove top 1% of influence points. Move to the psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 16:12:41",
+        "reviewer": "marcu",
+        "note": "Remove top 1% of influence points. Move to the psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 16:13:15",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale."
+      }
+    ]
+  },
+  "EG41_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:17:00",
+      "reviewer": "marcu",
+      "note": "Move to the psychosocial problems scale. For NE25, it seem that the scoring.reverse field needs to be the oppposite of what it is so check the logic that higher response values  mean healthier development."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:13:26",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 16:13:26",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale."
+      },
+      {
+        "timestamp": "2025-11-14 16:17:00",
+        "reviewer": "marcu",
+        "note": "Move to the psychosocial problems scale. For NE25, it seem that the scoring.reverse field needs to be the oppposite of what it is so check the logic that higher response values  mean healthier development."
+      }
+    ]
+  },
+  "EG42a": {
+    "current": {
+      "timestamp": "2025-11-14 16:17:45",
+      "reviewer": "marcu",
+      "note": "It doesn't make sense to me that there are no NE20 or NE22 data points being plotted here."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:17:45",
+        "reviewer": "marcu",
+        "note": "It doesn't make sense to me that there are no NE20 or NE22 data points being plotted here."
+      }
+    ]
+  },
+  "EG42b": {
+    "current": {
+      "timestamp": "2025-11-14 16:18:14",
+      "reviewer": "marcu",
+      "note": "It doesn't make sense to me that there are no NE25 datapoints plotted here."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:18:14",
+        "reviewer": "marcu",
+        "note": "It doesn't make sense to me that there are no NE25 datapoints plotted here."
+      }
+    ]
+  },
+  "EG42c": {
+    "current": {
+      "timestamp": "2025-11-14 16:18:43",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:18:43",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG43a_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:19:08",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:19:08",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG43a_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:19:25",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:19:25",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG43b": {
+    "current": {
+      "timestamp": "2025-11-14 16:19:58",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:19:58",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG44_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:20:29",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:20:29",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG44_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:22:17",
+      "reviewer": "marcu",
+      "note": "This seems to me that scoring.reverse needs to be the opposite of what it currenty is in the codebook json file."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:22:03",
+        "reviewer": "marcu",
+        "note": "This seems to me that scoring.reverse needs to be the opposite of what it is. We "
+      },
+      {
+        "timestamp": "2025-11-14 16:22:03",
+        "reviewer": "marcu",
+        "note": "This seems to me that scoring.reverse needs to be the opposite of what it is. We "
+      },
+      {
+        "timestamp": "2025-11-14 16:22:17",
+        "reviewer": "marcu",
+        "note": "This seems to me that scoring.reverse needs to be the opposite of what it currenty is in the codebook json file."
+      }
+    ]
+  },
+  "EG45_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:22:32",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:22:32",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG45_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:22:42",
+      "reviewer": "marcu",
+      "note": "No changes"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:22:42",
+        "reviewer": "marcu",
+        "note": "No changes"
+      }
+    ]
+  },
+  "EG46a_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:23:29",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:23:29",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG46a_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:24:06",
+      "reviewer": "marcu",
+      "note": "Exclude top 5 % of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:24:06",
+        "reviewer": "marcu",
+        "note": "Exclude top 5 % of influence points."
+      }
+    ]
+  },
+  "EG46b": {
+    "current": {
+      "timestamp": "2025-11-14 16:24:26",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:24:26",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG46c": {
+    "current": {
+      "timestamp": "2025-11-14 16:24:42",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:24:42",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG46d": {
+    "current": {
+      "timestamp": "2025-11-14 16:24:55",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:24:55",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "EG47a": {
+    "current": {
+      "timestamp": "2025-11-14 16:25:18",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:25:18",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG47b": {
+    "current": {
+      "timestamp": "2025-11-14 16:25:31",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:25:31",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG48_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:26:16",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:26:16",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "EG48_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:26:38",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:26:38",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "EG49_1": {
+    "current": {
+      "timestamp": "2025-11-14 16:26:59",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:26:59",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points."
+      }
+    ]
+  },
+  "EG49_2": {
+    "current": {
+      "timestamp": "2025-11-14 16:27:14",
+      "reviewer": "marcu",
+      "note": "Exclude top 5% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:27:14",
+        "reviewer": "marcu",
+        "note": "Exclude top 5% of influence points"
+      }
+    ]
+  },
+  "EG50a": {
+    "current": {
+      "timestamp": "2025-11-14 16:27:47",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:27:47",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points."
+      }
+    ]
+  },
+  "EG50b": {
+    "current": {
+      "timestamp": "2025-11-14 16:28:16",
+      "reviewer": "marcu",
+      "note": "Exclude top 1% of influence points"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:28:16",
+        "reviewer": "marcu",
+        "note": "Exclude top 1% of influence points"
+      }
+    ]
+  },
+  "NOM046X": {
+    "current": {
+      "timestamp": "2025-11-14 16:28:41",
+      "reviewer": "marcu",
+      "note": "No changes."
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:28:41",
+        "reviewer": "marcu",
+        "note": "No changes."
+      }
+    ]
+  },
+  "PS001": {
+    "current": {
+      "timestamp": "2025-11-14 16:30:34",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:30:34",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS002": {
+    "current": {
+      "timestamp": "2025-11-14 16:30:40",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:30:40",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS003": {
+    "current": {
+      "timestamp": "2025-11-14 16:30:52",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:30:52",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS004": {
+    "current": {
+      "timestamp": "2025-11-14 16:30:56",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:30:56",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS005": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:00",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:00",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS006": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:06",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:06",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS007": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:29",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:29",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS008": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:35",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:35",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS009": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:41",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:41",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS010": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:46",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:46",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS011": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:51",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:51",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS013": {
+    "current": {
+      "timestamp": "2025-11-14 16:31:57",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:31:57",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS014": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:03",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:03",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS015": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:14",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:14",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS016": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:19",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:19",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS017": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:23",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:23",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS018": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:29",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:29",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS019": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:34",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:34",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS020": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:45",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:45",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS022": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:51",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:51",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS023": {
+    "current": {
+      "timestamp": "2025-11-14 16:32:57",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:32:57",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS024": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:01",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:01",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS025": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:06",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:06",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS026": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:11",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:11",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS027": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:15",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:15",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS028": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:19",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:19",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS029": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:23",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:23",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS030": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:28",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:28",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS031": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:32",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:32",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS032": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:36",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:36",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS034": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:40",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:40",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS035": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:45",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:45",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS036": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:50",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:50",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS037": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:54",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:54",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS038": {
+    "current": {
+      "timestamp": "2025-11-14 16:33:58",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:33:58",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS039": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:03",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:03",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS040": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:07",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:07",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS041": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:11",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:11",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS042": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:15",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:15",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS043": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:21",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:21",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS044": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:26",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:26",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS045": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:30",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:30",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS046": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:34",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:34",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS047": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:39",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:39",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS048": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:45",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:45",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  },
+  "PS049": {
+    "current": {
+      "timestamp": "2025-11-14 16:34:49",
+      "reviewer": "marcu",
+      "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+    },
+    "history": [
+      {
+        "timestamp": "2025-11-14 16:34:49",
+        "reviewer": "marcu",
+        "note": "In the json codebook file, set scoring.reverse to true so that higher values indicate healthier development"
+      }
+    ]
+  }
+}

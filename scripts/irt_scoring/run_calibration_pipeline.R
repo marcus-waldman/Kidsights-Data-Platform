@@ -66,150 +66,63 @@ cat(sprintf("  Database: data/duckdb/kidsights_local.duckdb\n"))
 cat(sprintf("  Output: mplus/calibdat.dat\n\n"))
 
 # =============================================================================
-# Step 1: Create/Update Calibration Tables
+# Step 1: Verify Data Sources (SIMPLIFIED - No Study Tables Created)
+# =============================================================================
+#
+# NOTE: Study-specific calibration tables (ne25_calibration, nsch21_calibration, etc.)
+#       are NO LONGER CREATED. The calibration_dataset_long table created in Step 2.6
+#       is the SINGLE SOURCE OF TRUTH for all calibration data.
+#
+# This step only verifies that upstream data sources exist:
+#   - ne25_transformed (NE25 pipeline output)
+#   - historical_calibration_2020_2024 (NE20, NE22, USA24 combined)
+#   - nsch_2021, nsch_2022 (NSCH raw data)
 # =============================================================================
 
 if (!export_only) {
   cat(strrep("=", 80), "\n")
-  cat("STEP 1: CREATE/UPDATE CALIBRATION TABLES\n")
+  cat("STEP 1: VERIFY DATA SOURCES\n")
   cat(strrep("=", 80), "\n\n")
-  
-  # Check if historical tables exist
-  library(duckdb)
-  conn <- duckdb::dbConnect(duckdb::duckdb(), 
-                             dbdir = "data/duckdb/kidsights_local.duckdb", 
-                             read_only = TRUE)
-  tables <- DBI::dbListTables(conn)
-  DBI::dbDisconnect(conn)
-  
-  historical_tables <- c("ne20_calibration", "ne22_calibration", "usa24_calibration")
-  historical_exist <- all(historical_tables %in% tables)
-  
-  # Import historical data if needed
-  if (!historical_exist) {
-    cat("[1A] Importing historical calibration data (NE20, NE22, USA24)\n\n")
-    source("scripts/irt_scoring/import_historical_calibration.R")
-    cat("\n")
-  } else {
-    cat("[1A] Historical calibration tables already exist (skipping import)\n\n")
-  }
-  
-  # Create/update current study tables
-  cat("[1B] Creating current study calibration tables (NE25, NSCH21, NSCH22)\n\n")
-  source("scripts/irt_scoring/create_calibration_tables.R")
-  create_calibration_tables(
-    codebook_path = "codebook/data/codebook.json",
-    db_path = "data/duckdb/kidsights_local.duckdb",
-    studies = c("NE25", "NSCH21", "NSCH22")
-  )
 
-  cat("\n[OK] All calibration tables created/updated\n\n")
-
-  # Validate NE25 calibration table (most critical for data loss detection)
-  cat("[1C] Validating NE25 calibration table item presence\n\n")
-  source("R/utils/verify_calibration_items.R")
-
+  # Check if required upstream tables exist
   library(duckdb)
   conn <- duckdb::dbConnect(duckdb::duckdb(),
                              dbdir = "data/duckdb/kidsights_local.duckdb",
                              read_only = TRUE)
-  ne25_calib <- DBI::dbReadTable(conn, "ne25_calibration")
+  tables <- DBI::dbListTables(conn)
   DBI::dbDisconnect(conn)
 
-  ne25_verification <- verify_calibration_items(
-    data = ne25_calib,
-    lexicon_name = "equate",
-    verbose = TRUE,
-    stop_on_missing = FALSE  # Don't stop - missing items OK for multi-study context
-  )
+  required_tables <- c("ne25_transformed", "historical_calibration_2020_2024",
+                       "nsch_2021", "nsch_2022")
+  missing_tables <- setdiff(required_tables, tables)
 
-  if (ne25_verification$passed) {
-    cat("[OK] NE25 calibration table: All expected items present\n\n")
-  } else {
-    cat(sprintf("[WARNING] NE25 calibration table: %d expected items missing\n\n",
-                length(ne25_verification$missing_items)))
+  if (length(missing_tables) > 0) {
+    stop(sprintf("Missing required upstream tables: %s\nRun the appropriate pipelines first.",
+                 paste(missing_tables, collapse = ", ")))
   }
+
+  cat("[OK] All required upstream data sources exist:\n")
+  cat("     - ne25_transformed (NE25 pipeline)\n")
+  cat("     - historical_calibration_2020_2024 (NE20, NE22, USA24)\n")
+  cat("     - nsch_2021, nsch_2022 (NSCH raw data)\n\n")
 }
 
 # =============================================================================
-# Step 2: Validate Calibration Tables
-# =============================================================================
-
-if (!export_only && !tables_only) {
-  cat(strrep("=", 80), "\n")
-  cat("STEP 2: VALIDATE CALIBRATION TABLES\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("Running validation checks...\n\n")
-  source("scripts/irt_scoring/validate_calibration_tables.R")
-  cat("\n")
-}
-
-# =============================================================================
-# Step 2.4: Sentinel Missing Code Validation (MANDATORY)
-# =============================================================================
-
-if (!export_only && !tables_only) {
-  cat(strrep("=", 80), "\n")
-  cat("STEP 2.4: SENTINEL MISSING CODE VALIDATION (MANDATORY)\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("Checking ALL calibration tables for sentinel missing codes (values >= 90)...\n")
-  cat("This validates:\n")
-  cat("  - Historical data (NE20, NE22, USA24)\n")
-  cat("  - NSCH transformations (NSCH21, NSCH22)\n")
-  cat("  - Current study (NE25)\n\n")
-
-  source("scripts/irt_scoring/validate_calibration_sentinel_codes.R")
-
-  validate_calibration_sentinel_codes(
-    db_path = "data/duckdb/kidsights_local.duckdb",
-    codebook_path = "codebook/data/codebook.json",
-    verbose = TRUE,
-    stop_on_error = TRUE  # STOP pipeline if contamination detected
-  )
-
-  cat("\n[OK] All calibration tables are clean (no values >= 90)\n\n")
-}
-
-# =============================================================================
-# Step 2.5: Data Quality Assessment (MANDATORY)
-# =============================================================================
-
-if (!export_only && !tables_only) {
-  cat(strrep("=", 80), "\n")
-  cat("STEP 2.5: DATA QUALITY ASSESSMENT (MANDATORY)\n")
-  cat(strrep("=", 80), "\n\n")
-
-  cat("Running mandatory quality checks on calibration data...\n\n")
-  source("scripts/irt_scoring/validate_calibration_quality.R")
-
-  validate_calibration_quality(
-    db_path = "data/duckdb/kidsights_local.duckdb",
-    codebook_path = "codebook/data/codebook.json",
-    output_path = "docs/irt_scoring/quality_flags.csv",
-    verbose = TRUE
-  )
-
-  cat("\n[INFO] Quality assessment complete. Review flags at:\n")
-  cat("       - CSV: docs/irt_scoring/quality_flags.csv\n")
-  cat("       - HTML Report: docs/irt_scoring/calibration_quality_report.html\n")
-  cat("       (Render report with: quarto render docs/irt_scoring/calibration_quality_report.qmd)\n\n")
-}
-
-# =============================================================================
-# Step 2.6: Create Long Format Dataset with QA Masking
+# Step 2: Create Long Format Dataset (SINGLE SOURCE OF TRUTH)
 # =============================================================================
 
 if (!export_only && !tables_only && !skip_long_format) {
   cat(strrep("=", 80), "\n")
-  cat("STEP 2.6: CREATE LONG FORMAT DATASET\n")
+  cat("STEP 2: CREATE LONG FORMAT DATASET\n")
   cat(strrep("=", 80), "\n\n")
 
-  cat("Creating long format calibration dataset with:\n")
+  cat("Creating calibration_dataset_long (SINGLE SOURCE OF TRUTH) with:\n")
+  cat("  - NE25 data from ne25_transformed (direct, no intermediate table)\n")
+  cat("  - Historical data (NE20, NE22, USA24)\n")
   cat("  - ALL NSCH data (development + holdout for external validation)\n")
+  cat("  - Seeded dev/holdout split (reproducible)\n")
   cat("  - Cook's D influence point detection\n")
-  cat("  - QA masking flags (NE25 removal + influence points)\n\n")
+  cat("  - QA masking flags\n\n")
 
   source("scripts/irt_scoring/create_calibration_long.R")
 
@@ -271,67 +184,52 @@ if (!export_only && !tables_only && !skip_long_format) {
 
 } else if (!export_only && !tables_only && skip_long_format) {
   cat(strrep("=", 80), "\n")
-  cat("STEP 2.6: CREATE LONG FORMAT DATASET (SKIPPED)\n")
+  cat("STEP 2: CREATE LONG FORMAT DATASET (SKIPPED)\n")
   cat(strrep("=", 80), "\n\n")
-  cat("[INFO] Long format creation skipped (--skip-long-format flag)\n\n")
+  cat("[INFO] Long format creation skipped (--skip-long-format flag)\n")
+  cat("[WARNING] Using existing calibration_dataset_long table from previous run\n\n")
 }
 
 # =============================================================================
-# Step 3: Export Calibration Dataset
+# Step 3: Data Quality Assessment
+# =============================================================================
+
+if (!export_only && !tables_only) {
+  cat(strrep("=", 80), "\n")
+  cat("STEP 3: DATA QUALITY ASSESSMENT\n")
+  cat(strrep("=", 80), "\n\n")
+
+  cat("Running mandatory quality checks on calibration_dataset_long...\n\n")
+  source("scripts/irt_scoring/validate_calibration_quality.R")
+
+  validate_calibration_quality(
+    db_path = "data/duckdb/kidsights_local.duckdb",
+    codebook_path = "codebook/data/codebook.json",
+    output_path = "docs/irt_scoring/quality_flags.csv",
+    verbose = TRUE
+  )
+
+  cat("\n[INFO] Quality assessment complete. Review flags at:\n")
+  cat("       - CSV: docs/irt_scoring/quality_flags.csv\n")
+  cat("       - HTML Report: docs/irt_scoring/calibration_quality_report.html\n")
+  cat("       (Render report with: quarto render docs/irt_scoring/calibration_quality_report.qmd)\n\n")
+}
+
+# =============================================================================
+# Step 4: Export to Mplus Format (DEPRECATED - Use calibration_dataset_long instead)
 # =============================================================================
 
 if (!tables_only) {
   cat(strrep("=", 80), "\n")
-  cat("STEP 3: EXPORT CALIBRATION DATASET\n")
+  cat("STEP 4: EXPORT TO MPLUS FORMAT (DEPRECATED)\n")
   cat(strrep("=", 80), "\n\n")
-  
-  source("scripts/irt_scoring/export_calibration_dat.R")
-  
-  export_calibration_dat(
-    output_dat = "mplus/calibdat.dat",
-    db_path = "data/duckdb/kidsights_local.duckdb",
-    studies = "ALL",
-    nsch_sample_size = nsch_sample_size,
-    nsch_sample_seed = 12345,
-    create_db_view = FALSE
-  )
 
-  cat("\n[OK] Calibration dataset exported\n\n")
+  cat("[NOTE] The export_calibration_dat.R function still uses old study-specific tables.\n")
+  cat("       This step is DEPRECATED and will be removed in future versions.\n")
+  cat("       For Mplus calibration, query calibration_dataset_long directly using DuckDB.\n")
+  cat("       See: docs/irt_scoring/calibration_qa_cleanup_summary.md\n\n")
 
-  # Validate Mplus export format
-  cat("[3A] Validating Mplus export file format\n\n")
-  source("R/utils/verify_mplus_export.R")
-
-  # Calculate expected counts from actual table sizes
-  library(duckdb)
-  conn_validate <- duckdb::dbConnect(duckdb::duckdb(),
-                                     dbdir = "data/duckdb/kidsights_local.duckdb",
-                                     read_only = TRUE)
-
-  expected_records <- (
-    DBI::dbGetQuery(conn_validate, "SELECT COUNT(*) as n FROM ne20_calibration")$n +
-    DBI::dbGetQuery(conn_validate, "SELECT COUNT(*) as n FROM ne22_calibration")$n +
-    DBI::dbGetQuery(conn_validate, "SELECT COUNT(*) as n FROM ne25_calibration")$n +
-    DBI::dbGetQuery(conn_validate, "SELECT COUNT(*) as n FROM usa24_calibration")$n +
-    (2 * nsch_sample_size)  # NSCH21 + NSCH22 samples
-  )
-
-  DBI::dbDisconnect(conn_validate)
-
-  mplus_verification <- verify_mplus_export(
-    dat_file = "mplus/calibdat.dat",
-    expected_n = expected_records,
-    expected_vars = NULL,  # Variable count depends on item selection
-    verbose = TRUE,
-    stop_on_error = FALSE  # Don't stop - allow warnings
-  )
-
-  if (mplus_verification$passed) {
-    cat("[OK] Mplus export file format validated\n\n")
-  } else {
-    cat(sprintf("[WARNING] Mplus export has %d format issues - review before calibration\n\n",
-                length(mplus_verification$errors)))
-  }
+  cat("[INFO] Skipping deprecated Mplus export step\n\n")
 }
 
 # =============================================================================

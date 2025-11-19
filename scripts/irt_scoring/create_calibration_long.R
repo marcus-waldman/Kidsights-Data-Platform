@@ -47,34 +47,60 @@ cat(sprintf("      Loaded %d records\n", nrow(historical_data)))
 cat(sprintf("      Studies: %s\n\n", paste(unique(historical_data$study), collapse=", ")))
 
 # -----------------------------------------------------------------------------
-# Load NE25 data
+# Load NE25 data from ne25_transformed (single source of truth)
 # -----------------------------------------------------------------------------
 
-cat("[1.2] Loading NE25 calibration data...\n")
+cat("[1.2] Loading NE25 data from ne25_transformed (eligible=TRUE)...\n")
 
-ne25_data <- DBI::dbGetQuery(conn, "SELECT * FROM ne25_calibration")
-ne25_data$study <- "NE25"
+# Load NE25 transformed data
+ne25_data <- DBI::dbGetQuery(conn, "
+  SELECT * FROM ne25_transformed
+  WHERE eligible = TRUE
+")
 
-cat(sprintf("      Loaded %d records\n\n", nrow(ne25_data)))
+cat(sprintf("      Loaded %d eligible records\n", nrow(ne25_data)))
 
-# -----------------------------------------------------------------------------
-# Load current dev sample to identify NSCH dev IDs
-# -----------------------------------------------------------------------------
+# Map ne25 lexicon to equate lexicon using codebook
+cat("      Mapping ne25 → equate lexicon...\n")
+codebook_temp <- jsonlite::fromJSON("codebook/data/codebook.json")
 
-cat("[1.3] Loading current development sample to identify NSCH dev IDs...\n")
+ne25_to_equate <- list()
+for (item_id in names(codebook_temp$items)) {
+  item <- codebook_temp$items[[item_id]]
+  if (!is.null(item$lexicons$ne25) && !is.null(item$lexicons$equate)) {
+    ne25_name <- tolower(item$lexicons$ne25)
+    equate_name <- tolower(item$lexicons$equate)
+    ne25_to_equate[[ne25_name]] <- equate_name
+  }
+}
 
-dev_sample <- DBI::dbGetQuery(conn, "SELECT * FROM calibration_dataset_2020_2025")
+# Rename columns from ne25 → equate
+ne25_data <- ne25_data %>%
+  dplyr::rename_with(function(cols) {
+    sapply(cols, function(col) {
+      col_lower <- tolower(col)
+      if (col_lower %in% names(ne25_to_equate)) {
+        ne25_to_equate[[col_lower]]
+      } else {
+        col
+      }
+    })
+  })
 
-nsch21_dev_ids <- dev_sample %>%
-  dplyr::filter(study == "NSCH21") %>%
-  dplyr::pull(id)
+cat(sprintf("      Mapped %d item columns to equate lexicon\n", length(ne25_to_equate)))
 
-nsch22_dev_ids <- dev_sample %>%
-  dplyr::filter(study == "NSCH22") %>%
-  dplyr::pull(id)
+# Create integer IDs (format: 250311XXXXXX) and convert age
+ne25_data <- ne25_data %>%
+  dplyr::mutate(
+    id = 250311000000 + dplyr::row_number(),
+    study = "NE25",
+    studynum = 3,
+    years = age_in_days / 365.25,  # Convert days to years
+    wgt = dplyr::if_else(is.na(authenticity_weight), 1.0, authenticity_weight)
+  )
 
-cat(sprintf("      NSCH21 dev IDs: %d\n", length(nsch21_dev_ids)))
-cat(sprintf("      NSCH22 dev IDs: %d\n\n", length(nsch22_dev_ids)))
+cat(sprintf("      Created IDs, study metadata, and weights\n"))
+cat(sprintf("      Final NE25 records: %d\n\n", nrow(ne25_data)))
 
 DBI::dbDisconnect(conn, shutdown = TRUE)
 
@@ -82,7 +108,7 @@ DBI::dbDisconnect(conn, shutdown = TRUE)
 # Load FULL NSCH datasets
 # -----------------------------------------------------------------------------
 
-cat("[1.4] Loading FULL NSCH datasets (not sampled)...\n")
+cat("[1.3] Loading FULL NSCH datasets (not sampled)...\n")
 
 # Source helper functions
 source("scripts/irt_scoring/helpers/recode_nsch_2021.R")
@@ -105,6 +131,29 @@ nsch22_full <- recode_nsch_2022(
 )
 nsch22_full$study <- "NSCH22"
 cat(sprintf("        Loaded %d records\n\n", nrow(nsch22_full)))
+
+# -----------------------------------------------------------------------------
+# Create reproducible dev/holdout split for NSCH (seeded sampling)
+# -----------------------------------------------------------------------------
+
+cat("[1.4] Creating reproducible NSCH dev/holdout split (seed=12345, n=1000 per year)...\n")
+
+# Set seed for reproducibility (matching export_calibration_dat.R)
+set.seed(12345)
+
+# Sample 1000 dev IDs from each NSCH year
+nsch21_dev_ids <- nsch21_full %>%
+  dplyr::slice_sample(n = min(1000, nrow(nsch21_full))) %>%
+  dplyr::pull(id)
+
+nsch22_dev_ids <- nsch22_full %>%
+  dplyr::slice_sample(n = min(1000, nrow(nsch22_full))) %>%
+  dplyr::pull(id)
+
+cat(sprintf("      NSCH21 dev sample: %d records (holdout: %d)\n",
+            length(nsch21_dev_ids), nrow(nsch21_full) - length(nsch21_dev_ids)))
+cat(sprintf("      NSCH22 dev sample: %d records (holdout: %d)\n\n",
+            length(nsch22_dev_ids), nrow(nsch22_full) - length(nsch22_dev_ids)))
 
 # ==============================================================================
 # PHASE 2: Reshape to Long Format with devflag
@@ -130,7 +179,32 @@ for (item_id in all_items) {
 
 cat(sprintf("      Total items in codebook: %d\n", length(all_items)))
 cat(sprintf("      Kidsights developmental items: %d\n", length(valid_items)))
-cat(sprintf("      Excluded items (no kidsights domain): %d\n\n", length(all_items) - length(valid_items)))
+cat(sprintf("      Excluded items (no kidsights domain): %d\n", length(all_items) - length(valid_items)))
+
+# Build equate lexicon version for NE25 and NSCH data
+# NOTE: NE25 uses lowercase equate names, NSCH uses case-sensitive equate names
+cat("      Building equate lexicon item lists...\n")
+
+# For NE25: lowercase equate lexicon (as renamed in Phase 1)
+valid_items_equate_lower <- character()
+for (item_id in valid_items) {
+  item <- codebook$items[[item_id]]
+  if (!is.null(item$lexicons$equate)) {
+    valid_items_equate_lower <- c(valid_items_equate_lower, tolower(item$lexicons$equate))
+  }
+}
+
+# For NSCH: case-sensitive equate lexicon (as returned by recode helpers)
+valid_items_equate <- character()
+for (item_id in valid_items) {
+  item <- codebook$items[[item_id]]
+  if (!is.null(item$lexicons$equate)) {
+    valid_items_equate <- c(valid_items_equate, item$lexicons$equate)
+  }
+}
+
+cat(sprintf("      Equate lexicon (lowercase for NE25): %d items\n", length(valid_items_equate_lower)))
+cat(sprintf("      Equate lexicon (case-sensitive for NSCH): %d items\n\n", length(valid_items_equate)))
 
 # Metadata columns
 metadata_cols <- c("study", "studynum", "id", "years", "wgt")
@@ -167,22 +241,22 @@ reshape_to_long <- function(data, dev_ids = NULL, valid_items) {
   return(long_data)
 }
 
-cat("[2.1] Reshaping historical data...\n")
+cat("[2.1] Reshaping historical data (uses item IDs)...\n")
 historical_long <- reshape_to_long(historical_data, valid_items = valid_items)
 cat(sprintf("      %d rows created\n", nrow(historical_long)))
 
-cat("[2.2] Reshaping NE25 data...\n")
-ne25_long <- reshape_to_long(ne25_data, valid_items = valid_items)
+cat("[2.2] Reshaping NE25 data (uses lowercase equate lexicon)...\n")
+ne25_long <- reshape_to_long(ne25_data, valid_items = valid_items_equate_lower)
 cat(sprintf("      %d rows created\n", nrow(ne25_long)))
 
-cat("[2.3] Reshaping NSCH21 data (with devflag)...\n")
-nsch21_long <- reshape_to_long(nsch21_full, dev_ids = nsch21_dev_ids, valid_items = valid_items)
+cat("[2.3] Reshaping NSCH21 data (uses case-sensitive equate lexicon, with devflag)...\n")
+nsch21_long <- reshape_to_long(nsch21_full, dev_ids = nsch21_dev_ids, valid_items = valid_items_equate)
 cat(sprintf("      %d rows created\n", nrow(nsch21_long)))
 cat(sprintf("      devflag=1: %d rows\n", sum(nsch21_long$devflag == 1)))
 cat(sprintf("      devflag=0: %d rows\n", sum(nsch21_long$devflag == 0)))
 
-cat("[2.4] Reshaping NSCH22 data (with devflag)...\n")
-nsch22_long <- reshape_to_long(nsch22_full, dev_ids = nsch22_dev_ids, valid_items = valid_items)
+cat("[2.4] Reshaping NSCH22 data (uses case-sensitive equate lexicon, with devflag)...\n")
+nsch22_long <- reshape_to_long(nsch22_full, dev_ids = nsch22_dev_ids, valid_items = valid_items_equate)
 cat(sprintf("      %d rows created\n", nrow(nsch22_long)))
 cat(sprintf("      devflag=1: %d rows\n", sum(nsch22_long$devflag == 1)))
 cat(sprintf("      devflag=0: %d rows\n\n", sum(nsch22_long$devflag == 0)))

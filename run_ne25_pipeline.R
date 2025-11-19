@@ -22,6 +22,12 @@ rm(list = ls())
 source("R/utils/dependency_manager.R")
 ensure_database_dependencies(auto_install = TRUE, quiet = FALSE)
 
+# Load environment configuration for Python paths
+source("R/utils/environment_config.R")
+
+# Load safe join utilities
+source("R/utils/safe_joins.R")
+
 cat("===========================================\n")
 cat("   Kidsights NE25 Data Pipeline\n")
 cat("===========================================\n")

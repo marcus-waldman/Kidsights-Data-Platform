@@ -55,3 +55,41 @@ cat("  - Column names: names(ne25)\n")
 cat("  - Summary stats: summary(ne25)\n")
 cat("  - Filter included: ne25 %>% filter(meets_inclusion == TRUE)\n")
 cat("  - Explore eta: ne25 %>% select(pid, record_id, authenticity_eta_full, authenticity_eta_holdout)\n")
+
+
+dat = ne25 %>% 
+  dplyr::filter(meets_inclusion, authentic) %>% 
+  select(pid, record_id, authenticity_eta_full, authenticity_eta_holdout, authenticity_avg_logpost) %>% 
+  dplyr::mutate(dz_eta = (authenticity_eta_holdout - authenticity_eta_full)/sd(authenticity_eta_full))
+
+
+library(tidyverse)
+ggplot(dat, aes(x = authenticity_eta_holdout, authenticity_avg_logpost, fill = abs(dz_eta)<.1, color = abs(dz_eta) <.1)) + 
+  geom_point(alpha = 1)
+
+mu = c(mean(dat$authenticity_eta_holdout, na.rm = T), mean(dat$authenticity_avg_logpost, na.rm = T))
+sigma = dat %>% dplyr::select(authenticity_eta_holdout, authenticity_avg_logpost) %>% cov(use = "complete.obs")
+
+dat$dmaha = NA
+for(i in 1:nrow(dat)){
+  dat$dmaha[i] =  stats::mahalanobis(c(dat$authenticity_eta_holdout[i], dat$authenticity_avg_logpost[i]),center=mu, cov=sigma)
+}
+
+dat  = dat %>% 
+  dplyr::rowwise() %>% 
+  dplyr::mutate(
+    dmaha = stats::mahalanobis(
+      c(authenticity_eta_holdout, authenticity_avg_logpost), 
+      center = mu, 
+      cov = sigma
+    )
+  )
+
+
+ggplot(dat, aes(dmaha)) + stat_ecdf(geom = "point") +  geom_hline(yintercept = .95)
+
+ggplot(dat, aes(x = authenticity_eta_holdout, authenticity_avg_logpost, fill =dmaha<quantile(dat$dmaha,.98, na.rm = T), color = dmaha <quantile(dat$dmaha,.98, na.rm = T))) + 
+  geom_point(alpha = 1)
+
+
+

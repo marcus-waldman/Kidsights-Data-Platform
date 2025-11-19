@@ -228,8 +228,8 @@ create_analysis_dataset <- function(codebook, study) {
 
   # Combine all information
   analysis_data <- content %>%
-    dplyr::left_join(lexicons, by = "item_id") %>%
-    dplyr::left_join(responses, by = "item_id") %>%
+    safe_left_join(lexicons, by_vars = "item_id") %>%
+    safe_left_join(responses, by_vars = "item_id") %>%
     dplyr::arrange(domain, item_id)
 
   return(analysis_data)

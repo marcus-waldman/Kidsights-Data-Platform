@@ -107,36 +107,49 @@ validate_calibration_quality <- function(
 
   conn <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = TRUE)
 
-  # Check if combined table exists
+  # Check if long format table exists
   tables <- DBI::dbListTables(conn)
 
-  if (!"calibration_dataset_2020_2025_restructured" %in% tables) {
+  if (!"calibration_dataset_long" %in% tables) {
     DBI::dbDisconnect(conn)
-    stop("Table 'calibration_dataset_2020_2025_restructured' not found. Run calibration pipeline first.")
+    stop("Table 'calibration_dataset_long' not found. Run calibration pipeline first.")
   }
 
-  if (verbose) cat("      Loading calibration_dataset_2020_2025_restructured table\n")
+  if (verbose) cat("      Loading calibration_dataset_long table\n")
 
-  calibration_data <- DBI::dbGetQuery(conn, "
-    SELECT *
-    FROM calibration_dataset_2020_2025_restructured
+  # Load long format data (use maskflag=0 for original data, not QA-cleaned)
+  calibration_long <- DBI::dbGetQuery(conn, "
+    SELECT id, years, study, lex_equate, y
+    FROM calibration_dataset_long
+    WHERE maskflag = 0 AND devflag = 1
   ")
 
   DBI::dbDisconnect(conn)
 
   if (verbose) {
-    cat(sprintf("      Records: %d\n", nrow(calibration_data)))
-    cat(sprintf("      Columns: %d\n\n", ncol(calibration_data)))
+    cat(sprintf("      Records: %d (long format)\n", nrow(calibration_long)))
+    cat(sprintf("      Using maskflag=0 (original data, not QA-cleaned)\n"))
+    cat(sprintf("      Using devflag=1 (development sample, excludes NSCH holdout)\n\n"))
   }
 
+  # Convert long format to wide format for quality checks
+  if (verbose) cat("[3/3] Converting long format to wide format\n")
+
+  calibration_data <- calibration_long %>%
+    tidyr::pivot_wider(
+      id_cols = c(id, years, study),
+      names_from = lex_equate,
+      values_from = y,
+      values_fn = list(y = dplyr::first)  # Handle any duplicates
+    )
+
   # Extract item columns (exclude metadata)
-  metadata_cols <- c("study_num", "id", "years", "study")
+  metadata_cols <- c("id", "years", "study")
   item_cols <- setdiff(names(calibration_data), metadata_cols)
 
   if (verbose) {
-    cat("[3/3] Data loading complete\n")
     cat(sprintf("      Items to validate: %d\n", length(item_cols)))
-    cat(sprintf("      Studies: %s\n\n", paste(unique(calibration_data$study), collapse = ", ")))
+    cat(sprintf("      Studies: %s\n\n", paste(sort(unique(calibration_data$study)), collapse = ", ")))
   }
 
   # ===========================================================================

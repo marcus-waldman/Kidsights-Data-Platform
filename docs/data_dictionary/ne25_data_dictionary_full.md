@@ -1,8 +1,8 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-11-10 10:54:30  
+**Generated:** 2025-11-18 11:59:28  
 **Total Records:** 4966  
-**Total Variables:** 672  
+**Total Variables:** 674  
 **Categories:** 16  
 
 ## Overview
@@ -22,14 +22,14 @@ for race/ethnicity, education categories, and other demographic variables.
 - [Income](#income) (6 variables)
 - [Adverse_Experiences](#adverse_experiences) (32 variables)
 - [Childcare](#childcare) (21 variables)
-- [Coglan](#coglan) (80 variables)
+- [Coglan](#coglan) (79 variables)
 - [Eligibility](#eligibility) (3 variables)
 - [Geography](#geography) (28 variables)
-- [Health](#health) (4 variables)
 - [Mental_Health](#mental_health) (10 variables)
-- [Motor](#motor) (76 variables)
-- [Other](#other) (309 variables)
-- [Socemo](#socemo) (70 variables)
+- [Motor](#motor) (74 variables)
+- [Other](#other) (317 variables)
+- [Psychosocial_Problems_General](#psychosocial_problems_general) (16 variables)
+- [Socemo](#socemo) (55 variables)
 
 ## Race
 
@@ -215,9 +215,9 @@ for race/ethnicity, education categories, and other demographic variables.
 
 **Description:** No description available
 
-**Variables:** 80  
-**Average Missing:** 91.9%  
-**Data Types:** 0 factors, 80 numeric, 0 logical, 0 character
+**Variables:** 79  
+**Average Missing:** 91.8%  
+**Data Types:** 0 factors, 79 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
@@ -315,7 +315,6 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `nom024` | Can your child consistently write his/her first name, even if some of the letters aren't quite right or are backwards? | numeric | 82.1% | N/A |
 | `nom026` | How many letters of the alphabet can your child recognize? | numeric | 96.0% | N/A |
 | `nom026x` | About how many letters of the alphabet can your child recognize?  | numeric | 96.0% | N/A |
-| `nom061x` | Does your child bounce back quickly when things do not go their way? | numeric | 96.0% | N/A |
 | `nom2205` | How often can this child tell which group of objects has more? For example, can this child tell you a group of seven blocks has more than a group of four blocks? | numeric | 63.1% | N/A |
 | `sf122` | If you show your child two objects or people of different sizes, can he/she tell you which one is the big one and which is the small one? | numeric | 92.5% | N/A |
 | `sf127` | If you ask your child to give you three objects, such as stones or beans, does the child give you the correct number? | numeric | 94.9% | N/A |
@@ -356,7 +355,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
 | `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251110_105226) |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251118_115720) |
 | `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.3% | N/A |
 | `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
@@ -372,21 +371,6 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `tract_afact` | ZIP to census tract allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `urban_rural` | Urban/Rural classification(s) (U=Urban, R=Rural) - semicolon-separated if ZIP is mixed (2022 Census) | factor | 27.9% | 1 (R), 2 (R; U), 3 (U), 4 (U; R) |
 | `urban_rural_afact` | Urban/Rural allocation factor(s) - semicolon-separated, ordered by likelihood | character | 27.9% | N/A |
-
-## Health
-
-**Description:** No description available
-
-**Variables:** 4  
-**Average Missing:** 54.5%  
-**Data Types:** 0 factors, 4 numeric, 0 logical, 0 character
-
-| Variable | Label | Type | Missing | Details |
-|----------|-------|------|---------|---------|
-| `cqfa002` | In general, how would you describe your child's health? | numeric | 39.4% | N/A |
-| `cqr014x` | DURING THE PAST 12 MONTHS, how often have your child's health conditions or problems affected their ability to do things other children their age do? | numeric | 39.5% | N/A |
-| `nom044` | To what extent do your child's health conditions or problems affect their ability to do things? | numeric | 100.0% | N/A |
-| `nom046x` | How would you describe the condition of your child's teeth? | numeric | 39.4% | N/A |
 
 ## Mental_Health
 
@@ -413,9 +397,9 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 **Description:** No description available
 
-**Variables:** 76  
-**Average Missing:** 94.5%  
-**Data Types:** 0 factors, 76 numeric, 0 logical, 0 character
+**Variables:** 74  
+**Average Missing:** 94.3%  
+**Data Types:** 0 factors, 74 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
@@ -492,24 +476,24 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `nom035` | When using a pencil, can your child use fingers to hold it? | numeric | 81.7% | N/A |
 | `nom035x` | How does your child usually hold a pencil? | numeric | 80.3% | N/A |
 | `nom042x` | How well can this child bounce a ball for several seconds? | numeric | 62.9% | N/A |
-| `sf018` | While your child is on his/her back, can he/she bring his/her hands together such that the hands touch each other? | numeric | 99.5% | N/A |
-| `sf019` | Does your child move excitedly, kick legs, move arms or trunk, or make coo noises when a known person enters the room or speaks to him/her? | numeric | 99.5% | N/A |
 | `sf054` | <div class="rich-text-field-label"><p>Can your child pick up and drop a small object, such as a piece of food, small toy, or small stone, into a bucket or bowl while sitting?</p> <p><img src="https://unmcredcap.unmc.edu/redcap/redcap_v15.1.0/DataEntry/image_view.php?pid=7679&id=155629&doc_id_hash=392e90813ab18c7873cd0625944a40dce552fa22" alt="" width="400" height="298"></p></div> | numeric | 95.7% | N/A |
 
 ## Other
 
 **Description:** No description available
 
-**Variables:** 309  
-**Average Missing:** 38.8%  
-**Data Types:** 4 factors, 272 numeric, 1 logical, 32 character
+**Variables:** 317  
+**Average Missing:** 39.0%  
+**Data Types:** 4 factors, 280 numeric, 1 logical, 32 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
 | `authenticity` | Authenticity | factor | 0.0% | 1 (Fail), 2 (Pass) |
-| `authenticity_avg_logpost` | Authenticity Avg Logpost | numeric | 96.0% | N/A |
-| `authenticity_lz` | Authenticity Lz | numeric | 42.8% | N/A |
-| `authenticity_quintile` | Authenticity Quintile | numeric | 96.0% | N/A |
+| `authenticity_avg_logpost` | Authenticity Avg Logpost | numeric | 43.0% | N/A |
+| `authenticity_eta_full` | Authenticity Eta Full | numeric | 43.0% | N/A |
+| `authenticity_eta_holdout` | Authenticity Eta Holdout | numeric | 43.0% | N/A |
+| `authenticity_lz` | Authenticity Lz | numeric | 43.0% | N/A |
+| `authenticity_quintile` | Authenticity Quintile | numeric | 43.0% | N/A |
 | `authenticity_weight` | Authenticity Weight | numeric | 42.8% | N/A |
 | `cfqb001` | In general, how is your physical health? | numeric | 36.3% | N/A |
 | `cname1` | What is this child's name? (First name or nickname ONLY)
@@ -527,6 +511,7 @@ Providing your child's name is optional. We will only use if we follow-up in the
 | `consent_doc_complete` | Consent Doc Complete | numeric | 0.0% | N/A |
 | `consent_doc_timestamp` | Consent Doc Timestamp | character | 6.5% | N/A |
 | `cqfa001` | What is your marital status? | numeric | 36.8% | N/A |
+| `cqfa002` | In general, how would you describe your child's health? | numeric | 39.4% | N/A |
 | `cqfa005` | Since your child was born, how often has it been very hard to cover the basics, like food and housing, on your family's income? | numeric | 36.0% | N/A |
 | `cqfa006` | DURING THE PAST 12 MONTHS, which of these statements best describes your household's ability to afford the food you need? | numeric | 36.2% | N/A |
 | `cqfa009` | How many times has your child moved to a new address since he or she was born? | numeric | 36.2% | N/A |
@@ -587,6 +572,7 @@ Use the slider to select a value that best represents this value. | numeric | 35
 | `cqr010___9` | Cqr010   9 | numeric | 0.0% | N/A |
 | `cqr011` | Is your child of Hispanic, Latino, or Spanish origin? | numeric | 39.0% | N/A |
 | `cqr013` | Does your child need or use more medical care, mental health, or educational services than is usual for most children of the same age? | numeric | 40.0% | N/A |
+| `cqr014x` | DURING THE PAST 12 MONTHS, how often have your child's health conditions or problems affected their ability to do things other children their age do? | numeric | 39.5% | N/A |
 | `cqr015` | Does your child need or get special therapy, such as physical, occupational, or speech therapy? | numeric | 40.0% | N/A |
 | `cqr016` | Does your child have any emotional, developmental, or behavioral problems for which he/she needs treatment or counseling? | numeric | 39.8% | N/A |
 | `cqr017` | Parent or guardian divorced or separated? | numeric | 40.1% | N/A |
@@ -750,6 +736,8 @@ Enter 0 if you receive no such financial support. | numeric | 74.2% | N/A |
 Enter 0 if you receive no such financial support.
 
 Use the slider to select a value that best represents this value $[mrw003_2] | numeric | 66.0% | N/A |
+| `nom044` | To what extent do your child's health conditions or problems affect their ability to do things? | numeric | 100.0% | N/A |
+| `nom046x` | How would you describe the condition of your child's teeth? | numeric | 39.4% | N/A |
 | `nom047` | How often does this child show concern when they see others are hurt or unhappy? | numeric | 98.7% | N/A |
 | `nos` | 5 Nos | numeric | 99.4% | N/A |
 | `nos_count_90_179` | 3 consecutive No's count  | numeric | 99.0% | N/A |
@@ -836,6 +824,8 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `q959___6` | Q959   6 | numeric | 0.0% | N/A |
 | `q960` | DURING THE PAST YEAR, is there anything that you think has affected your child's development, positively or negatively? | numeric | 39.9% | N/A |
 | `redcap_survey_identifier` | Redcap Survey Identifier | numeric | 93.9% | N/A |
+| `sf018` | While your child is on his/her back, can he/she bring his/her hands together such that the hands touch each other? | numeric | 99.5% | N/A |
+| `sf019` | Does your child move excitedly, kick legs, move arms or trunk, or make coo noises when a known person enters the room or speaks to him/her? | numeric | 99.5% | N/A |
 | `source_project` | Source Project | factor | 0.0% | 1 (kidsights_data_survey), 2 (kidsights_email_registration), 3 (kidsights_public), 4 (kidsights_public_birth) |
 | `sq001` | Please enter your 5-digit zip code. | character | 25.4% | N/A |
 | `sq002___1` | Sq002   1 | numeric | 0.0% | N/A |
@@ -858,13 +848,40 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `survey_stop` | survey Stop | numeric | 99.4% | N/A |
 | `urban_pct` | Percentage of ZIP population in urban areas (0-100) | numeric | 27.9% | N/A |
 
+## Psychosocial_Problems_General
+
+**Description:** No description available
+
+**Variables:** 16  
+**Average Missing:** 83.2%  
+**Data Types:** 0 factors, 16 numeric, 0 logical, 0 character
+
+| Variable | Label | Type | Missing | Details |
+|----------|-------|------|---------|---------|
+| `credi030` | Does your child involve others in play? For example, play interactive games with other children. | numeric | 97.1% | N/A |
+| `credi031` | When the child is upset, does he/she calm down quickly on his/her own? | numeric | 95.5% | N/A |
+| `credi045` | Is your child kind to younger children? For example, speaks to them nicely and touches them gently. | numeric | 95.8% | N/A |
+| `ecdi018` | Does your child get along well with other children? | numeric | 93.6% | N/A |
+| `nom047x` | How often does this child show concern when they see others who are hurt or unhappy?  | numeric | 98.9% | N/A |
+| `nom048x` | Compared to other children his or her age, how much difficulty does this child have making or keeping friends? | numeric | 63.2% | N/A |
+| `nom049` | How often does this child play well with others? | numeric | 98.7% | N/A |
+| `nom049x` | How often does this child play well with other children? | numeric | 98.9% | N/A |
+| `nom052y` | How often does this child lose their temper? | numeric | 63.2% | N/A |
+| `nom054x` | How often does this child get easily distracted? | numeric | 63.2% | N/A |
+| `nom056x` | How often does this child have difficulty waiting for their turn? | numeric | 62.9% | N/A |
+| `nom059` | How often does your child show concern when they see others are hurt or unhappy? | numeric | 82.1% | N/A |
+| `nom060y` | How often does this child have trouble calming down? | numeric | 62.9% | N/A |
+| `nom061` | My child bounces back easily when things do not go his/her way. | numeric | 96.0% | N/A |
+| `nom061x` | Does your child bounce back quickly when things do not go their way? | numeric | 96.0% | N/A |
+| `nom062y` | How often does this child have difficulty when asked to end one activity and start a new activity? | numeric | 62.9% | N/A |
+
 ## Socemo
 
 **Description:** No description available
 
-**Variables:** 70  
-**Average Missing:** 89.1%  
-**Data Types:** 0 factors, 70 numeric, 0 logical, 0 character
+**Variables:** 55  
+**Average Missing:** 91.0%  
+**Data Types:** 0 factors, 55 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
@@ -901,12 +918,9 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `credi025` | Does the child imitate others' behaviors, such as washing hands or dishes? | numeric | 96.1% | N/A |
 | `credi028` | Does your child usually follow rules and obey adults? For example, "Go there" or "Don't do that." | numeric | 94.6% | N/A |
 | `credi029` | Can the child sit still when asked to by an adult? For example, for two minutes. | numeric | 93.7% | N/A |
-| `credi030` | Does your child involve others in play? For example, play interactive games with other children. | numeric | 97.1% | N/A |
-| `credi031` | When the child is upset, does he/she calm down quickly on his/her own? | numeric | 95.5% | N/A |
 | `credi036` | Can your child concentrate on one task, such as playing with friends or eating a meal, for 20 minutes? | numeric | 94.2% | N/A |
 | `credi038` | Does your child usually finish an activity he/she enjoys, such as a game or book? | numeric | 94.2% | N/A |
 | `credi041` | Can your child tell you when he/she is tired or hungry? | numeric | 96.6% | N/A |
-| `credi045` | Is your child kind to younger children? For example, speaks to them nicely and touches them gently. | numeric | 95.8% | N/A |
 | `credi046` | Does the child greet neighbors or other people he/she knows without being told? For example, by saying hello or gesturing hello. | numeric | 92.8% | N/A |
 | `credi052` | Does your child sometimes save things like candy or new toys for the future? | numeric | 91.7% | N/A |
 | `credi058` | Does your child ask about familiar people other than parents when they are not there? For example, "Where is the neighbor?" | numeric | 88.7% | N/A |
@@ -914,23 +928,11 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `ecdi015x` | Can your child do an activity, such as coloring or playing with building blocks, without repeatedly asking for help or giving up too quickly? | numeric | 88.5% | N/A |
 | `ecdi016` | Does your child ask about familiar people other than parents when they are not there? For example, "Where is Grandma?" | numeric | 94.1% | N/A |
 | `ecdi017` | Does your child offer to help someone who seems to need help? | numeric | 91.0% | N/A |
-| `ecdi018` | Does your child get along well with other children? | numeric | 93.6% | N/A |
 | `nom006` | How often can your child explain things they have seen or done so that you understand? | numeric | 95.6% | N/A |
-| `nom047x` | How often does this child show concern when they see others who are hurt or unhappy?  | numeric | 98.9% | N/A |
-| `nom048x` | Compared to other children his or her age, how much difficulty does this child have making or keeping friends? | numeric | 63.2% | N/A |
-| `nom049` | How often does this child play well with others? | numeric | 98.7% | N/A |
-| `nom049x` | How often does this child play well with other children? | numeric | 98.9% | N/A |
-| `nom052y` | How often does this child lose their temper? | numeric | 63.2% | N/A |
 | `nom053` | Can your child recognize and name emotions in themselves? | numeric | 81.7% | N/A |
 | `nom053x` | How often can your child recognize and name their own emotions? | numeric | 80.3% | N/A |
-| `nom054x` | How often does this child get easily distracted? | numeric | 63.2% | N/A |
-| `nom056x` | How often does this child have difficulty waiting for their turn? | numeric | 62.9% | N/A |
 | `nom057` | How often does your child take turns during games or fun activities? | numeric | 91.0% | N/A |
-| `nom059` | How often does your child show concern when they see others are hurt or unhappy? | numeric | 82.1% | N/A |
 | `nom059x` | How often does your child keep working on a task even when it is hard for them? | numeric | 80.5% | N/A |
-| `nom060y` | How often does this child have trouble calming down? | numeric | 62.9% | N/A |
-| `nom061` | My child bounces back easily when things do not go his/her way. | numeric | 96.0% | N/A |
-| `nom062y` | How often does this child have difficulty when asked to end one activity and start a new activity? | numeric | 62.9% | N/A |
 | `nom102` | How often does this child keep working at something until he or she is finished? | numeric | 62.9% | N/A |
 | `nom103` | When this child is paying attention, how often can he or she follow instructions to complete a simple task? | numeric | 63.0% | N/A |
 | `nom104` | Compared to other children their age, how often is this child able to sit still? | numeric | 63.0% | N/A |
@@ -948,4 +950,4 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-11-10 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-11-18 by the Kidsights Data Platform*

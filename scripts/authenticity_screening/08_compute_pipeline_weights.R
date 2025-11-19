@@ -188,10 +188,11 @@ compute_authenticity_weights <- function(data,
 
   params_full <- readRDS(params_file)
 
-  # Extract item parameters (params_full is a list with components $tau, $beta1, $delta, $eta)
+  # Extract item parameters (params_full is a list with components $tau, $beta1, $delta, $eta, $eta_correlation)
   tau_full <- params_full$tau
   beta1_full <- params_full$beta1
   delta_full <- params_full$delta
+  eta_correlation_full <- params_full$eta_correlation
 
   J <- length(tau_full)
 
@@ -199,6 +200,7 @@ compute_authenticity_weights <- function(data,
   cat(sprintf("[Loaded] tau range: [%.4f, %.4f]\n", min(tau_full), max(tau_full)))
   cat(sprintf("[Loaded] beta1 range: [%.4f, %.4f]\n", min(beta1_full), max(beta1_full)))
   cat(sprintf("[Loaded] delta: %.4f\n", delta_full))
+  cat(sprintf("[Loaded] eta_correlation: %.3f\n", eta_correlation_full))
 
   # ==========================================================================
   # PHASE 4: COMPILE HOLDOUT MODEL
@@ -227,7 +229,7 @@ compute_authenticity_weights <- function(data,
   plan(multisession, workers = n_cores)
 
   # Prepare holdout function
-  compute_holdout_logpost <- function(i, stan_data_inauthentic, tau_full, beta1_full, delta_full, K, holdout_model) {
+  compute_holdout_logpost <- function(i, stan_data_inauthentic, tau_full, beta1_full, delta_full, K, dimension, eta_correlation, holdout_model) {
 
     # Extract participant i's data
     mask_i <- stan_data_inauthentic$ivec == i
@@ -257,6 +259,8 @@ compute_authenticity_weights <- function(data,
       beta1 = beta1_full,
       delta = delta_full,
       K = K,
+      dimension = dimension,
+      eta_correlation = eta_correlation,
       M_holdout = M_holdout,
       j_holdout = j_holdout,
       y_holdout = y_holdout,
@@ -316,7 +320,7 @@ compute_authenticity_weights <- function(data,
       unique(stan_data_inauthentic$ivec),
       function(i) {
         result <- compute_holdout_logpost(i, stan_data_inauthentic, tau_full, beta1_full, delta_full,
-                                           stan_data_inauthentic$K, holdout_model)
+                                           stan_data_inauthentic$K, stan_data_inauthentic$dimension, eta_correlation_full, holdout_model)
         result$pid <- inauthentic_pids_stan[i]  # Add PID and record_id while i is in scope
         result$record_id <- inauthentic_record_ids_stan[i]
         p()

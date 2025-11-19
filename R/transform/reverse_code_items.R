@@ -200,13 +200,26 @@ reverse_code_items <- function(dat,
           if (response_ref_char %in% names(cb$response_sets)) {
             response_set <- cb$response_sets[[response_ref_char]]
 
-            # Extract values (response_set is a list of options)
+            # Extract ONLY substantive values (exclude missing codes)
+            # Missing codes are marked with "missing": true in response_set options
             valid_vals <- sapply(response_set, function(opt) {
+              # Check if this is a missing code
+              is_missing <- !is.null(opt$missing) && (opt$missing == TRUE || opt$missing == "true")
+
+              if (is_missing) {
+                return(NA)  # Exclude missing codes from valid set
+              }
+
               val <- if (is.list(opt$value)) opt$value[[1]] else opt$value
               as.numeric(val)
             })
 
-            valid_responses[[var_name]] <- sort(unique(valid_vals))
+            # Remove NAs (missing codes were marked as NA above)
+            valid_vals <- valid_vals[!is.na(valid_vals)]
+
+            if (length(valid_vals) > 0) {
+              valid_responses[[var_name]] <- sort(unique(valid_vals))
+            }
           }
         }
       }

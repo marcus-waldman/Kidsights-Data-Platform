@@ -24684,14 +24684,6 @@
         "equate": "PS001",
         "ne25": "PS001"
       },
-      "domains": {
-        "kidsights": {
-          "value": "psychosocial_problems_general",
-          "studies": [
-            "GSED_PF"
-          ]
-        }
-      },
       "age_range": {
         "min_months": 0,
         "max_months": 60,
@@ -27387,52 +27379,62 @@
     "standard_binary": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       },
       {
-        "value": -9,
-        "label": "Don't Know",
+        "value": 9,
+        "label": "Prefer not to answer",
         "missing": true
       }
     ],
     "likert_5": [
       {
         "value": 1,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Rarely"
+        "label": "Rarely",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       }
     ],
     "ps_frequency": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
       },
       {
         "value": -9,
@@ -27443,2219 +27445,2938 @@
     "hrtl_health_impact_ne25": [
       {
         "value": 0,
-        "label": "This child does not have any health conditions"
+        "label": "This child does not have any health conditions",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Usually"
+        "label": "Usually",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       }
     ],
     "hrtl_extent_ne25": [
       {
         "value": 0,
-        "label": "Very little"
+        "label": "Very little",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Somewhat"
+        "label": "Somewhat",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "A great deal"
+        "label": "A great deal",
+        "missing": false
       }
     ],
     "hrtl_dental_ne25": [
       {
         "value": 0,
-        "label": "This child does not have any teeth"
+        "label": "This child does not have any teeth",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Poor"
+        "label": "Poor",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Fair"
+        "label": "Fair",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Good"
+        "label": "Good",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very good"
+        "label": "Very good",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Excellent"
+        "label": "Excellent",
+        "missing": false
       }
     ],
     "hrtl_health_rating_ne25": [
       {
         "value": 0,
-        "label": "Excellent"
+        "label": "Excellent",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Very Good"
+        "label": "Very Good",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Good"
+        "label": "Good",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Fair"
+        "label": "Fair",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Poor"
+        "label": "Poor",
+        "missing": false
       }
     ],
     "ne25_cc79y": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_dd15": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_dd19": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_dd103": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_dd205": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_dd207": [
       {
         "value": 3,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot bounce a ball"
+        "label": "This child cannot bounce a ball",
+        "missing": false
       }
     ],
     "ne25_dd221": [
       {
         "value": 2,
-        "label": "No difficulty"
+        "label": "No difficulty",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "A little difficulty"
+        "label": "A little difficulty",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "A lot of difficulty"
+        "label": "A lot of difficulty",
+        "missing": false
       }
     ],
     "ne25_dd299": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg5a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg14b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg15_1": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg15_2": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg16a_1": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg16a_2": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg17a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg18a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg20a": [
       {
         "value": 4,
-        "label": "Up to 30 or more"
+        "label": "Up to 30 or more",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Up to 20"
+        "label": "Up to 20",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Up to ten"
+        "label": "Up to ten",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Up to five"
+        "label": "Up to five",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot count"
+        "label": "This child cannot count",
+        "missing": false
       }
     ],
     "ne25_eg20b_1": [
       {
         "value": 0,
-        "label": "Child cannot count"
+        "label": "Child cannot count",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "5"
+        "label": "5",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "10"
+        "label": "10",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "15"
+        "label": "15",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "20"
+        "label": "20",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "30"
+        "label": "30",
+        "missing": false
       }
     ],
     "ne25_eg21a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg21b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg22_1": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg22_2": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg23a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg24b": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg25a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg26b": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg27a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg27b_1": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg28a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg28b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg29a": [
       {
         "value": 4,
-        "label": "All of them"
+        "label": "All of them",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of them"
+        "label": "Most of them",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half of them"
+        "label": "About half of them",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of them"
+        "label": "Some of them",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of them"
+        "label": "None of them",
+        "missing": false
       }
     ],
     "ne25_eg29b": [
       {
         "value": 0,
-        "label": "None of them"
+        "label": "None of them",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of them"
+        "label": "Some of them",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Most of them"
+        "label": "Most of them",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "All of them"
+        "label": "All of them",
+        "missing": false
       }
     ],
     "ne25_eg30a": [
       {
         "value": 3,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot draw a circle"
+        "label": "This child cannot draw a circle",
+        "missing": false
       }
     ],
     "ne25_eg30d": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg30e": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg31a_1": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg32a": [
       {
         "value": 3,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot draw a face"
+        "label": "This child cannot draw a face",
+        "missing": false
       }
     ],
     "ne25_eg32b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg33a": [
       {
         "value": 3,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot draw a person"
+        "label": "This child cannot draw a person",
+        "missing": false
       }
     ],
     "ne25_eg33b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg34a": [
       {
         "value": 2,
-        "label": "Uses fingers to hold the pencil"
+        "label": "Uses fingers to hold the pencil",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Grips the pencil in their fist"
+        "label": "Grips the pencil in their fist",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot hold a pencil"
+        "label": "This child cannot hold a pencil",
+        "missing": false
       }
     ],
     "ne25_eg34b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg37_1": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half of the time"
+        "label": "About half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg37_2": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg38a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg38b": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg39a": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg39b": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg40_1": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg41_1": [
       {
         "value": 3,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Usually"
+        "label": "Usually",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg41_2": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg42a": [
       {
         "value": 3,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "This child cannot rhyme"
+        "label": "This child cannot rhyme",
+        "missing": false
       }
     ],
     "ne25_eg42c": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg43a_1": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg43a_2": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_eg44_1": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "ne25_eg45_1": [
       {
         "value": 4,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "ne25_eg45_2": [
       {
         "value": 4,
-        "label": "All of the time"
+        "label": "All of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Half of the time"
+        "label": "Half of the time",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Some of the time"
+        "label": "Some of the time",
+        "missing": false
       },
       {
         "value": 0,
-        "label": "None of the time"
+        "label": "None of the time",
+        "missing": false
       }
     ],
     "ne25_ps001": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps002": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps003": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps004": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps005": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps006": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps007": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps008": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps009": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps010": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps011": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps013": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps014": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps015": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps016": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps017": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps018": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps019": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps020": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps022": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps023": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps024": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps025": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps026": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps027": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps028": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps029": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps030": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps031": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps032": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps034": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps035": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps036": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps037": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps038": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps039": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps040": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps041": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps042": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps043": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps044": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps045": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps046": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps047": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps048": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "ne25_ps049": [
       {
         "value": 0,
-        "label": "Never or Almost Never"
+        "label": "Never or Almost Never",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Often"
+        "label": "Often",
+        "missing": false
+      },
+      {
+        "value": 9,
+        "label": "Prefer not to answer",
+        "missing": true
       }
     ],
     "hrtl_dailyact_cahmi22": [
       {
         "value": 0,
-        "label": "Do not have any health conditions"
+        "label": "Do not have any health conditions",
+        "missing": false
       },
       {
         "value": 1,
-        "label": "Daily activities never affected"
+        "label": "Daily activities never affected",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Daily activities moderately affected some of time"
+        "label": "Daily activities moderately affected some of time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Daily activities consistently affected, often a great deal"
+        "label": "Daily activities consistently affected, often a great deal",
+        "missing": false
       }
     ],
     "cahmi22_binary_yesno": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "cahmi22_always_never_5pt": [
       {
         "value": 1,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "cahmi22_skill_bounceab_4pt": [
       {
         "value": 1,
-        "label": "This child cannot bounce a ball"
+        "label": "This child cannot bounce a ball",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       }
     ],
     "cahmi22_countto_r_5pt": [
       {
         "value": 1,
-        "label": "This child cannot count"
+        "label": "This child cannot count",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Up to five"
+        "label": "Up to five",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Up to ten"
+        "label": "Up to ten",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Up to 20"
+        "label": "Up to 20",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Up to 30 or more"
+        "label": "Up to 30 or more",
+        "missing": false
       }
     ],
     "cahmi22_recogabc_5pt": [
       {
         "value": 1,
-        "label": "All of them"
+        "label": "All of them",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Most of them"
+        "label": "Most of them",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "About half of them"
+        "label": "About half of them",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Some of them"
+        "label": "Some of them",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "None of them"
+        "label": "None of them",
+        "missing": false
       }
     ],
     "cahmi22_skill_drawacir_4pt": [
       {
         "value": 1,
-        "label": "This child cannot draw a circle"
+        "label": "This child cannot draw a circle",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       }
     ],
     "cahmi22_skill_drawafac_4pt": [
       {
         "value": 1,
-        "label": "This child cannot draw a face"
+        "label": "This child cannot draw a face",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       }
     ],
     "cahmi22_skill_drawaper_4pt": [
       {
         "value": 1,
-        "label": "This child cannot draw a person"
+        "label": "This child cannot draw a person",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       }
     ],
     "cahmi22_always_never_4pt": [
       {
         "value": 1,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Usually"
+        "label": "Usually",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "cahmi22_skill_rhymewor_4pt": [
       {
         "value": 1,
-        "label": "This child cannot rhyme"
+        "label": "This child cannot rhyme",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Not well"
+        "label": "Not well",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Somewhat well"
+        "label": "Somewhat well",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Very well"
+        "label": "Very well",
+        "missing": false
       }
     ],
     "cahmi22_extent_3pt": [
       {
         "value": 1,
-        "label": "Very little"
+        "label": "Very little",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Somewhat"
+        "label": "Somewhat",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "A great deal"
+        "label": "A great deal",
+        "missing": false
       }
     ],
     "cahmi22_health_rating_5pt": [
       {
         "value": 1,
-        "label": "Excellent"
+        "label": "Excellent",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Very Good"
+        "label": "Very Good",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Good"
+        "label": "Good",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Fair"
+        "label": "Fair",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Poor"
+        "label": "Poor",
+        "missing": false
       }
     ],
     "cahmi22_health_impact_5pt": [
       {
         "value": 1,
-        "label": "This child does not have any health conditions"
+        "label": "This child does not have any health conditions",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Usually"
+        "label": "Usually",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       }
     ],
     "cahmi22_dental_rating_5pt": [
       {
         "value": 1,
-        "label": "Excellent"
+        "label": "Excellent",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Very Good"
+        "label": "Very Good",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Good"
+        "label": "Good",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Fair"
+        "label": "Fair",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Poor"
+        "label": "Poor",
+        "missing": false
       }
     ],
     "cahmi21_always_never_5pt": [
       {
         "value": 1,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Most of the time"
+        "label": "Most of the time",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "About half the time"
+        "label": "About half the time",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ],
     "cahmi21_binary_yesno": [
       {
         "value": 1,
-        "label": "Yes"
+        "label": "Yes",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "No"
+        "label": "No",
+        "missing": false
       }
     ],
     "cahmi21_difficulty_3pt": [
       {
         "value": 1,
-        "label": "No difficulty"
+        "label": "No difficulty",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "A little difficulty"
+        "label": "A little difficulty",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "A lot of difficulty"
+        "label": "A lot of difficulty",
+        "missing": false
       }
     ],
     "cahmi21_color_knowledge_3pt": [
       {
         "value": 1,
-        "label": "Yes, all of them"
+        "label": "Yes, all of them",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Yes, some of them"
+        "label": "Yes, some of them",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "No, none of them"
+        "label": "No, none of them",
+        "missing": false
       }
     ],
     "cahmi21_counting_ability_6pt": [
       {
         "value": 1,
-        "label": "This child cannot count"
+        "label": "This child cannot count",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Up to five"
+        "label": "Up to five",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Up to ten"
+        "label": "Up to ten",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Up to 20"
+        "label": "Up to 20",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "Up to 50"
+        "label": "Up to 50",
+        "missing": false
       },
       {
         "value": 6,
-        "label": "Up to 100 or more"
+        "label": "Up to 100 or more",
+        "missing": false
       }
     ],
     "cahmi21_letter_recognition_5pt": [
       {
         "value": 1,
-        "label": "All of them"
+        "label": "All of them",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Most of them"
+        "label": "Most of them",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "About half of them"
+        "label": "About half of them",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Some of them"
+        "label": "Some of them",
+        "missing": false
       },
       {
         "value": 5,
-        "label": "None of them"
+        "label": "None of them",
+        "missing": false
       }
     ],
     "cahmi21_pencil_grip_3pt": [
       {
         "value": 1,
-        "label": "Uses fingers to hold the pencil"
+        "label": "Uses fingers to hold the pencil",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Grips the pencil in their fist"
+        "label": "Grips the pencil in their fist",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "This child cannot hold a pencil"
+        "label": "This child cannot hold a pencil",
+        "missing": false
       }
     ],
     "cahmi21_always_never_4pt": [
       {
         "value": 1,
-        "label": "Always"
+        "label": "Always",
+        "missing": false
       },
       {
         "value": 2,
-        "label": "Usually"
+        "label": "Usually",
+        "missing": false
       },
       {
         "value": 3,
-        "label": "Sometimes"
+        "label": "Sometimes",
+        "missing": false
       },
       {
         "value": 4,
-        "label": "Never"
+        "label": "Never",
+        "missing": false
       }
     ]
   },

@@ -109,10 +109,10 @@ cat("    Adult pool size:", nrow(parent_pool), "adults\n")
 # Join children to their parents
 children_with_parents <- nhis_children %>%
   dplyr::filter(PAR1REL > 0) %>%
-  dplyr::left_join(
+  safe_left_join(
     parent_pool,
-    by = c("SERIAL" = "SERIAL", "PAR1REL" = "PERNUM", "YEAR" = "YEAR"),
-    suffix = c("_child", "_parent")
+    by_vars = c("SERIAL" = "SERIAL", "PAR1REL" = "PERNUM", "YEAR" = "YEAR"),
+    allow_collision = TRUE  # Intentional _child/_parent suffixes
   )
 
 cat("    Children successfully linked to parents:",
