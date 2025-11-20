@@ -22,10 +22,10 @@ Each participant receives a weight `w[i] ∈ (0,1)` derived from a logit-scale p
 
 - **Parameters**: `logitwgt[i]` (unconstrained, -∞ to +∞)
 - **Transformation**: `w[i] = inv_logit(logitwgt[i])`
-- **Mixture Prior**: `0.5 × N(-2, 2) + 0.5 × N(2, 2)` on logit scale
-  - Component 1: inv_logit(-2) ≈ 0.12 (favor exclusion)
-  - Component 2: inv_logit(2) ≈ 0.88 (favor inclusion)
-  - Creates **bimodal distribution**: clear include/exclude decision
+- **Mixture Prior**: `0.5 × N(-4, 1) + 0.5 × N(4, 1)` on logit scale
+  - Component 1: inv_logit(-4) ≈ 0.018 (strongly favor exclusion)
+  - Component 2: inv_logit(4) ≈ 0.982 (strongly favor inclusion)
+  - Creates **strongly bimodal distribution**: very clear include/exclude decision
 
 **Why logit parameterization?**
 - Eliminates hard boundaries at 0 and 1 (no optimizer walls)

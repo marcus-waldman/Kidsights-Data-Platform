@@ -238,7 +238,7 @@ model {
   eta_developmental ~ std_normal();
 
   // Mixture normal prior on logit-scaled weights
-  target += .5*normal_lpdf(logitwgt | -4, 1) + .5*normal_lpdf(logitwgt | 4, 1);
+  target += .5*(normal_lpdf(logitwgt | -4, 1) + normal_lpdf(logitwgt | 4, 1) );
 
   // ============================================================================
   // WEIGHTED LIKELIHOOD
