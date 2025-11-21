@@ -127,21 +127,79 @@ Under normality, sample skewness has variance ≈ 6/N_eff. The standardized skew
 ### Tuning Required via Cross-Validation
 
 **sigma_sum_w** (Normal sum prior scale):
-- **Tuning range**: 0.5 to 2.0
-- **Small values (0.5-1.0)**: Tight constraint, strong preference for sum ≈ N
+- **Tuning grid**: `2^(seq(-1, 1, by=0.25))` = {0.5, 0.59, 0.71, 0.84, 1.0, 1.19, 1.41, 1.68, 2.0}
+  - 9 values spanning order of magnitude
+  - Logarithmic spacing for better resolution near optimal value
+- **Small values (0.5-0.84)**: Tight constraint, strong preference for sum ≈ N
   - Use when expecting few inauthentic participants (<5%)
   - Prevents aggressive down-weighting
-- **Medium values (1.0-1.5)**: Moderate tolerance, allows ~5-10% deviation
+- **Medium values (0.84-1.41)**: Moderate tolerance, allows ~5-10% deviation
   - Recommended starting point for most applications
-- **Large values (1.5-2.0)**: Weak constraint, allows substantial down-weighting
+- **Large values (1.41-2.0)**: Weak constraint, allows substantial down-weighting
   - Use when expecting many inauthentic participants (>10%)
   - Provides flexibility for sparsity
 
-**Cross-validation strategy**:
-1. Fit models with σ_sum_w ∈ {0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0}
-2. Compute LOOCV log-posterior or WAIC for each
-3. Select σ_sum_w that maximizes predictive accuracy
-4. Validate selected value produces sensible exclusion rate (e.g., 5-15%)
+**Cross-validation strategy** (16-fold CV with Gauss-Hermite quadrature):
+
+**Phase 1: Initial fitting on full dataset**
+
+1. **Fit base model** (`fit0_full`):
+   - Model: Standard 2D IRT (no weights, no penalty)
+   - Estimates: tau, beta1, delta, eta_psychosocial, eta_developmental
+   - Purpose: Provides warm start for penalized models
+
+2. **Fit penalized models** (`fits_full_penalty`):
+   - Grid: 9 σ_sum_w values (see above)
+   - Warm start: Initialize item parameters from `fit0_full`
+   - Initialize weights: `logitwgt[i] = 0` for all i (neutral: w ≈ 0.5)
+   - Parallel: Fit all 9 σ values simultaneously on full dataset
+
+**Phase 2: Create stratified folds**
+
+3. **Extract logitwgt for stratification**:
+   - Use `fits_full_penalty` with σ_sum_w = 1.0 (middle value)
+   - Extract final `logitwgt[1:N]` estimates
+
+4. **Create 16 stratified folds**:
+   - Sort participants by: logitwgt (primary), age (secondary)
+   - Number off consecutively: 1, 2, 3, ..., 16, 1, 2, 3, ..., 16
+   - Result: Each fold has balanced distribution of weights AND ages
+   - Prevents fold imbalance (e.g., all inauthentic participants in one fold)
+
+**Phase 3: 16-fold cross-validation**
+
+5. **CV loop** (9 σ values × 16 folds = 144 fits in parallel):
+   - For each σ_sum_w value:
+     - For each fold k = 1:16:
+       - **Training**: Fit model to participants where fold ≠ k
+       - **Holdout evaluation**: Calculate marginal likelihood via Gauss-Hermite quadrature
+         - **Problem**: Can't estimate η for holdout persons without data leakage
+         - **Solution**: Marginalize over prior η ~ N(0,1) using GH quadrature
+         - For each holdout person i:
+           - **Dimension 1 items**: ∫ p(y_dim1 | η₁, θ) × φ(η₁) dη₁
+           - **Dimension 2 items**: ∫ p(y_dim2 | η₂, θ) × φ(η₂) dη₂
+           - **Independence**: Two separate 1D integrations (dimensions uncorrelated)
+           - **Marginal log-lik**: log p(y_i) = log(∫_dim1) + log(∫_dim2)
+           - **Person deviance**: dev_i = -2 × log p(y_i) / n_items[i]
+         - **Fold loss**: loss_k = mean(dev_i for i in fold k)
+     - **CV loss**: CV_loss(σ) = mean(loss_k across k=1:16)
+
+6. **Select optimal σ**:
+   - σ_opt = argmin(CV_loss)
+   - Validate: Check exclusion rate is sensible (e.g., 5-15%)
+   - Refit on full dataset with σ_opt for production use
+
+**Why Gauss-Hermite quadrature for holdout evaluation?**
+- **No data leakage**: Doesn't estimate η from holdout responses
+- **Proper marginalization**: Integrates over prior η ~ N(0,1)
+- **Independence**: Two 1D integrations (not 2D) because dimensions are uncorrelated
+- **Accurate**: 21-point GH quadrature provides high precision for normal integrals
+- **Fast**: 1D integration is computationally efficient (critical for 144 fits)
+
+**Computational strategy**:
+- **Parallel execution**: 144 total fits (9 σ × 16 folds) run simultaneously
+- **Warm starting**: Each CV fold fit initialized from corresponding `fits_full_penalty[σ]`
+- **Expected runtime**: TBD (depends on hardware, parallelization efficiency)
 
 ## Model Outputs
 
