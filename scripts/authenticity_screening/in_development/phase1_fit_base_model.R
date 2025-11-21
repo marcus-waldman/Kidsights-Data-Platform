@@ -25,12 +25,22 @@ source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 #' @param M_data Data frame with columns: pid, item_id, response, age
 #' @param J_data Data frame with columns: item_id, K (num categories), dimension
 #' @param output_dir Directory to save results (default: "output/authenticity_cv")
-#' @param n_chains Number of MCMC chains (default: 4)
-#' @param n_iter Number of iterations per chain (default: 2000)
-#' @param n_cores Number of cores for parallel chains (default: 4)
-#' @return Stan fit object
+#' @param init Initial parameter values for optimization (default: 0)
+#' @param iter Maximum iterations for L-BFGS optimization (default: 10000)
+#' @param algorithm Optimization algorithm to use (default: "LBFGS")
+#' @param verbose Print optimization progress (default: TRUE)
+#' @param refresh Print update every N iterations (default: 20)
+#' @param history_size L-BFGS history size for Hessian approximation (default: 500)
+#' @param tol_obj Absolute tolerance for objective function (default: 1e-12)
+#' @param tol_rel_obj Relative tolerance for objective function (default: 1)
+#' @param tol_grad Absolute tolerance for gradient (default: 1e-8)
+#' @param tol_rel_grad Relative tolerance for gradient (default: 1e3)
+#' @param tol_param Absolute tolerance for parameters (default: 1e-8)
 fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv",
-                           n_chains = 4, n_iter = 2000, n_cores = 4) {
+                           init = 0, iter = 10000, algorithm = "LBFGS",
+                           verbose = TRUE, refresh = 20, history_size = 500,
+                           tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8, 
+                           tol_rel_grad = 1e3, tol_param = 1e-8) {
 
   cat("\n")
   cat("================================================================================\n")
@@ -94,21 +104,25 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
   cat("[OK] Model compiled successfully\n\n")
 
   # Fit model
-  cat(sprintf("Fitting model (%d chains, %d iterations per chain)...\n", n_chains, n_iter))
-  cat("This may take 10-30 minutes depending on data size.\n\n")
+  cat(sprintf("Fitting model with %s optimization (max %d iterations)...\n", algorithm, iter))
+  cat("This may take 5-15 minutes depending on data size and convergence.\n\n")
 
   fit_start <- Sys.time()
 
-  fit0_full <- rstan::sampling(
+  fit0_full <- rstan::optimizing(
     stan_model,
     data = stan_data,
-    chains = n_chains,
-    iter = n_iter,
-    warmup = floor(n_iter / 2),
-    cores = n_cores,
-    refresh = 100,
-    control = list(adapt_delta = 0.95, max_treedepth = 12),
-    seed = 12345
+    init = init,
+    iter = iter,
+    algorithm = algorithm,
+    verbose = verbose,
+    refresh = refresh,
+    history_size = history_size,
+    tol_obj = tol_obj,
+    tol_rel_obj = tol_rel_obj,
+    tol_grad = tol_grad,
+    tol_rel_grad = tol_rel_grad,
+    tol_param = tol_param
   )
 
   fit_end <- Sys.time()
@@ -120,17 +134,14 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
 
   # Check convergence
   cat("Checking convergence diagnostics...\n")
-  summary_fit <- rstan::summary(fit0_full)$summary
-  max_rhat <- max(summary_fit[, "Rhat"], na.rm = TRUE)
-  min_neff <- min(summary_fit[, "n_eff"], na.rm = TRUE)
+  return_code <- fit0_full$return_code
 
-  cat(sprintf("  Max Rhat: %.4f %s\n", max_rhat,
-              ifelse(max_rhat < 1.1, "[OK]", "[WARNING: > 1.1]")))
-  cat(sprintf("  Min n_eff: %.0f %s\n", min_neff,
-              ifelse(min_neff > 100, "[OK]", "[WARNING: < 100]")))
+  cat(sprintf("  Return code: %d %s\n", return_code,
+              ifelse(return_code == 0, "[OK: Converged]", "[WARNING: Did not converge]")))
+  cat(sprintf("  Log-posterior: %.2f\n", fit0_full$value))
 
-  if (max_rhat > 1.1) {
-    warning("Some parameters have Rhat > 1.1. Consider increasing iterations.")
+  if (return_code != 0) {
+    warning(sprintf("Optimization did not converge (return_code = %d). Consider adjusting tolerances or increasing iterations.", return_code))
   }
 
   cat("\n")
@@ -138,12 +149,14 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
   # Extract parameters for warm starting
   cat("Extracting parameters for warm starting...\n")
 
-  params <- list(
-    tau = colMeans(rstan::extract(fit0_full, "tau")[[1]]),
-    beta1 = colMeans(rstan::extract(fit0_full, "beta1")[[1]]),
-    delta = colMeans(rstan::extract(fit0_full, "delta")[[1]]),
-    eta_psychosocial = colMeans(rstan::extract(fit0_full, "eta_psychosocial")[[1]]),
-    eta_developmental = colMeans(rstan::extract(fit0_full, "eta_developmental")[[1]])
+  params <- with(fit0_full,
+    list(
+      tau = par[startsWith(names(par), "tau")],
+      beta1 = par[startsWith(names(par), "beta1")],
+      delta = par[startsWith(names(par), "delta")],
+      eta_psychosocial = par[startsWith(names(par), "eta") & endsWith(names(par),"1]")],
+      eta_developmental = par[startsWith(names(par), "eta") & endsWith(names(par),"2]")]
+    )
   )
 
   # Save results

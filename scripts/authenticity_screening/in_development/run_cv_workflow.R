@@ -30,8 +30,23 @@ library(dplyr)
 source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 source("scripts/authenticity_screening/in_development/phase1_fit_base_model.R")
 source("scripts/authenticity_screening/in_development/phase1_fit_penalized_models.R")
+source("scripts/authenticity_screening/in_development/phase1c_sanity_check.R")
 source("scripts/authenticity_screening/in_development/phase2_create_folds.R")
 source("scripts/authenticity_screening/in_development/phase3_cv_loop.R")
+source("scripts/authenticity_screening/in_development/00_prepare_cv_data.R")
+
+# Step 0: Prepare data (first time only)
+cv_data <- prepare_cv_data()
+
+# Inspect what you got:
+M_data <- cv_data$M_data
+J_data <- cv_data$J_data
+
+cat(sprintf("Participants: %d\n", length(unique(M_data$pid))))
+cat(sprintf("Observations: %d\n", nrow(M_data)))
+cat(sprintf("Items: %d\n", nrow(J_data)))
+cat(sprintf("  - Psychosocial (dimension 1): %d items\n", sum(J_data$dimension == 1)))
+cat(sprintf("  - Developmental (dimension 2): %d items\n", sum(J_data$dimension == 2)))
 
 #' Run Complete CV Workflow
 #'
@@ -44,11 +59,18 @@ source("scripts/authenticity_screening/in_development/phase3_cv_loop.R")
 #' @param lambda_skew Skewness penalty strength (default: 1.0, fixed)
 #' @param n_folds Number of CV folds (default: 16)
 #' @param output_dir Directory to save all results (default: "output/authenticity_cv")
-#' @param phase1_chains Chains for Phase 1 fits (default: 4)
-#' @param phase1_iter Iterations for Phase 1 fits (default: 2000)
-#' @param phase3_chains Chains for Phase 3 CV fits (default: 2, faster)
-#' @param phase3_iter Iterations for Phase 3 CV fits (default: 1000, faster)
+#' @param iter Maximum iterations for L-BFGS optimization (default: 10000)
+#' @param algorithm Optimization algorithm to use (default: "LBFGS")
+#' @param verbose Print optimization progress (default: FALSE for Phase 1b/3)
+#' @param refresh Print update every N iterations (default: 0 for Phase 1b/3)
+#' @param history_size L-BFGS history size (default: 500)
+#' @param tol_obj Absolute tolerance for objective function (default: 1e-12)
+#' @param tol_rel_obj Relative tolerance for objective function (default: 1)
+#' @param tol_grad Absolute tolerance for gradient (default: 1e-8)
+#' @param tol_rel_grad Relative tolerance for gradient (default: 1e3)
+#' @param tol_param Absolute tolerance for parameters (default: 1e-8)
 #' @param skip_phase1 Skip Phase 1 if already run (default: FALSE)
+#' @param skip_phase1c Skip Phase 1c sanity check (default: FALSE)
 #' @param skip_phase2 Skip Phase 2 if already run (default: FALSE)
 #' @return List with optimal_sigma, cv_summary, and paths to all outputs
 run_complete_cv_workflow <- function(M_data, J_data,
@@ -56,11 +78,12 @@ run_complete_cv_workflow <- function(M_data, J_data,
                                       lambda_skew = 1.0,
                                       n_folds = 16,
                                       output_dir = "output/authenticity_cv",
-                                      phase1_chains = 4,
-                                      phase1_iter = 2000,
-                                      phase3_chains = 2,
-                                      phase3_iter = 1000,
+                                      iter = 10000, algorithm = "LBFGS",
+                                      verbose = FALSE, refresh = 0, history_size = 500,
+                                      tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8,
+                                      tol_rel_grad = 1e3, tol_param = 1e-8,
                                       skip_phase1 = FALSE,
+                                      skip_phase1c = FALSE,
                                       skip_phase2 = FALSE) {
 
   workflow_start <- Sys.time()
@@ -110,8 +133,17 @@ run_complete_cv_workflow <- function(M_data, J_data,
       M_data = M_data,
       J_data = J_data,
       output_dir = output_dir,
-      n_chains = phase1_chains,
-      n_iter = phase1_iter
+      init =0,
+      iter = 10000,
+      algorithm = "LBFGS",
+      verbose = TRUE,
+      refresh = 20,
+      history_size = 500,
+      tol_obj = 1e-12,
+      tol_rel_obj = 1,
+      tol_grad = 1e-8,
+      tol_rel_grad = 1e3,
+      tol_param = 1e-8
     )
 
     fit0_params <- readRDS(file.path(output_dir, "fit0_params.rds"))
@@ -141,8 +173,16 @@ run_complete_cv_workflow <- function(M_data, J_data,
       sigma_grid = sigma_grid,
       lambda_skew = lambda_skew,
       output_dir = output_dir,
-      n_chains = phase1_chains,
-      n_iter = phase1_iter
+      iter = iter,
+      algorithm = algorithm,
+      verbose = verbose,
+      refresh = refresh,
+      history_size = history_size,
+      tol_obj = tol_obj,
+      tol_rel_obj = tol_rel_obj,
+      tol_grad = tol_grad,
+      tol_rel_grad = tol_rel_grad,
+      tol_param = tol_param
     )
 
     fits_params <- phase1b_results$params
@@ -154,6 +194,39 @@ run_complete_cv_workflow <- function(M_data, J_data,
 
     fits_params <- readRDS(file.path(output_dir, "fits_full_penalty_params.rds"))
     cat("[OK] Loaded Phase 1b results\n\n")
+  }
+
+  # ============================================================================
+  # PHASE 1c: Sanity Check - Weight vs Eta Correspondence
+  # ============================================================================
+
+  if (!skip_phase1c) {
+    cat("\n")
+    cat("*** STARTING PHASE 1c: Sanity Check ***\n")
+    cat("\n")
+
+    sanity_check_results <- run_sanity_check(
+      fit0_params = fit0_params,
+      fits_params = fits_params,
+      sigma_grid = sigma_grid,
+      output_dir = output_dir,
+      weight_threshold = 0.5,
+      eta_threshold = 3.0
+    )
+
+    # Optionally halt workflow if sanity check fails
+    if (!sanity_check_results$overall_pass) {
+      warning("Phase 1c sanity check failed. Review diagnostic plots before continuing.")
+      cat("\n")
+      cat("Workflow will continue, but results should be carefully inspected.\n")
+      cat("Set skip_phase1c = TRUE to bypass this check in future runs.\n")
+      cat("\n")
+    }
+
+  } else {
+    cat("\n")
+    cat("*** SKIPPING PHASE 1c (sanity check disabled) ***\n")
+    cat("\n")
   }
 
   # ============================================================================
@@ -200,8 +273,16 @@ run_complete_cv_workflow <- function(M_data, J_data,
     lambda_skew = lambda_skew,
     n_folds = n_folds,
     output_dir = output_dir,
-    n_chains = phase3_chains,
-    n_iter = phase3_iter
+    iter = iter,
+    algorithm = algorithm,
+    verbose = verbose,
+    refresh = refresh,
+    history_size = history_size,
+    tol_obj = tol_obj,
+    tol_rel_obj = tol_rel_obj,
+    tol_grad = tol_grad,
+    tol_rel_grad = tol_rel_grad,
+    tol_param = tol_param
   )
 
   # ============================================================================

@@ -28,17 +28,26 @@ source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 #' @param sigma_grid Vector of σ_sum_w values (default: 2^(seq(-1, 1, by=0.25)))
 #' @param lambda_skew Skewness penalty strength (default: 1.0)
 #' @param output_dir Directory to save results
-#' @param n_chains Number of MCMC chains per model (default: 4)
-#' @param n_iter Number of iterations per chain (default: 2000)
-#' @param n_cores_per_fit Cores per model fit (default: 4)
+#' @param iter Maximum iterations for L-BFGS optimization (default: 10000)
+#' @param algorithm Optimization algorithm to use (default: "LBFGS")
+#' @param verbose Print optimization progress for each model (default: FALSE for parallel)
+#' @param refresh Print update every N iterations (default: 0 to suppress output)
+#' @param history_size L-BFGS history size for Hessian approximation (default: 500)
+#' @param tol_obj Absolute tolerance for objective function (default: 1e-12)
+#' @param tol_rel_obj Relative tolerance for objective function (default: 1)
+#' @param tol_grad Absolute tolerance for gradient (default: 1e-8)
+#' @param tol_rel_grad Relative tolerance for gradient (default: 1e3)
+#' @param tol_param Absolute tolerance for parameters (default: 1e-8)
 #' @param n_parallel Number of models to fit in parallel (default: 9 for all)
 #' @return List of Stan fit objects (one per σ value)
 fit_penalized_models <- function(M_data, J_data, fit0_params,
                                   sigma_grid = 2^(seq(-1, 1, by = 0.25)),
                                   lambda_skew = 1.0,
                                   output_dir = "output/authenticity_cv",
-                                  n_chains = 4, n_iter = 2000,
-                                  n_cores_per_fit = 4,
+                                  iter = 10000, algorithm = "LBFGS",
+                                  verbose = FALSE, refresh = 0, history_size = 500,
+                                  tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8,
+                                  tol_rel_grad = 1e3, tol_param = 1e-8,
                                   n_parallel = 9) {
 
   cat("\n")
@@ -125,40 +134,48 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
 
     fit_start <- Sys.time()
 
-    fit <- rstan::sampling(
+    fit <- rstan::optimizing(
       stan_model,
       data = stan_data,
       init = init_fn,
-      chains = n_chains,
-      iter = n_iter,
-      warmup = floor(n_iter / 2),
-      cores = n_cores_per_fit,
-      refresh = 0,  # Suppress per-iteration output for parallel
-      control = list(adapt_delta = 0.95, max_treedepth = 12),
-      seed = 12345 + idx
+      iter = iter,
+      algorithm = algorithm,
+      verbose = verbose,
+      refresh = refresh,
+      history_size = history_size,
+      tol_obj = tol_obj,
+      tol_rel_obj = tol_rel_obj,
+      tol_grad = tol_grad,
+      tol_rel_grad = tol_rel_grad,
+      tol_param = tol_param
     )
 
     fit_end <- Sys.time()
     fit_duration <- as.numeric(difftime(fit_end, fit_start, units = "mins"))
 
-    # Quick convergence check
-    summary_fit <- rstan::summary(fit)$summary
-    max_rhat <- max(summary_fit[, "Rhat"], na.rm = TRUE)
-    min_neff <- min(summary_fit[, "n_eff"], na.rm = TRUE)
+    # Check convergence
+    return_code <- fit$return_code
+    converged <- (return_code == 0)
 
-    cat(sprintf("[%d/%d] Complete (%.1f min) | Rhat: %.4f | n_eff: %.0f\n",
-                idx, length(sigma_grid), fit_duration, max_rhat, min_neff))
+    cat(sprintf("[%d/%d] Complete (%.1f min) | return_code: %d %s | log-posterior: %.2f\n",
+                idx, length(sigma_grid), fit_duration, return_code,
+                ifelse(converged, "[OK]", "[WARNING]"), fit$value))
+
+    if (!converged) {
+      warning(sprintf("Model %d (sigma=%.3f) did not converge (return_code=%d)",
+                      idx, sigma_sum_w, return_code))
+    }
 
     return(fit)
   }
 
   # Fit all models in parallel
-  cat(sprintf("\nFitting %d models in parallel (this may take 30-60 minutes)...\n",
+  cat(sprintf("\nFitting %d models in parallel (this may take 10-20 minutes with optimization)...\n",
               length(sigma_grid)))
 
   fit_start_all <- Sys.time()
 
-  # Use mclapply for Unix-like systems, or lapply for Windows
+  # Use mclapply for Unix-like systems, or parLapply for Windows
   if (.Platform$OS.type == "unix") {
     fits_full_penalty <- parallel::mclapply(
       seq_along(sigma_grid),
@@ -166,12 +183,86 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
       mc.cores = n_parallel
     )
   } else {
-    # Windows: Use sequential execution with progress
-    cat("[INFO] Windows detected - fitting models sequentially\n")
-    fits_full_penalty <- lapply(
+    # Windows: Use parallel cluster
+    cat(sprintf("[INFO] Windows detected - using parallel cluster (%d cores)\n", n_parallel))
+    cl <- parallel::makeCluster(n_parallel)
+
+    # Export necessary objects to cluster
+    parallel::clusterExport(cl, c(
+      "stan_model", "stan_data_base", "sigma_grid", "fit0_params", "N",
+      "iter", "algorithm", "verbose", "refresh", "history_size",
+      "tol_obj", "tol_rel_obj", "tol_grad", "tol_rel_grad", "tol_param"
+    ), envir = environment())
+
+    # Load packages on each worker
+    parallel::clusterEvalQ(cl, {
+      library(rstan)
+      library(dplyr)
+    })
+
+    # Fit models in parallel
+    fits_full_penalty <- parallel::parLapply(
+      cl,
       seq_along(sigma_grid),
-      function(i) fit_one_sigma(sigma_grid[i], i)
+      function(i) {
+        sigma_sum_w <- sigma_grid[i]
+        cat(sprintf("\n[%d/%d] Fitting model with sigma_sum_w = %.3f...\n",
+                    i, length(sigma_grid), sigma_sum_w))
+
+        # Add sigma_sum_w to data
+        stan_data <- stan_data_base
+        stan_data$sigma_sum_w <- sigma_sum_w
+
+        # Create init function
+        init_fn <- function() {
+          list(
+            tau = fit0_params$tau,
+            beta1 = fit0_params$beta1,
+            delta = fit0_params$delta,
+            eta_psychosocial = fit0_params$eta_psychosocial,
+            eta_developmental = fit0_params$eta_developmental,
+            logitwgt = rep(0, N)
+          )
+        }
+
+        fit_start <- Sys.time()
+
+        fit <- rstan::optimizing(
+          stan_model,
+          data = stan_data,
+          init = init_fn,
+          iter = iter,
+          algorithm = algorithm,
+          verbose = verbose,
+          refresh = refresh,
+          history_size = history_size,
+          tol_obj = tol_obj,
+          tol_rel_obj = tol_rel_obj,
+          tol_grad = tol_grad,
+          tol_rel_grad = tol_rel_grad,
+          tol_param = tol_param
+        )
+
+        fit_end <- Sys.time()
+        fit_duration <- as.numeric(difftime(fit_end, fit_start, units = "mins"))
+
+        return_code <- fit$return_code
+        converged <- (return_code == 0)
+
+        cat(sprintf("[%d/%d] Complete (%.1f min) | return_code: %d %s | log-posterior: %.2f\n",
+                    i, length(sigma_grid), fit_duration, return_code,
+                    ifelse(converged, "[OK]", "[WARNING]"), fit$value))
+
+        if (!converged) {
+          warning(sprintf("Model %d (sigma=%.3f) did not converge (return_code=%d)",
+                          i, sigma_sum_w, return_code))
+        }
+
+        return(fit)
+      }
     )
+
+    parallel::stopCluster(cl)
   }
 
   fit_end_all <- Sys.time()
@@ -192,16 +283,16 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
     fit <- fits_full_penalty[[i]]
     list(
       sigma_sum_w = sigma_grid[i],
-      tau = colMeans(rstan::extract(fit, "tau")[[1]]),
-      beta1 = colMeans(rstan::extract(fit, "beta1")[[1]]),
-      delta = colMeans(rstan::extract(fit, "delta")[[1]]),
-      eta_psychosocial = colMeans(rstan::extract(fit, "eta_psychosocial")[[1]]),
-      eta_developmental = colMeans(rstan::extract(fit, "eta_developmental")[[1]]),
-      logitwgt = colMeans(rstan::extract(fit, "logitwgt")[[1]]),
-      w = colMeans(rstan::extract(fit, "w")[[1]]),
-      sum_w = mean(rstan::extract(fit, "sum_weight")[[1]]),
-      n_excluded = mean(rstan::extract(fit, "n_excluded")[[1]]),
-      n_included = mean(rstan::extract(fit, "n_included")[[1]])
+      tau = fit$par[startsWith(names(fit$par), "tau")],
+      beta1 = fit$par[startsWith(names(fit$par), "beta1")],
+      delta = fit$par[startsWith(names(fit$par), "delta")],
+      eta_psychosocial = fit$par[startsWith(names(fit$par), "eta") & endsWith(names(fit$par), "1]")],
+      eta_developmental = fit$par[startsWith(names(fit$par), "eta") & endsWith(names(fit$par), "2]")],
+      logitwgt = fit$par[startsWith(names(fit$par), "logitwgt")],
+      w = fit$par[startsWith(names(fit$par), "w[")],
+      sum_w = fit$par["sum_weight"],
+      n_excluded = fit$par["n_excluded"],
+      n_included = fit$par["n_included"]
     )
   })
 

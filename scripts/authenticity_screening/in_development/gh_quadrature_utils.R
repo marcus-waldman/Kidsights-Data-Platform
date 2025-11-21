@@ -138,7 +138,7 @@ create_stratified_folds <- function(logitwgt, age, n_folds = 16) {
 #' @param gh List with nodes and weights from get_gh_nodes_weights()
 #' @param lambda_skew Skewness penalty strength (default: 1.0)
 #' @param sigma_sum_w Sum prior scale (hyperparameter to tune)
-#' @return List suitable for passing to rstan::sampling()
+#' @return List suitable for passing to rstan::optimizing()
 #'
 #' @examples
 #' \dontrun{
@@ -151,7 +151,7 @@ create_stratified_folds <- function(logitwgt, age, n_folds = 16) {
 #'   gh = gh,
 #'   sigma_sum_w = 1.0
 #' )
-#' fit <- rstan::sampling(stan_model, data = stan_data)
+#' fit <- rstan::optimizing(stan_model, data = stan_data, iter = 10000)
 #' }
 prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh,
                                   lambda_skew = 1.0, sigma_sum_w = 1.0) {
@@ -259,12 +259,14 @@ aggregate_cv_results <- function(cv_fits) {
 
   for (k in seq_along(cv_fits)) {
     fit <- cv_fits[[k]]
-    fold_loss <- rstan::extract(fit, "fold_loss")[[1]]
-    N_holdout <- fit@par_dims$holdout_deviance[1]
+    fold_loss <- fit$par["fold_loss"]
+    # For optimization, N_holdout should be passed separately or extracted from data
+    # Assuming it's available in the fit object's theta_tilde or data
+    N_holdout <- length(fit$par[startsWith(names(fit$par), "holdout_deviance")])
 
     results <- rbind(results, data.frame(
       fold = k,
-      fold_loss = mean(fold_loss),  # Mean across MCMC samples
+      fold_loss = fold_loss,  # Direct value from optimization
       N_holdout = N_holdout
     ))
   }

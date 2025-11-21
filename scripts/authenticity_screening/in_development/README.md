@@ -154,10 +154,10 @@ results <- run_complete_cv_workflow(
   lambda_skew = 1.0,                        # Fixed
   n_folds = 16,
   output_dir = "output/authenticity_cv",
-  phase1_chains = 4,
-  phase1_iter = 2000,
-  phase3_chains = 2,     # Faster for CV
-  phase3_iter = 1000
+  iter = 10000,           # L-BFGS max iterations
+  algorithm = "LBFGS",    # Optimization algorithm
+  verbose = FALSE,        # Suppress output for Phases 1b/3
+  refresh = 0             # No iteration updates
 )
 
 # Inspect results
@@ -165,12 +165,12 @@ print(results$optimal_sigma)    # Selected σ_sum_w
 print(results$cv_summary)       # CV loss for all σ values
 ```
 
-**Estimated Time:**
-- Phase 1a: 30-60 minutes (base model)
-- Phase 1b: 30-60 minutes (9 penalized models in parallel)
+**Estimated Time (with L-BFGS optimization):**
+- Phase 1a: 5-15 minutes (base model)
+- Phase 1b: 10-20 minutes (9 penalized models in parallel)
 - Phase 2: 1-2 minutes (fold creation)
-- Phase 3: 2-6 hours (144 CV fits in parallel, depends on hardware)
-- **Total: 3-8 hours** (mostly Phase 3)
+- Phase 3: 1-3 hours (144 CV fits in parallel, depends on hardware)
+- **Total: 1.5-4 hours** (mostly Phase 3)
 
 ### Skip Already-Completed Phases (Iterating on Phase 3)
 
@@ -201,10 +201,13 @@ results <- run_complete_cv_workflow(
 | `lambda_skew` | `1.0` | Skewness penalty strength (fixed) |
 | `n_folds` | `16` | Number of CV folds |
 | `output_dir` | `"output/authenticity_cv"` | Directory for all results |
-| `phase1_chains` | `4` | MCMC chains for Phase 1 fits |
-| `phase1_iter` | `2000` | Iterations per chain (Phase 1) |
-| `phase3_chains` | `2` | Chains for CV fits (faster) |
-| `phase3_iter` | `1000` | Iterations per chain (CV, faster) |
+| `iter` | `10000` | Maximum L-BFGS iterations |
+| `algorithm` | `"LBFGS"` | Optimization algorithm |
+| `verbose` | `FALSE` | Print optimization progress (Phases 1b/3) |
+| `refresh` | `0` | Print update every N iterations |
+| `history_size` | `500` | L-BFGS history size for Hessian approximation |
+| `tol_obj` | `1e-12` | Absolute tolerance for objective function |
+| `tol_grad` | `1e-8` | Absolute tolerance for gradient |
 | `skip_phase1` | `FALSE` | Skip Phase 1 if already run |
 | `skip_phase2` | `FALSE` | Skip Phase 2 if already run |
 
@@ -326,9 +329,9 @@ cv_results <- readRDS("output/authenticity_cv/cv_results.rds")
 # Check for failed fits
 sum(!cv_results$fit_success)  # Should be 0
 
-# Check Rhat diagnostics
-summary(cv_results$max_rhat)  # Should be < 1.1
-hist(cv_results$max_rhat)
+# Check optimization convergence
+table(cv_results$return_code)  # Should be all 0 (success)
+sum(cv_results$converged)      # Count of successful optimizations
 ```
 
 ### CV Loss Curve
@@ -358,7 +361,7 @@ ggplot(cv_summary, aes(x = sigma_sum_w, y = cv_loss)) +
 After selecting optimal σ, refit on full dataset and validate:
 
 1. **Exclusion Rate:** Should be 5-15% (w < 0.1)
-2. **Convergence:** Rhat < 1.01, n_eff > 400
+2. **Convergence:** return_code = 0, stable log-posterior value
 3. **Skewness:** sum(w) should be close to N
 4. **Weight Distribution:** Bimodal (many near 0, many near 1)
 
@@ -397,24 +400,25 @@ Located in `models/in_development/`:
 
 ### Problem: High proportion of failed CV fits
 
-**Cause:** Insufficient iterations, poor initialization, or data issues.
+**Cause:** Non-convergence in L-BFGS optimization or data issues.
 
 **Fixes:**
-1. Increase `phase3_iter` (e.g., 2000 instead of 1000)
-2. Increase `adapt_delta` (e.g., 0.98 instead of 0.95)
+1. Increase `iter` (e.g., 20000 instead of 10000)
+2. Adjust tolerances (e.g., `tol_rel_obj = 10`, `tol_rel_grad = 1e4`)
 3. Check for participants with very few item responses (< 5)
+4. Inspect failed fits' return_code values for patterns
 
-### Problem: Very long execution time (> 12 hours)
+### Problem: Long execution time (> 6 hours)
 
 **Causes:**
 - Sequential execution on Windows (no cluster setup)
 - Low core count
-- High iterations per CV fit
+- Slow convergence in optimization
 
 **Fixes:**
 1. Set up `parallel::makeCluster()` with maximum cores
-2. Reduce `phase3_iter` to 800-1000 (acceptable for CV)
-3. Reduce `phase3_chains` to 2 (faster, still valid)
+2. Use defaults (iter = 10000 is usually sufficient)
+3. Increase `history_size` to 700-1000 for faster convergence
 4. Use HPC cluster if available
 
 ### Problem: CV loss curve is flat

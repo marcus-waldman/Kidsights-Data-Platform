@@ -31,9 +31,16 @@ source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 #' @param lambda_skew Skewness penalty strength (default: 1.0)
 #' @param n_folds Number of folds (default: 16)
 #' @param output_dir Directory to save results
-#' @param n_chains Number of MCMC chains per fit (default: 2, faster for CV)
-#' @param n_iter Number of iterations per chain (default: 1000, faster for CV)
-#' @param n_cores_per_fit Cores per model fit (default: 2)
+#' @param iter Maximum iterations for L-BFGS optimization (default: 10000)
+#' @param algorithm Optimization algorithm to use (default: "LBFGS")
+#' @param verbose Print optimization progress for each fit (default: FALSE)
+#' @param refresh Print update every N iterations (default: 0 to suppress output)
+#' @param history_size L-BFGS history size for Hessian approximation (default: 500)
+#' @param tol_obj Absolute tolerance for objective function (default: 1e-12)
+#' @param tol_rel_obj Relative tolerance for objective function (default: 1)
+#' @param tol_grad Absolute tolerance for gradient (default: 1e-8)
+#' @param tol_rel_grad Relative tolerance for gradient (default: 1e3)
+#' @param tol_param Absolute tolerance for parameters (default: 1e-8)
 #' @param n_parallel_jobs Number of parallel jobs (default: min(144, detectCores()))
 #' @return List with cv_results, cv_summary, and optimal_sigma
 run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
@@ -41,8 +48,10 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
                         lambda_skew = 1.0,
                         n_folds = 16,
                         output_dir = "output/authenticity_cv",
-                        n_chains = 2, n_iter = 1000,
-                        n_cores_per_fit = 2,
+                        iter = 10000, algorithm = "LBFGS",
+                        verbose = FALSE, refresh = 0, history_size = 500,
+                        tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8,
+                        tol_rel_grad = 1e3, tol_param = 1e-8,
                         n_parallel_jobs = min(144, parallel::detectCores())) {
 
   cat("\n")
@@ -58,7 +67,7 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
   cat(sprintf("  Total fits: %d (σ) × %d (folds) = %d\n",
               length(sigma_grid), n_folds, length(sigma_grid) * n_folds))
   cat(sprintf("  Parallel jobs: %d\n", n_parallel_jobs))
-  cat(sprintf("  Chains per fit: %d, Iterations: %d\n", n_chains, n_iter))
+  cat(sprintf("  Optimization: %s (max %d iterations)\n", algorithm, iter))
   cat("\n")
 
   # Generate Gauss-Hermite nodes/weights
@@ -96,9 +105,9 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
   cv_grid$job_id <- 1:nrow(cv_grid)
 
   cat(sprintf("Total CV jobs: %d\n", nrow(cv_grid)))
-  cat(sprintf("Estimated time: %.0f-%.0f minutes (depends on hardware)\n",
-              nrow(cv_grid) * 2 / n_parallel_jobs,
-              nrow(cv_grid) * 5 / n_parallel_jobs))
+  cat(sprintf("Estimated time: %.0f-%.0f minutes with optimization (depends on hardware)\n",
+              nrow(cv_grid) * 0.5 / n_parallel_jobs,
+              nrow(cv_grid) * 2 / n_parallel_jobs))
   cat("\n")
 
   # Function to fit one (σ, fold) combination
@@ -136,17 +145,20 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
 
     # Fit CV model
     fit <- tryCatch({
-      rstan::sampling(
+      rstan::optimizing(
         stan_model_cv,
         data = stan_data,
         init = init_fn,
-        chains = n_chains,
-        iter = n_iter,
-        warmup = floor(n_iter / 2),
-        cores = n_cores_per_fit,
-        refresh = 0,
-        control = list(adapt_delta = 0.95, max_treedepth = 10),
-        seed = 12345 + job_id
+        iter = iter,
+        algorithm = algorithm,
+        verbose = verbose,
+        refresh = refresh,
+        history_size = history_size,
+        tol_obj = tol_obj,
+        tol_rel_obj = tol_rel_obj,
+        tol_grad = tol_grad,
+        tol_rel_grad = tol_rel_grad,
+        tol_param = tol_param
       )
     }, error = function(e) {
       warning(sprintf("[Job %d] Fit failed: %s", job_id, e$message))
@@ -161,20 +173,20 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
         fold = holdout_fold,
         fold_loss = NA,
         N_holdout = NA,
+        converged = FALSE,
         fit_success = FALSE
       ))
     }
 
     # Extract fold_loss
-    fold_loss_samples <- rstan::extract(fit, "fold_loss")[[1]]
-    fold_loss <- mean(fold_loss_samples)
+    fold_loss <- fit$par["fold_loss"]
 
     # Get holdout size
     N_holdout <- stan_data$N_holdout
 
-    # Quick convergence check
-    summary_fit <- rstan::summary(fit, pars = c("tau", "beta1", "delta"))$summary
-    max_rhat <- max(summary_fit[, "Rhat"], na.rm = TRUE)
+    # Check convergence
+    return_code <- fit$return_code
+    converged <- (return_code == 0)
 
     return(data.frame(
       job_id = job_id,
@@ -183,7 +195,8 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
       fold = holdout_fold,
       fold_loss = fold_loss,
       N_holdout = N_holdout,
-      max_rhat = max_rhat,
+      return_code = return_code,
+      converged = converged,
       fit_success = TRUE
     ))
   }
@@ -209,8 +222,9 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
     # Export necessary objects to cluster
     parallel::clusterExport(cl, c(
       "stan_model_cv", "M_data_with_folds", "J_data", "fits_params",
-      "gh", "lambda_skew", "n_chains", "n_iter", "n_cores_per_fit",
-      "prepare_cv_stan_data"
+      "gh", "lambda_skew", "iter", "algorithm", "verbose", "refresh",
+      "history_size", "tol_obj", "tol_rel_obj", "tol_grad",
+      "tol_rel_grad", "tol_param", "prepare_cv_stan_data"
     ), envir = environment())
 
     # Load packages on each worker
@@ -252,7 +266,7 @@ run_cv_loop <- function(M_data, J_data, fold_assignments, fits_params,
       cv_loss = mean(fold_loss, na.rm = TRUE),
       se_loss = sd(fold_loss, na.rm = TRUE) / sqrt(dplyr::n()),
       n_folds_converged = dplyr::n(),
-      mean_rhat = mean(max_rhat, na.rm = TRUE),
+      n_folds_success = sum(converged, na.rm = TRUE),
       .groups = "drop"
     ) %>%
     dplyr::arrange(cv_loss)
