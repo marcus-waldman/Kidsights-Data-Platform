@@ -56,7 +56,7 @@ source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 #' NOTE: M_data uses person_id (1:N) as unique identifier.
 #' This is created in 00_prepare_cv_data.R by mapping (pid, record_id) → person_id.
 run_cv_loop <- function(M_data, J_data, fits_params,
-                        sigma_grid = 2^(seq(-1, 1, by = 0.25)),
+                        sigma_grid,
                         weight_threshold = 0.5,
                         integrate_training = TRUE,
                         n_folds = 16,
@@ -402,15 +402,16 @@ run_cv_loop <- function(M_data, J_data, fits_params,
     warning(sprintf("%d fits failed out of %d total", n_failures, nrow(cv_results)))
   }
 
-  # Aggregate by sigma
+  # Aggregate by sigma (weighted average by N_holdout)
   cv_summary <- cv_results %>%
     dplyr::filter(fit_success) %>%
     dplyr::group_by(sigma_idx, sigma_sum_w) %>%
     dplyr::summarise(
-      cv_loss = mean(fold_loss, na.rm = TRUE),
+      cv_loss = sum(fold_loss * N_holdout, na.rm = TRUE) / sum(N_holdout, na.rm = TRUE),
       se_loss = sd(fold_loss, na.rm = TRUE) / sqrt(dplyr::n()),
       n_folds_converged = dplyr::n(),
       n_folds_success = sum(converged, na.rm = TRUE),
+      total_holdout = sum(N_holdout, na.rm = TRUE),
       .groups = "drop"
     ) %>%
     dplyr::arrange(cv_loss)
