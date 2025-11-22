@@ -48,7 +48,7 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
                                   verbose = FALSE, refresh = 0, history_size = 500,
                                   tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8,
                                   tol_rel_grad = 1e3, tol_param = 1e-8,
-                                  n_parallel = 9) {
+                                  n_parallel = max(c(parallel::detectCores()/2, length(sigma_grid)))) {
 
   cat("\n")
   cat("================================================================================\n")
@@ -69,11 +69,11 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
   cat("\n")
 
   # Prepare Stan data (same across all σ values)
-  unique_pids <- unique(M_data$pid)
-  N <- length(unique_pids)
+  unique_person_ids <- unique(M_data$person_id)
+  N <- length(unique_person_ids)
 
-  pid_map <- data.frame(pid = unique_pids, new_id = 1:N)
-  M_data$ivec <- pid_map$new_id[match(M_data$pid, pid_map$pid)]
+  person_map <- data.frame(person_id = unique_person_ids, new_id = 1:N)
+  M_data$ivec <- person_map$new_id[match(M_data$person_id, person_map$person_id)]
 
   age <- M_data %>%
     dplyr::group_by(ivec) %>%

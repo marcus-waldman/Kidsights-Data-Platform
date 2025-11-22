@@ -126,19 +126,26 @@ create_stratified_folds <- function(logitwgt, age, n_folds = 16) {
 }
 
 
-#' Prepare Data for CV Stan Model
+#' Prepare Data for CV Stan Model (Integrated or Joint Posterior)
 #'
 #' Splits data into training and holdout sets for one CV fold, formats for
-#' authenticity_glmm_cv.stan model.
+#' authenticity_glmm_cv_integrated.stan or authenticity_glmm_cv_joint.stan.
 #'
-#' @param M_data Data frame with columns: pid, item_id, response, age
+#' @param M_data Data frame with columns: person_id, item_id, response, age
 #' @param J_data Data frame with columns: item_id, K (num categories), dimension
-#' @param folds Vector of fold assignments (length = number of unique pids)
+#' @param folds Vector of fold assignments (length = number of unique person_ids)
 #' @param holdout_fold Which fold to hold out (1 to n_folds)
 #' @param gh List with nodes and weights from get_gh_nodes_weights()
-#' @param lambda_skew Skewness penalty strength (default: 1.0)
-#' @param sigma_sum_w Sum prior scale (hyperparameter to tune)
 #' @return List suitable for passing to rstan::optimizing()
+#'
+#' @details
+#' This function prepares data for the NEW CV models (Phase 3 refactor):
+#'   - NO lambda_skew or sigma_sum_w (penalties only used in Phase 1b)
+#'   - Data already filtered to w > 0.5 (no weight parameters needed)
+#'   - Includes kvec and dimvec for efficient item lookups
+#'
+#' NOTE: M_data uses person_id (1:N) as unique identifier.
+#' This is created in 00_prepare_cv_data.R by mapping (pid, record_id) → person_id.
 #'
 #' @examples
 #' \dontrun{
@@ -148,46 +155,44 @@ create_stratified_folds <- function(logitwgt, age, n_folds = 16) {
 #'   J_data = items,
 #'   folds = folds,
 #'   holdout_fold = 1,
-#'   gh = gh,
-#'   sigma_sum_w = 1.0
+#'   gh = gh
 #' )
-#' fit <- rstan::optimizing(stan_model, data = stan_data, iter = 10000)
+#' fit <- rstan::optimizing(stan_model_integrated, data = stan_data, iter = 10000)
 #' }
-prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh,
-                                  lambda_skew = 1.0, sigma_sum_w = 1.0) {
+prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh) {
 
-  # Get unique PIDs
-  unique_pids <- unique(M_data$pid)
-  N_total <- length(unique_pids)
+  # Get unique person_ids
+  unique_person_ids <- unique(M_data$person_id)
+  N_total <- length(unique_person_ids)
 
   if (length(folds) != N_total) {
-    stop(sprintf("folds length (%d) != number of unique PIDs (%d)",
+    stop(sprintf("folds length (%d) != number of unique person_ids (%d)",
                  length(folds), N_total))
   }
 
-  # Create PID to fold mapping
-  pid_to_fold <- data.frame(pid = unique_pids, fold = folds)
+  # Create person_id to fold mapping
+  person_to_fold <- data.frame(person_id = unique_person_ids, fold = folds)
 
   # Split into training and holdout
-  train_pids <- pid_to_fold$pid[pid_to_fold$fold != holdout_fold]
-  holdout_pids <- pid_to_fold$pid[pid_to_fold$fold == holdout_fold]
+  train_person_ids <- person_to_fold$person_id[person_to_fold$fold != holdout_fold]
+  holdout_person_ids <- person_to_fold$person_id[person_to_fold$fold == holdout_fold]
 
   # Filter observations
-  M_train <- M_data[M_data$pid %in% train_pids, ]
-  M_holdout <- M_data[M_data$pid %in% holdout_pids, ]
+  M_train <- M_data[M_data$person_id %in% train_person_ids, ]
+  M_holdout <- M_data[M_data$person_id %in% holdout_person_ids, ]
 
   # Re-index persons (1:N_train and 1:N_holdout)
-  train_pid_map <- data.frame(
-    pid = train_pids,
-    new_id = 1:length(train_pids)
+  train_person_map <- data.frame(
+    person_id = train_person_ids,
+    new_id = 1:length(train_person_ids)
   )
-  holdout_pid_map <- data.frame(
-    pid = holdout_pids,
-    new_id = 1:length(holdout_pids)
+  holdout_person_map <- data.frame(
+    person_id = holdout_person_ids,
+    new_id = 1:length(holdout_person_ids)
   )
 
-  M_train$ivec <- train_pid_map$new_id[match(M_train$pid, train_pid_map$pid)]
-  M_holdout$ivec <- holdout_pid_map$new_id[match(M_holdout$pid, holdout_pid_map$pid)]
+  M_train$ivec <- train_person_map$new_id[match(M_train$person_id, train_person_map$person_id)]
+  M_holdout$ivec <- holdout_person_map$new_id[match(M_holdout$person_id, holdout_person_map$person_id)]
 
   # Get age vectors
   age_train <- M_train %>%
@@ -224,10 +229,8 @@ prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh,
     # Item metadata
     K = J_data$K,
     dimension = J_data$dimension,
-
-    # Hyperparameters
-    lambda_skew = lambda_skew,
-    sigma_sum_w = sigma_sum_w,
+    kvec = J_data$K,        # Lookup: category count per item (same as K)
+    dimvec = J_data$dimension,  # Lookup: dimension per item (same as dimension)
 
     # Gauss-Hermite quadrature
     n_nodes = length(gh$nodes),

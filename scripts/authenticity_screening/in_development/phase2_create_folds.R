@@ -1,17 +1,21 @@
-# Phase 2: Extract logitwgt and Create Stratified Folds
+# Phase 2: Create σ-Specific Stratified Folds
 #
 # This script:
-#   1. Extracts logitwgt from the σ_sum_w = 1.0 fit (middle of grid)
-#   2. Creates 16 stratified folds by sorting on logitwgt + age
-#   3. Validates fold balance
+#   1. For EACH σ_sum_w value from Phase 1b:
+#      a. Extract weights (w) from penalized model fit
+#      b. Filter to participants with w > 0.5
+#      c. Create 16 age-stratified folds using filtered subset
+#      d. Save fold assignments specific to that σ value
 #
-# Stratification ensures each fold has similar distributions of:
-#   - Authenticity weights (prevents all inauthentic in one fold)
-#   - Ages (prevents age confounding)
+# Why σ-specific folds?
+#   - Different σ values → different effective sample sizes (w > 0.5 threshold)
+#   - Each σ evaluated on the participants it actually includes
+#   - Age stratification ensures balanced folds within each subset
 #
-# Outputs:
-#   - fold_assignments.rds: Vector of fold IDs (1-16) for each participant
-#   - fold_diagnostics.rds: Summary statistics per fold
+# Outputs (9 files, one per σ):
+#   - fold_assignments_sigma_{idx}.rds: pid + fold for participants with w > 0.5
+#   - fold_diagnostics_sigma_{idx}.rds: Fold balance statistics
+#   - fold_metadata.rds: Sample size summary across all σ values
 
 library(rstan)
 library(dplyr)
@@ -20,215 +24,202 @@ library(ggplot2)
 # Source utilities
 source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 
-#' Create Stratified Folds from Penalized Model Fit
+#' Create σ-Specific Stratified Folds for All Penalized Models
 #'
-#' @param M_data Data frame with columns: pid, age (and others)
-#' @param fits_params List of extracted parameters from Phase 1b
-#' @param sigma_for_stratification Which σ value to use (default: 1.0)
+#' For each σ_sum_w value from Phase 1b, this function:
+#'   1. Extracts weights (w) from the penalized model
+#'   2. Filters to participants with w > 0.5
+#'   3. Creates 16 age-stratified folds using the filtered subset
+#'   4. Saves fold assignments specific to that σ value
+#'
+#' @param M_data Data frame with columns: person_id (1:N), age, item_id, response
+#' @param fits_params List of extracted parameters from Phase 1b (length = number of σ values)
+#' @param weight_threshold Minimum weight for inclusion (default: 0.5)
 #' @param n_folds Number of folds (default: 16)
 #' @param output_dir Directory to save results
 #' @param create_plots Whether to create diagnostic plots (default: TRUE)
-#' @return Data frame with pid and fold assignment
-create_folds_phase2 <- function(M_data, fits_params,
-                                 sigma_for_stratification = 1.0,
-                                 n_folds = 16,
-                                 output_dir = "output/authenticity_cv",
-                                 create_plots = TRUE) {
+#' @return List with fold_metadata (sample sizes per σ)
+#'
+#' @details
+#' NOTE: M_data uses person_id (1:N) as unique identifier.
+#' This is created in 00_prepare_cv_data.R by mapping (pid, record_id) → person_id.
+create_folds_phase2_multi_sigma <- function(M_data, fits_params,
+                                             weight_threshold = 0.5,
+                                             n_folds = 16,
+                                             output_dir = "output/authenticity_cv",
+                                             create_plots = TRUE) {
 
   cat("\n")
   cat("================================================================================\n")
-  cat("  PHASE 2: Creating Stratified Folds\n")
+  cat("  PHASE 2: Creating σ-Specific Stratified Folds\n")
   cat("================================================================================\n")
   cat("\n")
 
-  # Find fit with closest sigma to target
+  # Extract σ values from fits_params
   sigma_values <- sapply(fits_params, function(x) x$sigma_sum_w)
-  idx <- which.min(abs(sigma_values - sigma_for_stratification))
-  sigma_used <- sigma_values[idx]
+  n_sigma <- length(sigma_values)
 
-  if (abs(sigma_used - sigma_for_stratification) > 0.01) {
-    warning(sprintf("Requested σ = %.3f not found. Using σ = %.3f instead.",
-                    sigma_for_stratification, sigma_used))
-  }
+  cat(sprintf("Configuration:\n"))
+  cat(sprintf("  Number of σ values: %d\n", n_sigma))
+  cat(sprintf("  σ range: %.3f to %.3f\n", min(sigma_values), max(sigma_values)))
+  cat(sprintf("  Weight threshold: w > %.2f\n", weight_threshold))
+  cat(sprintf("  Number of folds: %d\n\n", n_folds))
 
-  cat(sprintf("Using σ_sum_w = %.3f for stratification\n", sigma_used))
-  cat(sprintf("Creating %d folds\n\n", n_folds))
-
-  # Extract logitwgt and get unique person-level data
-  logitwgt_all <- fits_params[[idx]]$logitwgt
-  w_all <- fits_params[[idx]]$w
-
-  # Get unique PIDs with age
-  person_data <- M_data %>%
-    dplyr::group_by(pid) %>%
+  # Get unique person-level data (all participants)
+  # person_id is artificial (1:N), already unique
+  person_data_all <- M_data %>%
+    dplyr::group_by(person_id) %>%
     dplyr::summarise(
       age = dplyr::first(age),
       .groups = "drop"
     ) %>%
-    dplyr::arrange(pid)
+    dplyr::arrange(person_id)
 
-  if (length(logitwgt_all) != nrow(person_data)) {
-    stop(sprintf("Mismatch: %d logitwgt values but %d unique PIDs",
-                 length(logitwgt_all), nrow(person_data)))
-  }
+  N_total <- nrow(person_data_all)
+  cat(sprintf("Total person-level observations: N = %d\n\n", N_total))
 
-  # Add weights to person data
-  person_data$logitwgt <- logitwgt_all
-  person_data$w <- w_all
-
-  cat(sprintf("Person-level data:\n"))
-  cat(sprintf("  N = %d participants\n", nrow(person_data)))
-  cat(sprintf("  logitwgt: mean = %.3f, sd = %.3f, range = [%.3f, %.3f]\n",
-              mean(person_data$logitwgt), sd(person_data$logitwgt),
-              min(person_data$logitwgt), max(person_data$logitwgt)))
-  cat(sprintf("  w: mean = %.3f, sd = %.3f, range = [%.3f, %.3f]\n",
-              mean(person_data$w), sd(person_data$w),
-              min(person_data$w), max(person_data$w)))
-  cat(sprintf("  age: mean = %.2f, sd = %.2f, range = [%.2f, %.2f]\n",
-              mean(person_data$age), sd(person_data$age),
-              min(person_data$age), max(person_data$age)))
-  cat("\n")
-
-  # Create stratified folds
-  folds <- create_stratified_folds(
-    logitwgt = person_data$logitwgt,
-    age = person_data$age,
-    n_folds = n_folds
+  # Initialize metadata storage
+  fold_metadata <- data.frame(
+    sigma_idx = integer(),
+    sigma_sum_w = numeric(),
+    N_total = integer(),
+    N_filtered = integer(),
+    N_excluded = integer(),
+    pct_excluded = numeric()
   )
 
-  person_data$fold <- folds
+  # Loop over all σ values
+  for (sigma_idx in 1:n_sigma) {
+    sigma_sum_w <- sigma_values[sigma_idx]
 
-  # Compute fold diagnostics
-  fold_diagnostics <- person_data %>%
-    dplyr::group_by(fold) %>%
-    dplyr::summarise(
-      n = dplyr::n(),
-      mean_logitwgt = mean(logitwgt),
-      sd_logitwgt = sd(logitwgt),
-      mean_w = mean(w),
-      sd_w = sd(w),
-      n_excluded = sum(w < 0.1),
-      n_included = sum(w > 0.9),
-      mean_age = mean(age),
-      sd_age = sd(age),
-      .groups = "drop"
-    )
+    cat(sprintf("================================================================================\n"))
+    cat(sprintf("  Processing σ_sum_w = %.3f (index %d/%d)\n", sigma_sum_w, sigma_idx, n_sigma))
+    cat(sprintf("================================================================================\n\n"))
 
-  cat("\n")
-  cat("Fold diagnostics:\n")
-  print(fold_diagnostics, n = n_folds)
-  cat("\n")
+    # Extract weights for this σ
+    w_all <- fits_params[[sigma_idx]]$w
 
-  # Check balance
-  cat("Balance checks:\n")
-  cat(sprintf("  Fold size: %d to %d (ideal: %.0f)\n",
-              min(fold_diagnostics$n), max(fold_diagnostics$n),
-              nrow(person_data) / n_folds))
-  cat(sprintf("  Mean logitwgt: %.3f to %.3f (range: %.3f)\n",
-              min(fold_diagnostics$mean_logitwgt),
-              max(fold_diagnostics$mean_logitwgt),
-              diff(range(fold_diagnostics$mean_logitwgt))))
-  cat(sprintf("  Mean w: %.3f to %.3f (range: %.3f)\n",
-              min(fold_diagnostics$mean_w),
-              max(fold_diagnostics$mean_w),
-              diff(range(fold_diagnostics$mean_w))))
-  cat(sprintf("  Mean age: %.2f to %.2f (range: %.2f)\n",
-              min(fold_diagnostics$mean_age),
-              max(fold_diagnostics$mean_age),
-              diff(range(fold_diagnostics$mean_age))))
-  cat("\n")
-
-  # Save results
-  folds_file <- file.path(output_dir, "fold_assignments.rds")
-  diagnostics_file <- file.path(output_dir, "fold_diagnostics.rds")
-  person_data_file <- file.path(output_dir, "person_data_with_folds.rds")
-
-  # Just save fold vector (for easy merging)
-  fold_assignments <- data.frame(
-    pid = person_data$pid,
-    fold = person_data$fold
-  )
-
-  saveRDS(fold_assignments, folds_file)
-  saveRDS(fold_diagnostics, diagnostics_file)
-  saveRDS(person_data, person_data_file)
-
-  cat(sprintf("[OK] Saved fold assignments: %s\n", folds_file))
-  cat(sprintf("[OK] Saved diagnostics: %s\n", diagnostics_file))
-  cat(sprintf("[OK] Saved person data: %s\n", person_data_file))
-  cat("\n")
-
-  # Create diagnostic plots
-  if (create_plots) {
-    cat("Creating diagnostic plots...\n")
-
-    plots_dir <- file.path(output_dir, "plots")
-    if (!dir.exists(plots_dir)) {
-      dir.create(plots_dir, recursive = TRUE)
+    if (length(w_all) != N_total) {
+      stop(sprintf("Mismatch: %d weights from σ_idx=%d but %d PIDs in M_data",
+                   length(w_all), sigma_idx, N_total))
     }
 
-    # Plot 1: Distribution of logitwgt by fold
-    p1 <- ggplot2::ggplot(person_data, ggplot2::aes(x = factor(fold), y = logitwgt)) +
-      ggplot2::geom_boxplot(fill = "steelblue", alpha = 0.6) +
-      ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
-      ggplot2::labs(
-        title = "Distribution of logitwgt by Fold",
-        subtitle = sprintf("σ_sum_w = %.3f used for stratification", sigma_used),
-        x = "Fold",
-        y = "logitwgt"
-      ) +
-      ggplot2::theme_minimal()
+    # Add weights to person data
+    person_data <- person_data_all
+    person_data$w <- w_all
 
-    ggplot2::ggsave(file.path(plots_dir, "fold_logitwgt_distribution.png"),
-                    p1, width = 10, height = 6, dpi = 300)
+    # Filter to w > threshold
+    person_data_filtered <- person_data %>%
+      dplyr::filter(w > weight_threshold)
 
-    # Plot 2: Distribution of age by fold
-    p2 <- ggplot2::ggplot(person_data, ggplot2::aes(x = factor(fold), y = age)) +
-      ggplot2::geom_boxplot(fill = "darkgreen", alpha = 0.6) +
-      ggplot2::labs(
-        title = "Distribution of Age by Fold",
-        x = "Fold",
-        y = "Age (years)"
-      ) +
-      ggplot2::theme_minimal()
+    N_filtered <- nrow(person_data_filtered)
+    N_excluded <- N_total - N_filtered
+    pct_excluded <- 100 * N_excluded / N_total
 
-    ggplot2::ggsave(file.path(plots_dir, "fold_age_distribution.png"),
-                    p2, width = 10, height = 6, dpi = 300)
+    cat(sprintf("  Total participants: %d\n", N_total))
+    cat(sprintf("  w > %.2f: %d (%.1f%%)\n", weight_threshold, N_filtered,
+                100 * N_filtered / N_total))
+    cat(sprintf("  Excluded: %d (%.1f%%)\n\n", N_excluded, pct_excluded))
 
-    # Plot 3: Fold diagnostics (means)
-    p3_data <- fold_diagnostics %>%
-      tidyr::pivot_longer(
-        cols = c(mean_logitwgt, mean_w, mean_age),
-        names_to = "metric",
-        values_to = "value"
+    if (N_filtered < n_folds) {
+      stop(sprintf("ERROR: Only %d participants remain after filtering, but need at least %d for %d folds",
+                   N_filtered, n_folds, n_folds))
+    }
+
+    # Create age-stratified folds
+    # Sort by age and number off consecutively to ensure age balance
+    person_data_filtered <- person_data_filtered %>%
+      dplyr::arrange(age) %>%
+      dplyr::mutate(fold = rep(1:n_folds, length.out = N_filtered))
+
+    # Compute fold diagnostics
+    fold_diagnostics <- person_data_filtered %>%
+      dplyr::group_by(fold) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        mean_w = mean(w),
+        sd_w = sd(w),
+        min_w = min(w),
+        max_w = max(w),
+        mean_age = mean(age),
+        sd_age = sd(age),
+        min_age = min(age),
+        max_age = max(age),
+        .groups = "drop"
       )
 
-    p3 <- ggplot2::ggplot(p3_data, ggplot2::aes(x = factor(fold), y = value)) +
-      ggplot2::geom_col(fill = "coral", alpha = 0.7) +
-      ggplot2::facet_wrap(~ metric, scales = "free_y", ncol = 1) +
-      ggplot2::labs(
-        title = "Fold-Level Summary Statistics",
-        x = "Fold",
-        y = "Mean Value"
-      ) +
-      ggplot2::theme_minimal()
-
-    ggplot2::ggsave(file.path(plots_dir, "fold_summary_stats.png"),
-                    p3, width = 10, height = 8, dpi = 300)
-
-    cat(sprintf("[OK] Saved plots to: %s\n", plots_dir))
     cat("\n")
-  }
+    cat("Fold diagnostics:\n")
+    print(fold_diagnostics, n = n_folds)
+    cat("\n")
+
+    # Check balance
+    cat("Balance checks:\n")
+    cat(sprintf("  Fold size: %d to %d (ideal: %.0f)\n",
+                min(fold_diagnostics$n), max(fold_diagnostics$n),
+                N_filtered / n_folds))
+    cat(sprintf("  Mean w: %.3f to %.3f (range: %.3f)\n",
+                min(fold_diagnostics$mean_w),
+                max(fold_diagnostics$mean_w),
+                diff(range(fold_diagnostics$mean_w))))
+    cat(sprintf("  Mean age: %.2f to %.2f (range: %.2f)\n",
+                min(fold_diagnostics$mean_age),
+                max(fold_diagnostics$mean_age),
+                diff(range(fold_diagnostics$mean_age))))
+    cat("\n")
+
+    # Save results for this σ
+    folds_file <- file.path(output_dir, sprintf("fold_assignments_sigma_%d.rds", sigma_idx))
+    diagnostics_file <- file.path(output_dir, sprintf("fold_diagnostics_sigma_%d.rds", sigma_idx))
+    person_data_file <- file.path(output_dir, sprintf("person_data_sigma_%d.rds", sigma_idx))
+
+    # Save fold assignments (person_id, fold)
+    fold_assignments <- person_data_filtered %>%
+      dplyr::select(person_id, fold)
+
+    saveRDS(fold_assignments, folds_file)
+    saveRDS(fold_diagnostics, diagnostics_file)
+    saveRDS(person_data_filtered, person_data_file)
+
+    cat(sprintf("[OK] Saved fold assignments: %s\n", folds_file))
+    cat(sprintf("[OK] Saved diagnostics: %s\n", diagnostics_file))
+    cat(sprintf("[OK] Saved person data: %s\n\n", person_data_file))
+
+    # Store metadata
+    fold_metadata <- rbind(fold_metadata, data.frame(
+      sigma_idx = sigma_idx,
+      sigma_sum_w = sigma_sum_w,
+      N_total = N_total,
+      N_filtered = N_filtered,
+      N_excluded = N_excluded,
+      pct_excluded = pct_excluded
+    ))
+  }  # End loop over σ values
+
+  # Save overall metadata
+  metadata_file <- file.path(output_dir, "fold_metadata.rds")
+  saveRDS(fold_metadata, metadata_file)
+
+  cat("================================================================================\n")
+  cat("  SUMMARY: Fold Metadata Across All σ Values\n")
+  cat("================================================================================\n\n")
+  print(fold_metadata, row.names = FALSE)
+  cat("\n")
+  cat(sprintf("[OK] Saved metadata: %s\n\n", metadata_file))
 
   cat("================================================================================\n")
   cat("  PHASE 2 COMPLETE\n")
   cat("================================================================================\n")
-  cat("\n")
+  cat(sprintf("  Created %d sets of fold assignments (one per σ value)\n", n_sigma))
+  cat(sprintf("  Each set has %d folds\n", n_folds))
+  cat(sprintf("  Total files created: %d\n", n_sigma * 3 + 1))
+  cat("================================================================================\n\n")
 
-  return(fold_assignments)
+  return(fold_metadata)
 }
 
 
 # Example usage (commented out - run interactively)
+# M_data <- readRDS("data/temp/cv_M_data.rds")
 # fits_params <- readRDS("output/authenticity_cv/fits_full_penalty_params.rds")
-# fold_assignments <- create_folds_phase2(M_data, fits_params)
+# fold_metadata <- create_folds_phase2_multi_sigma(M_data, fits_params)

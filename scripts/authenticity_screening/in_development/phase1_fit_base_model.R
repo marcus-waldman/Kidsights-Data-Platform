@@ -54,16 +54,16 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
     cat(sprintf("[OK] Created output directory: %s\n", output_dir))
   }
 
-  # Get unique PIDs and map to 1:N
-  unique_pids <- unique(M_data$pid)
-  N <- length(unique_pids)
+  # Get unique person_ids and map to 1:N
+  unique_person_ids <- unique(M_data$person_id)
+  N <- length(unique_person_ids)
 
-  pid_map <- data.frame(
-    pid = unique_pids,
+  person_map <- data.frame(
+    person_id = unique_person_ids,
     new_id = 1:N
   )
 
-  M_data$ivec <- pid_map$new_id[match(M_data$pid, pid_map$pid)]
+  M_data$ivec <- person_map$new_id[match(M_data$person_id, person_map$person_id)]
 
   # Get age vector (one per person)
   age <- M_data %>%
@@ -93,7 +93,7 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
   cat("\n")
 
   # Compile model (if not already compiled)
-  model_file <- "models/authenticity_glmm_independent.stan"
+  model_file <- "models/authenticity_glmm.stan"
 
   if (!file.exists(model_file)) {
     stop(sprintf("Model file not found: %s", model_file))
@@ -112,7 +112,7 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
   fit0_full <- rstan::optimizing(
     stan_model,
     data = stan_data,
-    init = init,
+    init = 1,
     iter = iter,
     algorithm = algorithm,
     verbose = verbose,
@@ -154,8 +154,9 @@ fit_base_model <- function(M_data, J_data, output_dir = "output/authenticity_cv"
       tau = par[startsWith(names(par), "tau")],
       beta1 = par[startsWith(names(par), "beta1")],
       delta = par[startsWith(names(par), "delta")],
-      eta_psychosocial = par[startsWith(names(par), "eta") & endsWith(names(par),"1]")],
-      eta_developmental = par[startsWith(names(par), "eta") & endsWith(names(par),"2]")]
+      eta_psychosocial = par[startsWith(names(par), "eta[") & endsWith(names(par),"1]")],
+      eta_developmental = par[startsWith(names(par), "eta[") & endsWith(names(par),"2]")], 
+      eta_correlation =   par[names(par)=="eta_correlation"]
     )
   )
 

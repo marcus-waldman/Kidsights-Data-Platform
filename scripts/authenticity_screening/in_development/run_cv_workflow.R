@@ -11,7 +11,7 @@
 #   Phase 3:  Run 16-fold CV loop (144 total fits)
 #
 # INPUTS:
-#   - M_data: Response data (pid, item_id, response, age)
+#   - M_data: Response data (person_id, item_id, response, age)
 #   - J_data: Item metadata (item_id, K, dimension)
 #
 # OUTPUTS:
@@ -35,25 +35,24 @@ source("scripts/authenticity_screening/in_development/phase2_create_folds.R")
 source("scripts/authenticity_screening/in_development/phase3_cv_loop.R")
 source("scripts/authenticity_screening/in_development/00_prepare_cv_data.R")
 
-# Step 0: Prepare data (first time only)
-cv_data <- prepare_cv_data()
+# Step 0: Load pre-prepared data
+# NOTE: Data is automatically prepared when 00_prepare_cv_data.R is sourced above
+# (auto-execution block runs in non-interactive mode)
+M_data <- readRDS("data/temp/cv_M_data.rds")
+J_data <- readRDS("data/temp/cv_J_data.rds")
 
-# Inspect what you got:
-M_data <- cv_data$M_data
-J_data <- cv_data$J_data
-
-cat(sprintf("Participants: %d\n", length(unique(M_data$pid))))
+cat(sprintf("Participants: %d\n", length(unique(M_data$person_id))))
 cat(sprintf("Observations: %d\n", nrow(M_data)))
 cat(sprintf("Items: %d\n", nrow(J_data)))
-cat(sprintf("  - Psychosocial (dimension 1): %d items\n", sum(J_data$dimension == 1)))
-cat(sprintf("  - Developmental (dimension 2): %d items\n", sum(J_data$dimension == 2)))
+cat(sprintf("  - Psychosocial/Behavioral (dimension 1): %d items\n", sum(J_data$dimension == 1)))
+cat(sprintf("  - Developmental Skills (dimension 2): %d items\n", sum(J_data$dimension == 2)))
 
 #' Run Complete CV Workflow
 #'
 #' Executes all three phases of the cross-validation procedure to select
 #' optimal σ_sum_w hyperparameter.
 #'
-#' @param M_data Data frame with columns: pid, item_id, response, age
+#' @param M_data Data frame with columns: person_id, item_id, response, age
 #' @param J_data Data frame with columns: item_id, K (num categories), dimension
 #' @param sigma_grid Vector of σ_sum_w values to evaluate (default: 2^(seq(-1,1,by=0.25)))
 #' @param lambda_skew Skewness penalty strength (default: 1.0, fixed)
@@ -74,12 +73,12 @@ cat(sprintf("  - Developmental (dimension 2): %d items\n", sum(J_data$dimension 
 #' @param skip_phase2 Skip Phase 2 if already run (default: FALSE)
 #' @return List with optimal_sigma, cv_summary, and paths to all outputs
 run_complete_cv_workflow <- function(M_data, J_data,
-                                      sigma_grid = 2^(seq(-1, 1, by = 0.25)),
+                                      sigma_grid = 2^(seq(-2, 2, len = 16)),
                                       lambda_skew = 1.0,
-                                      n_folds = 16,
+                                      n_folds = 2,
                                       output_dir = "output/authenticity_cv",
                                       iter = 10000, algorithm = "LBFGS",
-                                      verbose = FALSE, refresh = 0, history_size = 500,
+                                      verbose = TRUE, refresh = 20, history_size = 500,
                                       tol_obj = 1e-12, tol_rel_obj = 1, tol_grad = 1e-8,
                                       tol_rel_grad = 1e3, tol_param = 1e-8,
                                       skip_phase1 = FALSE,
@@ -107,7 +106,7 @@ run_complete_cv_workflow <- function(M_data, J_data,
   cat("\n")
 
   cat("Data summary:\n")
-  cat(sprintf("  Participants: %d unique PIDs\n", length(unique(M_data$pid))))
+  cat(sprintf("  Participants: %d unique person_ids\n", length(unique(M_data$person_id))))
   cat(sprintf("  Observations: %d total responses\n", nrow(M_data)))
   cat(sprintf("  Items: %d total items\n", nrow(J_data)))
   cat(sprintf("  Age range: %.2f to %.2f years\n",
@@ -134,16 +133,16 @@ run_complete_cv_workflow <- function(M_data, J_data,
       J_data = J_data,
       output_dir = output_dir,
       init =0,
-      iter = 10000,
-      algorithm = "LBFGS",
-      verbose = TRUE,
-      refresh = 20,
-      history_size = 500,
-      tol_obj = 1e-12,
-      tol_rel_obj = 1,
-      tol_grad = 1e-8,
-      tol_rel_grad = 1e3,
-      tol_param = 1e-8
+      iter = iter,
+      algorithm = algorithm,
+      verbose = verbose,
+      refresh = refresh,
+      history_size = history_size,
+      tol_obj = tol_obj,
+      tol_rel_obj = tol_rel_obj,
+      tol_grad = tol_grad,
+      tol_rel_grad = tol_rel_grad,
+      tol_param = tol_param
     )
 
     fit0_params <- readRDS(file.path(output_dir, "fit0_params.rds"))
@@ -173,7 +172,7 @@ run_complete_cv_workflow <- function(M_data, J_data,
       sigma_grid = sigma_grid,
       lambda_skew = lambda_skew,
       output_dir = output_dir,
-      iter = iter,
+      iter = 2000,
       algorithm = algorithm,
       verbose = verbose,
       refresh = refresh,
@@ -184,8 +183,6 @@ run_complete_cv_workflow <- function(M_data, J_data,
       tol_rel_grad = tol_rel_grad,
       tol_param = tol_param
     )
-
-    fits_params <- phase1b_results$params
 
   } else {
     cat("\n")
@@ -211,7 +208,7 @@ run_complete_cv_workflow <- function(M_data, J_data,
       sigma_grid = sigma_grid,
       output_dir = output_dir,
       weight_threshold = 0.5,
-      eta_threshold = 3.0
+      eta_threshold_prob = 0.99
     )
 
     # Optionally halt workflow if sanity check fails
@@ -230,18 +227,18 @@ run_complete_cv_workflow <- function(M_data, J_data,
   }
 
   # ============================================================================
-  # PHASE 2: Create Stratified Folds
+  # PHASE 2: Create σ-Specific Stratified Folds
   # ============================================================================
 
   if (!skip_phase2) {
     cat("\n")
-    cat("*** STARTING PHASE 2: Stratified Folds ***\n")
+    cat("*** STARTING PHASE 2: σ-Specific Stratified Folds ***\n")
     cat("\n")
 
-    fold_assignments <- create_folds_phase2(
+    fold_metadata <- create_folds_phase2_multi_sigma(
       M_data = M_data,
       fits_params = fits_params,
-      sigma_for_stratification = 1.0,
+      weight_threshold = 0.5,
       n_folds = n_folds,
       output_dir = output_dir,
       create_plots = TRUE
@@ -249,28 +246,28 @@ run_complete_cv_workflow <- function(M_data, J_data,
 
   } else {
     cat("\n")
-    cat("*** SKIPPING PHASE 2 (loading existing results) ***\n")
+    cat("*** SKIPPING PHASE 2 (will load σ-specific folds in Phase 3) ***\n")
     cat("\n")
 
-    fold_assignments <- readRDS(file.path(output_dir, "fold_assignments.rds"))
-    cat("[OK] Loaded Phase 2 results\n\n")
+    fold_metadata <- readRDS(file.path(output_dir, "fold_metadata.rds"))
+    cat("[OK] Loaded Phase 2 metadata\n\n")
   }
 
   # ============================================================================
-  # PHASE 3: Cross-Validation Loop
+  # PHASE 3: Cross-Validation Loop (REFACTORED)
   # ============================================================================
 
   cat("\n")
-  cat("*** STARTING PHASE 3: CV Loop ***\n")
+  cat("*** STARTING PHASE 3: CV Loop (Integrated Likelihood) ***\n")
   cat("\n")
 
   cv_results <- run_cv_loop(
     M_data = M_data,
     J_data = J_data,
-    fold_assignments = fold_assignments,
     fits_params = fits_params,
     sigma_grid = sigma_grid,
-    lambda_skew = lambda_skew,
+    weight_threshold = 0.5,
+    integrate_training = TRUE,  # DEFAULT: Use integrated likelihood
     n_folds = n_folds,
     output_dir = output_dir,
     iter = iter,
@@ -345,25 +342,21 @@ run_complete_cv_workflow <- function(M_data, J_data,
 }
 
 
-# ################################################################################
-# # EXAMPLE USAGE
-# ################################################################################
-#
-# # Load data
-# M_data <- read.csv("data/responses.csv")  # pid, item_id, response, age
-# J_data <- read.csv("data/items.csv")      # item_id, K, dimension
-#
-# # Run complete workflow
-# results <- run_complete_cv_workflow(
-#   M_data = M_data,
-#   J_data = J_data,
-#   output_dir = "output/authenticity_cv"
-# )
-#
-# # Inspect results
-# print(results$optimal_sigma)
-# print(results$cv_summary)
-#
+################################################################################
+# EXAMPLE USAGE
+################################################################################
+
+# Run complete workflow
+results <- run_complete_cv_workflow(
+  M_data = M_data,
+  J_data = J_data,
+  output_dir = "output/authenticity_cv"
+)
+
+# Inspect results
+print(results$optimal_sigma)
+print(results$cv_summary)
+
 # # To skip already-completed phases (for iterating on Phase 3):
 # results <- run_complete_cv_workflow(
 #   M_data = M_data,

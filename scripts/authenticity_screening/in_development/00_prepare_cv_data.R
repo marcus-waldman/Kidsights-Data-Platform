@@ -6,13 +6,20 @@
 #' cross-validation workflow. It creates M_data (response-level) and J_data
 #' (item-level metadata) in the format expected by run_cv_workflow.R.
 #'
+#' Inclusion criteria:
+#'   - eligible = TRUE (pass CID2-5: consent, caregiver, child age, Nebraska)
+#'   - Includes both authentic and inauthentic participants (CID6, CID7 failures)
+#'   - Expected N ≈ 3,507 participants (2,635 authentic + 872 inauthentic)
+#'
 #' Data sources:
-#'   - M_data: From ne25_calibration table (or raw calibration preparation)
+#'   - M_data: From ne25_transformed table (eligible participants)
 #'   - J_data: From codebook.json item metadata
 #'
 #' Outputs:
-#'   - data/temp/cv_M_data.rds: Response data (pid, item_id, response, age)
+#'   - data/temp/cv_M_data.rds: Response data (person_id, item_id, response, age)
+#'       * NOTE: 'person_id' is artificial (1:N) representing unique (pid, record_id) pairs
 #'   - data/temp/cv_J_data.rds: Item metadata (item_id, K, dimension)
+#'   - data/temp/cv_person_map.rds: Mapping from person_id back to original (pid, record_id)
 #'
 #' Usage:
 #'   source("scripts/authenticity_screening/in_development/00_prepare_cv_data.R")
@@ -30,12 +37,10 @@ source("R/utils/safe_joins.R")
 #' @param db_path Path to DuckDB database
 #' @param codebook_path Path to codebook.json
 #' @param output_dir Directory to save prepared data
-#' @param use_authentic_only If TRUE, only include authentic participants (default: TRUE)
 #' @return List with M_data and J_data
 prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
                              codebook_path = "codebook/data/codebook.json",
-                             output_dir = "data/temp",
-                             use_authentic_only = TRUE) {
+                             output_dir = "data/temp") {
 
   cat("\n")
   cat("================================================================================\n")
@@ -128,10 +133,16 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
       next
     }
 
-    # Create dimension indicator (matching line 144-151 of 01_prepare_data.R)
-    # 1 = psychosocial_problems_general
-    # 2 = developmental (motor, coglan, socemo)
-    dimension <- if (grepl("psychosocial", domain_value, ignore.case = TRUE)) 1L else 2L
+    # Create dimension indicator
+    # 1 = psychosocial/behavioral problems (psychosocial_problems_general, socemo)
+    # 2 = developmental skills (motor, coglan)
+    dimension <- if (domain_value %in% c("psychosocial_problems_general", "socemo")) {
+      1L
+    } else if (domain_value %in% c("motor", "coglan")) {
+      2L
+    } else {
+      NA_integer_  # Unknown domain - will be filtered out
+    }
 
     J_data_list[[equate_name]] <- data.frame(
       item_id = equate_name,  # Use equate name as item_id
@@ -149,9 +160,9 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
     dplyr::filter(!is.na(dimension))
 
   cat(sprintf("[Extracted] J_data: %d calibration items\n", nrow(J_data)))
-  cat(sprintf("  - Dimension 1 (Psychosocial): %d items\n",
+  cat(sprintf("  - Dimension 1 (Psychosocial/Behavioral): %d items\n",
               sum(J_data$dimension == 1)))
-  cat(sprintf("  - Dimension 2 (Developmental): %d items\n",
+  cat(sprintf("  - Dimension 2 (Developmental Skills): %d items\n",
               sum(J_data$dimension == 2)))
   cat("\n")
 
@@ -176,21 +187,29 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
 
   cat("=== STEP 4: EXTRACT RESPONSE DATA ===\n\n")
 
-  # Query ne25_transformed (matching 01_prepare_data.R)
+  # Query ne25_transformed
+  # Filter: eligible = TRUE only (pass CID2-5: consent, caregiver, child age, Nebraska)
+  # Includes both authentic and inauthentic participants (CID6, CID7 failures)
   cat("[Source] ne25_transformed table\n")
+  cat("[Filter] eligible = TRUE (basic eligibility: CID2-5)\n")
+  cat("         Includes all authenticity patterns (CID6, CID7 pass/fail)\n\n")
 
-  query <- if (use_authentic_only) {
-    "SELECT *, age_in_days / 365.25 AS age_years
-     FROM ne25_transformed
-     WHERE eligible = TRUE AND authentic = TRUE"
-  } else {
-    "SELECT *, age_in_days / 365.25 AS age_years
-     FROM ne25_transformed
-     WHERE eligible = TRUE"
-  }
+  query <- "SELECT *, age_in_days / 365.25 AS age_years
+           FROM ne25_transformed
+           WHERE eligible = TRUE"
 
   ne25_data <- DBI::dbGetQuery(con, query)
-  cat(sprintf("[Loaded] %d participants\n", nrow(ne25_data)))
+
+  # Report authenticity breakdown
+  n_total <- nrow(ne25_data)
+  n_authentic <- sum(ne25_data$authentic == TRUE, na.rm = TRUE)
+  n_inauthentic <- sum(ne25_data$authentic == FALSE, na.rm = TRUE)
+
+  cat(sprintf("[Loaded] %d participants\n", n_total))
+  cat(sprintf("  - Authentic (pass CID6 & CID7): %d (%.1f%%)\n",
+              n_authentic, 100 * n_authentic / n_total))
+  cat(sprintf("  - Inauthentic (fail CID6 or CID7): %d (%.1f%%)\n",
+              n_inauthentic, 100 * n_inauthentic / n_total))
 
   # Get NE25 column names from item metadata
   ne25_columns <- J_data$ne25_name
@@ -214,38 +233,76 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
   ne25_items <- ne25_data %>%
     dplyr::select(pid, record_id, age_years, dplyr::all_of(J_data$ne25_name))
 
-  # Create unique person identifier (pid + record_id combination)
-  # This is needed because same pid can have multiple survey completions
-  person_lookup <- ne25_items %>%
-    dplyr::select(pid, record_id) %>%
-    dplyr::distinct() %>%
-    dplyr::arrange(pid, record_id) %>%
-    dplyr::mutate(person_id = dplyr::row_number())
-
-  cat(sprintf("[Person IDs] Created %d unique person_ids from %d unique PIDs\n\n",
-              nrow(person_lookup), length(unique(person_lookup$pid))))
-
-  # Convert to long format (M_data)
-  M_data <- ne25_items %>%
+  # Convert to long format and filter to people with at least one valid response
+  # NOTE: Some eligible participants may have all NA responses and will be excluded
+  ne25_long <- ne25_items %>%
     tidyr::pivot_longer(
       cols = dplyr::all_of(J_data$ne25_name),
       names_to = "ne25_name",
       values_to = "response"
     ) %>%
-    dplyr::filter(!is.na(response)) %>%  # Remove missing responses
+    dplyr::filter(!is.na(response))  # Remove missing responses
+
+  cat(sprintf("[Response filtering] Started with %d eligible participants\n",
+              nrow(ne25_data)))
+
+  # Get unique (pid, record_id) combinations that have at least one response
+  persons_with_data <- ne25_long %>%
+    dplyr::select(pid, record_id) %>%
+    dplyr::distinct()
+
+  cat(sprintf("[Response filtering] %d have at least one valid response\n",
+              nrow(persons_with_data)))
+  cat(sprintf("                     %d excluded (all NA responses)\n\n",
+              nrow(ne25_data) - nrow(persons_with_data)))
+
+  # Create unique person identifier (pid + record_id combination)
+  # CRITICAL: pid alone does NOT uniquely identify participants!
+  # Only include people with actual response data
+  person_lookup <- persons_with_data %>%
+    dplyr::select(pid, record_id) %>%
+    dplyr::distinct() %>%
+    dplyr::arrange(pid, record_id) %>%
+    dplyr::mutate(person_id = dplyr::row_number())
+
+  n_unique_persons <- nrow(person_lookup)
+  n_unique_pids <- length(unique(person_lookup$pid))
+
+  cat(sprintf("[Person IDs] Created %d unique person_ids from %d participants with data\n",
+              n_unique_persons, n_unique_persons))
+  cat(sprintf("  - Original unique PIDs: %d\n", n_unique_pids))
+  cat(sprintf("  - Mean responses per PID: %.1f\n\n", n_unique_persons / n_unique_pids))
+
+  # Convert to M_data format
+  # NOTE: Final M_data uses person_id (1:N) as unique identifier (NOT renamed)
+  M_data <- ne25_long %>%
     safe_left_join(
       J_data %>% dplyr::select(ne25_name, item_id),
       by_vars = "ne25_name"
     ) %>%
     safe_left_join(
       person_lookup,
+      by_vars = c("pid", "record_id")  # Join on BOTH to get unique person_id
+    ) %>%
+    safe_left_join(
+      ne25_items %>% dplyr::select(pid, record_id, age_years),
       by_vars = c("pid", "record_id")
     ) %>%
-    dplyr::select(pid = person_id, item_id, response, age = age_years)
+    dplyr::select(person_id, item_id, response, age = age_years)  # Keep as person_id
+
+  # Validate person_id mapping
+  if (any(is.na(M_data$person_id))) {
+    stop("ERROR: Some observations failed to get person_id assignment. Check pid+record_id join.")
+  }
+
+  if (length(unique(M_data$person_id)) != n_unique_persons) {
+    stop(sprintf("ERROR: M_data has %d unique person_ids but person_lookup has %d",
+                 length(unique(M_data$person_id)), n_unique_persons))
+  }
 
   cat(sprintf("\n[M_data] Response-level data:\n"))
   cat(sprintf("  - %d unique persons (consecutive IDs 1:%d)\n",
-              length(unique(M_data$pid)), max(M_data$pid)))
+              length(unique(M_data$person_id)), max(M_data$person_id)))
   cat(sprintf("  - %d total observations\n", nrow(M_data)))
   cat(sprintf("  - %d unique items\n", length(unique(M_data$item_id))))
   cat(sprintf("  - Age range: %.2f to %.2f years\n",
@@ -266,9 +323,9 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
     dplyr::filter(item_id %in% items_in_data)
 
   cat(sprintf("[Aligned] J_data: %d items with responses\n", nrow(J_data)))
-  cat(sprintf("  - Dimension 1 (Psychosocial): %d items\n",
+  cat(sprintf("  - Dimension 1 (Psychosocial/Behavioral): %d items\n",
               sum(J_data$dimension == 1)))
-  cat(sprintf("  - Dimension 2 (Developmental): %d items\n",
+  cat(sprintf("  - Dimension 2 (Developmental Skills): %d items\n",
               sum(J_data$dimension == 2)))
   cat("\n")
 
@@ -293,7 +350,7 @@ prepare_cv_data <- function(db_path = "data/duckdb/kidsights_local.duckdb",
       item_map,
       by_vars = c("item_id" = "equate_name")
     ) %>%
-    dplyr::select(pid, item_id = item_id_int, response, age)
+    dplyr::select(person_id, item_id = item_id_int, response, age)
 
   # Update J_data with integer item_id
   J_data_final <- item_map %>%
