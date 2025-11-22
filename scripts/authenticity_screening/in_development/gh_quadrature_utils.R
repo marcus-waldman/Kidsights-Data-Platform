@@ -211,7 +211,7 @@ prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh) {
   stan_data <- list(
     # Training data
     M_train = nrow(M_train),
-    N_train = length(train_pids),
+    N_train = length(train_person_ids),
     J = nrow(J_data),
     ivec_train = M_train$ivec,
     jvec_train = M_train$item_id,
@@ -220,7 +220,7 @@ prepare_cv_stan_data <- function(M_data, J_data, folds, holdout_fold, gh) {
 
     # Holdout data
     M_holdout = nrow(M_holdout),
-    N_holdout = length(holdout_pids),
+    N_holdout = length(holdout_person_ids),
     ivec_holdout = M_holdout$ivec,
     jvec_holdout = M_holdout$item_id,
     yvec_holdout = M_holdout$response,
