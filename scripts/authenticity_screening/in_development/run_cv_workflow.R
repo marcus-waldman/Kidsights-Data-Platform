@@ -184,6 +184,9 @@ run_complete_cv_workflow <- function(M_data, J_data,
       tol_param = tol_param
     )
 
+    # Load the saved fits_params for downstream use
+    fits_params <- readRDS(file.path(output_dir, "fits_full_penalty_params.rds"))
+
   } else {
     cat("\n")
     cat("*** SKIPPING PHASE 1b (loading existing results) ***\n")

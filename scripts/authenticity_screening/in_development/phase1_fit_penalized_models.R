@@ -41,7 +41,7 @@ source("scripts/authenticity_screening/in_development/gh_quadrature_utils.R")
 #' @param n_parallel Number of models to fit in parallel (default: 9 for all)
 #' @return List of Stan fit objects (one per σ value)
 fit_penalized_models <- function(M_data, J_data, fit0_params,
-                                  sigma_grid = 2^(seq(-1, 1, by = 0.25)),
+                                  sigma_grid,
                                   lambda_skew = 1.0,
                                   output_dir = "output/authenticity_cv",
                                   iter = 10000, algorithm = "LBFGS",
@@ -55,11 +55,6 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
   cat("  PHASE 1b: Fitting Penalized Models (σ_sum_w Grid)\n")
   cat("================================================================================\n")
   cat("\n")
-
-  # Validate sigma grid
-  if (length(sigma_grid) != 9) {
-    warning(sprintf("Expected 9 sigma values, got %d. Proceeding anyway.", length(sigma_grid)))
-  }
 
   cat(sprintf("σ_sum_w grid (%d values): ", length(sigma_grid)))
   cat(paste(sprintf("%.3f", sigma_grid), collapse = ", "))
