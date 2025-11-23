@@ -151,8 +151,16 @@ run_sanity_check <- function(fit0_params, fits_params, sigma_grid,
     cor_w_mahal <- cor(w, mahal_dist, use = "complete.obs")
 
     # Extract skewness diagnostics from params (before creating plots)
-    z_skewness <- params$z_skewness_final
-    skewness_weighted <- params$skewness_weighted_final
+    # Check if skewness diagnostics exist (backwards compatibility)
+    has_skewness <- !is.null(params$z_skewness_final) && length(params$z_skewness_final) > 0
+
+    if (has_skewness) {
+      z_skewness <- params$z_skewness_final
+      skewness_weighted <- params$skewness_weighted_final
+    } else {
+      z_skewness <- NA
+      skewness_weighted <- NA
+    }
 
     # Add to summary table
     diagnostic_summary <- rbind(diagnostic_summary, data.frame(
@@ -255,48 +263,52 @@ run_sanity_check <- function(fit0_params, fits_params, sigma_grid,
     ggsave(plot_file, p, width = 8, height = 7, dpi = 150)
 
     # =========================================================================
-    # SKEWNESS PENALTY DIAGNOSTIC PLOT
+    # SKEWNESS PENALTY DIAGNOSTIC PLOT (only if diagnostics available)
     # =========================================================================
 
-    # Extract t_std_soft from params (z_skewness and skewness_weighted already extracted above)
-    t_std_soft <- params$t_std_soft_final
+    if (has_skewness) {
+      # Extract t_std_soft from params (z_skewness and skewness_weighted already extracted above)
+      t_std_soft <- params$t_std_soft_final
 
-    # Create histogram of soft-clipped standardized t-statistics
-    hist_data <- data.frame(t_std_soft = t_std_soft)
+      # Create histogram of soft-clipped standardized t-statistics
+      hist_data <- data.frame(t_std_soft = t_std_soft)
 
-    # Generate N(0,1) density curve for overlay
-    x_range <- seq(-4, 4, length.out = 200)
-    normal_density <- data.frame(
-      x = x_range,
-      y = dnorm(x_range, mean = 0, sd = 1)
-    )
-
-    p_skew <- ggplot(hist_data, aes(x = t_std_soft)) +
-      geom_histogram(aes(y = after_stat(density)), bins = 50,
-                     fill = "steelblue", alpha = 0.6, color = "white") +
-      geom_line(data = normal_density, aes(x = x, y = y),
-                color = "red", linewidth = 1, linetype = "dashed") +
-      geom_vline(xintercept = 0, color = "black", linewidth = 0.8, linetype = "solid") +
-      labs(
-        title = sprintf("Skewness Penalty Diagnostic: \u03c3_sum_w = %.3f", sigma_sum_w),
-        subtitle = sprintf(
-          "Weighted skewness: %.4f | z-score: %.3f | Mean t: %.3f",
-          skewness_weighted, z_skewness, mean(t_std_soft)
-        ),
-        x = "Soft-Clipped Standardized t-Statistic (t_std_soft_final)",
-        y = "Density",
-        caption = "Red dashed line: N(0,1) expected under symmetry | Vertical line: perfect symmetry (t=0)"
-      ) +
-      theme_minimal() +
-      theme(
-        plot.title = element_text(face = "bold"),
-        plot.subtitle = element_text(size = 9),
-        plot.caption = element_text(size = 8, hjust = 0)
+      # Generate N(0,1) density curve for overlay
+      x_range <- seq(-4, 4, length.out = 200)
+      normal_density <- data.frame(
+        x = x_range,
+        y = dnorm(x_range, mean = 0, sd = 1)
       )
 
-    # Save skewness diagnostic plot
-    skew_plot_file <- file.path(plots_dir, sprintf("phase1c_skewness_sigma_%.3f.png", sigma_sum_w))
-    ggsave(skew_plot_file, p_skew, width = 8, height = 6, dpi = 150)
+      p_skew <- ggplot(hist_data, aes(x = t_std_soft)) +
+        geom_histogram(aes(y = after_stat(density)), bins = 50,
+                       fill = "steelblue", alpha = 0.6, color = "white") +
+        geom_line(data = normal_density, aes(x = x, y = y),
+                  color = "red", linewidth = 1, linetype = "dashed") +
+        geom_vline(xintercept = 0, color = "black", linewidth = 0.8, linetype = "solid") +
+        labs(
+          title = sprintf("Skewness Penalty Diagnostic: \u03c3_sum_w = %.3f", sigma_sum_w),
+          subtitle = sprintf(
+            "Weighted skewness: %.4f | z-score: %.3f | Mean t: %.3f",
+            skewness_weighted, z_skewness, mean(t_std_soft)
+          ),
+          x = "Soft-Clipped Standardized t-Statistic (t_std_soft_final)",
+          y = "Density",
+          caption = "Red dashed line: N(0,1) expected under symmetry | Vertical line: perfect symmetry (t=0)"
+        ) +
+        theme_minimal() +
+        theme(
+          plot.title = element_text(face = "bold"),
+          plot.subtitle = element_text(size = 9),
+          plot.caption = element_text(size = 8, hjust = 0)
+        )
+
+      # Save skewness diagnostic plot
+      skew_plot_file <- file.path(plots_dir, sprintf("phase1c_skewness_sigma_%.3f.png", sigma_sum_w))
+      ggsave(skew_plot_file, p_skew, width = 8, height = 6, dpi = 150)
+    } else {
+      skew_plot_file <- NULL  # No skewness plot for old fits
+    }
 
     cat(sprintf("  Low weight (w < %.2f): %d / %d (%.1f%%)\n",
                 weight_threshold, n_low_weight, N, 100 * n_low_weight / N))
@@ -306,10 +318,18 @@ run_sanity_check <- function(fit0_params, fits_params, sigma_grid,
     cat(sprintf("  Precision (D > %.1f | w < %.2f): %.1f%%\n",
                 eta_threshold, weight_threshold, 100 * precision))
     cat(sprintf("  Correlation (w, D_robust): %.3f\n", cor_w_mahal))
-    cat(sprintf("  Weighted skewness: %.4f (z-score: %.3f)\n", skewness_weighted, z_skewness))
+
+    if (has_skewness) {
+      cat(sprintf("  Weighted skewness: %.4f (z-score: %.3f)\n", skewness_weighted, z_skewness))
+    }
+
     cat(sprintf("  [OK] Saved plots:\n"))
     cat(sprintf("      - %s\n", basename(plot_file)))
-    cat(sprintf("      - %s\n", basename(skew_plot_file)))
+
+    if (has_skewness && !is.null(skew_plot_file)) {
+      cat(sprintf("      - %s\n", basename(skew_plot_file)))
+    }
+
     cat("\n")
   }
 
