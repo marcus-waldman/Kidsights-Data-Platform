@@ -287,7 +287,11 @@ fit_penalized_models <- function(M_data, J_data, fit0_params,
       w = fit$par[startsWith(names(fit$par), "w[")],
       sum_w = fit$par["sum_weight"],
       n_excluded = fit$par["n_excluded"],
-      n_included = fit$par["n_included"]
+      n_included = fit$par["n_included"],
+      # Skewness penalty diagnostics
+      t_std_soft_final = fit$par[startsWith(names(fit$par), "t_std_soft_final")],
+      z_skewness_final = fit$par["z_skewness_final"],
+      skewness_weighted_final = fit$par["skewness_weighted_final"]
     )
   })
 
