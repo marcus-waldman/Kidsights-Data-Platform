@@ -227,7 +227,7 @@ data %>%
 ```
 
 **Why This Matters:**
-- Detects overlapping column names (like `eligible`, `authentic`) before joining
+- Detects overlapping column names (like `eligible`, `data_quality`) before joining
 - Auto-fixes collisions by removing duplicate columns from right table with warnings
 - Validates row count doesn't change (catches many-to-many joins)
 - Prevents `.x`/`.y` suffix confusion (e.g., `eligible.x` vs `eligible.y`)
@@ -435,10 +435,11 @@ pip install pyreadstat
 - **Reliability:** 100% success rate (eliminated segmentation faults)
 - **Data:** 3,908 records from 4 REDCap projects
 - **Derived Variables:** 99 variables created by recode_it()
-- **Authenticity Screening:** IRT-based response pattern analysis integrated (Step 6.5)
-  - 2,643 authentic participants (weight = 1.0)
-  - 196 inauthentic participants with normalized weights (0.42-1.96, sum = 196)
-  - `meets_inclusion` filter: 2,831 participants for imputation (eligible + non-NA weights)
+- **Influential Observations:** MANUAL workflow (Step 6.5 joins influence diagnostics from database if available)
+  - Diagnostics stored in `ne25_flagged_observations` table (must be created manually via Cook's Distance analysis)
+  - See `scripts/influence_diagnostics/README.md` for influence diagnostics workflow
+  - Pipeline creates `influential` column (TRUE if observation manually identified as high-leverage)
+  - Pipeline creates `overall_influence_cutoff` column (influence score threshold used for flagging)
 - **Storage:** Local DuckDB with 11 tables, 7,812 records
 
 ### ✅ ACS Pipeline - Complete
@@ -562,3 +563,4 @@ pip install pyreadstat
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
 *Updated: January 2025 | Version: 3.4.0*
+- pid does not uniquely identify an individual in the nebraska 2025 (ne25) data. It is the pid + record_id combination.
