@@ -1,13 +1,13 @@
 main_model <- rstan::stan_model("models/authenticity_glmm_beta_sumprior_stable.stan")
 stan_data_full <- readRDS("data/temp/stan_data_authentic.rds")
 stan_data_full$lambda_skew = 1
-stan_data_full$sigma_sum_w = 1
+stan_data_full$sigma_sum_w = .5
 
 fit_full <- rstan::optimizing(
   object = main_model,
   data = stan_data_full,
   init =0,
-  iter = 1000,
+  iter = 10000,
   algorithm = "LBFGS",
   verbose = TRUE,
   refresh = 20,
@@ -27,7 +27,7 @@ w_raw <- fit_full$par[w_raw_indices]
 w <- w_raw  # Rescale to sum = N
 
 library(tidyverse)
-ggplot(data.frame(wgt = w), aes(wgt)) + stat_ecdf(geom= "point")
+ggplot(data.frame(wgt = w), aes(wgt)) + stat_ecdf(geom= "point") + labs(title = "labmda_wgt = 2")
 
 # Summary statistics
 cat("\n")

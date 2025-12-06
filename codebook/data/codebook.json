@@ -3294,7 +3294,7 @@
         72
       ],
       "scoring": {
-        "reverse": false
+        "reverse": true
       },
       "psychometric": {
         "calibration_item": true,
@@ -3327,14 +3327,16 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
       ],
-      "reverse_coded": {
-        "ne25": true
-      }
+      "reverse_coded": false
     },
     "AA57": {
       "id": 37,
@@ -19764,7 +19766,7 @@
         72
       ],
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": 30
       },
       "psychometric": {
@@ -19801,14 +19803,16 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
       ],
-      "reverse_coded": {
-        "ne25": true
-      }
+      "reverse_coded": false
     },
     "EG30e": {
       "id": 197,
@@ -19857,7 +19861,7 @@
         72
       ],
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": 30
       },
       "psychometric": {
@@ -19894,14 +19898,16 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
       ],
-      "reverse_coded": {
-        "ne25": true
-      }
+      "reverse_coded": false
     },
     "EG30f": {
       "id": 198,
@@ -21767,7 +21773,7 @@
         72
       ],
       "scoring": {
-        "reverse": false,
+        "reverse": true,
         "equate_group": 39,
         "reverse_by_study": {
           "cahmi22": false
@@ -21801,7 +21807,11 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
@@ -21821,7 +21831,8 @@
             "emerging": 2
           }
         }
-      }
+      },
+      "reverse_coded": true
     },
     "EG39b": {
       "id": 218,
@@ -22268,11 +22279,16 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
-      ]
+      ],
+      "reverse_coded": true
     },
     "EG42a": {
       "id": 223,
@@ -23063,7 +23079,11 @@
       },
       "metadata": {
         "added_date": "2025-10-01",
-        "modified_date": "2025-10-01"
+        "modified_date": "2025-12-02",
+        "reverse_coding_correction": {
+          "date": "2025-12-02",
+          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+        }
       },
       "instruments": [
         "Kidsights Measurement Tool"
