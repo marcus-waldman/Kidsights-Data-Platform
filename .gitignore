@@ -123,3 +123,13 @@ exports/
 
 # Goodsync metadata
 _gsdata_/
+
+# Build artifacts and output files
+*.html
+*.pdf
+output/
+R/authenticity_screening/
+
+# Todo archive artifacts
+todo/archive.zip
+todo/kidsights-calibration/
