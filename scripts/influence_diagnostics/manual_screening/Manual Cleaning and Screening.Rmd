@@ -1,0 +1,1544 @@
+---
+title: "Manual Screening and Cleaning"
+author: "Marcus Waldman"
+date: "2025-12-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+
+### Stage 1: Ensure all reverse coding is applied and applied correctly
+
+
+
+* Fit Model 1a (fit in Mplus): Within each domain, all loadings are set to be equal
+```{r model1a}
+library(tidyverse)
+library(MplusAutomation)
+
+source("scripts/authenticity_screening/manual_screening/00_load_item_response_data.R")
+
+# Obtain wide item response dataset
+out_list_00<-load_stage1_data()
+wide_dat = out_list_00$wide_data
+person_dat = out_list_00$person_data
+item_metadata = out_list_00$item_metadata
+
+mplus_dat = wide_dat %>%
+  safe_left_join(person_dat %>% dplyr::select(pid,recordid,female,years), by_vars = c("pid","recordid")) %>% 
+  dplyr::mutate(
+    female = as.integer(female), 
+    logyrs = log(years + 1),
+    femXyrs = female*years
+  ) %>% 
+  dplyr::relocate(pid,recordid,female,years,femXyrs,logyrs)
+
+if(FALSE){
+MplusAutomation::prepareMplusData(
+  mplus_dat, 
+  filename = file.path("scripts/authenticity_screening/manual_screening/","mplus/model_1a/model_1a.dat"), 
+  inpfile = T)
+
+source("scripts/authenticity_screening/manual_screening/01_generate_model1a_syntax.R")
+
+ # Generate syntax
+  syntax <- generate_model1a_syntax(wide_data = mplus_dat, item_metadata = out_list_00$item_metadata)
+
+  # Inspect it
+  cat(syntax)
+
+  # Save to file when ready
+  writeLines(syntax, file.path("scripts/authenticity_screening/manual_screening/","mplus/model_1a/model_1a.inp"))
+}
+
+```
+ 
+
+* Fit Model 1b (fit in Mplus): Free all loadings, but place a N(0,1) prior on the loadings. Use the values from Model 1a as starting values.
+
+```{r}
+if(FALSE){
+  
+    source( file.path("scripts/authenticity_screening/manual_screening/", "02_generate_model1b_syntax.R") )
+
+  # The function accepts model1a_svalues parameter:
+  syntax <- generate_model1b_syntax(
+    wide_data = mplus_dat,
+    item_metadata = out_list_00$item_metadata,
+    model1a_out_file =  file.path("scripts/authenticity_screening/manual_screening/", "mplus/model_1a/model_1a.out")
+  )
+  
+  # Inspect it
+  cat(syntax)
+
+  # Save to file when ready
+  writeLines(syntax,  file.path("scripts/authenticity_screening/manual_screening/", "mplus/model_1a/model_1b.inp"))
+  
+}
+
+
+```
+
+
+* Fit Model 1c (fit in Mplus): Set all loadings from Model 1b < 0 to be equal to zero, and place a N(0,5) loading on all remaining free loadings. Save out the factor score. 
+```{r}
+
+if(FALSE){
+     source('scripts/authenticity_screening/manual_screening/03_generate_model1c_syntax.R')
+
+
+  syntax <- generate_model1c_syntax(
+    model1b_out_file = "scripts/authenticity_screening/manual_screening/mplus/model_1a/model_1b.out",
+    wide_data = mplus_dat,
+    item_metadata = out_list_00$item_metadata, 
+    force_zero = T
+  )
+
+  # Inspect generated syntax
+  cat(syntax)
+
+  # Save to file when ready
+  writeLines(syntax, "scripts/authenticity_screening/manual_screening/mplus/model_1a/model_1c.inp")
+  
+}
+
+
+```
+
+
+#### Stage 1, Follow-up A: Fix codebook and rerun NE25 pipeline to items where reverse coding was not applied correctly or need to be dropped. 
+
+* In R, using the Mplus Automation package, extract the factor scores from Model 1c. 
+
+```{r model1c}
+
+
+
+  # Read in the results
+  out_list = MplusAutomation::readModels(
+    target = file.path("scripts/authenticity_screening/manual_screening","mplus/model_1a"), 
+    filefilter = "model_1c"
+  )
+  fscores_1c_df = out_list$savedata %>% 
+    dplyr::rename_all(tolower)
+  
+  
+
+```
+
+* For items explicitly fixed to @0 in Model 1c, perform ICC analysis:
+  - **Test only the factor(s) each item was fixed to @0 on** (from Model 1c syntax)
+  - **14 unique items to test** (8 on both factors, 6 on f_dev only)
+  - **Baseline ICC**: Fit item ~ factor_score using full data (polr/glm)
+  - **If baseline slope < 0 & p < .05**: Apply Cook's D filtering (D > 4/n), refit model
+  - **Model fallback**: If polr/glm fails after filtering, use OLS (lm) instead
+  - **Classification**:
+    - **REVERSE_CODING_ERROR**: Baseline negative & p<.05 AND filtered negative & p<.05 → Fix codebook
+    - **BAD_ITEM**: Otherwise → No codebook change needed
+
+```{r}
+library(MASS)
+library(broom)
+library(parallel)
+
+# Setup parallel cluster (16 cores)
+n_cores = 16
+cl = parallel::makeCluster(n_cores)
+
+# Prepare long format data with both factor scores
+long_1c_df = fscores_1c_df %>%
+  dplyr::select(f_psych, f_dev, aa4:ps049) %>%
+  tidyr::pivot_longer(aa4:ps049, names_to = "item", values_to = "y") %>%
+  dplyr::filter(!is.na(y))
+
+# ========================================================================
+# DEFINE ITEMS FIXED TO @0 IN MODEL 1C (from Mplus syntax)
+# ========================================================================
+# Structure: list(item = c(factors_tested))
+zero_fixed_items = list(
+  aa4 = c("f_psych", "f_dev"),
+  aa56 = c("f_psych", "f_dev"),
+  cc4 = c("f_psych", "f_dev"),
+  cc25 = c("f_psych", "f_dev"),
+  cc60 = c("f_psych", "f_dev"),
+  eg39a = c("f_psych", "f_dev"),
+  eg41_2 = c("f_psych"),
+  ps040 = c("f_psych", "f_dev"),
+  eg25a = c("f_dev"),
+  cc16 = c("f_dev"),
+  eg7_1 = c("f_dev"),
+  eg8_1 = c("f_dev"),
+  eg30d = c("f_dev"),
+  eg30e = c("f_dev")
+)
+
+items_vec = names(zero_fixed_items)
+
+# Initialize results storage
+icc_results = data.frame(
+  item = character(),
+  dimension = integer(),
+  factor_tested = character(),
+  slope_full = numeric(),
+  p_full = numeric(),
+  slope_filtered = numeric(),
+  p_filtered = numeric(),
+  n_influential = integer(),
+  classification = character(),
+  stringsAsFactors = FALSE
+)
+
+cat("================================================================================\n")
+cat("  BIFACTOR ICC ANALYSIS FOR ZERO-FIXED ITEMS\n")
+cat("  Cook's Distance Threshold: 4/n (parallel processing: 16 cores)\n")
+cat("================================================================================\n\n")
+
+for(i in items_vec){
+
+  # Filter to current item
+  long_1c_item = long_1c_df %>%
+    dplyr::filter(item == i)
+
+  if(nrow(long_1c_item) == 0){
+    cat(sprintf("[SKIP] %s - no data\n", toupper(i)))
+    next
+  }
+
+  # Get item metadata (for dimension info, optional)
+  metadata_i = item_metadata %>%
+    dplyr::filter(tolower(equate_name) == i)
+
+  dim_i = if(nrow(metadata_i) > 0) metadata_i$dimension else NA
+  y_max = max(long_1c_item$y)
+
+  # Convert to ordered factor if polytomous
+  if(y_max > 1){
+    long_1c_item = long_1c_item %>%
+      dplyr::mutate(y = as.ordered(y))
+  }
+
+  # Define which factors to test based on zero_fixed_items list
+  factors_to_test = zero_fixed_items[[i]]
+
+  cat(sprintf("\n[Item: %s] Fixed to @0 on: %s\n",
+              toupper(i), paste(toupper(factors_to_test), collapse = ", ")))
+
+  # Loop through factors to test
+  for(factor_name in factors_to_test){
+
+    # Extract factor scores
+    eta = long_1c_item[[factor_name]]
+    n_obs = nrow(long_1c_item)
+
+    # ========================================================================
+    # BASELINE ICC: Full range
+    # ========================================================================
+
+    if(y_max > 1){
+      # Ordinal logistic regression
+      fit_full = tryCatch(
+        suppressWarnings(MASS::polr(y ~ eta, data = long_1c_item)),
+        error = function(e) NULL
+      )
+
+      if(is.null(fit_full)){
+        cat(sprintf("  [%s] FULL RANGE - Model failed to converge\n", toupper(factor_name)))
+        next
+      }
+
+      slope_full = coef(fit_full)["eta"]
+
+      # Extract p-value safely (polr doesn't always provide p-values)
+      p_full = tryCatch({
+        tidy_result = broom::tidy(fit_full)
+        if("p.value" %in% names(tidy_result)){
+          tidy_result %>%
+            dplyr::filter(term == "eta") %>%
+            dplyr::pull(p.value)
+        } else {
+          # Calculate p-value manually from t-statistic if available
+          if("statistic" %in% names(tidy_result)){
+            t_stat = tidy_result %>%
+              dplyr::filter(term == "eta") %>%
+              dplyr::pull(statistic)
+            2 * pnorm(-abs(t_stat))  # Two-tailed p-value
+          } else {
+            NA_real_
+          }
+        }
+      }, error = function(e) NA_real_)
+
+    } else {
+      # Binary logistic regression
+      fit_full = tryCatch(
+        suppressWarnings(glm(y ~ eta, data = long_1c_item, family = binomial(link = "logit"))),
+        error = function(e) NULL,
+        warning = function(w) {
+          # Return model even with warnings (separation, convergence issues)
+          suppressWarnings(glm(y ~ eta, data = long_1c_item, family = binomial(link = "logit")))
+        }
+      )
+
+      if(is.null(fit_full) || !fit_full$converged){
+        cat(sprintf("  [%s] FULL RANGE - Model failed to converge or has separation\n", toupper(factor_name)))
+
+        # Store as convergence failure
+        icc_results = rbind(icc_results, data.frame(
+          item = i,
+          dimension = dim_i,
+          factor_tested = factor_name,
+          slope_full = NA_real_,
+          p_full = NA_real_,
+          slope_filtered = NA_real_,
+          p_filtered = NA_real_,
+          n_influential = 0,
+          classification = "BAD_ITEM_CONVERGENCE_FAILURE",
+          stringsAsFactors = FALSE
+        ))
+        next
+      }
+
+      slope_full = coef(fit_full)["eta"]
+
+      # Extract p-value safely
+      p_full = tryCatch({
+        broom::tidy(fit_full) %>%
+          dplyr::filter(term == "eta") %>%
+          dplyr::pull(p.value)
+      }, error = function(e) NA_real_)
+    }
+
+    # Handle NA slopes (shouldn't happen, but be defensive)
+    if(is.na(slope_full)){
+      cat(sprintf("  [%s] FULL RANGE - Slope: NA, p: %.4f (n=%d) [ERROR]\n",
+                  toupper(factor_name), p_full, n_obs))
+
+      icc_results = rbind(icc_results, data.frame(
+        item = i,
+        dimension = dim_i,
+        factor_tested = factor_name,
+        slope_full = NA_real_,
+        p_full = p_full,
+        slope_filtered = NA_real_,
+        p_filtered = NA_real_,
+        n_influential = 0,
+        classification = "BAD_ITEM_SLOPE_UNAVAILABLE",
+        stringsAsFactors = FALSE
+      ))
+      next
+    }
+
+    cat(sprintf("  [%s] FULL RANGE - Slope: %.4f, p: %.4f (n=%d)\n",
+                toupper(factor_name), slope_full, p_full, n_obs))
+
+    # ========================================================================
+    # COOK'S DISTANCE FILTERING: Remove influential points (if baseline slope negative)
+    # ========================================================================
+
+    slope_filtered = NA
+    p_filtered = NA
+    n_influential = 0
+    classification = "GOOD_ITEM"
+
+    if(slope_full < 0){
+
+      cat(sprintf("  [%s] COOK'S D - Calculating influence (parallel, %d cores)...\n",
+                  toupper(factor_name), n_cores))
+
+      # ========================================================================
+      # Calculate Cook's Distance via leave-one-out refitting (PARALLELIZED)
+      # ========================================================================
+
+      # Add eta as column to data frame for proper subsetting in parallel workers
+      long_1c_item_with_eta = long_1c_item
+      long_1c_item_with_eta$eta = eta
+
+      # Store fitted values from full model ONCE (avoid refitting in each iteration)
+      fitted_full_vec = fitted(fit_full)
+
+      # Export data and packages to cluster
+      parallel::clusterExport(cl, c("long_1c_item_with_eta", "y_max", "fitted_full_vec"), envir = environment())
+      parallel::clusterEvalQ(cl, library(MASS))
+
+      # Calculate Cook's D for each observation
+      if(y_max > 1){
+        # Ordinal logistic: Leave-one-out refitting
+        cooks_d = parallel::parSapply(cl, 1:n_obs, function(idx){
+
+          # Fit model WITHOUT observation idx
+          fit_loo = tryCatch(
+            suppressWarnings(MASS::polr(y ~ eta, data = long_1c_item_with_eta[-idx, ])),
+            error = function(e) return(NA)
+          )
+
+          if(is.null(fit_loo) || any(is.na(coef(fit_loo)))){
+            return(NA)
+          }
+
+          # Get fitted values from LOO model
+          fitted_loo = fitted(fit_loo)
+
+          # Cook's D: Sum of squared differences in fitted values
+          # Scaled by number of parameters
+          # NOTE: fitted() returns matrix for polr (n x k), need to subset rows correctly
+          p = length(coef(fit_loo)) + length(fit_loo$zeta)  # slope + thresholds
+
+          # Ensure proper matrix subsetting (remove row idx, keep all columns)
+          if(is.matrix(fitted_full_vec)){
+            sum((fitted_full_vec[-idx, ] - fitted_loo)^2) / p
+          } else {
+            sum((fitted_full_vec[-idx] - fitted_loo)^2) / p
+          }
+        })
+
+      } else {
+        # Binary logistic: Can use built-in cooks.distance()
+        cooks_d = cooks.distance(fit_full)
+      }
+
+      # Filter observations with Cook's D > 4/n
+      threshold = 4 / n_obs
+      influential_idx = which(cooks_d > threshold & !is.na(cooks_d))
+      n_influential = length(influential_idx)
+
+      cat(sprintf("  [%s] COOK'S D - %d influential points (D > %.6f)\n",
+                  toupper(factor_name), n_influential, threshold))
+
+      if(n_influential == 0){
+        cat(sprintf("  [%s] COOK'S D - No influential points detected\n",
+                    toupper(factor_name)))
+
+        # Check if baseline was significantly negative
+        baseline_sig = !is.na(p_full) && p_full < 0.05
+
+        if(baseline_sig){
+          # Baseline significantly negative + no outliers = REVERSE CODING ERROR
+          classification = "REVERSE_CODING_ERROR"
+          cat(sprintf("  [%s] *** REVERSE CODING ERROR (persistent significant negative, no outliers) ***\n", toupper(factor_name)))
+        } else {
+          # Baseline not significant = BAD ITEM
+          classification = "BAD_ITEM"
+          cat(sprintf("  [%s] *** BAD ITEM (negative but not significant) ***\n", toupper(factor_name)))
+        }
+
+      } else {
+
+        # Remove influential observations
+        long_1c_filtered = long_1c_item[-influential_idx, ]
+
+        if(nrow(long_1c_filtered) < 50){
+          cat(sprintf("  [%s] FILTERED - Insufficient data after filtering (n=%d)\n",
+                      toupper(factor_name), nrow(long_1c_filtered)))
+          classification = "BAD_ITEM_INSUFFICIENT_DATA"
+        } else {
+
+          # Refit on filtered data
+          if(y_max > 1){
+            fit_filtered = tryCatch(
+              suppressWarnings(MASS::polr(y ~ eta, data = long_1c_filtered)),
+              error = function(e) NULL
+            )
+          } else {
+            fit_filtered = tryCatch(
+              suppressWarnings(glm(y ~ eta, data = long_1c_filtered, family = binomial(link = "logit"))),
+              error = function(e) NULL,
+              warning = function(w) {
+                suppressWarnings(glm(y ~ eta, data = long_1c_filtered, family = binomial(link = "logit")))
+              }
+            )
+          }
+
+          # Check convergence for binary models
+          if(!is.null(fit_filtered) && y_max == 1 && !fit_filtered$converged){
+            cat(sprintf("  [%s] FILTERED - GLM failed, trying OLS fallback\n", toupper(factor_name)))
+            fit_filtered = NULL  # Force OLS fallback
+          }
+
+          if(is.null(fit_filtered)){
+            cat(sprintf("  [%s] FILTERED - Using OLS fallback (lm)\n", toupper(factor_name)))
+
+            # OLS fallback for ordinal/binary when logistic models fail
+            fit_filtered = tryCatch(
+              lm(as.numeric(y) ~ eta, data = long_1c_filtered),
+              error = function(e) NULL
+            )
+
+            if(is.null(fit_filtered)){
+              cat(sprintf("  [%s] FILTERED - OLS also failed\n", toupper(factor_name)))
+              classification = "BAD_ITEM_MODEL_FAILURE"
+            }
+          }
+
+          if(!is.null(fit_filtered) && classification != "BAD_ITEM_MODEL_FAILURE"){
+
+            slope_filtered = coef(fit_filtered)["eta"]
+
+            # Extract p-value safely - handle polr, glm, or lm
+            p_filtered = tryCatch({
+              tidy_result = broom::tidy(fit_filtered)
+              if("p.value" %in% names(tidy_result)){
+                tidy_result %>%
+                  dplyr::filter(term == "eta") %>%
+                  dplyr::pull(p.value)
+              } else if("statistic" %in% names(tidy_result)){
+                # polr case - use z-statistic
+                t_stat = tidy_result %>%
+                  dplyr::filter(term == "eta") %>%
+                  dplyr::pull(statistic)
+                2 * pnorm(-abs(t_stat))
+              } else {
+                NA_real_
+              }
+            }, error = function(e) NA_real_)
+
+            cat(sprintf("  [%s] FILTERED  - Slope: %.4f, p: %.4f (n=%d)\n",
+                        toupper(factor_name), slope_filtered, p_filtered, nrow(long_1c_filtered)))
+
+            # Classification logic
+            # REVERSE_CODING_ERROR: Baseline negative & p<.05 AND filtered negative & p<.05
+            # BAD_ITEM: Otherwise
+
+            # Check if baseline was significant
+            baseline_sig = !is.na(p_full) && p_full < 0.05
+
+            if(!is.na(slope_filtered) && slope_filtered < 0 && !is.na(p_filtered) && p_filtered < 0.05 && baseline_sig){
+              classification = "REVERSE_CODING_ERROR"
+              cat(sprintf("  [%s] *** REVERSE CODING ERROR DETECTED (persistent significant negative slope) ***\n", toupper(factor_name)))
+            } else {
+              classification = "BAD_ITEM"
+              cat(sprintf("  [%s] *** BAD ITEM (negative slope not persistently significant) ***\n", toupper(factor_name)))
+            }
+          }
+        }
+      }
+
+    } else {
+      # Positive slope or near-zero slope
+      classification = "NO_REVERSE_CODING_ERROR"
+      cat(sprintf("  [%s] No reverse coding error (slope >= 0)\n", toupper(factor_name)))
+    }
+
+    # Store results
+    icc_results = rbind(icc_results, data.frame(
+      item = i,
+      dimension = dim_i,
+      factor_tested = factor_name,
+      slope_full = slope_full,
+      p_full = p_full,
+      slope_filtered = slope_filtered,
+      p_filtered = p_filtered,
+      n_influential = n_influential,
+      classification = classification,
+      stringsAsFactors = FALSE
+    ))
+
+  } # End factor loop
+
+} # End item loop
+
+# Clean up parallel cluster
+parallel::stopCluster(cl)
+
+cat("\n================================================================================\n")
+cat("  ICC ANALYSIS COMPLETE\n")
+cat("================================================================================\n\n")
+
+# Summary by classification
+summary_tbl = icc_results %>%
+  dplyr::group_by(classification) %>%
+  dplyr::summarise(
+    n_items = dplyr::n(),
+    items = paste(unique(item), collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(dplyr::desc(n_items))
+
+print(summary_tbl)
+
+# Items to reverse code
+reverse_code_items = icc_results %>%
+  dplyr::filter(classification == "REVERSE_CODING_ERROR") %>%
+  dplyr::pull(item) %>%
+  unique()
+
+cat("\n=== ITEMS TO REVERSE CODE IN CODEBOOK ===\n")
+cat(paste(toupper(reverse_code_items), collapse = ", "), "\n")
+
+# Items to drop
+drop_items = icc_results %>%
+  dplyr::filter(stringr::str_detect(classification, "BAD_ITEM|FLAG_MANUAL")) %>%
+  dplyr::pull(item) %>%
+  unique()
+
+cat("\n=== ITEMS TO DROP FROM CALIBRATION ===\n")
+cat(paste(toupper(drop_items), collapse = ", "), "\n")
+
+# ========================================================================
+# EXPORT RESULTS TO CSV FOR MANUAL REVIEW
+# ========================================================================
+
+# Sort by classification priority for easier review
+icc_results_sorted = icc_results %>%
+  dplyr::mutate(
+    # Create priority ranking for sorting
+    priority = dplyr::case_when(
+      classification == "REVERSE_CODING_ERROR" ~ 1,
+      stringr::str_detect(classification, "FLAG_MANUAL") ~ 2,
+      stringr::str_detect(classification, "BAD_ITEM") ~ 3,
+      classification == "GOOD_ITEM" ~ 4,
+      TRUE ~ 5
+    )
+  ) %>%
+  dplyr::arrange(priority, item, factor_tested) %>%
+  dplyr::select(-priority)
+
+# Generate timestamped filename
+timestamp = format(Sys.time(), "%Y%m%d_%H%M%S")
+output_file = file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("icc_results_%s.csv", timestamp)
+)
+
+# Export to CSV
+readr::write_csv(icc_results_sorted, output_file)
+
+cat(sprintf("\n[OK] Results exported to: %s\n", output_file))
+cat(sprintf("     Total records: %d\n", nrow(icc_results_sorted)))
+cat(sprintf("     Unique items: %d\n", length(unique(icc_results_sorted$item))))
+
+```
+
+
+* 
+```{r}
+
+MplusAutomation::prepareMplusData(
+  mplus_dat %>% 
+    dplyr::mutate(
+        EG39a = abs(EG39a - max(EG39a,na.rm = T)),
+        EG41_2 = abs(EG41_2 - max(EG41_2, na.rm = T))
+    ), 
+  filename = file.path("scripts/authenticity_screening/manual_screening/","mplus/model_1a/model_1d.dat"), 
+  inpfile = T
+)
+
+
+
+```
+
+
+* Update the the codebook with items that are dropped or properly fix the reverse coding issue. 
+* Re-run the NE25 pipeline
+* Refit Model 1c (fit in Mplus), excluding any items that were dropped.
+* Verify all loadings are positive. If not produce an error for manual review. 
+
+
+* If ANY loadings were fixed to zero in Model 1c, proceed with Stage 1 Follow-up A. Otherwise, proceed to Stage 2.
+
+
+### Stage 1, Follow-up B: Assess influence of outliers on @0 loadings in Model 1f
+
+* Extract factor scores from Model 1f
+* For each loading fixed to @0 in Model 1f:
+  - Fit baseline ICC model (polr/glm/lm)
+  - Calculate Cook's D and remove observations > 95th percentile
+  - Refit model on filtered data
+  - Compare slopes before/after filtering
+* Export diagnostic CSV with slopes, p-values, and model types
+
+```{r model1f_icc_analysis}
+if (FALSE){
+  library(MASS)
+library(broom)
+library(parallel)
+
+# ========================================================================
+# STEP 1: Parse model_1f.inp to identify @0 loadings
+# ========================================================================
+
+model_1f_path <- "scripts/authenticity_screening/manual_screening/mplus/model_1a/model_1f.inp"
+lines_1f <- readLines(model_1f_path)
+
+# Extract MODEL section
+model_start <- grep("^MODEL:", lines_1f)
+model_end <- grep("^Model Prior:|^OUTPUT:|^SAVEDATA:", lines_1f)[1] - 1
+model_lines <- lines_1f[model_start:model_end]
+
+# Pattern: f_psych BY item@0; or f_dev BY item@0;
+pattern_zero <- "\\s+(f_psych|f_dev)\\s+BY\\s+([A-Za-z0-9_]+)@0\\s*;"
+
+# Extract matches
+zero_loadings_1f <- list()
+for(line in model_lines){
+  if(grepl(pattern_zero, line)){
+    match <- stringr::str_match(line, pattern_zero)
+    factor_name <- match[,2]
+    item <- match[,3]
+
+    # Build list structure: item -> c(factors)
+    if(is.null(zero_loadings_1f[[item]])){
+      zero_loadings_1f[[item]] <- factor_name
+    } else {
+      zero_loadings_1f[[item]] <- c(zero_loadings_1f[[item]], factor_name)
+    }
+  }
+}
+
+cat("================================================================================\n")
+cat("  MODEL 1F ICC ANALYSIS: ZERO-FIXED LOADINGS\n")
+cat("  Cook's Distance Threshold: 95th percentile (remove top 5%)\n")
+cat("================================================================================\n\n")
+
+cat(sprintf("Found %d items with @0 loadings in model_1f.inp:\n", length(zero_loadings_1f)))
+for(item in names(zero_loadings_1f)){
+  factors <- paste(zero_loadings_1f[[item]], collapse = ", ")
+  cat(sprintf("  %s: %s\n", toupper(item), factors))
+}
+cat("\n")
+
+# ========================================================================
+# STEP 2: Extract factor scores from Model 1f
+# ========================================================================
+
+out_list_1f <- MplusAutomation::readModels(
+  target = file.path("scripts/authenticity_screening/manual_screening","mplus/model_1a"),
+  filefilter = "model_1f"
+)
+
+fscores_1f_df <- out_list_1f$savedata %>%
+  dplyr::rename_all(tolower)
+
+# Prepare long format
+long_1f_df <- fscores_1f_df %>%
+  dplyr::select(f_psych, f_dev, aa4:ps049) %>%
+  tidyr::pivot_longer(aa4:ps049, names_to = "item", values_to = "y") %>%
+  dplyr::filter(!is.na(y))
+
+cat(sprintf("Factor scores extracted: %d observations\n\n", nrow(fscores_1f_df)))
+
+# ========================================================================
+# STEP 3: Setup parallel cluster and results storage
+# ========================================================================
+
+n_cores <- 16
+cl <- parallel::makeCluster(n_cores)
+
+icc_results_1f <- data.frame(
+  item = character(),
+  factor_tested = character(),
+  slope_full = numeric(),
+  p_full = numeric(),
+  slope_filtered = numeric(),
+  p_filtered = numeric(),
+  n_influential = integer(),
+  n_full = integer(),
+  n_filtered = integer(),
+  model_type_full = character(),
+  model_type_filtered = character(),
+  stringsAsFactors = FALSE
+)
+
+# ========================================================================
+# STEP 4: Loop through @0 items and fit models
+# ========================================================================
+
+for(item_name in names(zero_loadings_1f)){
+
+  factors_to_test <- zero_loadings_1f[[item_name]]
+
+  # Filter to current item
+  long_1f_item <- long_1f_df %>% dplyr::filter(item == item_name)
+
+  if(nrow(long_1f_item) == 0){
+    cat(sprintf("[SKIP] %s - no data\n", toupper(item_name)))
+    next
+  }
+
+  y_max <- max(long_1f_item$y, na.rm = TRUE)
+
+  # Convert to ordered factor if polytomous
+  if(y_max > 1){
+    long_1f_item <- long_1f_item %>%
+      dplyr::mutate(y = as.ordered(y))
+  }
+
+  cat(sprintf("\n[Item: %s] Fixed to @0 on: %s\n",
+              toupper(item_name), paste(toupper(factors_to_test), collapse = ", ")))
+
+  for(factor_name in factors_to_test){
+
+    eta <- long_1f_item[[factor_name]]
+    n_obs <- nrow(long_1f_item)
+
+    # ========================================================================
+    # FULL MODEL FIT
+    # ========================================================================
+
+    model_type_full <- NA_character_
+    slope_full <- NA_real_
+    p_full <- NA_real_
+    fit_full <- NULL
+
+    if(y_max > 1){
+      # Try ordinal logistic regression
+      fit_full <- tryCatch(
+        suppressWarnings(MASS::polr(y ~ eta, data = long_1f_item)),
+        error = function(e) NULL
+      )
+
+      if(!is.null(fit_full)){
+        model_type_full <- "polr"
+        slope_full <- coef(fit_full)["eta"]
+
+        p_full <- tryCatch({
+          tidy_result <- broom::tidy(fit_full)
+          if("statistic" %in% names(tidy_result)){
+            t_stat <- tidy_result %>%
+              dplyr::filter(term == "eta") %>%
+              dplyr::pull(statistic)
+            2 * pnorm(-abs(t_stat))
+          } else {
+            NA_real_
+          }
+        }, error = function(e) NA_real_)
+      }
+
+    } else {
+      # Binary logistic regression
+      fit_full <- tryCatch(
+        suppressWarnings(glm(y ~ eta, data = long_1f_item, family = binomial(link = "logit"))),
+        error = function(e) NULL,
+        warning = function(w) {
+          suppressWarnings(glm(y ~ eta, data = long_1f_item, family = binomial(link = "logit")))
+        }
+      )
+
+      if(!is.null(fit_full) && fit_full$converged){
+        model_type_full <- "glm"
+        slope_full <- coef(fit_full)["eta"]
+
+        p_full <- tryCatch({
+          broom::tidy(fit_full) %>%
+            dplyr::filter(term == "eta") %>%
+            dplyr::pull(p.value)
+        }, error = function(e) NA_real_)
+      } else {
+        fit_full <- NULL
+      }
+    }
+
+    # OLS fallback
+    if(is.na(model_type_full)){
+      fit_full <- tryCatch(
+        lm(as.numeric(y) ~ eta, data = long_1f_item),
+        error = function(e) NULL
+      )
+
+      if(!is.null(fit_full)){
+        model_type_full <- "lm"
+        slope_full <- coef(fit_full)["eta"]
+
+        p_full <- tryCatch({
+          broom::tidy(fit_full) %>%
+            dplyr::filter(term == "eta") %>%
+            dplyr::pull(p.value)
+        }, error = function(e) NA_real_)
+      }
+    }
+
+    if(is.na(model_type_full)){
+      cat(sprintf("  [%s] All models failed to converge\n", toupper(factor_name)))
+      next
+    }
+
+    cat(sprintf("  [%s] FULL MODEL (%s) - Slope: %.4f, p: %.4f (n=%d)\n",
+                toupper(factor_name), model_type_full, slope_full, p_full, n_obs))
+
+    # ========================================================================
+    # COOK'S DISTANCE CALCULATION
+    # ========================================================================
+
+    long_1f_item_with_eta <- long_1f_item
+    long_1f_item_with_eta$eta <- eta
+    fitted_full_vec <- fitted(fit_full)
+
+    parallel::clusterExport(cl, c("long_1f_item_with_eta", "y_max", "fitted_full_vec", "model_type_full"),
+                            envir = environment())
+    parallel::clusterEvalQ(cl, library(MASS))
+
+    if(model_type_full == "polr"){
+      # Ordinal: Leave-one-out refitting
+      cooks_d <- parallel::parSapply(cl, 1:n_obs, function(idx){
+        fit_loo <- tryCatch(
+          suppressWarnings(MASS::polr(y ~ eta, data = long_1f_item_with_eta[-idx, ])),
+          error = function(e) return(NA)
+        )
+
+        if(is.null(fit_loo) || any(is.na(coef(fit_loo)))){
+          return(NA)
+        }
+
+        fitted_loo <- fitted(fit_loo)
+        p <- length(coef(fit_loo)) + length(fit_loo$zeta)
+
+        if(is.matrix(fitted_full_vec)){
+          sum((fitted_full_vec[-idx, ] - fitted_loo)^2) / p
+        } else {
+          sum((fitted_full_vec[-idx] - fitted_loo)^2) / p
+        }
+      })
+
+    } else if(model_type_full == "glm"){
+      cooks_d <- cooks.distance(fit_full)
+    } else {
+      cooks_d <- cooks.distance(fit_full)
+    }
+
+    # 95th percentile threshold
+    threshold <- quantile(cooks_d, 0.95, na.rm = TRUE)
+    influential_idx <- which(cooks_d > threshold & !is.na(cooks_d))
+    n_influential <- length(influential_idx)
+
+    cat(sprintf("  [%s] COOK'S D - %d influential points (> 95th percentile = %.6f)\n",
+                toupper(factor_name), n_influential, threshold))
+
+    # ========================================================================
+    # FILTERED MODEL FIT
+    # ========================================================================
+
+    if(n_influential == 0){
+      slope_filtered <- slope_full
+      p_filtered <- p_full
+      model_type_filtered <- model_type_full
+      n_filtered <- n_obs
+
+      cat(sprintf("  [%s] No influential points detected\n", toupper(factor_name)))
+
+    } else {
+
+      long_1f_filtered <- long_1f_item[-influential_idx, ]
+      n_filtered <- nrow(long_1f_filtered)
+
+      # CRITICAL: Also filter eta vector to match filtered data
+      eta_filtered <- eta[-influential_idx]
+
+      # Fit filtered model (even with small sample sizes per user request)
+      model_type_filtered <- NA_character_
+      fit_filtered <- NULL
+
+      if(y_max > 1){
+        fit_filtered <- tryCatch(
+          suppressWarnings(MASS::polr(y ~ eta_filtered, data = long_1f_filtered)),
+          error = function(e) NULL
+        )
+
+        if(!is.null(fit_filtered)){
+          model_type_filtered <- "polr"
+        }
+      } else {
+        fit_filtered <- tryCatch(
+          suppressWarnings(glm(y ~ eta_filtered, data = long_1f_filtered, family = binomial(link = "logit"))),
+          error = function(e) NULL,
+          warning = function(w) {
+            suppressWarnings(glm(y ~ eta_filtered, data = long_1f_filtered, family = binomial(link = "logit")))
+          }
+        )
+
+        if(!is.null(fit_filtered) && fit_filtered$converged){
+          model_type_filtered <- "glm"
+        } else {
+          fit_filtered <- NULL
+        }
+      }
+
+      # OLS fallback
+      if(is.na(model_type_filtered)){
+        cat(sprintf("  [%s] FILTERED - Using OLS fallback (lm)\n", toupper(factor_name)))
+
+        fit_filtered <- tryCatch(
+          lm(as.numeric(y) ~ eta_filtered, data = long_1f_filtered),
+          error = function(e) NULL
+        )
+
+        if(!is.null(fit_filtered)){
+          model_type_filtered <- "lm"
+        }
+      }
+
+      if(!is.na(model_type_filtered)){
+        slope_filtered <- coef(fit_filtered)["eta_filtered"]
+
+        p_filtered <- tryCatch({
+          tidy_result <- broom::tidy(fit_filtered)
+          if("p.value" %in% names(tidy_result)){
+            tidy_result %>%
+              dplyr::filter(term == "eta_filtered") %>%
+              dplyr::pull(p.value)
+          } else if("statistic" %in% names(tidy_result)){
+            t_stat <- tidy_result %>%
+              dplyr::filter(term == "eta_filtered") %>%
+              dplyr::pull(statistic)
+            2 * pnorm(-abs(t_stat))
+          } else {
+            NA_real_
+          }
+        }, error = function(e) NA_real_)
+
+        cat(sprintf("  [%s] FILTERED (%s) - Slope: %.4f, p: %.4f (n=%d)\n",
+                    toupper(factor_name), model_type_filtered,
+                    slope_filtered, p_filtered, n_filtered))
+      } else {
+        slope_filtered <- NA_real_
+        p_filtered <- NA_real_
+        model_type_filtered <- "model_failure"
+        cat(sprintf("  [%s] FILTERED - All models failed\n", toupper(factor_name)))
+      }
+    }
+
+    # ========================================================================
+    # STORE RESULTS
+    # ========================================================================
+
+    icc_results_1f <- rbind(icc_results_1f, data.frame(
+      item = item_name,
+      factor_tested = factor_name,
+      slope_full = slope_full,
+      p_full = p_full,
+      slope_filtered = slope_filtered,
+      p_filtered = p_filtered,
+      n_influential = n_influential,
+      n_full = n_obs,
+      n_filtered = n_filtered,
+      model_type_full = model_type_full,
+      model_type_filtered = model_type_filtered,
+      stringsAsFactors = FALSE
+    ))
+
+  } # End factor loop
+
+} # End item loop
+
+parallel::stopCluster(cl)
+
+# ========================================================================
+# EXPORT RESULTS TO CSV
+# ========================================================================
+
+icc_results_1f_sorted <- icc_results_1f %>%
+  dplyr::arrange(item, factor_tested)
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_file_1f <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("icc_results_model1f_%s.csv", timestamp)
+)
+
+readr::write_csv(icc_results_1f_sorted, output_file_1f)
+
+cat("\n================================================================================\n")
+cat("  MODEL 1F ICC ANALYSIS COMPLETE\n")
+cat("================================================================================\n\n")
+
+cat(sprintf("[OK] Model 1f ICC results exported to: %s\n", output_file_1f))
+cat(sprintf("     Total records: %d\n", nrow(icc_results_1f_sorted)))
+cat(sprintf("     Unique items: %d\n", length(unique(icc_results_1f_sorted$item))))
+
+# Print summary
+cat("\n=== SUMMARY: Slope Changes After Filtering ===\n")
+summary_1f <- icc_results_1f_sorted %>%
+  dplyr::mutate(
+    slope_change = slope_filtered - slope_full,
+    slope_pct_change = ifelse(abs(slope_full) > 0.001,
+                               100 * (slope_filtered - slope_full) / abs(slope_full),
+                               NA_real_)
+  ) %>%
+  dplyr::select(item, factor_tested, slope_full, slope_filtered,
+                slope_change, slope_pct_change, n_influential)
+
+print(summary_1f, n = Inf)
+}
+
+
+```
+
+## Stage 1, Follow-up C: Comprehensive item-level influence statistics for all items
+
+*This section computes Cook's Distance for all individuals across all items using the bifactor model (y ~ f_psych + f_dev). This provides a comprehensive view of which individuals show unusual response patterns that may distort item-level relationships.
+
+* Now lets 
+
+```{r}
+MplusAutomation::prepareMplusData(
+  mplus_dat %>% 
+    dplyr::mutate(
+        EG39a = abs(EG39a - max(EG39a,na.rm = T)), # Has been updated
+        EG41_2 = abs(EG41_2 - max(EG41_2, na.rm = T)), #Has 
+        EG30d = abs(EG30d - max(EG30d,na.rm = T)), 
+        EG30e = abs(EG30e - max(EG30e,na.rm = T)), 
+        AA56 = abs(AA56 - max(AA56,na.rm = T)),
+        EG44_2 = abs(EG44_2 - max(EG44_2,na.rm = T)) #So clearly reverse coded based on analysis below
+    ), 
+  filename = file.path("scripts/authenticity_screening/manual_screening/","mplus/model_1a/model_1g.dat"), 
+  inpfile = T
+)
+
+
+# Investigate item EG44_2
+
+
+out_list_1f <- MplusAutomation::readModels(
+  target = file.path("scripts/authenticity_screening/manual_screening","mplus/model_1a"),
+  filefilter = "model_1f"
+)
+
+fscores_1f_df = out_list_1f$savedata %>% 
+  dplyr::rename_all(tolower)
+
+ggplot(fscores_1f_df, aes(x = f_dev, y = eg44_2)) + geom_point() + stat_smooth(method = "gam") #clearly problem with existing coding
+
+ggplot(fscores_1f_df, aes(x = f_dev, y = aa60))+ geom_point() + stat_smooth(method = "gam") #clearly problem with existing coding
+
+mplus_dat2 = mplus_dat %>% 
+    dplyr::mutate(
+        EG39a = abs(EG39a - max(EG39a,na.rm = T)), # Has been updated
+        EG41_2 = abs(EG41_2 - max(EG41_2, na.rm = T)), #Has 
+        EG30d = abs(EG30d - max(EG30d,na.rm = T)), 
+        EG30e = abs(EG30e - max(EG30e,na.rm = T)), 
+        AA56 = abs(AA56 - max(AA56,na.rm = T)),
+        EG44_2 = abs(EG44_2 - max(EG44_2,na.rm = T)) #So clearly reverse coded based on analysis below
+    )
+```
+
+
+```{r comprehensive_influence_statistics}
+# Source helper function
+source("R/authenticity_screening/compute_item_influence.R")
+
+# ========================================================================
+# STEP 1: Load factor scores from Model 1f
+# ========================================================================
+
+out_list_1f_full <- MplusAutomation::readModels(
+  target = file.path("scripts/authenticity_screening/manual_screening", "mplus/model_1a"),
+  filefilter = "model_1f"
+)
+
+fscores_1f_full <- out_list_1f_full$savedata %>%
+  dplyr::rename_all(tolower)
+
+cat("================================================================================\n")
+cat("  COMPREHENSIVE ITEM-LEVEL INFLUENCE ANALYSIS\n")
+cat("  Model: y ~ f_psych + f_dev (bifactor)\n")
+cat("================================================================================\n\n")
+
+cat(sprintf("Factor scores loaded: %d observations\n\n", nrow(fscores_1f_full)))
+
+# ========================================================================
+# STEP 2: Define all items to analyze
+# ========================================================================
+
+# Get all item columns (from aa4 to ps049)
+all_item_cols <- names(fscores_1f_full)
+item_start_idx <- which(all_item_cols == "aa4")
+item_end_idx <- which(all_item_cols == "ps049")
+
+if (length(item_start_idx) == 0 || length(item_end_idx) == 0) {
+  stop("Could not find item range (aa4 to ps049) in fscores data")
+}
+
+all_items <- all_item_cols[item_start_idx:item_end_idx]
+
+cat(sprintf("Items to analyze: %d\n", length(all_items)))
+cat(sprintf("Range: %s to %s\n\n", all_items[1], all_items[length(all_items)]))
+
+# ========================================================================
+# STEP 3: Compute influence statistics for all items
+# ========================================================================
+
+influence_all_items <- compute_item_influence(
+  fscores_df = fscores_1f_full,
+  item_list = all_items,
+  factor_cols = c("f_psych", "f_dev"),
+  item_start_col = "aa4",
+  item_end_col = "ps049",
+  n_cores = 16,
+  verbose = TRUE
+)
+
+# ========================================================================
+# STEP 4: Identify high-influence individuals (top 5%)
+# ========================================================================
+
+high_influence_all <- influence_all_items %>%
+  dplyr::group_by(item) %>%
+  dplyr::mutate(
+    threshold_95 = quantile(cooks_d, 0.95, na.rm = TRUE),
+    influential = cooks_d > threshold_95
+  ) %>%
+  dplyr::ungroup()
+
+high_influence_5pct_all <- high_influence_all %>%
+  dplyr::filter(influential) %>%
+  dplyr::arrange(item, dplyr::desc(cooks_d))
+
+cat("\n================================================================================\n")
+cat("  HIGH-INFLUENCE SUMMARY (TOP 5% PER ITEM)\n")
+cat("================================================================================\n\n")
+
+cat(sprintf("Total observations analyzed: %s\n",
+            format(nrow(influence_all_items), big.mark = ",")))
+cat(sprintf("High-influence observations (top 5%%): %s\n",
+            format(nrow(high_influence_5pct_all), big.mark = ",")))
+cat(sprintf("Unique items with data: %d\n",
+            length(unique(influence_all_items$item))))
+
+# ========================================================================
+# STEP 5: Summary statistics by item
+# ========================================================================
+
+summary_by_item <- influence_all_items %>%
+  dplyr::group_by(item, model_type, n_categories) %>%
+  dplyr::summarise(
+    n_obs = dplyr::n(),
+    mean_cooks_d = mean(cooks_d, na.rm = TRUE),
+    median_cooks_d = median(cooks_d, na.rm = TRUE),
+    max_cooks_d = max(cooks_d, na.rm = TRUE),
+    threshold_95 = quantile(cooks_d, 0.95, na.rm = TRUE),
+    n_influential = sum(cooks_d > quantile(cooks_d, 0.95, na.rm = TRUE), na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(dplyr::desc(max_cooks_d))
+
+cat("\n=== TOP 20 ITEMS BY MAXIMUM COOK'S D ===\n")
+print(head(summary_by_item, 20))
+
+# ========================================================================
+# STEP 6: Individual-level summary (cross-item influence)
+# ========================================================================
+
+# Count how many items each individual is influential on
+individual_influence_summary <- high_influence_5pct_all %>%
+  dplyr::group_by(pid, record_id) %>%
+  dplyr::summarise(
+    n_items_influential = dplyr::n(),
+    mean_cooks_d = mean(cooks_d, na.rm = TRUE),
+    max_cooks_d = max(cooks_d, na.rm = TRUE),
+    items = paste(item, collapse = ", "),
+    .groups = "drop"
+  ) %>%
+  dplyr::arrange(dplyr::desc(n_items_influential), dplyr::desc(mean_cooks_d))
+
+cat("\n\n=== TOP 20 INDIVIDUALS BY NUMBER OF INFLUENTIAL ITEMS ===\n")
+print(head(individual_influence_summary, 20))
+
+# ========================================================================
+# STEP 7: Export results
+# ========================================================================
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+
+# Full influence data
+output_file_full <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("influence_all_items_full_%s.feather", timestamp)
+)
+arrow::write_feather(high_influence_all, output_file_full)
+
+# High-influence subset (top 5%)
+output_file_top5 <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("influence_all_items_top5pct_%s.feather", timestamp)
+)
+arrow::write_feather(high_influence_5pct_all, output_file_top5)
+
+# Summary by item
+output_file_summary_item <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("influence_summary_by_item_%s.csv", timestamp)
+)
+readr::write_csv(summary_by_item, output_file_summary_item)
+
+# Summary by individual
+output_file_summary_indiv <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("influence_summary_by_individual_%s.csv", timestamp)
+)
+readr::write_csv(individual_influence_summary, output_file_summary_indiv)
+
+cat("\n================================================================================\n")
+cat("  RESULTS EXPORTED\n")
+cat("================================================================================\n\n")
+
+cat(sprintf("[OK] Full influence data (all items/individuals):\n"))
+cat(sprintf("     %s\n", output_file_full))
+cat(sprintf("     %s observations\n\n", format(nrow(high_influence_all), big.mark = ",")))
+
+cat(sprintf("[OK] High-influence subset (top 5%% per item):\n"))
+cat(sprintf("     %s\n", output_file_top5))
+cat(sprintf("     %s observations\n\n", format(nrow(high_influence_5pct_all), big.mark = ",")))
+
+cat(sprintf("[OK] Summary by item:\n"))
+cat(sprintf("     %s\n", output_file_summary_item))
+cat(sprintf("     %d items\n\n", nrow(summary_by_item)))
+
+cat(sprintf("[OK] Summary by individual:\n"))
+cat(sprintf("     %s\n", output_file_summary_indiv))
+cat(sprintf("     %d individuals\n\n", nrow(individual_influence_summary)))
+
+```
+
+* Let's analyze the Cook's distance
+
+```{r}
+
+influence_df = high_influence_all %>% 
+  dplyr::mutate(
+    pars =  2 + (n_categories - 1), 
+    cooks_d_std = cooks_d * sqrt(pars)
+  ) %>% 
+  dplyr::group_by(pid, record_id) %>% 
+  dplyr::summarise(
+    mean = mean(cooks_d_std), 
+    median = median(cooks_d_std), 
+    sd = sd(cooks_d_std), 
+    pr_influential = mean(influential)
+  )
+
+
+ggplot(influence_df, aes(x = median, y = sd)) + geom_point()
+ggplot(influence_df, aes(x = median, y = pr_influential)) + geom_point()
+
+
+influence_df %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(median, sd, pr_influential) %>% 
+  cor()
+
+soft_bound<-function(x){.99*x + .005}
+
+hazen_percentile <- function(x) {
+  n <- length(x)
+  ranks <- rank(x, ties.method = "average")
+  percentiles <- (ranks - 0.5) / n
+  return(percentiles)
+}
+
+influence_df = influence_df %>% 
+  ungroup() %>% 
+  dplyr::mutate(
+    z_influential = hazen_percentile(pr_influential) %>% qnorm(),
+    z_median = hazen_percentile(median) %>% qnorm(), 
+    z_sd = hazen_percentile(sd) %>% qnorm()
+  ) 
+
+
+influence_df %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(z_median, z_sd,z_influential) %>% 
+  cor()
+
+
+data.pca <- princomp(influence_df %>% dplyr::select(z_median, z_sd, z_influential))
+
+influence_df = influence_df %>% 
+  dplyr::mutate(
+    overall_influence = data.pca$scores[,1] %>% as.numeric(),
+    influence_pca2 =  data.pca$scores[,2] %>% as.numeric()
+  )
+
+influence_df %>% 
+  dplyr::ungroup() %>% 
+  dplyr::select(z_median, z_sd,z_influential, overall_influence) %>% 
+  cor()
+
+
+ggplot(influence_df, aes(x = overall_influence)) + geom_histogram()
+
+influence_df = influence_df %>% 
+  dplyr::arrange(desc(overall_influence))
+
+
+ggplot(influence_df %>% dplyr::arrange((overall_influence)) %>% dplyr::mutate(delta = c(0,diff(overall_influence))) %>% na.omit(), aes(x = 1:nrow(influence_df), y = c(delta))) + geom_point()
+
+# following pid and record_id to be excluded: 
+influence_df %>% dplyr::select(pid, record_id, overall_influence) %>% print(3)
+
+# Observation 1 is pid = 8014 and record_id = 1357
+# Observation 2 is pid = 8014 and record_id = 1233
+# Observation 3 is pid = 7999 and record_id = 212
+
+```
+
+## Stage 1, Follow-up D: Determine optimal influence cutoff via entropy-normalized LOOCV
+
+This section uses sequential removal of high-influence individuals (sorted by `overall_influence`) to identify the optimal cutoff. For each value of k (0 to 100 individuals removed), we evaluate predictive performance using entropy-normalized leave-one-out cross-validation across all items.
+
+```{r test_small_subset, eval=FALSE}
+# ========================================================================
+# SMALL TEST: k=0 to 10, first 10 items (verify correctness)
+# ========================================================================
+
+source("R/authenticity_screening/optimize_influence_cutoff.R")
+
+# Get first 10 items for testing
+test_items <- all_items[1:10]
+
+cutoff_test <- optimize_influence_cutoff(
+  fscores_df = fscores_1f_full,
+  influence_df = influence_df,
+  item_list = test_items,
+  max_k = 10,
+  factor_cols = c("f_psych", "f_dev"),
+  n_cores = 16,
+  n_folds = 50,
+  verbose = TRUE
+)
+
+print(cutoff_test)
+
+# Quick visualization
+ggplot(cutoff_test, aes(x = k, y = mean_normalized_log_lik)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Test: Entropy-Normalized Log-Likelihood vs. Number Removed",
+    subtitle = "First 10 items, k=0 to 10",
+    x = "Number of individuals removed (k)",
+    y = "Mean entropy-normalized log-likelihood"
+  ) +
+  theme_minimal()
+
+```
+
+```{r full_cutoff_optimization}
+# ========================================================================
+# FULL ANALYSIS: k=0 to 100, all items
+# ========================================================================
+
+source("R/authenticity_screening/optimize_influence_cutoff.R")
+
+# Run full optimization
+cutoff_results_full <- optimize_influence_cutoff(
+  fscores_df = fscores_1f_full,
+  influence_df = influence_df,
+  item_list = all_items,
+  max_k = 300,
+  factor_cols = c("f_psych", "f_dev"),
+  n_cores = 24,
+  n_folds = 10,
+  random_seed = 42,
+  verbose = TRUE
+)
+
+# ========================================================================
+# EXPORT RESULTS
+# ========================================================================
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+
+output_file_cutoff <- file.path(
+  "scripts/authenticity_screening/manual_screening",
+  sprintf("influence_cutoff_optimization_%s.csv", timestamp)
+)
+
+readr::write_csv(cutoff_results_full, output_file_cutoff)
+
+cat("\n================================================================================\n")
+cat("  CUTOFF OPTIMIZATION RESULTS EXPORTED\n")
+cat("================================================================================\n\n")
+cat(sprintf("[OK] %s\n", output_file_cutoff))
+cat(sprintf("     %d cutoff values tested (k = 0 to %d)\n\n",
+            nrow(cutoff_results_full), max(cutoff_results_full$k)))
+
+# ========================================================================
+# IDENTIFY OPTIMAL CUTOFF
+# ========================================================================
+
+optimal_row <- cutoff_results_full %>%
+  dplyr::filter(mean_normalized_log_lik == max(mean_normalized_log_lik, na.rm = TRUE)) %>%
+  dplyr::slice(1)
+
+cat("=== OPTIMAL CUTOFF ===\n")
+cat(sprintf("Optimal k: %d individuals\n", optimal_row$k))
+cat(sprintf("Overall influence cutoff: %.4f\n", optimal_row$overall_influence_cutoff))
+cat(sprintf("Mean normalized log-lik: %.4f\n", optimal_row$mean_normalized_log_lik))
+cat(sprintf("SD normalized log-lik: %.4f\n", optimal_row$sd_normalized_log_lik))
+cat(sprintf("Individuals remaining: %d\n\n", optimal_row$n_individuals_remaining))
+
+# ========================================================================
+# VISUALIZATION
+# ========================================================================
+
+# Main plot: log-likelihood vs. k
+p1 <- ggplot(cutoff_results_full, aes(x = k, y = mean_normalized_log_lik)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(size = 2, color = "steelblue") +
+  geom_vline(xintercept = optimal_row$k, linetype = "dashed", color = "red") +
+  annotate("text", x = optimal_row$k, y = min(cutoff_results_full$mean_normalized_log_lik),
+           label = sprintf("Optimal k = %d", optimal_row$k),
+           hjust = -0.1, color = "red") +
+  labs(
+    title = "Influence Cutoff Optimization",
+    subtitle = sprintf("Entropy-normalized LOOCV across %d items", length(all_items)),
+    x = "Number of high-influence individuals removed (k)",
+    y = "Mean entropy-normalized log-likelihood",
+    caption = "Higher values = better predictive performance"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+
+print(p1)
+
+# Secondary plot: Marginal improvement
+cutoff_results_marginal <- cutoff_results_full %>%
+  dplyr::mutate(
+    marginal_improvement = mean_normalized_log_lik - dplyr::lag(mean_normalized_log_lik),
+    cumulative_improvement = mean_normalized_log_lik - mean_normalized_log_lik[1]
+  )
+
+p2 <- ggplot(cutoff_results_marginal, aes(x = k, y = marginal_improvement)) +
+  geom_col(fill = "steelblue", alpha = 0.7) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Marginal Improvement from Each Additional Removal",
+    x = "Number of individuals removed (k)",
+    y = "Marginal change in log-likelihood"
+  ) +
+  theme_minimal()
+
+print(p2)
+
+# Cumulative improvement
+p3 <- ggplot(cutoff_results_marginal %>% filter(k > 0),
+             aes(x = k, y = cumulative_improvement)) +
+  geom_line(color = "darkgreen", size = 1) +
+  geom_point(size = 2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  labs(
+    title = "Cumulative Improvement from Baseline (k=0)",
+    x = "Number of individuals removed (k)",
+    y = "Cumulative change in log-likelihood"
+  ) +
+  theme_minimal()
+
+print(p3)
+
+# ========================================================================
+# SUMMARY TABLE
+# ========================================================================
+
+cat("\n=== TOP 10 CUTOFFS BY PREDICTIVE PERFORMANCE ===\n")
+cutoff_results_full %>%
+  dplyr::arrange(dplyr::desc(mean_normalized_log_lik)) %>%
+  dplyr::select(k, overall_influence_cutoff, mean_normalized_log_lik,
+                n_individuals_remaining, n_items_analyzed) %>%
+  head(10) %>%
+  print()
+
+```
+
+

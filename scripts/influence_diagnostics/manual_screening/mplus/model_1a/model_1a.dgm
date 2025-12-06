@@ -1,0 +1,1296 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+
+  Model 1a - Equal Loadings Within Domain + Latent Regression
+  NE25 Authenticity Screening Stage 1
+  2-Parameter IRT with Demographic Covariates
+  Generated: 2025-12-01
+
+DATA:
+  FILE = "model_1a.dat";
+VARIABLE:
+  NAMES =
+    pid recordid female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12
+    AA13 AA14 AA15 AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34
+    AA36 AA38 AA41 AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68
+    AA69 AA71 AA72 AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9
+    CC10 CC11 CC12 CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27
+    CC28 CC29 CC30 CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43
+    CC45 CC46 CC48 CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66
+    CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85
+    CC87 CC89 DD15 DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1
+    EG4a_1 EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a
+    EG11_1 EG12a EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c
+    EG17a EG17b EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d
+    EG20e_1 EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b
+    EG26b EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d
+    EG30e EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b
+    EG35b EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1
+    EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2
+    EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b
+    PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014
+    PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027
+    PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040
+    PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  USEVARIABLES =
+    female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15
+    AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41
+    AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72
+    AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12
+    CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30
+    CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48
+    CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69
+    CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15
+    DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2
+    EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a
+    EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b
+    EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1
+    EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b
+    EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d EG30e
+    EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b EG35b
+    EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1 EG41_2
+    EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1
+    EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b PS002
+    PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014 PS015
+    PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027 PS028
+    PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040 PS041
+    PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  CATEGORICAL =
+     AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15 AA17 AA19 AA20 AA21 AA24
+    AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41 AA43 AA46 AA47 AA49 AA50
+    AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72 AA102 AA104 AA203 AA205
+    BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12 CC13 CC14 CC15 CC16 CC17
+    CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30 CC31 CC32 CC33 CC34 CC35
+    CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48 CC50 CC51 CC52 CC53 CC54
+    CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76
+    CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15 DD19 DD103 DD205 DD207 DD221
+    DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1
+    EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a EG13a EG14a EG14b EG15_1 EG15_2
+    EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b EG18a EG18b EG19a_2 EG19a_3
+    EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1 EG20e_2 EG21a EG21b EG22_1
+    EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b EG27a EG27b_1 EG28a EG28b EG28c
+    EG29a EG29b EG29c EG30a EG30c EG30d EG30e EG30f EG31a_1 EG31a_2 EG31b
+    EG32a EG32b EG33a EG33b EG34a EG34b EG35b EG36b EG37_1 EG37_2 EG38a EG38b
+    EG38c EG39a EG39b EG40_1 EG41_1 EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b
+    EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b
+    EG48_2 EG49_1 EG49_2 EG50b PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009
+    PS010 PS011 PS013 PS014 PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023
+    PS024 PS025 PS026 PS027 PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036
+    PS037 PS038 PS039 PS040 PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048
+    PS049;
+  IDVARIABLE = pid;
+  AUXILIARY = recordid;
+  MISSING = . ;
+ANALYSIS:
+  ESTIMATOR = MLR;
+  ALGORITHM = INTEGRATION;
+  INTEGRATION = GAUSS(16);
+  LINK = LOGIT;
+  PROCESSORS = 16;
+OUTPUT:
+  NOSERROR;
+  SVALUES;
+MODEL:
+  F_Psych BY
+    AA4*1     (a001)
+    AA50*1     (a001)
+    AA54*1     (a001)
+    AA55*1     (a001)
+    AA56*1     (a001)
+    AA57*1     (a001)
+    AA60*1     (a001)
+    AA65*1     (a001)
+    AA68*1     (a001)
+    AA69*1     (a001)
+    AA71*1     (a001)
+    AA72*1     (a001)
+    AA102*1     (a001)
+    AA104*1     (a001)
+    AA203*1     (a001)
+    AA205*1     (a001)
+    BB5*1     (a001)
+    BB6*1     (a001)
+    CC4*1     (a001)
+    CC8*1     (a001)
+    CC11*1     (a001)
+    CC12*1     (a001)
+    CC13*1     (a001)
+    CC20*1     (a001)
+    CC25*1     (a001)
+    CC26*1     (a001)
+    CC33*1     (a001)
+    CC54*1     (a001)
+    CC60*1     (a001)
+    CC62*1     (a001)
+    CC65*1     (a001)
+    CC68*1     (a001)
+    CC69*1     (a001)
+    CC78*1     (a001)
+    CC80*1     (a001)
+    CC83*1     (a001)
+    CC85*1     (a001)
+    CC87*1     (a001)
+    CC89*1     (a001)
+    DD103*1     (a001)
+    DD221*1     (a001)
+    DD299*1     (a001)
+    EG5a*1     (a001)
+    EG5b*1     (a001)
+    EG6_1*1     (a001)
+    EG6_2*1     (a001)
+    EG16a_1*1     (a001)
+    EG16a_2*1     (a001)
+    EG16b*1     (a001)
+    EG16c*1     (a001)
+    EG17a*1     (a001)
+    EG17b*1     (a001)
+    EG18a*1     (a001)
+    EG18b*1     (a001)
+    EG23a*1     (a001)
+    EG23b*1     (a001)
+    EG24b*1     (a001)
+    EG25a*1     (a001)
+    EG25b*1     (a001)
+    EG26b*1     (a001)
+    EG37_1*1     (a001)
+    EG37_2*1     (a001)
+    EG38a*1     (a001)
+    EG38b*1     (a001)
+    EG38c*1     (a001)
+    EG39a*1     (a001)
+    EG39b*1     (a001)
+    EG40_1*1     (a001)
+    EG41_1*1     (a001)
+    EG41_2*1     (a001)
+    EG43a_2*1     (a001)
+    PS002*1     (a001)
+    PS003*1     (a001)
+    PS004*1     (a001)
+    PS005*1     (a001)
+    PS006*1     (a001)
+    PS007*1     (a001)
+    PS008*1     (a001)
+    PS009*1     (a001)
+    PS010*1     (a001)
+    PS011*1     (a001)
+    PS013*1     (a001)
+    PS014*1     (a001)
+    PS015*1     (a001)
+    PS016*1     (a001)
+    PS017*1     (a001)
+    PS018*1     (a001)
+    PS019*1     (a001)
+    PS020*1     (a001)
+    PS022*1     (a001)
+    PS023*1     (a001)
+    PS024*1     (a001)
+    PS025*1     (a001)
+    PS026*1     (a001)
+    PS027*1     (a001)
+    PS028*1     (a001)
+    PS029*1     (a001)
+    PS030*1     (a001)
+    PS031*1     (a001)
+    PS032*1     (a001)
+    PS034*1     (a001)
+    PS035*1     (a001)
+    PS036*1     (a001)
+    PS037*1     (a001)
+    PS038*1     (a001)
+    PS039*1     (a001)
+    PS040*1     (a001)
+    PS041*1     (a001)
+    PS042*1     (a001)
+    PS043*1     (a001)
+    PS044*1     (a001)
+    PS045*1     (a001)
+    PS046*1     (a001)
+    PS047*1     (a001)
+    PS048*1     (a001)
+    PS049*1     (a001);
+  F_Dev BY
+    AA4*1     (b001)
+    AA50*1     (b001)
+    AA54*1     (b001)
+    AA55*1     (b001)
+    AA56*1     (b001)
+    AA57*1     (b001)
+    AA60*1     (b001)
+    AA65*1     (b001)
+    AA68*1     (b001)
+    AA69*1     (b001)
+    AA71*1     (b001)
+    AA72*1     (b001)
+    AA102*1     (b001)
+    AA104*1     (b001)
+    AA203*1     (b001)
+    AA205*1     (b001)
+    BB5*1     (b001)
+    BB6*1     (b001)
+    CC4*1     (b001)
+    CC8*1     (b001)
+    CC11*1     (b001)
+    CC12*1     (b001)
+    CC13*1     (b001)
+    CC20*1     (b001)
+    CC25*1     (b001)
+    CC26*1     (b001)
+    CC33*1     (b001)
+    CC54*1     (b001)
+    CC60*1     (b001)
+    CC62*1     (b001)
+    CC65*1     (b001)
+    CC68*1     (b001)
+    CC69*1     (b001)
+    CC78*1     (b001)
+    CC80*1     (b001)
+    CC83*1     (b001)
+    CC85*1     (b001)
+    CC87*1     (b001)
+    CC89*1     (b001)
+    DD103*1     (b001)
+    DD221*1     (b001)
+    DD299*1     (b001)
+    EG5a*1     (b001)
+    EG5b*1     (b001)
+    EG6_1*1     (b001)
+    EG6_2*1     (b001)
+    EG16a_1*1     (b001)
+    EG16a_2*1     (b001)
+    EG16b*1     (b001)
+    EG16c*1     (b001)
+    EG17a*1     (b001)
+    EG17b*1     (b001)
+    EG18a*1     (b001)
+    EG18b*1     (b001)
+    EG23a*1     (b001)
+    EG23b*1     (b001)
+    EG24b*1     (b001)
+    EG25a*1     (b001)
+    EG25b*1     (b001)
+    EG26b*1     (b001)
+    EG37_1*1     (b001)
+    EG37_2*1     (b001)
+    EG38a*1     (b001)
+    EG38b*1     (b001)
+    EG38c*1     (b001)
+    EG39a*1     (b001)
+    EG39b*1     (b001)
+    EG40_1*1     (b001)
+    EG41_1*1     (b001)
+    EG41_2*1     (b001)
+    EG43a_2*1     (b001)
+    PS002*1     (b001)
+    PS003*1     (b001)
+    PS004*1     (b001)
+    PS005*1     (b001)
+    PS006*1     (b001)
+    PS007*1     (b001)
+    PS008*1     (b001)
+    PS009*1     (b001)
+    PS010*1     (b001)
+    PS011*1     (b001)
+    PS013*1     (b001)
+    PS014*1     (b001)
+    PS015*1     (b001)
+    PS016*1     (b001)
+    PS017*1     (b001)
+    PS018*1     (b001)
+    PS019*1     (b001)
+    PS020*1     (b001)
+    PS022*1     (b001)
+    PS023*1     (b001)
+    PS024*1     (b001)
+    PS025*1     (b001)
+    PS026*1     (b001)
+    PS027*1     (b001)
+    PS028*1     (b001)
+    PS029*1     (b001)
+    PS030*1     (b001)
+    PS031*1     (b001)
+    PS032*1     (b001)
+    PS034*1     (b001)
+    PS035*1     (b001)
+    PS036*1     (b001)
+    PS037*1     (b001)
+    PS038*1     (b001)
+    PS039*1     (b001)
+    PS040*1     (b001)
+    PS041*1     (b001)
+    PS042*1     (b001)
+    PS043*1     (b001)
+    PS044*1     (b001)
+    PS045*1     (b001)
+    PS046*1     (b001)
+    PS047*1     (b001)
+    PS048*1     (b001)
+    PS049*1     (b001)
+    AA5*1     (b001)
+    AA6*1     (b001)
+    AA7*1     (b001)
+    AA9*1     (b001)
+    AA11*1     (b001)
+    AA12*1     (b001)
+    AA13*1     (b001)
+    AA14*1     (b001)
+    AA15*1     (b001)
+    AA17*1     (b001)
+    AA19*1     (b001)
+    AA20*1     (b001)
+    AA21*1     (b001)
+    AA24*1     (b001)
+    AA26*1     (b001)
+    AA27*1     (b001)
+    AA28*1     (b001)
+    AA29*1     (b001)
+    AA30*1     (b001)
+    AA31*1     (b001)
+    AA34*1     (b001)
+    AA36*1     (b001)
+    AA38*1     (b001)
+    AA41*1     (b001)
+    AA43*1     (b001)
+    AA46*1     (b001)
+    AA47*1     (b001)
+    AA49*1     (b001)
+    BB201*1     (b001)
+    CC5*1     (b001)
+    CC6*1     (b001)
+    CC9*1     (b001)
+    CC10*1     (b001)
+    CC14*1     (b001)
+    CC15*1     (b001)
+    CC16*1     (b001)
+    CC17*1     (b001)
+    CC18*1     (b001)
+    CC19*1     (b001)
+    CC21*1     (b001)
+    CC27*1     (b001)
+    CC28*1     (b001)
+    CC29*1     (b001)
+    CC30*1     (b001)
+    CC31*1     (b001)
+    CC32*1     (b001)
+    CC34*1     (b001)
+    CC35*1     (b001)
+    CC36*1     (b001)
+    CC37*1     (b001)
+    CC39*1     (b001)
+    CC40*1     (b001)
+    CC41*1     (b001)
+    CC42*1     (b001)
+    CC43*1     (b001)
+    CC45*1     (b001)
+    CC46*1     (b001)
+    CC48*1     (b001)
+    CC50*1     (b001)
+    CC51*1     (b001)
+    CC52*1     (b001)
+    CC53*1     (b001)
+    CC56*1     (b001)
+    CC61*1     (b001)
+    CC64*1     (b001)
+    CC66*1     (b001)
+    CC67*1     (b001)
+    CC71*1     (b001)
+    CC72*1     (b001)
+    CC74*1     (b001)
+    CC75*1     (b001)
+    CC76*1     (b001)
+    CC79y*1     (b001)
+    CC84*1     (b001)
+    DD15*1     (b001)
+    DD19*1     (b001)
+    DD205*1     (b001)
+    DD207*1     (b001)
+    EG1_1*1     (b001)
+    EG1_2*1     (b001)
+    EG2_1*1     (b001)
+    EG3_1*1     (b001)
+    EG4a_1*1     (b001)
+    EG4b_2*1     (b001)
+    EG7_1*1     (b001)
+    EG7_2*1     (b001)
+    EG8_1*1     (b001)
+    EG8_2*1     (b001)
+    EG9a*1     (b001)
+    EG10a*1     (b001)
+    EG11_1*1     (b001)
+    EG12a*1     (b001)
+    EG13a*1     (b001)
+    EG14a*1     (b001)
+    EG14b*1     (b001)
+    EG15_1*1     (b001)
+    EG15_2*1     (b001)
+    EG19a_2*1     (b001)
+    EG19a_3*1     (b001)
+    EG19a_4*1     (b001)
+    EG20a*1     (b001)
+    EG20b_1*1     (b001)
+    EG20c*1     (b001)
+    EG20d*1     (b001)
+    EG20e_1*1     (b001)
+    EG20e_2*1     (b001)
+    EG21a*1     (b001)
+    EG21b*1     (b001)
+    EG22_1*1     (b001)
+    EG22_2*1     (b001)
+    EG27a*1     (b001)
+    EG27b_1*1     (b001)
+    EG28a*1     (b001)
+    EG28b*1     (b001)
+    EG28c*1     (b001)
+    EG29a*1     (b001)
+    EG29b*1     (b001)
+    EG29c*1     (b001)
+    EG30a*1     (b001)
+    EG30c*1     (b001)
+    EG30d*1     (b001)
+    EG30e*1     (b001)
+    EG30f*1     (b001)
+    EG31a_1*1     (b001)
+    EG31a_2*1     (b001)
+    EG31b*1     (b001)
+    EG32a*1     (b001)
+    EG32b*1     (b001)
+    EG33a*1     (b001)
+    EG33b*1     (b001)
+    EG34a*1     (b001)
+    EG34b*1     (b001)
+    EG35b*1     (b001)
+    EG36b*1     (b001)
+    EG42a*1     (b001)
+    EG42c*1     (b001)
+    EG43a_1*1     (b001)
+    EG43b*1     (b001)
+    EG44_1*1     (b001)
+    EG44_2*1     (b001)
+    EG45_1*1     (b001)
+    EG45_2*1     (b001)
+    EG46a_1*1     (b001)
+    EG46a_2*1     (b001)
+    EG46b*1     (b001)
+    EG46c*1     (b001)
+    EG46d*1     (b001)
+    EG47a*1     (b001)
+    EG47b*1     (b001)
+    EG48_2*1     (b001)
+    EG49_1*1     (b001)
+    EG49_2*1     (b001)
+    EG50b*1     (b001);
+  F_Psych ON female years femXyrs logyrs;
+  F_Dev ON female years femXyrs logyrs;
+  F_Psych@1;
+  F_Dev@1;
+  [F_Psych@0];
+  [F_Dev@0];
+  F_Psych WITH F_Dev@0;
+INPUT_END
+1
+0
+0
+0
+MLR
+1
+GENERAL
+0
+269
+2
+4
+aa4 aa5 aa6 aa7 aa9 aa11 aa12 aa13 aa14 aa15 aa17 aa19 aa20 aa21 aa24 aa26 aa27 aa28 aa29 aa30 aa31 aa34 aa36 aa38 aa41 aa43 aa46 aa47 aa49 aa50 aa54 aa55 aa56 aa57 aa60 aa65 aa68 aa69 aa71 aa72 aa102 aa104 aa203 aa205 bb5 bb6 bb201 cc4 cc5 cc6 cc8 cc9 cc10 cc11 cc12 cc13 cc14 cc15 cc16 cc17 cc18 cc19 cc20 cc21 cc25 cc26 cc27 cc28 cc29 cc30 cc31 cc32 cc33 cc34 cc35 cc36 cc37 cc39 cc40 cc41 cc42 cc43 cc45 cc46 cc48 cc50 cc51 cc52 cc53 cc54 cc56 cc60 cc61 cc62 cc64 cc65 cc66 cc67 cc68 cc69 cc71 cc72 cc74 cc75 cc76 cc78 cc79y cc80 cc83 cc84 cc85 cc87 cc89 dd15 dd19 dd103 dd205 dd207 dd221 dd299 eg1_1 eg1_2 eg2_1 eg3_1 eg4a_1 eg4b_2 eg5a eg5b eg6_1 eg6_2 eg7_1 eg7_2 eg8_1 eg8_2 eg9a eg10a eg11_1 eg12a eg13a eg14a eg14b eg15_1 eg15_2 eg16a_1 eg16a_2 eg16b eg16c eg17a eg17b eg18a eg18b eg19a_2 eg19a_3 eg19a_4 eg20a eg20b_1 eg20c eg20d eg20e_1 eg20e_2 eg21a eg21b eg22_1 eg22_2 eg23a eg23b eg24b eg25a eg25b eg26b eg27a eg27b_1 eg28a eg28b eg28c eg29a eg29b eg29c eg30a eg30c eg30d eg30e eg30f eg31a_1 eg31a_2 eg31b eg32a eg32b eg33a eg33b eg34a eg34b eg35b eg36b eg37_1 eg37_2 eg38a eg38b eg38c eg39a eg39b eg40_1 eg41_1 eg41_2 eg42a eg42c eg43a_1 eg43a_2 eg43b eg44_1 eg44_2 eg45_1 eg45_2 eg46a_1 eg46a_2 eg46b eg46c eg46d eg47a eg47b eg48_2 eg49_1 eg49_2 eg50b ps002 ps003 ps004 ps005 ps006 ps007 ps008 ps009 ps010 ps011 ps013 ps014 ps015 ps016 ps017 ps018 ps019 ps020 ps022 ps023 ps024 ps025 ps026 ps027 ps028 ps029 ps030 ps031 ps032 ps034 ps035 ps036 ps037 ps038 ps039 ps040 ps041 ps042 ps043 ps044 ps045 ps046 ps047 ps048 ps049 f_psych f_dev female years femxyrs logyrs
+2
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1 1 0 0 0 0
+0
+2
+f_psych
+aa4 aa50 aa54 aa55 aa56 aa57 aa60 aa65 aa68 aa69 aa71 aa72 aa102 aa104 aa203 aa205 bb5 bb6 cc4 cc8 cc11 cc12 cc13 cc20 cc25 cc26 cc33 cc54 cc60 cc62 cc65 cc68 cc69 cc78 cc80 cc83 cc85 cc87 cc89 dd103 dd221 dd299 eg5a eg5b eg6_1 eg6_2 eg16a_1 eg16a_2 eg16b eg16c eg17a eg17b eg18a eg18b eg23a eg23b eg24b eg25a eg25b eg26b eg37_1 eg37_2 eg38a eg38b eg38c eg39a eg39b eg40_1 eg41_1 eg41_2 eg43a_2 ps002 ps003 ps004 ps005 ps006 ps007 ps008 ps009 ps010 ps011 ps013 ps014 ps015 ps016 ps017 ps018 ps019 ps020 ps022 ps023 ps024 ps025 ps026 ps027 ps028 ps029 ps030 ps031 ps032 ps034 ps035 ps036 ps037 ps038 ps039 ps040 ps041 ps042 ps043 ps044 ps045 ps046 ps047 ps048 ps049
+f_dev
+aa4 aa50 aa54 aa55 aa56 aa57 aa60 aa65 aa68 aa69 aa71 aa72 aa102 aa104 aa203 aa205 bb5 bb6 cc4 cc8 cc11 cc12 cc13 cc20 cc25 cc26 cc33 cc54 cc60 cc62 cc65 cc68 cc69 cc78 cc80 cc83 cc85 cc87 cc89 dd103 dd221 dd299 eg5a eg5b eg6_1 eg6_2 eg16a_1 eg16a_2 eg16b eg16c eg17a eg17b eg18a eg18b eg23a eg23b eg24b eg25a eg25b eg26b eg37_1 eg37_2 eg38a eg38b eg38c eg39a eg39b eg40_1 eg41_1 eg41_2 eg43a_2 ps002 ps003 ps004 ps005 ps006 ps007 ps008 ps009 ps010 ps011 ps013 ps014 ps015 ps016 ps017 ps018 ps019 ps020 ps022 ps023 ps024 ps025 ps026 ps027 ps028 ps029 ps030 ps031 ps032 ps034 ps035 ps036 ps037 ps038 ps039 ps040 ps041 ps042 ps043 ps044 ps045 ps046 ps047 ps048 ps049 aa5 aa6 aa7 aa9 aa11 aa12 aa13 aa14 aa15 aa17 aa19 aa20 aa21 aa24 aa26 aa27 aa28 aa29 aa30 aa31 aa34 aa36 aa38 aa41 aa43 aa46 aa47 aa49 bb201 cc5 cc6 cc9 cc10 cc14 cc15 cc16 cc17 cc18 cc19 cc21 cc27 cc28 cc29 cc30 cc31 cc32 cc34 cc35 cc36 cc37 cc39 cc40 cc41 cc42 cc43 cc45 cc46 cc48 cc50 cc51 cc52 cc53 cc56 cc61 cc64 cc66 cc67 cc71 cc72 cc74 cc75 cc76 cc79y cc84 dd15 dd19 dd205 dd207 eg1_1 eg1_2 eg2_1 eg3_1 eg4a_1 eg4b_2 eg7_1 eg7_2 eg8_1 eg8_2 eg9a eg10a eg11_1 eg12a eg13a eg14a eg14b eg15_1 eg15_2 eg19a_2 eg19a_3 eg19a_4 eg20a eg20b_1 eg20c eg20d eg20e_1 eg20e_2 eg21a eg21b eg22_1 eg22_2 eg27a eg27b_1 eg28a eg28b eg28c eg29a eg29b eg29c eg30a eg30c eg30d eg30e eg30f eg31a_1 eg31a_2 eg31b eg32a eg32b eg33a eg33b eg34a eg34b eg35b eg36b eg42a eg42c eg43a_1 eg43b eg44_1 eg44_2 eg45_1 eg45_2 eg46a_1 eg46a_2 eg46b eg46c eg46d eg47a eg47b eg48_2 eg49_1 eg49_2 eg50b
+1 1 f_psych aa4    1.513
+91 1 f_psych aa4 a001
+1 1 f_psych aa50    1.513
+91 1 f_psych aa50 a001
+1 1 f_psych aa54    1.513
+91 1 f_psych aa54 a001
+1 1 f_psych aa55    1.513
+91 1 f_psych aa55 a001
+1 1 f_psych aa56    1.513
+91 1 f_psych aa56 a001
+1 1 f_psych aa57    1.513
+91 1 f_psych aa57 a001
+1 1 f_psych aa60    1.513
+91 1 f_psych aa60 a001
+1 1 f_psych aa65    1.513
+91 1 f_psych aa65 a001
+1 1 f_psych aa68    1.513
+91 1 f_psych aa68 a001
+1 1 f_psych aa69    1.513
+91 1 f_psych aa69 a001
+1 1 f_psych aa71    1.513
+91 1 f_psych aa71 a001
+1 1 f_psych aa72    1.513
+91 1 f_psych aa72 a001
+1 1 f_psych aa102    1.513
+91 1 f_psych aa102 a001
+1 1 f_psych aa104    1.513
+91 1 f_psych aa104 a001
+1 1 f_psych aa203    1.513
+91 1 f_psych aa203 a001
+1 1 f_psych aa205    1.513
+91 1 f_psych aa205 a001
+1 1 f_psych bb5    1.513
+91 1 f_psych bb5 a001
+1 1 f_psych bb6    1.513
+91 1 f_psych bb6 a001
+1 1 f_psych cc4    1.513
+91 1 f_psych cc4 a001
+1 1 f_psych cc8    1.513
+91 1 f_psych cc8 a001
+1 1 f_psych cc11    1.513
+91 1 f_psych cc11 a001
+1 1 f_psych cc12    1.513
+91 1 f_psych cc12 a001
+1 1 f_psych cc13    1.513
+91 1 f_psych cc13 a001
+1 1 f_psych cc20    1.513
+91 1 f_psych cc20 a001
+1 1 f_psych cc25    1.513
+91 1 f_psych cc25 a001
+1 1 f_psych cc26    1.513
+91 1 f_psych cc26 a001
+1 1 f_psych cc33    1.513
+91 1 f_psych cc33 a001
+1 1 f_psych cc54    1.513
+91 1 f_psych cc54 a001
+1 1 f_psych cc60    1.513
+91 1 f_psych cc60 a001
+1 1 f_psych cc62    1.513
+91 1 f_psych cc62 a001
+1 1 f_psych cc65    1.513
+91 1 f_psych cc65 a001
+1 1 f_psych cc68    1.513
+91 1 f_psych cc68 a001
+1 1 f_psych cc69    1.513
+91 1 f_psych cc69 a001
+1 1 f_psych cc78    1.513
+91 1 f_psych cc78 a001
+1 1 f_psych cc80    1.513
+91 1 f_psych cc80 a001
+1 1 f_psych cc83    1.513
+91 1 f_psych cc83 a001
+1 1 f_psych cc85    1.513
+91 1 f_psych cc85 a001
+1 1 f_psych cc87    1.513
+91 1 f_psych cc87 a001
+1 1 f_psych cc89    1.513
+91 1 f_psych cc89 a001
+1 1 f_psych dd103    1.513
+91 1 f_psych dd103 a001
+1 1 f_psych dd221    1.513
+91 1 f_psych dd221 a001
+1 1 f_psych dd299    1.513
+91 1 f_psych dd299 a001
+1 1 f_psych eg5a    1.513
+91 1 f_psych eg5a a001
+1 1 f_psych eg5b    1.513
+91 1 f_psych eg5b a001
+1 1 f_psych eg6_1    1.513
+91 1 f_psych eg6_1 a001
+1 1 f_psych eg6_2    1.513
+91 1 f_psych eg6_2 a001
+1 1 f_psych eg16a_1    1.513
+91 1 f_psych eg16a_1 a001
+1 1 f_psych eg16a_2    1.513
+91 1 f_psych eg16a_2 a001
+1 1 f_psych eg16b    1.513
+91 1 f_psych eg16b a001
+1 1 f_psych eg16c    1.513
+91 1 f_psych eg16c a001
+1 1 f_psych eg17a    1.513
+91 1 f_psych eg17a a001
+1 1 f_psych eg17b    1.513
+91 1 f_psych eg17b a001
+1 1 f_psych eg18a    1.513
+91 1 f_psych eg18a a001
+1 1 f_psych eg18b    1.513
+91 1 f_psych eg18b a001
+1 1 f_psych eg23a    1.513
+91 1 f_psych eg23a a001
+1 1 f_psych eg23b    1.513
+91 1 f_psych eg23b a001
+1 1 f_psych eg24b    1.513
+91 1 f_psych eg24b a001
+1 1 f_psych eg25a    1.513
+91 1 f_psych eg25a a001
+1 1 f_psych eg25b    1.513
+91 1 f_psych eg25b a001
+1 1 f_psych eg26b    1.513
+91 1 f_psych eg26b a001
+1 1 f_psych eg37_1    1.513
+91 1 f_psych eg37_1 a001
+1 1 f_psych eg37_2    1.513
+91 1 f_psych eg37_2 a001
+1 1 f_psych eg38a    1.513
+91 1 f_psych eg38a a001
+1 1 f_psych eg38b    1.513
+91 1 f_psych eg38b a001
+1 1 f_psych eg38c    1.513
+91 1 f_psych eg38c a001
+1 1 f_psych eg39a    1.513
+91 1 f_psych eg39a a001
+1 1 f_psych eg39b    1.513
+91 1 f_psych eg39b a001
+1 1 f_psych eg40_1    1.513
+91 1 f_psych eg40_1 a001
+1 1 f_psych eg41_1    1.513
+91 1 f_psych eg41_1 a001
+1 1 f_psych eg41_2    1.513
+91 1 f_psych eg41_2 a001
+1 1 f_psych eg43a_2    1.513
+91 1 f_psych eg43a_2 a001
+1 1 f_psych ps002    1.513
+91 1 f_psych ps002 a001
+1 1 f_psych ps003    1.513
+91 1 f_psych ps003 a001
+1 1 f_psych ps004    1.513
+91 1 f_psych ps004 a001
+1 1 f_psych ps005    1.513
+91 1 f_psych ps005 a001
+1 1 f_psych ps006    1.513
+91 1 f_psych ps006 a001
+1 1 f_psych ps007    1.513
+91 1 f_psych ps007 a001
+1 1 f_psych ps008    1.513
+91 1 f_psych ps008 a001
+1 1 f_psych ps009    1.513
+91 1 f_psych ps009 a001
+1 1 f_psych ps010    1.513
+91 1 f_psych ps010 a001
+1 1 f_psych ps011    1.513
+91 1 f_psych ps011 a001
+1 1 f_psych ps013    1.513
+91 1 f_psych ps013 a001
+1 1 f_psych ps014    1.513
+91 1 f_psych ps014 a001
+1 1 f_psych ps015    1.513
+91 1 f_psych ps015 a001
+1 1 f_psych ps016    1.513
+91 1 f_psych ps016 a001
+1 1 f_psych ps017    1.513
+91 1 f_psych ps017 a001
+1 1 f_psych ps018    1.513
+91 1 f_psych ps018 a001
+1 1 f_psych ps019    1.513
+91 1 f_psych ps019 a001
+1 1 f_psych ps020    1.513
+91 1 f_psych ps020 a001
+1 1 f_psych ps022    1.513
+91 1 f_psych ps022 a001
+1 1 f_psych ps023    1.513
+91 1 f_psych ps023 a001
+1 1 f_psych ps024    1.513
+91 1 f_psych ps024 a001
+1 1 f_psych ps025    1.513
+91 1 f_psych ps025 a001
+1 1 f_psych ps026    1.513
+91 1 f_psych ps026 a001
+1 1 f_psych ps027    1.513
+91 1 f_psych ps027 a001
+1 1 f_psych ps028    1.513
+91 1 f_psych ps028 a001
+1 1 f_psych ps029    1.513
+91 1 f_psych ps029 a001
+1 1 f_psych ps030    1.513
+91 1 f_psych ps030 a001
+1 1 f_psych ps031    1.513
+91 1 f_psych ps031 a001
+1 1 f_psych ps032    1.513
+91 1 f_psych ps032 a001
+1 1 f_psych ps034    1.513
+91 1 f_psych ps034 a001
+1 1 f_psych ps035    1.513
+91 1 f_psych ps035 a001
+1 1 f_psych ps036    1.513
+91 1 f_psych ps036 a001
+1 1 f_psych ps037    1.513
+91 1 f_psych ps037 a001
+1 1 f_psych ps038    1.513
+91 1 f_psych ps038 a001
+1 1 f_psych ps039    1.513
+91 1 f_psych ps039 a001
+1 1 f_psych ps040    1.513
+91 1 f_psych ps040 a001
+1 1 f_psych ps041    1.513
+91 1 f_psych ps041 a001
+1 1 f_psych ps042    1.513
+91 1 f_psych ps042 a001
+1 1 f_psych ps043    1.513
+91 1 f_psych ps043 a001
+1 1 f_psych ps044    1.513
+91 1 f_psych ps044 a001
+1 1 f_psych ps045    1.513
+91 1 f_psych ps045 a001
+1 1 f_psych ps046    1.513
+91 1 f_psych ps046 a001
+1 1 f_psych ps047    1.513
+91 1 f_psych ps047 a001
+1 1 f_psych ps048    1.513
+91 1 f_psych ps048 a001
+1 1 f_psych ps049    1.513
+91 1 f_psych ps049 a001
+1 1 f_dev aa4    1.193
+91 1 f_dev aa4 b001
+1 1 f_dev aa50    1.193
+91 1 f_dev aa50 b001
+1 1 f_dev aa54    1.193
+91 1 f_dev aa54 b001
+1 1 f_dev aa55    1.193
+91 1 f_dev aa55 b001
+1 1 f_dev aa56    1.193
+91 1 f_dev aa56 b001
+1 1 f_dev aa57    1.193
+91 1 f_dev aa57 b001
+1 1 f_dev aa60    1.193
+91 1 f_dev aa60 b001
+1 1 f_dev aa65    1.193
+91 1 f_dev aa65 b001
+1 1 f_dev aa68    1.193
+91 1 f_dev aa68 b001
+1 1 f_dev aa69    1.193
+91 1 f_dev aa69 b001
+1 1 f_dev aa71    1.193
+91 1 f_dev aa71 b001
+1 1 f_dev aa72    1.193
+91 1 f_dev aa72 b001
+1 1 f_dev aa102    1.193
+91 1 f_dev aa102 b001
+1 1 f_dev aa104    1.193
+91 1 f_dev aa104 b001
+1 1 f_dev aa203    1.193
+91 1 f_dev aa203 b001
+1 1 f_dev aa205    1.193
+91 1 f_dev aa205 b001
+1 1 f_dev bb5    1.193
+91 1 f_dev bb5 b001
+1 1 f_dev bb6    1.193
+91 1 f_dev bb6 b001
+1 1 f_dev cc4    1.193
+91 1 f_dev cc4 b001
+1 1 f_dev cc8    1.193
+91 1 f_dev cc8 b001
+1 1 f_dev cc11    1.193
+91 1 f_dev cc11 b001
+1 1 f_dev cc12    1.193
+91 1 f_dev cc12 b001
+1 1 f_dev cc13    1.193
+91 1 f_dev cc13 b001
+1 1 f_dev cc20    1.193
+91 1 f_dev cc20 b001
+1 1 f_dev cc25    1.193
+91 1 f_dev cc25 b001
+1 1 f_dev cc26    1.193
+91 1 f_dev cc26 b001
+1 1 f_dev cc33    1.193
+91 1 f_dev cc33 b001
+1 1 f_dev cc54    1.193
+91 1 f_dev cc54 b001
+1 1 f_dev cc60    1.193
+91 1 f_dev cc60 b001
+1 1 f_dev cc62    1.193
+91 1 f_dev cc62 b001
+1 1 f_dev cc65    1.193
+91 1 f_dev cc65 b001
+1 1 f_dev cc68    1.193
+91 1 f_dev cc68 b001
+1 1 f_dev cc69    1.193
+91 1 f_dev cc69 b001
+1 1 f_dev cc78    1.193
+91 1 f_dev cc78 b001
+1 1 f_dev cc80    1.193
+91 1 f_dev cc80 b001
+1 1 f_dev cc83    1.193
+91 1 f_dev cc83 b001
+1 1 f_dev cc85    1.193
+91 1 f_dev cc85 b001
+1 1 f_dev cc87    1.193
+91 1 f_dev cc87 b001
+1 1 f_dev cc89    1.193
+91 1 f_dev cc89 b001
+1 1 f_dev dd103    1.193
+91 1 f_dev dd103 b001
+1 1 f_dev dd221    1.193
+91 1 f_dev dd221 b001
+1 1 f_dev dd299    1.193
+91 1 f_dev dd299 b001
+1 1 f_dev eg5a    1.193
+91 1 f_dev eg5a b001
+1 1 f_dev eg5b    1.193
+91 1 f_dev eg5b b001
+1 1 f_dev eg6_1    1.193
+91 1 f_dev eg6_1 b001
+1 1 f_dev eg6_2    1.193
+91 1 f_dev eg6_2 b001
+1 1 f_dev eg16a_1    1.193
+91 1 f_dev eg16a_1 b001
+1 1 f_dev eg16a_2    1.193
+91 1 f_dev eg16a_2 b001
+1 1 f_dev eg16b    1.193
+91 1 f_dev eg16b b001
+1 1 f_dev eg16c    1.193
+91 1 f_dev eg16c b001
+1 1 f_dev eg17a    1.193
+91 1 f_dev eg17a b001
+1 1 f_dev eg17b    1.193
+91 1 f_dev eg17b b001
+1 1 f_dev eg18a    1.193
+91 1 f_dev eg18a b001
+1 1 f_dev eg18b    1.193
+91 1 f_dev eg18b b001
+1 1 f_dev eg23a    1.193
+91 1 f_dev eg23a b001
+1 1 f_dev eg23b    1.193
+91 1 f_dev eg23b b001
+1 1 f_dev eg24b    1.193
+91 1 f_dev eg24b b001
+1 1 f_dev eg25a    1.193
+91 1 f_dev eg25a b001
+1 1 f_dev eg25b    1.193
+91 1 f_dev eg25b b001
+1 1 f_dev eg26b    1.193
+91 1 f_dev eg26b b001
+1 1 f_dev eg37_1    1.193
+91 1 f_dev eg37_1 b001
+1 1 f_dev eg37_2    1.193
+91 1 f_dev eg37_2 b001
+1 1 f_dev eg38a    1.193
+91 1 f_dev eg38a b001
+1 1 f_dev eg38b    1.193
+91 1 f_dev eg38b b001
+1 1 f_dev eg38c    1.193
+91 1 f_dev eg38c b001
+1 1 f_dev eg39a    1.193
+91 1 f_dev eg39a b001
+1 1 f_dev eg39b    1.193
+91 1 f_dev eg39b b001
+1 1 f_dev eg40_1    1.193
+91 1 f_dev eg40_1 b001
+1 1 f_dev eg41_1    1.193
+91 1 f_dev eg41_1 b001
+1 1 f_dev eg41_2    1.193
+91 1 f_dev eg41_2 b001
+1 1 f_dev eg43a_2    1.193
+91 1 f_dev eg43a_2 b001
+1 1 f_dev ps002    1.193
+91 1 f_dev ps002 b001
+1 1 f_dev ps003    1.193
+91 1 f_dev ps003 b001
+1 1 f_dev ps004    1.193
+91 1 f_dev ps004 b001
+1 1 f_dev ps005    1.193
+91 1 f_dev ps005 b001
+1 1 f_dev ps006    1.193
+91 1 f_dev ps006 b001
+1 1 f_dev ps007    1.193
+91 1 f_dev ps007 b001
+1 1 f_dev ps008    1.193
+91 1 f_dev ps008 b001
+1 1 f_dev ps009    1.193
+91 1 f_dev ps009 b001
+1 1 f_dev ps010    1.193
+91 1 f_dev ps010 b001
+1 1 f_dev ps011    1.193
+91 1 f_dev ps011 b001
+1 1 f_dev ps013    1.193
+91 1 f_dev ps013 b001
+1 1 f_dev ps014    1.193
+91 1 f_dev ps014 b001
+1 1 f_dev ps015    1.193
+91 1 f_dev ps015 b001
+1 1 f_dev ps016    1.193
+91 1 f_dev ps016 b001
+1 1 f_dev ps017    1.193
+91 1 f_dev ps017 b001
+1 1 f_dev ps018    1.193
+91 1 f_dev ps018 b001
+1 1 f_dev ps019    1.193
+91 1 f_dev ps019 b001
+1 1 f_dev ps020    1.193
+91 1 f_dev ps020 b001
+1 1 f_dev ps022    1.193
+91 1 f_dev ps022 b001
+1 1 f_dev ps023    1.193
+91 1 f_dev ps023 b001
+1 1 f_dev ps024    1.193
+91 1 f_dev ps024 b001
+1 1 f_dev ps025    1.193
+91 1 f_dev ps025 b001
+1 1 f_dev ps026    1.193
+91 1 f_dev ps026 b001
+1 1 f_dev ps027    1.193
+91 1 f_dev ps027 b001
+1 1 f_dev ps028    1.193
+91 1 f_dev ps028 b001
+1 1 f_dev ps029    1.193
+91 1 f_dev ps029 b001
+1 1 f_dev ps030    1.193
+91 1 f_dev ps030 b001
+1 1 f_dev ps031    1.193
+91 1 f_dev ps031 b001
+1 1 f_dev ps032    1.193
+91 1 f_dev ps032 b001
+1 1 f_dev ps034    1.193
+91 1 f_dev ps034 b001
+1 1 f_dev ps035    1.193
+91 1 f_dev ps035 b001
+1 1 f_dev ps036    1.193
+91 1 f_dev ps036 b001
+1 1 f_dev ps037    1.193
+91 1 f_dev ps037 b001
+1 1 f_dev ps038    1.193
+91 1 f_dev ps038 b001
+1 1 f_dev ps039    1.193
+91 1 f_dev ps039 b001
+1 1 f_dev ps040    1.193
+91 1 f_dev ps040 b001
+1 1 f_dev ps041    1.193
+91 1 f_dev ps041 b001
+1 1 f_dev ps042    1.193
+91 1 f_dev ps042 b001
+1 1 f_dev ps043    1.193
+91 1 f_dev ps043 b001
+1 1 f_dev ps044    1.193
+91 1 f_dev ps044 b001
+1 1 f_dev ps045    1.193
+91 1 f_dev ps045 b001
+1 1 f_dev ps046    1.193
+91 1 f_dev ps046 b001
+1 1 f_dev ps047    1.193
+91 1 f_dev ps047 b001
+1 1 f_dev ps048    1.193
+91 1 f_dev ps048 b001
+1 1 f_dev ps049    1.193
+91 1 f_dev ps049 b001
+1 1 f_dev aa5    1.193
+91 1 f_dev aa5 b001
+1 1 f_dev aa6    1.193
+91 1 f_dev aa6 b001
+1 1 f_dev aa7    1.193
+91 1 f_dev aa7 b001
+1 1 f_dev aa9    1.193
+91 1 f_dev aa9 b001
+1 1 f_dev aa11    1.193
+91 1 f_dev aa11 b001
+1 1 f_dev aa12    1.193
+91 1 f_dev aa12 b001
+1 1 f_dev aa13    1.193
+91 1 f_dev aa13 b001
+1 1 f_dev aa14    1.193
+91 1 f_dev aa14 b001
+1 1 f_dev aa15    1.193
+91 1 f_dev aa15 b001
+1 1 f_dev aa17    1.193
+91 1 f_dev aa17 b001
+1 1 f_dev aa19    1.193
+91 1 f_dev aa19 b001
+1 1 f_dev aa20    1.193
+91 1 f_dev aa20 b001
+1 1 f_dev aa21    1.193
+91 1 f_dev aa21 b001
+1 1 f_dev aa24    1.193
+91 1 f_dev aa24 b001
+1 1 f_dev aa26    1.193
+91 1 f_dev aa26 b001
+1 1 f_dev aa27    1.193
+91 1 f_dev aa27 b001
+1 1 f_dev aa28    1.193
+91 1 f_dev aa28 b001
+1 1 f_dev aa29    1.193
+91 1 f_dev aa29 b001
+1 1 f_dev aa30    1.193
+91 1 f_dev aa30 b001
+1 1 f_dev aa31    1.193
+91 1 f_dev aa31 b001
+1 1 f_dev aa34    1.193
+91 1 f_dev aa34 b001
+1 1 f_dev aa36    1.193
+91 1 f_dev aa36 b001
+1 1 f_dev aa38    1.193
+91 1 f_dev aa38 b001
+1 1 f_dev aa41    1.193
+91 1 f_dev aa41 b001
+1 1 f_dev aa43    1.193
+91 1 f_dev aa43 b001
+1 1 f_dev aa46    1.193
+91 1 f_dev aa46 b001
+1 1 f_dev aa47    1.193
+91 1 f_dev aa47 b001
+1 1 f_dev aa49    1.193
+91 1 f_dev aa49 b001
+1 1 f_dev bb201    1.193
+91 1 f_dev bb201 b001
+1 1 f_dev cc5    1.193
+91 1 f_dev cc5 b001
+1 1 f_dev cc6    1.193
+91 1 f_dev cc6 b001
+1 1 f_dev cc9    1.193
+91 1 f_dev cc9 b001
+1 1 f_dev cc10    1.193
+91 1 f_dev cc10 b001
+1 1 f_dev cc14    1.193
+91 1 f_dev cc14 b001
+1 1 f_dev cc15    1.193
+91 1 f_dev cc15 b001
+1 1 f_dev cc16    1.193
+91 1 f_dev cc16 b001
+1 1 f_dev cc17    1.193
+91 1 f_dev cc17 b001
+1 1 f_dev cc18    1.193
+91 1 f_dev cc18 b001
+1 1 f_dev cc19    1.193
+91 1 f_dev cc19 b001
+1 1 f_dev cc21    1.193
+91 1 f_dev cc21 b001
+1 1 f_dev cc27    1.193
+91 1 f_dev cc27 b001
+1 1 f_dev cc28    1.193
+91 1 f_dev cc28 b001
+1 1 f_dev cc29    1.193
+91 1 f_dev cc29 b001
+1 1 f_dev cc30    1.193
+91 1 f_dev cc30 b001
+1 1 f_dev cc31    1.193
+91 1 f_dev cc31 b001
+1 1 f_dev cc32    1.193
+91 1 f_dev cc32 b001
+1 1 f_dev cc34    1.193
+91 1 f_dev cc34 b001
+1 1 f_dev cc35    1.193
+91 1 f_dev cc35 b001
+1 1 f_dev cc36    1.193
+91 1 f_dev cc36 b001
+1 1 f_dev cc37    1.193
+91 1 f_dev cc37 b001
+1 1 f_dev cc39    1.193
+91 1 f_dev cc39 b001
+1 1 f_dev cc40    1.193
+91 1 f_dev cc40 b001
+1 1 f_dev cc41    1.193
+91 1 f_dev cc41 b001
+1 1 f_dev cc42    1.193
+91 1 f_dev cc42 b001
+1 1 f_dev cc43    1.193
+91 1 f_dev cc43 b001
+1 1 f_dev cc45    1.193
+91 1 f_dev cc45 b001
+1 1 f_dev cc46    1.193
+91 1 f_dev cc46 b001
+1 1 f_dev cc48    1.193
+91 1 f_dev cc48 b001
+1 1 f_dev cc50    1.193
+91 1 f_dev cc50 b001
+1 1 f_dev cc51    1.193
+91 1 f_dev cc51 b001
+1 1 f_dev cc52    1.193
+91 1 f_dev cc52 b001
+1 1 f_dev cc53    1.193
+91 1 f_dev cc53 b001
+1 1 f_dev cc56    1.193
+91 1 f_dev cc56 b001
+1 1 f_dev cc61    1.193
+91 1 f_dev cc61 b001
+1 1 f_dev cc64    1.193
+91 1 f_dev cc64 b001
+1 1 f_dev cc66    1.193
+91 1 f_dev cc66 b001
+1 1 f_dev cc67    1.193
+91 1 f_dev cc67 b001
+1 1 f_dev cc71    1.193
+91 1 f_dev cc71 b001
+1 1 f_dev cc72    1.193
+91 1 f_dev cc72 b001
+1 1 f_dev cc74    1.193
+91 1 f_dev cc74 b001
+1 1 f_dev cc75    1.193
+91 1 f_dev cc75 b001
+1 1 f_dev cc76    1.193
+91 1 f_dev cc76 b001
+1 1 f_dev cc79y    1.193
+91 1 f_dev cc79y b001
+1 1 f_dev cc84    1.193
+91 1 f_dev cc84 b001
+1 1 f_dev dd15    1.193
+91 1 f_dev dd15 b001
+1 1 f_dev dd19    1.193
+91 1 f_dev dd19 b001
+1 1 f_dev dd205    1.193
+91 1 f_dev dd205 b001
+1 1 f_dev dd207    1.193
+91 1 f_dev dd207 b001
+1 1 f_dev eg1_1    1.193
+91 1 f_dev eg1_1 b001
+1 1 f_dev eg1_2    1.193
+91 1 f_dev eg1_2 b001
+1 1 f_dev eg2_1    1.193
+91 1 f_dev eg2_1 b001
+1 1 f_dev eg3_1    1.193
+91 1 f_dev eg3_1 b001
+1 1 f_dev eg4a_1    1.193
+91 1 f_dev eg4a_1 b001
+1 1 f_dev eg4b_2    1.193
+91 1 f_dev eg4b_2 b001
+1 1 f_dev eg7_1    1.193
+91 1 f_dev eg7_1 b001
+1 1 f_dev eg7_2    1.193
+91 1 f_dev eg7_2 b001
+1 1 f_dev eg8_1    1.193
+91 1 f_dev eg8_1 b001
+1 1 f_dev eg8_2    1.193
+91 1 f_dev eg8_2 b001
+1 1 f_dev eg9a    1.193
+91 1 f_dev eg9a b001
+1 1 f_dev eg10a    1.193
+91 1 f_dev eg10a b001
+1 1 f_dev eg11_1    1.193
+91 1 f_dev eg11_1 b001
+1 1 f_dev eg12a    1.193
+91 1 f_dev eg12a b001
+1 1 f_dev eg13a    1.193
+91 1 f_dev eg13a b001
+1 1 f_dev eg14a    1.193
+91 1 f_dev eg14a b001
+1 1 f_dev eg14b    1.193
+91 1 f_dev eg14b b001
+1 1 f_dev eg15_1    1.193
+91 1 f_dev eg15_1 b001
+1 1 f_dev eg15_2    1.193
+91 1 f_dev eg15_2 b001
+1 1 f_dev eg19a_2    1.193
+91 1 f_dev eg19a_2 b001
+1 1 f_dev eg19a_3    1.193
+91 1 f_dev eg19a_3 b001
+1 1 f_dev eg19a_4    1.193
+91 1 f_dev eg19a_4 b001
+1 1 f_dev eg20a    1.193
+91 1 f_dev eg20a b001
+1 1 f_dev eg20b_1    1.193
+91 1 f_dev eg20b_1 b001
+1 1 f_dev eg20c    1.193
+91 1 f_dev eg20c b001
+1 1 f_dev eg20d    1.193
+91 1 f_dev eg20d b001
+1 1 f_dev eg20e_1    1.193
+91 1 f_dev eg20e_1 b001
+1 1 f_dev eg20e_2    1.193
+91 1 f_dev eg20e_2 b001
+1 1 f_dev eg21a    1.193
+91 1 f_dev eg21a b001
+1 1 f_dev eg21b    1.193
+91 1 f_dev eg21b b001
+1 1 f_dev eg22_1    1.193
+91 1 f_dev eg22_1 b001
+1 1 f_dev eg22_2    1.193
+91 1 f_dev eg22_2 b001
+1 1 f_dev eg27a    1.193
+91 1 f_dev eg27a b001
+1 1 f_dev eg27b_1    1.193
+91 1 f_dev eg27b_1 b001
+1 1 f_dev eg28a    1.193
+91 1 f_dev eg28a b001
+1 1 f_dev eg28b    1.193
+91 1 f_dev eg28b b001
+1 1 f_dev eg28c    1.193
+91 1 f_dev eg28c b001
+1 1 f_dev eg29a    1.193
+91 1 f_dev eg29a b001
+1 1 f_dev eg29b    1.193
+91 1 f_dev eg29b b001
+1 1 f_dev eg29c    1.193
+91 1 f_dev eg29c b001
+1 1 f_dev eg30a    1.193
+91 1 f_dev eg30a b001
+1 1 f_dev eg30c    1.193
+91 1 f_dev eg30c b001
+1 1 f_dev eg30d    1.193
+91 1 f_dev eg30d b001
+1 1 f_dev eg30e    1.193
+91 1 f_dev eg30e b001
+1 1 f_dev eg30f    1.193
+91 1 f_dev eg30f b001
+1 1 f_dev eg31a_1    1.193
+91 1 f_dev eg31a_1 b001
+1 1 f_dev eg31a_2    1.193
+91 1 f_dev eg31a_2 b001
+1 1 f_dev eg31b    1.193
+91 1 f_dev eg31b b001
+1 1 f_dev eg32a    1.193
+91 1 f_dev eg32a b001
+1 1 f_dev eg32b    1.193
+91 1 f_dev eg32b b001
+1 1 f_dev eg33a    1.193
+91 1 f_dev eg33a b001
+1 1 f_dev eg33b    1.193
+91 1 f_dev eg33b b001
+1 1 f_dev eg34a    1.193
+91 1 f_dev eg34a b001
+1 1 f_dev eg34b    1.193
+91 1 f_dev eg34b b001
+1 1 f_dev eg35b    1.193
+91 1 f_dev eg35b b001
+1 1 f_dev eg36b    1.193
+91 1 f_dev eg36b b001
+1 1 f_dev eg42a    1.193
+91 1 f_dev eg42a b001
+1 1 f_dev eg42c    1.193
+91 1 f_dev eg42c b001
+1 1 f_dev eg43a_1    1.193
+91 1 f_dev eg43a_1 b001
+1 1 f_dev eg43b    1.193
+91 1 f_dev eg43b b001
+1 1 f_dev eg44_1    1.193
+91 1 f_dev eg44_1 b001
+1 1 f_dev eg44_2    1.193
+91 1 f_dev eg44_2 b001
+1 1 f_dev eg45_1    1.193
+91 1 f_dev eg45_1 b001
+1 1 f_dev eg45_2    1.193
+91 1 f_dev eg45_2 b001
+1 1 f_dev eg46a_1    1.193
+91 1 f_dev eg46a_1 b001
+1 1 f_dev eg46a_2    1.193
+91 1 f_dev eg46a_2 b001
+1 1 f_dev eg46b    1.193
+91 1 f_dev eg46b b001
+1 1 f_dev eg46c    1.193
+91 1 f_dev eg46c b001
+1 1 f_dev eg46d    1.193
+91 1 f_dev eg46d b001
+1 1 f_dev eg47a    1.193
+91 1 f_dev eg47a b001
+1 1 f_dev eg47b    1.193
+91 1 f_dev eg47b b001
+1 1 f_dev eg48_2    1.193
+91 1 f_dev eg48_2 b001
+1 1 f_dev eg49_1    1.193
+91 1 f_dev eg49_1 b001
+1 1 f_dev eg49_2    1.193
+91 1 f_dev eg49_2 b001
+1 1 f_dev eg50b    1.193
+91 1 f_dev eg50b b001
+1 1 female f_psych   -0.106
+1 1 years f_psych    0.659
+1 1 femxyrs f_psych    0.041
+1 1 logyrs f_psych   -6.465
+1 1 female f_dev    0.272
+1 1 years f_dev   -0.388
+1 1 femxyrs f_dev   -0.032
+1 1 logyrs f_dev    6.375
+2 1 f_psych f_dev    0.000
+4 1 f_psych    1.000
+4 1 f_dev    1.000
+2 1 female years  999.000
+2 1 female femxyrs  999.000
+2 1 female logyrs  999.000
+2 1 years femxyrs  999.000
+2 1 years logyrs  999.000
+2 1 femxyrs logyrs  999.000

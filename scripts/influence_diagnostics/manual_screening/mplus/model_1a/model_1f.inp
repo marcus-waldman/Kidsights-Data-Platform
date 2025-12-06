@@ -1,0 +1,900 @@
+TITLE: 
+  Model 1d - Selective Zero Constraints + N(0,5) Priors
+  NE25 Authenticity Screening Stage 1
+  2-Parameter IRT with Demographic Covariates
+  Generated: 2025-12-01
+
+DATA: 
+  FILE = "model_1d.dat";
+
+VARIABLE:
+  NAMES = 
+    pid recordid female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12
+    AA13 AA14 AA15 AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34
+    AA36 AA38 AA41 AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68
+    AA69 AA71 AA72 AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9
+    CC10 CC11 CC12 CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27
+    CC28 CC29 CC30 CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43
+    CC45 CC46 CC48 CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66
+    CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85
+    CC87 CC89 DD15 DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1
+    EG4a_1 EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a
+    EG11_1 EG12a EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c
+    EG17a EG17b EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d
+    EG20e_1 EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b
+    EG26b EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d
+    EG30e EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b
+    EG35b EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1
+    EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2
+    EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b
+    PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014
+    PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027
+    PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040
+    PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  
+  USEVARIABLES = 
+    female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15
+    AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41
+    AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72
+    AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12
+    CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30
+    CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48
+    CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69
+    CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15
+    DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2
+    EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a
+    EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b
+    EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1
+    EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b
+    EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d EG30e
+    EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b EG35b
+    EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1 EG41_2
+    EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1
+    EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b PS002
+    PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014 PS015
+    PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027 PS028
+    PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040 PS041
+    PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  
+  CATEGORICAL = 
+     AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15 AA17 AA19 AA20 AA21 AA24
+    AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41 AA43 AA46 AA47 AA49 AA50
+    AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72 AA102 AA104 AA203 AA205
+    BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12 CC13 CC14 CC15 CC16 CC17
+    CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30 CC31 CC32 CC33 CC34 CC35
+    CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48 CC50 CC51 CC52 CC53 CC54
+    CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76
+    CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15 DD19 DD103 DD205 DD207 DD221
+    DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1
+    EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a EG13a EG14a EG14b EG15_1 EG15_2
+    EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b EG18a EG18b EG19a_2 EG19a_3
+    EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1 EG20e_2 EG21a EG21b EG22_1
+    EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b EG27a EG27b_1 EG28a EG28b EG28c
+    EG29a EG29b EG29c EG30a EG30c EG30d EG30e EG30f EG31a_1 EG31a_2 EG31b
+    EG32a EG32b EG33a EG33b EG34a EG34b EG35b EG36b EG37_1 EG37_2 EG38a EG38b
+    EG38c EG39a EG39b EG40_1 EG41_1 EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b
+    EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b
+    EG48_2 EG49_1 EG49_2 EG50b PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009
+    PS010 PS011 PS013 PS014 PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023
+    PS024 PS025 PS026 PS027 PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036
+    PS037 PS038 PS039 PS040 PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048
+    PS049;
+  
+  IDVARIABLE = pid;
+  AUXILIARY = recordid;
+  
+  MISSING = . ;
+  
+  ! Create derived covariates
+  DEFINE:
+
+ANALYSIS:
+  ESTIMATOR = MLR;                     ! Maximum likelihood with robust SEs
+  ALGORITHM = FS;             ! Numerical integration for categorical
+  INTEGRATION = GAUSS(10);             ! 16-point Gauss-Hermite quadrature
+  LINK = LOGIT;                        ! Logit link (graded response model)
+  PROCESSORS = 16;                     ! Parallel processing
+
+MODEL:
+
+
+       f_psych BY aa4@0.13785;
+       f_psych BY aa50@2.08545;
+       f_psych BY aa54@0;
+       f_psych BY aa55@0;
+       f_psych BY aa56@0;
+       f_psych BY aa57@0.85052;
+       f_psych BY aa60@0;
+       f_psych BY aa65@0.74167;
+       f_psych BY aa68@1.00183;
+       f_psych BY aa69@0.50196;
+       f_psych BY aa71@0.10505;
+       f_psych BY aa72@0.09210;
+       f_psych BY aa102@1.67325;
+       f_psych BY aa104@0.76557;
+       f_psych BY aa203@0.67101;
+       f_psych BY aa205@0.19480;
+       f_psych BY bb5@0.27786;
+       f_psych BY bb6@0.62653;
+       f_psych BY cc4@2.22520;
+       f_psych BY cc8@1.99691;
+       f_psych BY cc11@1.03427;
+       f_psych BY cc12@0;
+       f_psych BY cc13@1.42322;
+       f_psych BY cc20@2.34035;
+       f_psych BY cc25@0.24369;
+       f_psych BY cc26@0.31838;
+       f_psych BY cc33@0.97927;
+       f_psych BY cc54@0.32880;
+       f_psych BY cc60@0;
+       f_psych BY cc62@0.60958;
+       f_psych BY cc65@0.25541;
+       f_psych BY cc68@0.32040;
+       f_psych BY cc69@0.03019;
+       f_psych BY cc78@0.03561;
+       f_psych BY cc80@0.66068;
+       f_psych BY cc83@0;
+       f_psych BY cc85@0.42501;
+       f_psych BY cc87@0.06904;
+       f_psych BY cc89@0.81277;
+       f_psych BY dd103@0.70308;
+       f_psych BY dd221@1.32191;
+       f_psych BY dd299@1.10174;
+       f_psych BY eg5a@0.89399;
+       f_psych BY eg5b@0.43708;
+       f_psych BY eg6_1@0.46824;
+       f_psych BY eg6_2@0.66311;
+       f_psych BY eg16a_1@0.63533;
+       f_psych BY eg16a_2@1.15453;
+       f_psych BY eg16b@1.65003;
+       f_psych BY eg16c@0.65275;
+       f_psych BY eg17a@0.39306;
+       f_psych BY eg17b@0.42889;
+       f_psych BY eg18a@0.78400;
+       f_psych BY eg18b@0.51153;
+       f_psych BY eg23a@0.85822;
+       f_psych BY eg23b@0.57916;
+       f_psych BY eg24b@1.41815;
+       f_psych BY eg25a@1.40435;
+       f_psych BY eg25b@0.78296;
+       f_psych BY eg26b@1.29100;
+       f_psych BY eg37_1@0.66016;
+       f_psych BY eg37_2@0.24905;
+       f_psych BY eg38a@0.49528;
+       f_psych BY eg38b@0.55412;
+       f_psych BY eg38c@0.38290;
+       f_psych BY eg39a@1.10048;
+       f_psych BY eg39b@0.40296;
+       f_psych BY eg40_1@0.51650;
+       f_psych BY eg41_1@0.79750;
+       f_psych BY eg41_2@0.47137;
+       f_psych BY eg43a_2@0.64264;
+       f_psych BY ps002@1.07153;
+       f_psych BY ps003@1.72275;
+       f_psych BY ps004@1.46355;
+       f_psych BY ps005@1.47528;
+       f_psych BY ps006@1.60408;
+       f_psych BY ps007@2.03695;
+       f_psych BY ps008@1.70933;
+       f_psych BY ps009@1.47772;
+       f_psych BY ps010@1.29357;
+       f_psych BY ps011@1.10821;
+       f_psych BY ps013@1.06023;
+       f_psych BY ps014@1.91373;
+       f_psych BY ps015@2.55041;
+       f_psych BY ps016@2.23081;
+       f_psych BY ps017@1.70390;
+       f_psych BY ps018@0.93147;
+       f_psych BY ps019@1.36084;
+       f_psych BY ps020@1.21168;
+       f_psych BY ps022@2.22497;
+       f_psych BY ps023@1.91029;
+       f_psych BY ps024@2.40451;
+       f_psych BY ps025@1.36069;
+       f_psych BY ps026@2.14858;
+       f_psych BY ps027@2.30192;
+       f_psych BY ps028@1.58918;
+       f_psych BY ps029@2.21946;
+       f_psych BY ps030@1.10611;
+       f_psych BY ps031@1.49940;
+       f_psych BY ps032@2.42603;
+       f_psych BY ps034@1.72311;
+       f_psych BY ps035@1.33461;
+       f_psych BY ps036@1.36170;
+       f_psych BY ps037@2.12435;
+       f_psych BY ps038@1.58689;
+       f_psych BY ps039@1.64587;
+       f_psych BY ps040@1.60869;
+       f_psych BY ps041@2.48811;
+       f_psych BY ps042@2.00500;
+       f_psych BY ps043@2.19929;
+       f_psych BY ps044@1.99317;
+       f_psych BY ps045@2.77843;
+       f_psych BY ps046@1.60212;
+       f_psych BY ps047@1.30659;
+       f_psych BY ps048@1.82787;
+       f_psych BY ps049@2.33883;
+       f_dev BY aa4@0;
+       f_dev BY aa50@0.25115;
+       f_dev BY aa54@0.48974;
+       f_dev BY aa55@1.27898;
+       f_dev BY aa56@0;
+       f_dev BY aa57@0.70267;
+       f_dev BY aa60@1.48692;
+       f_dev BY aa65@1.29100;
+       f_dev BY aa68@0.87163;
+       f_dev BY aa69@1.23059;
+       f_dev BY aa71@0.67158;
+       f_dev BY aa72@1.85370;
+       f_dev BY aa102@1.43904;
+       f_dev BY aa104@1.37046;
+       f_dev BY aa203@1.87885;
+       f_dev BY aa205@1.67924;
+       f_dev BY bb5@2.45510;
+       f_dev BY bb6@1.59859;
+       f_dev BY cc4@0;
+       f_dev BY cc8@2.18654;
+       f_dev BY cc11@0.30206;
+       f_dev BY cc12@1.94812;
+       f_dev BY cc13@1.48938;
+       f_dev BY cc20@0;
+       f_dev BY cc25@0.17940;
+       f_dev BY cc26@1.46952;
+       f_dev BY cc33@2.77901;
+       f_dev BY cc54@1.31781;
+       f_dev BY cc60@0;
+       f_dev BY cc62@1.16620;
+       f_dev BY cc65@1.40949;
+       f_dev BY cc68@1.72664;
+       f_dev BY cc69@2.18761;
+       f_dev BY cc78@2.76251;
+       f_dev BY cc80@1.32536;
+       f_dev BY cc83@1.72035;
+       f_dev BY cc85@2.89637;
+       f_dev BY cc87@1.07713;
+       f_dev BY cc89@0.79191;
+       f_dev BY dd103@0.60305;
+       f_dev BY dd221@0.21632;
+       f_dev BY dd299@0.14278;
+       f_dev BY eg5a@0.64769;
+       f_dev BY eg5b@0.74947;
+       f_dev BY eg6_1@1.59247;
+       f_dev BY eg6_2@1.02446;
+       f_dev BY eg16a_1@0.29910;
+       f_dev BY eg16a_2@0.56397;
+       f_dev BY eg16b@0.34713;
+       f_dev BY eg16c@1.15702;
+       f_dev BY eg17a@0.50192;
+       f_dev BY eg17b@1.09815;
+       f_dev BY eg18a@0.47170;
+       f_dev BY eg18b@1.12603;
+       f_dev BY eg23a@0.55329;
+       f_dev BY eg23b@1.48028;
+       f_dev BY eg24b@0.03941;
+       f_dev BY eg25a@0;
+       f_dev BY eg25b@0.62678;
+       f_dev BY eg26b@0;
+       f_dev BY eg37_1@0.29459;
+       f_dev BY eg37_2@0.45957;
+       f_dev BY eg38a@0.87626;
+       f_dev BY eg38b@1.05911;
+       f_dev BY eg38c@1.73435;
+       f_dev BY eg39a@0;
+       f_dev BY eg39b@0.99047;
+       f_dev BY eg40_1@0.76820;
+       f_dev BY eg41_1@0.57193;
+       f_dev BY eg41_2@0.62250;
+       f_dev BY eg43a_2@1.36675;
+       f_dev BY aa5@0.85693;
+       f_dev BY aa6@1.54270;
+       f_dev BY aa7@1.49843;
+       f_dev BY aa9@0.58763;
+       f_dev BY aa11@0.51349;
+       f_dev BY aa12@0.39289;
+       f_dev BY aa13@0.82909;
+       f_dev BY aa14@0.68644;
+       f_dev BY aa15@0.54115;
+       f_dev BY aa17@2.18828;
+       f_dev BY aa19@2.11775;
+       f_dev BY aa20@2.86848;
+       f_dev BY aa21@1.78615;
+       f_dev BY aa24@1.42563;
+       f_dev BY aa26@1.98433;
+       f_dev BY aa27@1.68052;
+       f_dev BY aa28@2.79891;
+       f_dev BY aa29@2.36182;
+       f_dev BY aa30@1.53193;
+       f_dev BY aa31@1.41783;
+       f_dev BY aa34@0.42569;
+       f_dev BY aa36@2.56359;
+       f_dev BY aa38@1.44072;
+       f_dev BY aa41@2.31510;
+       f_dev BY aa43@1.83568;
+       f_dev BY aa46@1.12629;
+       f_dev BY aa47@2.68039;
+       f_dev BY aa49@1.29596;
+       f_dev BY bb201@1.71902;
+       f_dev BY cc5@2.08902;
+       f_dev BY cc6@2.60140;
+       f_dev BY cc9@2.72056;
+       f_dev BY cc10@0.31794;
+       f_dev BY cc14@1.55869;
+       f_dev BY cc15@0.67951;
+       f_dev BY cc16@0.12721;
+       f_dev BY cc17@2.64922;
+       f_dev BY cc18@2.67219;
+       f_dev BY cc19@0.85073;
+       f_dev BY cc21@0.71324;
+       f_dev BY cc27@1.52115;
+       f_dev BY cc28@1.14010;
+       f_dev BY cc29@0.67543;
+       f_dev BY cc30@1.45590;
+       f_dev BY cc31@0.50294;
+       f_dev BY cc32@0.86280;
+       f_dev BY cc34@0.61422;
+       f_dev BY cc35@1.20960;
+       f_dev BY cc36@0.74986;
+       f_dev BY cc37@1.59709;
+       f_dev BY cc39@2.63916;
+       f_dev BY cc40@4.16080;
+       f_dev BY cc41@1.12668;
+       f_dev BY cc42@1.54124;
+       f_dev BY cc43@1.53490;
+       f_dev BY cc45@3.09895;
+       f_dev BY cc46@2.33110;
+       f_dev BY cc48@3.33308;
+       f_dev BY cc50@1.43271;
+       f_dev BY cc51@1.65117;
+       f_dev BY cc52@2.33304;
+       f_dev BY cc53@0.96507;
+       f_dev BY cc56@2.87849;
+       f_dev BY cc61@2.05124;
+       f_dev BY cc64@1.17532;
+       f_dev BY cc66@1.51790;
+       f_dev BY cc67@1.25705;
+       f_dev BY cc71@1.88990;
+       f_dev BY cc72@2.66038;
+       f_dev BY cc74@2.02513;
+       f_dev BY cc75@2.47884;
+       f_dev BY cc76@0.88509;
+       f_dev BY cc79y@2.21629;
+       f_dev BY cc84@0.82760;
+       f_dev BY dd15@0.96031;
+       f_dev BY dd19@1.47314;
+       f_dev BY dd205@1.17600;
+       f_dev BY dd207@0.78063;
+       f_dev BY eg1_1@1.66077;
+       f_dev BY eg1_2@1.56675;
+       f_dev BY eg2_1@2.28966;
+       f_dev BY eg3_1@2.39029;
+       f_dev BY eg4a_1@1.83558;
+       f_dev BY eg4b_2@1.35481;
+       f_dev BY eg7_1@0;
+       f_dev BY eg7_2@1.07338;
+       f_dev BY eg8_1@0.19696;
+       f_dev BY eg8_2@1.88919;
+       f_dev BY eg9a@0.61532;
+       f_dev BY eg10a@2.53501;
+       f_dev BY eg11_1@2.56913;
+       f_dev BY eg12a@2.20210;
+       f_dev BY eg13a@1.10825;
+       f_dev BY eg14a@2.02804;
+       f_dev BY eg14b@1.21576;
+       f_dev BY eg15_1@1.21177;
+       f_dev BY eg15_2@1.43851;
+       f_dev BY eg19a_2@3.05639;
+       f_dev BY eg19a_3@2.55782;
+       f_dev BY eg19a_4@3.11999;
+       f_dev BY eg20a@1.45851;
+       f_dev BY eg20b_1@0.86765;
+       f_dev BY eg20c@1.71201;
+       f_dev BY eg20d@1.98887;
+       f_dev BY eg20e_1@1.52356;
+       f_dev BY eg20e_2@1.71008;
+       f_dev BY eg21a@1.21071;
+       f_dev BY eg21b@1.22837;
+       f_dev BY eg22_1@1.74107;
+       f_dev BY eg22_2@1.66675;
+       f_dev BY eg27a@1.28025;
+       f_dev BY eg27b_1@1.60946;
+       f_dev BY eg28a@2.09341;
+       f_dev BY eg28b@2.13754;
+       f_dev BY eg28c@2.10560;
+       f_dev BY eg29a@1.16312;
+       f_dev BY eg29b@1.22845;
+       f_dev BY eg29c@1.15838;
+       f_dev BY eg30a@1.26152;
+       f_dev BY eg30c@1.22018;
+       f_dev BY eg30d@0;
+       f_dev BY eg30e@0;
+       f_dev BY eg30f@0.94556;
+       f_dev BY eg31a_1@1.62899;
+       f_dev BY eg31a_2@1.30254;
+       f_dev BY eg31b@1.98236;
+       f_dev BY eg32a@1.26078;
+       f_dev BY eg32b@1.41195;
+       f_dev BY eg33a@1.37032;
+       f_dev BY eg33b@1.21198;
+       f_dev BY eg34a@0.90321;
+       f_dev BY eg34b@1.22307;
+       f_dev BY eg35b@0.95612;
+       f_dev BY eg36b@1.11238;
+       f_dev BY eg42a@1.68185;
+       f_dev BY eg42c@1.84342;
+       f_dev BY eg43a_1@1.21285;
+       f_dev BY eg43b@1.54987;
+       f_dev BY eg44_1@1.41987;
+       f_dev BY eg44_2@0;
+       f_dev BY eg45_1@1.57795;
+       f_dev BY eg45_2@1.63831;
+       f_dev BY eg46a_1@2.05741;
+       f_dev BY eg46a_2@2.85835;
+       f_dev BY eg46b@0.82647;
+       f_dev BY eg46c@2.04288;
+       f_dev BY eg46d@1.82262;
+       f_dev BY eg47a@3.04916;
+       f_dev BY eg47b@2.87875;
+       f_dev BY eg48_2@2.13317;
+       f_dev BY eg49_1@1.44539;
+       f_dev BY eg49_2@3.12126;
+       f_dev BY eg50b@2.07034;
+
+     f_psych ON female@0.16606;
+     f_dev ON female@0.24149;
+     f_dev ON years@-0.56123;
+     f_dev ON femxyrs@-0.02557;
+     f_dev ON logyrs@6.73440;
+
+     f_psych WITH f_dev@0;
+
+     [ f_psych*0 ];
+     [ f_dev*0 ];
+
+     [ aa4$1*-0.44552 ];
+     [ aa5$1*0.16143 ];
+     [ aa6$1@-0.93613 ];
+     [ aa7$1@-2.15049 ];
+     [ aa9$1*1.10094 ];
+     [ aa11$1*-0.11952 ];
+     [ aa12$1*0.62114 ];
+     [ aa13$1*2.34109 ];
+     [ aa14$1*1.63381 ];
+     [ aa15$1*1.45014 ];
+     [ aa17$1@5.85550 ];
+     [ aa19$1@6.80912 ];
+     [ aa20$1@11.74686 ];
+     [ aa21$1@6.14920 ];
+     [ aa24$1@6.42748 ];
+     [ aa26$1@10.87715 ];
+     [ aa27$1@8.66747 ];
+     [ aa28$1@13.84521 ];
+     [ aa29$1@13.12035 ];
+     [ aa30$1@8.13452 ];
+     [ aa31$1@8.01894 ];
+     [ aa34$1*2.75673 ];
+     [ aa36$1@17.34814 ];
+     [ aa38$1@8.89925 ];
+     [ aa41$1@15.48495 ];
+     [ aa43$1@12.32236 ];
+     [ aa46$1@9.21186 ];
+     [ aa47$1@18.84860 ];
+     [ aa49$1@9.67568 ];
+     [ aa50$1*0.08946 ];
+     [ aa54$1*0.49803 ];
+     [ aa55$1*9.14120 ];
+     [ aa56$1*-0.52185 ];
+     [ aa57$1*2.65791 ];
+     [ aa60$1*5.07883 ];
+     [ aa65$1*6.71742 ];
+     [ aa68$1*2.19681 ];
+     [ aa69$1*5.87890 ];
+     [ aa71$1*4.58964 ];
+     [ aa72$1*11.18423 ];
+     [ aa102$1@-1.51513 ];
+     [ aa104$1*5.58466 ];
+     [ aa203$1*-1.07994 ];
+     [ aa205$1*10.10788 ];
+     [ bb5$1*14.54459 ];
+     [ bb6$1*9.32160 ];
+     [ bb201$1@8.83466 ];
+     [ cc4$1*-3.69657 ];
+     [ cc5$1@-2.84929 ];
+     [ cc6$1@-5.56682 ];
+     [ cc8$1@-2.84257 ];
+     [ cc9$1@-3.92192 ];
+     [ cc10$1*-1.63980 ];
+     [ cc11$1*-2.00155 ];
+     [ cc12$1*-5.37372 ];
+     [ cc13$1*-6.21625 ];
+     [ cc14$1@-2.58790 ];
+     [ cc15$1*-0.76832 ];
+     [ cc16$1*-1.34817 ];
+     [ cc17$1@-5.34076 ];
+     [ cc18$1@-2.30467 ];
+     [ cc19$1*-2.41705 ];
+     [ cc20$1@-1.66185 ];
+     [ cc21$1*0.44335 ];
+     [ cc25$1*-1.58108 ];
+     [ cc26$1*-1.02594 ];
+     [ cc27$1@0.88332 ];
+     [ cc28$1@0.98296 ];
+     [ cc29$1*-0.71184 ];
+     [ cc30$1@3.17418 ];
+     [ cc31$1*1.34852 ];
+     [ cc32$1*0.92045 ];
+     [ cc33$1*0.57012 ];
+     [ cc34$1*1.30205 ];
+     [ cc35$1@0.51095 ];
+     [ cc36$1*0.21536 ];
+     [ cc37$1@0.90522 ];
+     [ cc39$1@7.06349 ];
+     [ cc40$1@12.43388 ];
+     [ cc41$1@2.28285 ];
+     [ cc42$1@5.88181 ];
+     [ cc43$1@5.96505 ];
+     [ cc45$1@13.05015 ];
+     [ cc46$1@9.86170 ];
+     [ cc48$1@14.15901 ];
+     [ cc50$1@5.77335 ];
+     [ cc51$1@6.11910 ];
+     [ cc52$1@10.08629 ];
+     [ cc53$1*5.53557 ];
+     [ cc54$1*5.65432 ];
+     [ cc56$1@13.50005 ];
+     [ cc60$1*-2.40099 ];
+     [ cc61$1@11.06456 ];
+     [ cc62$1*4.32885 ];
+     [ cc64$1@7.05301 ];
+     [ cc65$1*10.31766 ];
+     [ cc66$1@8.40200 ];
+     [ cc67$1@8.00714 ];
+     [ cc68$1*5.95390 ];
+     [ cc69$1*11.46768 ];
+     [ cc71$1@8.84693 ];
+     [ cc72$1@14.99430 ];
+     [ cc74$1@10.92631 ];
+     [ cc75$1@14.72255 ];
+     [ cc76$1*5.45950 ];
+     [ cc78$1*18.16054 ];
+     [ cc79y$1@14.31718 ];
+     [ cc80$1*8.65163 ];
+     [ cc83$1*10.04283 ];
+     [ cc84$1*6.75579 ];
+     [ cc85$1*15.36881 ];
+     [ cc87$1*8.38151 ];
+     [ cc89$1*3.19484 ];
+     [ dd15$1*6.93171 ];
+     [ dd19$1@12.54991 ];
+     [ dd19$2@13.83796 ];
+     [ dd19$3@14.57443 ];
+     [ dd19$4@16.52106 ];
+     [ dd103$1*-0.58129 ];
+     [ dd103$2*2.71537 ];
+     [ dd103$3*3.87639 ];
+     [ dd103$4*6.70761 ];
+     [ dd205$1@6.62184 ];
+     [ dd205$2@8.28143 ];
+     [ dd205$3@9.17622 ];
+     [ dd205$4@10.93670 ];
+     [ dd207$1*3.17527 ];
+     [ dd207$2*5.37894 ];
+     [ dd207$3*7.70411 ];
+     [ dd221$1*-2.52234 ];
+     [ dd221$2*0.45139 ];
+     [ dd299$1*-2.72100 ];
+     [ dd299$2*-0.87339 ];
+     [ dd299$3*0.57438 ];
+     [ dd299$4*5.00635 ];
+     [ eg1_1$1@8.26079 ];
+     [ eg1_2$1@8.65419 ];
+     [ eg2_1$1@13.06306 ];
+     [ eg3_1$1@15.22731 ];
+     [ eg4a_1$1@12.31627 ];
+     [ eg4b_2$1@9.82995 ];
+     [ eg5a$1*0.71393 ];
+     [ eg5a$2*3.17069 ];
+     [ eg5a$3*4.45130 ];
+     [ eg5a$4*7.41667 ];
+     [ eg5b$1*3.74134 ];
+     [ eg6_1$1*8.65185 ];
+     [ eg6_2$1*4.57932 ];
+     [ eg7_1$1*-2.38657 ];
+     [ eg7_2$1@-0.48076 ];
+     [ eg8_1$1*-0.47191 ];
+     [ eg8_2$1@1.18496 ];
+     [ eg9a$1*2.12515 ];
+     [ eg10a$1@10.70562 ];
+     [ eg11_1$1@13.79403 ];
+     [ eg12a$1@13.12292 ];
+     [ eg13a$1@8.52677 ];
+     [ eg14a$1@15.01468 ];
+     [ eg14b$1@8.52335 ];
+     [ eg15_1$1@7.75769 ];
+     [ eg15_1$2@9.41961 ];
+     [ eg15_1$3@10.21705 ];
+     [ eg15_1$4@12.33284 ];
+     [ eg15_2$1@9.69747 ];
+     [ eg15_2$2@11.39994 ];
+     [ eg15_2$3@12.02497 ];
+     [ eg15_2$4@14.23119 ];
+     [ eg16a_1$1*-0.39269 ];
+     [ eg16a_1$2*0.24956 ];
+     [ eg16a_1$3*2.29617 ];
+     [ eg16a_2$1*0.70435 ];
+     [ eg16a_2$2*1.67492 ];
+     [ eg16a_2$3*4.35413 ];
+     [ eg16b$1*-1.70570 ];
+     [ eg16c$1*5.11935 ];
+     [ eg17a$1*-0.17718 ];
+     [ eg17a$2*2.88858 ];
+     [ eg17a$3*4.18334 ];
+     [ eg17a$4*6.90300 ];
+     [ eg17b$1*5.48758 ];
+     [ eg18a$1*-0.90607 ];
+     [ eg18a$2*1.91988 ];
+     [ eg18a$3*3.42007 ];
+     [ eg18a$4*6.25658 ];
+     [ eg18b$1*6.01487 ];
+     [ eg19a_2$1@19.21888 ];
+     [ eg19a_3$1@15.79040 ];
+     [ eg19a_4$1@20.19908 ];
+     [ eg20a$1@8.08032 ];
+     [ eg20a$2@10.08410 ];
+     [ eg20a$3@12.04992 ];
+     [ eg20a$4@14.35452 ];
+     [ eg20b_1$1*4.93427 ];
+     [ eg20b_1$2*6.17248 ];
+     [ eg20b_1$3*7.71359 ];
+     [ eg20b_1$4*8.65598 ];
+     [ eg20b_1$5*10.84764 ];
+     [ eg20c$1@12.34578 ];
+     [ eg20d$1@13.24621 ];
+     [ eg20e_1$1@10.88525 ];
+     [ eg20e_2$1@12.22819 ];
+     [ eg21a$1@7.69459 ];
+     [ eg21a$2@9.12864 ];
+     [ eg21a$3@9.63804 ];
+     [ eg21a$4@10.84050 ];
+     [ eg21b$1@9.09391 ];
+     [ eg22_1$1@14.18404 ];
+     [ eg22_1$2@15.75108 ];
+     [ eg22_1$3@16.40965 ];
+     [ eg22_1$4@18.50030 ];
+     [ eg22_2$1@12.88418 ];
+     [ eg22_2$2@14.32428 ];
+     [ eg22_2$3@15.11038 ];
+     [ eg22_2$4@17.05161 ];
+     [ eg23a$1*-0.80590 ];
+     [ eg23a$2*2.09937 ];
+     [ eg23a$3*3.73881 ];
+     [ eg23a$4*6.72001 ];
+     [ eg23b$1*5.15205 ];
+     [ eg24b$1*-4.64185 ];
+     [ eg24b$2*-2.66848 ];
+     [ eg24b$3*-0.97678 ];
+     [ eg24b$4*3.47430 ];
+     [ eg25a$1*-4.76078 ];
+     [ eg25a$2*-2.97306 ];
+     [ eg25a$3*-1.58333 ];
+     [ eg25a$4*2.39355 ];
+     [ eg25b$1*1.33429 ];
+     [ eg26b$1*-4.83718 ];
+     [ eg26b$2*-3.18089 ];
+     [ eg26b$3*-1.71486 ];
+     [ eg26b$4*2.07407 ];
+     [ eg27a$1@6.24594 ];
+     [ eg27a$2@8.33326 ];
+     [ eg27a$3@9.08853 ];
+     [ eg27a$4@10.76016 ];
+     [ eg27b_1$1@10.94417 ];
+     [ eg28a$1@16.79325 ];
+     [ eg28a$2@17.70276 ];
+     [ eg28a$3@18.31569 ];
+     [ eg28a$4@19.47262 ];
+     [ eg28b$1@18.25839 ];
+     [ eg28c$1@18.25573 ];
+     [ eg29a$1@6.93509 ];
+     [ eg29a$2@8.86851 ];
+     [ eg29a$3@9.77442 ];
+     [ eg29a$4@11.06946 ];
+     [ eg29b$1@7.83083 ];
+     [ eg29b$2@10.31979 ];
+     [ eg29b$3@11.61210 ];
+     [ eg29c$1@7.88188 ];
+     [ eg30a$1@7.28120 ];
+     [ eg30a$2@9.00500 ];
+     [ eg30a$3@12.04462 ];
+     [ eg30c$1@8.82546 ];
+     [ eg30d$1*-15.13357 ];
+     [ eg30e$1*-15.62879 ];
+     [ eg30f$1*6.74474 ];
+     [ eg31a_1$1@8.07728 ];
+     [ eg31a_2$1@5.59700 ];
+     [ eg31b$1@7.17178 ];
+     [ eg32a$1@8.74345 ];
+     [ eg32a$2@10.50295 ];
+     [ eg32a$3@12.28246 ];
+     [ eg32b$1@11.81653 ];
+     [ eg33a$1@10.16982 ];
+     [ eg33a$2@11.66853 ];
+     [ eg33a$3@13.89790 ];
+     [ eg33b$1@10.98526 ];
+     [ eg34a$1*3.66627 ];
+     [ eg34a$2*7.03084 ];
+     [ eg34b$1@7.49558 ];
+     [ eg35b$1*5.23365 ];
+     [ eg36b$1@6.75683 ];
+     [ eg37_1$1*-2.19931 ];
+     [ eg37_1$2*-0.24042 ];
+     [ eg37_1$3*0.81731 ];
+     [ eg37_1$4*2.99360 ];
+     [ eg37_2$1*-0.25878 ];
+     [ eg37_2$2*1.65760 ];
+     [ eg37_2$3*2.25953 ];
+     [ eg37_2$4*4.08289 ];
+     [ eg38a$1*2.92985 ];
+     [ eg38a$2*5.56643 ];
+     [ eg38a$3*6.56313 ];
+     [ eg38a$4*9.26512 ];
+     [ eg38b$1*6.37046 ];
+     [ eg38c$1*10.36449 ];
+     [ eg39a$1*-3.20716 ];
+     [ eg39a$2*-1.47012 ];
+     [ eg39a$3*0.02572 ];
+     [ eg39a$4*3.41603 ];
+     [ eg39b$1*2.29880 ];
+     [ eg39b$2*5.68359 ];
+     [ eg39b$3*6.99668 ];
+     [ eg39b$4*9.71770 ];
+     [ eg40_1$1*1.95148 ];
+     [ eg40_1$2*4.83535 ];
+     [ eg40_1$3*6.35361 ];
+     [ eg40_1$4*9.33188 ];
+     [ eg41_1$1*-1.35042 ];
+     [ eg41_1$2*2.54493 ];
+     [ eg41_1$3*5.53812 ];
+     [ eg41_2$1*-0.14008 ];
+     [ eg41_2$2*2.57440 ];
+     [ eg41_2$3*3.62411 ];
+     [ eg41_2$4*6.29744 ];
+     [ eg42a$1@12.24522 ];
+     [ eg42a$2@13.67676 ];
+     [ eg42a$3@16.37441 ];
+     [ eg42c$1@13.88191 ];
+     [ eg42c$2@15.63386 ];
+     [ eg42c$3@16.57185 ];
+     [ eg42c$4@18.36599 ];
+     [ eg43a_1$1@6.08497 ];
+     [ eg43a_1$2@7.93534 ];
+     [ eg43a_1$3@8.76699 ];
+     [ eg43a_1$4@11.12391 ];
+     [ eg43a_2$1*6.55482 ];
+     [ eg43a_2$2*8.55786 ];
+     [ eg43a_2$3*9.75629 ];
+     [ eg43a_2$4*12.10662 ];
+     [ eg43b$1@11.70177 ];
+     [ eg44_1$1@7.65513 ];
+     [ eg44_2$1*-10.55564 ];
+     [ eg45_1$1@10.63798 ];
+     [ eg45_1$2@12.66545 ];
+     [ eg45_1$3@13.59200 ];
+     [ eg45_1$4@15.66731 ];
+     [ eg45_2$1@11.09188 ];
+     [ eg45_2$2@13.24409 ];
+     [ eg45_2$3@14.24172 ];
+     [ eg45_2$4@16.52077 ];
+     [ eg46a_1$1@4.88779 ];
+     [ eg46a_2$1@6.67414 ];
+     [ eg46b$1*1.91880 ];
+     [ eg46c$1@4.31135 ];
+     [ eg46d$1@3.31644 ];
+     [ eg47a$1@12.64788 ];
+     [ eg47b$1@9.05438 ];
+     [ eg48_2$1@12.44594 ];
+     [ eg49_1$1@1.31558 ];
+     [ eg49_2$1@4.54955 ];
+     [ eg50b$1@11.33313 ];
+     [ ps002$1@-3.06889 ];
+     [ ps002$2@-0.22140 ];
+     [ ps003$1@-4.02383 ];
+     [ ps003$2@-0.94247 ];
+     [ ps004$1@-3.34855 ];
+     [ ps004$2@-1.64477 ];
+     [ ps005$1@-3.56875 ];
+     [ ps005$2@-1.22687 ];
+     [ ps006$1@-3.94847 ];
+     [ ps006$2@-0.12697 ];
+     [ ps007$1@-4.20833 ];
+     [ ps007$2@-0.50723 ];
+     [ ps008$1@-3.84858 ];
+     [ ps008$2@-0.35502 ];
+     [ ps009$1@-3.81312 ];
+     [ ps009$2@-0.81550 ];
+     [ ps010$1@-3.22506 ];
+     [ ps010$2@-0.76636 ];
+     [ ps011$1@-2.77003 ];
+     [ ps011$2@-0.16867 ];
+     [ ps013$1@-2.93535 ];
+     [ ps013$2@-0.81549 ];
+     [ ps014$1@-4.59690 ];
+     [ ps014$2@-2.23105 ];
+     [ ps015$1@-5.25197 ];
+     [ ps015$2@-2.06157 ];
+     [ ps016$1@-5.03782 ];
+     [ ps016$2@-1.94193 ];
+     [ ps017$1@-3.88470 ];
+     [ ps017$2@-1.26009 ];
+     [ ps018$1*-2.51894 ];
+     [ ps018$2*0.32626 ];
+     [ ps019$1@-3.37919 ];
+     [ ps019$2@-1.01512 ];
+     [ ps020$1@-1.95748 ];
+     [ ps020$2@1.50184 ];
+     [ ps022$1@-4.92349 ];
+     [ ps022$2@-2.02943 ];
+     [ ps023$1@-4.52903 ];
+     [ ps023$2@-1.24166 ];
+     [ ps024$1@-5.89252 ];
+     [ ps024$2@-2.48877 ];
+     [ ps025$1@-3.09814 ];
+     [ ps025$2@-0.10645 ];
+     [ ps026$1@-4.80795 ];
+     [ ps026$2@-1.93983 ];
+     [ ps027$1@-4.76023 ];
+     [ ps027$2@-1.69963 ];
+     [ ps028$1@-3.43900 ];
+     [ ps028$2@0.57364 ];
+     [ ps029$1@-5.14697 ];
+     [ ps029$2@-2.40927 ];
+     [ ps030$1@-2.29746 ];
+     [ ps030$2@0.55383 ];
+     [ ps031$1@-3.57584 ];
+     [ ps031$2@-0.41785 ];
+     [ ps032$1@-5.72330 ];
+     [ ps032$2@-2.51454 ];
+     [ ps034$1@-3.51456 ];
+     [ ps034$2@-0.09962 ];
+     [ ps035$1@-3.36195 ];
+     [ ps035$2@-0.21844 ];
+     [ ps036$1@-3.04500 ];
+     [ ps036$2@-0.32389 ];
+     [ ps037$1@-4.36623 ];
+     [ ps037$2@-0.31885 ];
+     [ ps038$1@-3.29824 ];
+     [ ps038$2@0.55695 ];
+     [ ps039$1@-3.48391 ];
+     [ ps039$2@-0.13916 ];
+     [ ps040$1*-3.75998 ];
+     [ ps040$2*-0.58774 ];
+     [ ps041$1@-5.70261 ];
+     [ ps041$2@-2.05685 ];
+     [ ps042$1@-5.07290 ];
+     [ ps042$2@-1.77006 ];
+     [ ps043$1@-5.32534 ];
+     [ ps043$2@-2.66045 ];
+     [ ps044$1@-4.84803 ];
+     [ ps044$2@-2.30900 ];
+     [ ps045$1@-6.26748 ];
+     [ ps045$2@-3.90900 ];
+     [ ps046$1@-3.41781 ];
+     [ ps046$2@0.54481 ];
+     [ ps047$1@-2.88719 ];
+     [ ps047$2@0.33417 ];
+     [ ps048$1@-5.21445 ];
+     [ ps048$2@-1.67779 ];
+     [ ps049$1@-6.01078 ];
+     [ ps049$2@-3.09561 ];
+
+     f_psych*1;
+     f_dev*1;
+
+Model Prior:
+DO(1,110) a# ~ N(0,5);
+
+
+OUTPUT:
+  SVALUES;
+
+SAVEDATA:
+FILE = "model_1f_fscores.dat";
+SAVE = fscores;

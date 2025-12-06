@@ -324,7 +324,8 @@ check_ne25_eligibility <- function(data, data_dictionary) {
       values_from = status
     ) %>%
     dplyr::rename_with(tolower) %>%
-    dplyr::relocate(retrieved_date, pid, record_id, eligibility, authenticity, compensation)
+    dplyr::relocate(retrieved_date, pid, record_id, eligibility, `data quality`, compensation) %>%
+    dplyr::rename(data_quality = `data quality`)
 
   # Get mailing addresses for eligible participants
   mailing_info <- data %>%
@@ -368,10 +369,9 @@ apply_ne25_eligibility <- function(data, eligibility_results) {
         by_vars = c("retrieved_date", "pid", "record_id")
       ) %>%
       dplyr::mutate(
-        # Overall inclusion flag
+        # Overall eligibility and data quality flags
         eligible = eligibility == "Pass",
-        authentic = authenticity == "Pass",
-        include = eligible & authentic
+        data_quality = `data_quality` == "Pass"
       )
   }, error = function(e) {
     cat("ERROR in apply_ne25_eligibility:\n")
@@ -507,7 +507,7 @@ get_eligibility_criteria_definitions <- function() {
   definitions <- data.frame(
     cid = 1:8,
     category = c("Compensation", "Eligibility", "Eligibility", "Eligibility",
-                 "Eligibility", "Authenticity", "Authenticity", "Compensation"),
+                 "Eligibility", "Data Quality", "Data Quality", "Compensation"),
     action = c("Exclusion", "Exclusion", "Inclusion", "Inclusion", "Inclusion",
                "Exclusion", "Exclusion", "Exclusion"),
     description = c(

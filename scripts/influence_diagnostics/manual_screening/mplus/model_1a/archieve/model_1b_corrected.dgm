@@ -1,0 +1,1388 @@
+VERSION 1.1.0
+INPUT
+TITLE:
+
+  Model 1b - Free Loadings Within Domain + N(0,1) Priors
+  NE25 Authenticity Screening Stage 1
+  2-Parameter IRT with Demographic Covariates
+  Generated: 2025-12-01
+
+DATA:
+  FILE = "mplus/model_1b/model_1a.dat";
+VARIABLE:
+  NAMES =
+    id female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14
+    AA15 AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38
+    AA41 AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71
+    AA72 AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11
+    CC12 CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29
+    CC30 CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46
+    CC48 CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68
+    CC69 CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89
+    DD15 DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1
+    EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1
+    EG12a EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c EG17a
+    EG17b EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d
+    EG20e_1 EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b
+    EG26b EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d
+    EG30e EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b
+    EG35b EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1
+    EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2
+    EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b
+    PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014
+    PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027
+    PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040
+    PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  USEVARIABLES =
+    female years femXyrs logyrs AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15
+    AA17 AA19 AA20 AA21 AA24 AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41
+    AA43 AA46 AA47 AA49 AA50 AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72
+    AA102 AA104 AA203 AA205 BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12
+    CC13 CC14 CC15 CC16 CC17 CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30
+    CC31 CC32 CC33 CC34 CC35 CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48
+    CC50 CC51 CC52 CC53 CC54 CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69
+    CC71 CC72 CC74 CC75 CC76 CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15
+    DD19 DD103 DD205 DD207 DD221 DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2
+    EG5a EG5b EG6_1 EG6_2 EG7_1 EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a
+    EG13a EG14a EG14b EG15_1 EG15_2 EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b
+    EG18a EG18b EG19a_2 EG19a_3 EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1
+    EG20e_2 EG21a EG21b EG22_1 EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b
+    EG27a EG27b_1 EG28a EG28b EG28c EG29a EG29b EG29c EG30a EG30c EG30d EG30e
+    EG30f EG31a_1 EG31a_2 EG31b EG32a EG32b EG33a EG33b EG34a EG34b EG35b
+    EG36b EG37_1 EG37_2 EG38a EG38b EG38c EG39a EG39b EG40_1 EG41_1 EG41_2
+    EG42a EG42c EG43a_1 EG43a_2 EG43b EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1
+    EG46a_2 EG46b EG46c EG46d EG47a EG47b EG48_2 EG49_1 EG49_2 EG50b PS002
+    PS003 PS004 PS005 PS006 PS007 PS008 PS009 PS010 PS011 PS013 PS014 PS015
+    PS016 PS017 PS018 PS019 PS020 PS022 PS023 PS024 PS025 PS026 PS027 PS028
+    PS029 PS030 PS031 PS032 PS034 PS035 PS036 PS037 PS038 PS039 PS040 PS041
+    PS042 PS043 PS044 PS045 PS046 PS047 PS048 PS049;
+  CATEGORICAL =
+     AA4 AA5 AA6 AA7 AA9 AA11 AA12 AA13 AA14 AA15 AA17 AA19 AA20 AA21 AA24
+    AA26 AA27 AA28 AA29 AA30 AA31 AA34 AA36 AA38 AA41 AA43 AA46 AA47 AA49 AA50
+    AA54 AA55 AA56 AA57 AA60 AA65 AA68 AA69 AA71 AA72 AA102 AA104 AA203 AA205
+    BB5 BB6 BB201 CC4 CC5 CC6 CC8 CC9 CC10 CC11 CC12 CC13 CC14 CC15 CC16 CC17
+    CC18 CC19 CC20 CC21 CC25 CC26 CC27 CC28 CC29 CC30 CC31 CC32 CC33 CC34 CC35
+    CC36 CC37 CC39 CC40 CC41 CC42 CC43 CC45 CC46 CC48 CC50 CC51 CC52 CC53 CC54
+    CC56 CC60 CC61 CC62 CC64 CC65 CC66 CC67 CC68 CC69 CC71 CC72 CC74 CC75 CC76
+    CC78 CC79y CC80 CC83 CC84 CC85 CC87 CC89 DD15 DD19 DD103 DD205 DD207 DD221
+    DD299 EG1_1 EG1_2 EG2_1 EG3_1 EG4a_1 EG4b_2 EG5a EG5b EG6_1 EG6_2 EG7_1
+    EG7_2 EG8_1 EG8_2 EG9a EG10a EG11_1 EG12a EG13a EG14a EG14b EG15_1 EG15_2
+    EG16a_1 EG16a_2 EG16b EG16c EG17a EG17b EG18a EG18b EG19a_2 EG19a_3
+    EG19a_4 EG20a EG20b_1 EG20c EG20d EG20e_1 EG20e_2 EG21a EG21b EG22_1
+    EG22_2 EG23a EG23b EG24b EG25a EG25b EG26b EG27a EG27b_1 EG28a EG28b EG28c
+    EG29a EG29b EG29c EG30a EG30c EG30d EG30e EG30f EG31a_1 EG31a_2 EG31b
+    EG32a EG32b EG33a EG33b EG34a EG34b EG35b EG36b EG37_1 EG37_2 EG38a EG38b
+    EG38c EG39a EG39b EG40_1 EG41_1 EG41_2 EG42a EG42c EG43a_1 EG43a_2 EG43b
+    EG44_1 EG44_2 EG45_1 EG45_2 EG46a_1 EG46a_2 EG46b EG46c EG46d EG47a EG47b
+    EG48_2 EG49_1 EG49_2 EG50b PS002 PS003 PS004 PS005 PS006 PS007 PS008 PS009
+    PS010 PS011 PS013 PS014 PS015 PS016 PS017 PS018 PS019 PS020 PS022 PS023
+    PS024 PS025 PS026 PS027 PS028 PS029 PS030 PS031 PS032 PS034 PS035 PS036
+    PS037 PS038 PS039 PS040 PS041 PS042 PS043 PS044 PS045 PS046 PS047 PS048
+    PS049;
+  IDVARIABLE = id;
+  MISSING = . ;
+ANALYSIS:
+  ESTIMATOR = MLR;
+  ALGORITHM = INTEGRATION;
+  INTEGRATION = GAUSS(16);
+  LINK = LOGIT;
+  PROCESSORS = 16;
+  COVERAGE = 0.05;
+OUTPUT:
+  NOSERROR;
+  SVALUES;
+MODEL:
+  F_Psych BY
+    AA4*1.21688     (a001)
+    AA50*1.21688     (a002)
+    AA54*1.21688     (a003)
+    AA55*1.21688     (a004)
+    AA56*1.21688     (a005)
+    AA57*1.21688     (a006)
+    AA60*1.21688     (a007)
+    AA65*1.21688     (a008)
+    AA68*1.21688     (a009)
+    AA69*1.21688     (a010)
+    AA71*1.21688     (a011)
+    AA72*1.21688     (a012)
+    AA102*1.21688     (a013)
+    AA104*1.21688     (a014)
+    AA203*1.21688     (a015)
+    AA205*1.21688     (a016)
+    BB5*1.21688     (a017)
+    BB6*1.21688     (a018)
+    CC4*1.21688     (a019)
+    CC8*1.21688     (a020)
+    CC11*1.21688     (a021)
+    CC12*1.21688     (a022)
+    CC13*1.21688     (a023)
+    CC20*1.21688     (a024)
+    CC25*1.21688     (a025)
+    CC26*1.21688     (a026)
+    CC33*1.21688     (a027)
+    CC54*1.21688     (a028)
+    CC60*1.21688     (a029)
+    CC62*1.21688     (a030)
+    CC65*1.21688     (a031)
+    CC68*1.21688     (a032)
+    CC69*1.21688     (a033)
+    CC78*1.21688     (a034)
+    CC80*1.21688     (a035)
+    CC83*1.21688     (a036)
+    CC85*1.21688     (a037)
+    CC87*1.21688     (a038)
+    CC89*1.21688     (a039)
+    DD103*1.21688     (a040)
+    DD221*1.21688     (a041)
+    DD299*1.21688     (a042)
+    EG5a*1.21688     (a043)
+    EG5b*1.21688     (a044)
+    EG6_1*1.21688     (a045)
+    EG6_2*1.21688     (a046)
+    EG16a_1*1.21688     (a047)
+    EG16a_2*1.21688     (a048)
+    EG16b*1.21688     (a049)
+    EG16c*1.21688     (a050)
+    EG17a*1.21688     (a051)
+    EG17b*1.21688     (a052)
+    EG18a*1.21688     (a053)
+    EG18b*1.21688     (a054)
+    EG23a*1.21688     (a055)
+    EG23b*1.21688     (a056)
+    EG24b*1.21688     (a057)
+    EG25a*1.21688     (a058)
+    EG25b*1.21688     (a059)
+    EG26b*1.21688     (a060)
+    EG37_1*1.21688     (a061)
+    EG37_2*1.21688     (a062)
+    EG38a*1.21688     (a063)
+    EG38b*1.21688     (a064)
+    EG38c*1.21688     (a065)
+    EG39a*1.21688     (a066)
+    EG39b*1.21688     (a067)
+    EG40_1*1.21688     (a068)
+    EG41_1*1.21688     (a069)
+    EG41_2*1.21688     (a070)
+    EG43a_2*1.21688     (a071)
+    PS002*1.21688     (a072)
+    PS003*1.21688     (a073)
+    PS004*1.21688     (a074)
+    PS005*1.21688     (a075)
+    PS006*1.21688     (a076)
+    PS007*1.21688     (a077)
+    PS008*1.21688     (a078)
+    PS009*1.21688     (a079)
+    PS010*1.21688     (a080)
+    PS011*1.21688     (a081)
+    PS013*1.21688     (a082)
+    PS014*1.21688     (a083)
+    PS015*1.21688     (a084)
+    PS016*1.21688     (a085)
+    PS017*1.21688     (a086)
+    PS018*1.21688     (a087)
+    PS019*1.21688     (a088)
+    PS020*1.21688     (a089)
+    PS022*1.21688     (a090)
+    PS023*1.21688     (a091)
+    PS024*1.21688     (a092)
+    PS025*1.21688     (a093)
+    PS026*1.21688     (a094)
+    PS027*1.21688     (a095)
+    PS028*1.21688     (a096)
+    PS029*1.21688     (a097)
+    PS030*1.21688     (a098)
+    PS031*1.21688     (a099)
+    PS032*1.21688     (a100)
+    PS034*1.21688     (a101)
+    PS035*1.21688     (a102)
+    PS036*1.21688     (a103)
+    PS037*1.21688     (a104)
+    PS038*1.21688     (a105)
+    PS039*1.21688     (a106)
+    PS040*1.21688     (a107)
+    PS041*1.21688     (a108)
+    PS042*1.21688     (a109)
+    PS043*1.21688     (a110)
+    PS044*1.21688     (a111)
+    PS045*1.21688     (a112)
+    PS046*1.21688     (a113)
+    PS047*1.21688     (a114)
+    PS048*1.21688     (a115)
+    PS049*1.21688     (a116);
+  F_Dev BY
+    AA5*1.49020     (b001)
+    AA6*1.49020     (b002)
+    AA7*1.49020     (b003)
+    AA9*1.49020     (b004)
+    AA11*1.49020     (b005)
+    AA12*1.49020     (b006)
+    AA13*1.49020     (b007)
+    AA14*1.49020     (b008)
+    AA15*1.49020     (b009)
+    AA17*1.49020     (b010)
+    AA19*1.49020     (b011)
+    AA20*1.49020     (b012)
+    AA21*1.49020     (b013)
+    AA24*1.49020     (b014)
+    AA26*1.49020     (b015)
+    AA27*1.49020     (b016)
+    AA28*1.49020     (b017)
+    AA29*1.49020     (b018)
+    AA30*1.49020     (b019)
+    AA31*1.49020     (b020)
+    AA34*1.49020     (b021)
+    AA36*1.49020     (b022)
+    AA38*1.49020     (b023)
+    AA41*1.49020     (b024)
+    AA43*1.49020     (b025)
+    AA46*1.49020     (b026)
+    AA47*1.49020     (b027)
+    AA49*1.49020     (b028)
+    BB201*1.49020     (b029)
+    CC5*1.49020     (b030)
+    CC6*1.49020     (b031)
+    CC9*1.49020     (b032)
+    CC10*1.49020     (b033)
+    CC14*1.49020     (b034)
+    CC15*1.49020     (b035)
+    CC16*1.49020     (b036)
+    CC17*1.49020     (b037)
+    CC18*1.49020     (b038)
+    CC19*1.49020     (b039)
+    CC21*1.49020     (b040)
+    CC27*1.49020     (b041)
+    CC28*1.49020     (b042)
+    CC29*1.49020     (b043)
+    CC30*1.49020     (b044)
+    CC31*1.49020     (b045)
+    CC32*1.49020     (b046)
+    CC34*1.49020     (b047)
+    CC35*1.49020     (b048)
+    CC36*1.49020     (b049)
+    CC37*1.49020     (b050)
+    CC39*1.49020     (b051)
+    CC40*1.49020     (b052)
+    CC41*1.49020     (b053)
+    CC42*1.49020     (b054)
+    CC43*1.49020     (b055)
+    CC45*1.49020     (b056)
+    CC46*1.49020     (b057)
+    CC48*1.49020     (b058)
+    CC50*1.49020     (b059)
+    CC51*1.49020     (b060)
+    CC52*1.49020     (b061)
+    CC53*1.49020     (b062)
+    CC56*1.49020     (b063)
+    CC61*1.49020     (b064)
+    CC64*1.49020     (b065)
+    CC66*1.49020     (b066)
+    CC67*1.49020     (b067)
+    CC71*1.49020     (b068)
+    CC72*1.49020     (b069)
+    CC74*1.49020     (b070)
+    CC75*1.49020     (b071)
+    CC76*1.49020     (b072)
+    CC79y*1.49020     (b073)
+    CC84*1.49020     (b074)
+    DD15*1.49020     (b075)
+    DD19*1.49020     (b076)
+    DD205*1.49020     (b077)
+    DD207*1.49020     (b078)
+    EG1_1*1.49020     (b079)
+    EG1_2*1.49020     (b080)
+    EG2_1*1.49020     (b081)
+    EG3_1*1.49020     (b082)
+    EG4a_1*1.49020     (b083)
+    EG4b_2*1.49020     (b084)
+    EG7_1*1.49020     (b085)
+    EG7_2*1.49020     (b086)
+    EG8_1*1.49020     (b087)
+    EG8_2*1.49020     (b088)
+    EG9a*1.49020     (b089)
+    EG10a*1.49020     (b090)
+    EG11_1*1.49020     (b091)
+    EG12a*1.49020     (b092)
+    EG13a*1.49020     (b093)
+    EG14a*1.49020     (b094)
+    EG14b*1.49020     (b095)
+    EG15_1*1.49020     (b096)
+    EG15_2*1.49020     (b097)
+    EG19a_2*1.49020     (b098)
+    EG19a_3*1.49020     (b099)
+    EG19a_4*1.49020     (b100)
+    EG20a*1.49020     (b101)
+    EG20b_1*1.49020     (b102)
+    EG20c*1.49020     (b103)
+    EG20d*1.49020     (b104)
+    EG20e_1*1.49020     (b105)
+    EG20e_2*1.49020     (b106)
+    EG21a*1.49020     (b107)
+    EG21b*1.49020     (b108)
+    EG22_1*1.49020     (b109)
+    EG22_2*1.49020     (b110)
+    EG27a*1.49020     (b111)
+    EG27b_1*1.49020     (b112)
+    EG28a*1.49020     (b113)
+    EG28b*1.49020     (b114)
+    EG28c*1.49020     (b115)
+    EG29a*1.49020     (b116)
+    EG29b*1.49020     (b117)
+    EG29c*1.49020     (b118)
+    EG30a*1.49020     (b119)
+    EG30c*1.49020     (b120)
+    EG30d*1.49020     (b121)
+    EG30e*1.49020     (b122)
+    EG30f*1.49020     (b123)
+    EG31a_1*1.49020     (b124)
+    EG31a_2*1.49020     (b125)
+    EG31b*1.49020     (b126)
+    EG32a*1.49020     (b127)
+    EG32b*1.49020     (b128)
+    EG33a*1.49020     (b129)
+    EG33b*1.49020     (b130)
+    EG34a*1.49020     (b131)
+    EG34b*1.49020     (b132)
+    EG35b*1.49020     (b133)
+    EG36b*1.49020     (b134)
+    EG42a*1.49020     (b135)
+    EG42c*1.49020     (b136)
+    EG43a_1*1.49020     (b137)
+    EG43b*1.49020     (b138)
+    EG44_1*1.49020     (b139)
+    EG44_2*1.49020     (b140)
+    EG45_1*1.49020     (b141)
+    EG45_2*1.49020     (b142)
+    EG46a_1*1.49020     (b143)
+    EG46a_2*1.49020     (b144)
+    EG46b*1.49020     (b145)
+    EG46c*1.49020     (b146)
+    EG46d*1.49020     (b147)
+    EG47a*1.49020     (b148)
+    EG47b*1.49020     (b149)
+    EG48_2*1.49020     (b150)
+    EG49_1*1.49020     (b151)
+    EG49_2*1.49020     (b152)
+    EG50b*1.49020     (b153);
+  F_Psych ON female*0.07110;
+  F_Psych ON years*0.61311;
+  F_Psych ON femXyrs*0.03347;
+  F_Psych ON logyrs*-2.55766;
+  F_Dev ON female*0.23693;
+  F_Dev ON years*-0.59209;
+  F_Dev ON femXyrs*-0.02833;
+  F_Dev ON logyrs*6.78724;
+  F_Psych WITH F_Dev*0.16661;
+  [F_Psych@0];
+  [F_Dev@0];
+  [ AA4$1*-1.66308 ];
+  [ AA50$1*-1.39420 ];
+  [ AA54$1*-0.74250 ];
+  [ AA55$1*-1.67477 ];
+  [ AA56$1*0.31028 ];
+  [ AA57$1*-3.00779 ];
+  [ AA60$1*-0.89297 ];
+  [ AA65$1*-1.88512 ];
+  [ AA68$1*-3.99302 ];
+  [ AA69$1*-3.14359 ];
+  [ AA71$1*-2.38629 ];
+  [ AA72$1*-2.54662 ];
+  [ AA102$1*-2.25855 ];
+  [ AA104$1*-2.80722 ];
+  [ AA203$1*-2.18548 ];
+  [ AA205$1*-0.57999 ];
+  [ BB5$1*-2.01911 ];
+  [ BB6$1*-3.23494 ];
+  [ CC4$1*-3.61438 ];
+  [ CC8$1*-2.64889 ];
+  [ CC11$1*-3.30447 ];
+  [ CC12$1*-5.08715 ];
+  [ CC13$1*-5.08715 ];
+  [ CC20$1*-2.38862 ];
+  [ CC25$1*-2.94272 ];
+  [ CC26$1*-3.08614 ];
+  [ CC33$1*-2.37762 ];
+  [ CC54$1*-2.18513 ];
+  [ CC60$1*-4.53230 ];
+  [ CC62$1*-2.64008 ];
+  [ CC65$1*-3.32604 ];
+  [ CC68$1*-3.31761 ];
+  [ CC69$1*-1.36307 ];
+  [ CC78$1*-2.13690 ];
+  [ CC80$1*-2.10564 ];
+  [ CC83$1*-2.12204 ];
+  [ CC85$1*-2.04304 ];
+  [ CC87$1*-1.35773 ];
+  [ CC89$1*-3.60519 ];
+  [ DD103$1*-7.74231 ];
+  [ DD103$2*-4.39182 ];
+  [ DD103$3*-3.19316 ];
+  [ DD103$4*-0.29262 ];
+  [ DD221$1*-6.13269 ];
+  [ DD221$2*-3.17091 ];
+  [ DD299$1*-5.88822 ];
+  [ DD299$2*-3.98169 ];
+  [ DD299$3*-2.48370 ];
+  [ DD299$4*2.00669 ];
+  [ EG5a$1*-6.67815 ];
+  [ EG5a$2*-4.21697 ];
+  [ EG5a$3*-2.93992 ];
+  [ EG5a$4*-0.04032 ];
+  [ EG5b$1*-2.69996 ];
+  [ EG6_1$1*-2.72294 ];
+  [ EG6_2$1*-4.01339 ];
+  [ EG16a_1$1*-3.78355 ];
+  [ EG16a_1$2*-3.09102 ];
+  [ EG16a_1$3*-0.91932 ];
+  [ EG16a_2$1*-4.17281 ];
+  [ EG16a_2$2*-3.19725 ];
+  [ EG16a_2$3*-0.52168 ];
+  [ EG16b$1*-4.79734 ];
+  [ EG16c$1*-2.84421 ];
+  [ EG17a$1*-6.56358 ];
+  [ EG17a$2*-3.37418 ];
+  [ EG17a$3*-1.99666 ];
+  [ EG17a$4*0.96127 ];
+  [ EG17b$1*-3.07405 ];
+  [ EG18a$1*-6.95251 ];
+  [ EG18a$2*-4.05488 ];
+  [ EG18a$3*-2.48642 ];
+  [ EG18a$4*0.45468 ];
+  [ EG18b$1*-2.54510 ];
+  [ EG23a$1*-7.46948 ];
+  [ EG23a$2*-4.54034 ];
+  [ EG23a$3*-2.87301 ];
+  [ EG23a$4*0.12454 ];
+  [ EG23b$1*-2.87640 ];
+  [ EG24b$1*-6.63928 ];
+  [ EG24b$2*-4.69985 ];
+  [ EG24b$3*-3.06341 ];
+  [ EG24b$4*1.15549 ];
+  [ EG25a$1*-5.90236 ];
+  [ EG25a$2*-4.15996 ];
+  [ EG25a$3*-2.81680 ];
+  [ EG25a$4*0.97276 ];
+  [ EG25b$1*-2.25538 ];
+  [ EG26b$1*-5.99134 ];
+  [ EG26b$2*-4.34876 ];
+  [ EG26b$3*-2.89500 ];
+  [ EG26b$4*0.83443 ];
+  [ EG37_1$1*-6.91606 ];
+  [ EG37_1$2*-4.90426 ];
+  [ EG37_1$3*-3.75111 ];
+  [ EG37_1$4*-1.31514 ];
+  [ EG37_2$1*-4.57368 ];
+  [ EG37_2$2*-2.61896 ];
+  [ EG37_2$3*-1.98697 ];
+  [ EG37_2$4*0.02025 ];
+  [ EG38a$1*-6.20127 ];
+  [ EG38a$2*-3.71427 ];
+  [ EG38a$3*-2.81533 ];
+  [ EG38a$4*-0.24342 ];
+  [ EG38b$1*-4.46595 ];
+  [ EG38c$1*-2.63228 ];
+  [ EG39a$1*-4.40525 ];
+  [ EG39a$2*-1.43858 ];
+  [ EG39a$3*-0.26829 ];
+  [ EG39a$4*1.26824 ];
+  [ EG39b$1*-7.00528 ];
+  [ EG39b$2*-3.56120 ];
+  [ EG39b$3*-2.26779 ];
+  [ EG39b$4*0.43825 ];
+  [ EG40_1$1*-6.44693 ];
+  [ EG40_1$2*-3.60556 ];
+  [ EG40_1$3*-2.11539 ];
+  [ EG40_1$4*0.85103 ];
+  [ EG41_1$1*-7.83414 ];
+  [ EG41_1$2*-3.79840 ];
+  [ EG41_1$3*-0.62083 ];
+  [ EG41_2$1*-3.60484 ];
+  [ EG41_2$2*-0.92680 ];
+  [ EG41_2$3*0.03667 ];
+  [ EG41_2$4*2.67580 ];
+  [ EG43a_2$1*-5.26470 ];
+  [ EG43a_2$2*-3.40657 ];
+  [ EG43a_2$3*-2.29646 ];
+  [ EG43a_2$4*-0.07855 ];
+  [ PS002$1*-5.04950 ];
+  [ PS002$2*-2.04121 ];
+  [ PS003$1*-5.45279 ];
+  [ PS003$2*-2.65300 ];
+  [ PS004$1*-5.03113 ];
+  [ PS004$2*-3.37706 ];
+  [ PS005$1*-5.24031 ];
+  [ PS005$2*-2.97473 ];
+  [ PS006$1*-5.50039 ];
+  [ PS006$2*-1.94102 ];
+  [ PS007$1*-5.31099 ];
+  [ PS007$2*-2.23854 ];
+  [ PS008$1*-5.31327 ];
+  [ PS008$2*-2.13881 ];
+  [ PS009$1*-5.47929 ];
+  [ PS009$2*-2.58755 ];
+  [ PS010$1*-5.04906 ];
+  [ PS010$2*-2.57223 ];
+  [ PS011$1*-4.71093 ];
+  [ PS011$2*-1.98469 ];
+  [ PS013$1*-4.91984 ];
+  [ PS013$2*-2.67475 ];
+  [ PS014$1*-5.75356 ];
+  [ PS014$2*-3.69828 ];
+  [ PS015$1*-5.63791 ];
+  [ PS015$2*-3.29432 ];
+  [ PS016$1*-5.80780 ];
+  [ PS016$2*-3.33308 ];
+  [ PS017$1*-5.34468 ];
+  [ PS017$2*-2.94124 ];
+  [ PS018$1*-4.53785 ];
+  [ PS018$2*-1.44664 ];
+  [ PS019$1*-5.15672 ];
+  [ PS019$2*-2.80662 ];
+  [ PS020$1*-3.81027 ];
+  [ PS020$2*-0.30597 ];
+  [ PS022$1*-5.72489 ];
+  [ PS022$2*-3.40161 ];
+  [ PS023$1*-5.73738 ];
+  [ PS023$2*-2.87822 ];
+  [ PS024$1*-6.30037 ];
+  [ PS024$2*-3.66886 ];
+  [ PS025$1*-4.87997 ];
+  [ PS025$2*-1.92009 ];
+  [ PS026$1*-5.70531 ];
+  [ PS026$2*-3.36372 ];
+  [ PS027$1*-5.53273 ];
+  [ PS027$2*-3.12014 ];
+  [ PS028$1*-5.03537 ];
+  [ PS028$2*-1.30598 ];
+  [ PS029$1*-5.91719 ];
+  [ PS029$2*-3.70367 ];
+  [ PS030$1*-4.20996 ];
+  [ PS030$2*-1.23462 ];
+  [ PS031$1*-5.24434 ];
+  [ PS031$2*-2.21208 ];
+  [ PS032$1*-6.13670 ];
+  [ PS032$2*-3.68417 ];
+  [ PS034$1*-5.00156 ];
+  [ PS034$2*-1.91002 ];
+  [ PS035$1*-5.16744 ];
+  [ PS035$2*-2.02713 ];
+  [ PS036$1*-4.82232 ];
+  [ PS036$2*-2.12792 ];
+  [ PS037$1*-5.39413 ];
+  [ PS037$2*-2.09227 ];
+  [ PS038$1*-4.89807 ];
+  [ PS038$2*-1.31551 ];
+  [ PS039$1*-5.03313 ];
+  [ PS039$2*-1.94932 ];
+  [ PS040$1*-5.31060 ];
+  [ PS040$2*-2.36030 ];
+  [ PS041$1*-6.09036 ];
+  [ PS041$2*-3.32785 ];
+  [ PS042$1*-6.09658 ];
+  [ PS042$2*-3.27800 ];
+  [ PS043$1*-6.06799 ];
+  [ PS043$2*-3.89793 ];
+  [ PS044$1*-5.90661 ];
+  [ PS044$2*-3.72169 ];
+  [ PS045$1*-6.15176 ];
+  [ PS045$2*-4.44968 ];
+  [ PS046$1*-5.01286 ];
+  [ PS046$2*-1.33040 ];
+  [ PS047$1*-4.70684 ];
+  [ PS047$2*-1.48309 ];
+  [ PS048$1*-6.43444 ];
+  [ PS048$2*-3.27120 ];
+  [ PS049$1*-6.46280 ];
+  [ PS049$2*-4.13610 ];
+  [ AA5$1*0.77352 ];
+  [ AA6$1*-0.60912 ];
+  [ AA7$1*-1.89934 ];
+  [ AA9$1*2.46919 ];
+  [ AA11$1*0.84350 ];
+  [ AA12$1*2.43225 ];
+  [ AA13$1*3.74277 ];
+  [ AA14$1*3.15467 ];
+  [ AA15$1*3.50438 ];
+  [ AA17$1*3.63314 ];
+  [ AA19$1*4.56625 ];
+  [ AA20$1*5.86298 ];
+  [ AA21$1*4.87209 ];
+  [ AA24$1*6.74947 ];
+  [ AA26$1*8.27367 ];
+  [ AA27$1*7.75651 ];
+  [ AA28$1*7.37288 ];
+  [ AA29$1*8.48783 ];
+  [ AA30$1*7.99394 ];
+  [ AA31$1*8.52342 ];
+  [ AA34$1*9.94350 ];
+  [ AA36$1*10.12529 ];
+  [ AA38$1*9.25579 ];
+  [ AA41$1*9.97098 ];
+  [ AA43$1*10.03624 ];
+  [ AA46$1*12.18192 ];
+  [ AA47$1*10.56487 ];
+  [ AA49$1*11.15122 ];
+  [ BB201$1*7.48989 ];
+  [ CC5$1*-1.87678 ];
+  [ CC6$1*-3.24429 ];
+  [ CC9$1*-2.14852 ];
+  [ CC10$1*-2.07631 ];
+  [ CC14$1*-2.06748 ];
+  [ CC15$1*-0.71833 ];
+  [ CC16$1*-1.45364 ];
+  [ CC17$1*-3.07251 ];
+  [ CC18$1*-1.34708 ];
+  [ CC19$1*-2.62155 ];
+  [ CC21$1*1.41848 ];
+  [ CC27$1*0.99845 ];
+  [ CC28$1*1.59316 ];
+  [ CC29$1*-0.12791 ];
+  [ CC30$1*3.15290 ];
+  [ CC31$1*3.62072 ];
+  [ CC32$1*1.81157 ];
+  [ CC34$1*2.97258 ];
+  [ CC35$1*0.91884 ];
+  [ CC36$1*1.84078 ];
+  [ CC37$1*0.49887 ];
+  [ CC39$1*3.53837 ];
+  [ CC40$1*4.04170 ];
+  [ CC41$1*3.09719 ];
+  [ CC42$1*5.53251 ];
+  [ CC43$1*5.69957 ];
+  [ CC45$1*6.00133 ];
+  [ CC46$1*6.11088 ];
+  [ CC48$1*6.05974 ];
+  [ CC50$1*5.94874 ];
+  [ CC51$1*5.35778 ];
+  [ CC52$1*6.20528 ];
+  [ CC53$1*8.32514 ];
+  [ CC56$1*6.88399 ];
+  [ CC61$1*8.23176 ];
+  [ CC64$1*8.99230 ];
+  [ CC66$1*8.34909 ];
+  [ CC67$1*9.60910 ];
+  [ CC71$1*6.87569 ];
+  [ CC72$1*8.27052 ];
+  [ CC74$1*7.94736 ];
+  [ CC75$1*8.86435 ];
+  [ CC76$1*9.44729 ];
+  [ CC79y$1*9.84739 ];
+  [ CC84$1*11.76226 ];
+  [ DD15$1*10.87276 ];
+  [ DD19$1*12.60070 ];
+  [ DD19$2*13.86911 ];
+  [ DD19$3*14.59898 ];
+  [ DD19$4*16.54549 ];
+  [ DD205$1*9.03122 ];
+  [ DD205$2*10.75844 ];
+  [ DD205$3*11.70244 ];
+  [ DD205$4*13.59886 ];
+  [ DD207$1*8.62556 ];
+  [ DD207$2*11.10446 ];
+  [ DD207$3*13.96532 ];
+  [ EG1_1$1*7.46367 ];
+  [ EG1_2$1*8.33407 ];
+  [ EG2_1$1*8.50161 ];
+  [ EG3_1$1*9.48591 ];
+  [ EG4a_1$1*10.05077 ];
+  [ EG4b_2$1*10.80836 ];
+  [ EG7_1$1*-0.56216 ];
+  [ EG7_2$1*-0.13265 ];
+  [ EG8_1$1*1.43090 ];
+  [ EG8_2$1*1.04648 ];
+  [ EG9a$1*5.11388 ];
+  [ EG10a$1*6.06551 ];
+  [ EG11_1$1*8.11680 ];
+  [ EG12a$1*8.93270 ];
+  [ EG13a$1*11.30957 ];
+  [ EG14a$1*11.12419 ];
+  [ EG14b$1*10.56045 ];
+  [ EG15_1$1*9.85391 ];
+  [ EG15_1$2*11.61083 ];
+  [ EG15_1$3*12.46957 ];
+  [ EG15_1$4*14.77626 ];
+  [ EG15_2$1*10.11427 ];
+  [ EG15_2$2*11.78498 ];
+  [ EG15_2$3*12.39948 ];
+  [ EG15_2$4*14.59473 ];
+  [ EG19a_2$1*9.30271 ];
+  [ EG19a_3$1*9.08844 ];
+  [ EG19a_4$1*9.52528 ];
+  [ EG20a$1*8.41490 ];
+  [ EG20a$2*10.37226 ];
+  [ EG20a$3*12.27424 ];
+  [ EG20a$4*14.42072 ];
+  [ EG20b_1$1*9.49322 ];
+  [ EG20b_1$2*10.82237 ];
+  [ EG20b_1$3*12.45347 ];
+  [ EG20b_1$4*13.42545 ];
+  [ EG20b_1$5*15.65083 ];
+  [ EG20c$1*10.79704 ];
+  [ EG20d$1*9.97086 ];
+  [ EG20e_1$1*10.71957 ];
+  [ EG20e_2$1*10.71259 ];
+  [ EG21a$1*9.75203 ];
+  [ EG21a$2*11.21927 ];
+  [ EG21a$3*11.73743 ];
+  [ EG21a$4*12.95628 ];
+  [ EG21b$1*11.03818 ];
+  [ EG22_1$1*11.94819 ];
+  [ EG22_1$2*13.37049 ];
+  [ EG22_1$3*13.97750 ];
+  [ EG22_1$4*15.92247 ];
+  [ EG22_2$1*11.40512 ];
+  [ EG22_2$2*12.71958 ];
+  [ EG22_2$3*13.44111 ];
+  [ EG22_2$4*15.23920 ];
+  [ EG27a$1*7.89246 ];
+  [ EG27a$2*9.97995 ];
+  [ EG27a$3*10.74459 ];
+  [ EG27a$4*12.46989 ];
+  [ EG27b_1$1*9.98459 ];
+  [ EG28a$1*11.75859 ];
+  [ EG28a$2*12.49050 ];
+  [ EG28a$3*12.97580 ];
+  [ EG28a$4*13.90426 ];
+  [ EG28b$1*12.58558 ];
+  [ EG28c$1*12.82360 ];
+  [ EG29a$1*9.36509 ];
+  [ EG29a$2*11.33695 ];
+  [ EG29a$3*12.26712 ];
+  [ EG29a$4*13.59014 ];
+  [ EG29b$1*9.81180 ];
+  [ EG29b$2*12.28165 ];
+  [ EG29b$3*13.56765 ];
+  [ EG29c$1*10.25631 ];
+  [ EG30a$1*9.01549 ];
+  [ EG30a$2*10.76177 ];
+  [ EG30a$3*13.77286 ];
+  [ EG30c$1*10.82917 ];
+  [ EG30d$1*9.89979 ];
+  [ EG30e$1*9.46609 ];
+  [ EG30f$1*10.53136 ];
+  [ EG31a_1$1*7.41748 ];
+  [ EG31a_2$1*6.49868 ];
+  [ EG31b$1*5.11524 ];
+  [ EG32a$1*10.47916 ];
+  [ EG32a$2*12.25087 ];
+  [ EG32a$3*14.00686 ];
+  [ EG32b$1*12.36282 ];
+  [ EG33a$1*11.09588 ];
+  [ EG33a$2*12.55315 ];
+  [ EG33a$3*14.67148 ];
+  [ EG33b$1*13.07756 ];
+  [ EG34a$1*8.10607 ];
+  [ EG34a$2*11.83318 ];
+  [ EG34b$1*9.48462 ];
+  [ EG35b$1*8.42041 ];
+  [ EG36b$1*9.23766 ];
+  [ EG42a$1*10.71550 ];
+  [ EG42a$2*12.01714 ];
+  [ EG42a$3*14.48550 ];
+  [ EG42c$1*10.94866 ];
+  [ EG42c$2*12.48512 ];
+  [ EG42c$3*13.30530 ];
+  [ EG42c$4*14.90104 ];
+  [ EG43a_1$1*8.17163 ];
+  [ EG43a_1$2*10.01865 ];
+  [ EG43a_1$3*10.85654 ];
+  [ EG43a_1$4*13.22945 ];
+  [ EG43b$1*11.29172 ];
+  [ EG44_1$1*8.08924 ];
+  [ EG44_2$1*11.05364 ];
+  [ EG45_1$1*9.99013 ];
+  [ EG45_1$2*11.88552 ];
+  [ EG45_1$3*12.75692 ];
+  [ EG45_1$4*14.73805 ];
+  [ EG45_2$1*9.86759 ];
+  [ EG45_2$2*11.87496 ];
+  [ EG45_2$3*12.81959 ];
+  [ EG45_2$4*14.99440 ];
+  [ EG46a_1$1*3.09704 ];
+  [ EG46a_2$1*2.77534 ];
+  [ EG46b$1*3.12037 ];
+  [ EG46c$1*2.67149 ];
+  [ EG46d$1*2.29290 ];
+  [ EG47a$1*5.91709 ];
+  [ EG47b$1*4.39653 ];
+  [ EG48_2$1*8.67585 ];
+  [ EG49_1$1*1.45987 ];
+  [ EG49_2$1*2.19374 ];
+  [ EG50b$1*8.08250 ];
+  F_Psych@1;
+  F_Dev@1;
+INPUT_END
+1
+0
+0
+0
+MLR
+1
+GENERAL
+0
+269
+2
+4
+aa4 aa5 aa6 aa7 aa9 aa11 aa12 aa13 aa14 aa15 aa17 aa19 aa20 aa21 aa24 aa26 aa27 aa28 aa29 aa30 aa31 aa34 aa36 aa38 aa41 aa43 aa46 aa47 aa49 aa50 aa54 aa55 aa56 aa57 aa60 aa65 aa68 aa69 aa71 aa72 aa102 aa104 aa203 aa205 bb5 bb6 bb201 cc4 cc5 cc6 cc8 cc9 cc10 cc11 cc12 cc13 cc14 cc15 cc16 cc17 cc18 cc19 cc20 cc21 cc25 cc26 cc27 cc28 cc29 cc30 cc31 cc32 cc33 cc34 cc35 cc36 cc37 cc39 cc40 cc41 cc42 cc43 cc45 cc46 cc48 cc50 cc51 cc52 cc53 cc54 cc56 cc60 cc61 cc62 cc64 cc65 cc66 cc67 cc68 cc69 cc71 cc72 cc74 cc75 cc76 cc78 cc79y cc80 cc83 cc84 cc85 cc87 cc89 dd15 dd19 dd103 dd205 dd207 dd221 dd299 eg1_1 eg1_2 eg2_1 eg3_1 eg4a_1 eg4b_2 eg5a eg5b eg6_1 eg6_2 eg7_1 eg7_2 eg8_1 eg8_2 eg9a eg10a eg11_1 eg12a eg13a eg14a eg14b eg15_1 eg15_2 eg16a_1 eg16a_2 eg16b eg16c eg17a eg17b eg18a eg18b eg19a_2 eg19a_3 eg19a_4 eg20a eg20b_1 eg20c eg20d eg20e_1 eg20e_2 eg21a eg21b eg22_1 eg22_2 eg23a eg23b eg24b eg25a eg25b eg26b eg27a eg27b_1 eg28a eg28b eg28c eg29a eg29b eg29c eg30a eg30c eg30d eg30e eg30f eg31a_1 eg31a_2 eg31b eg32a eg32b eg33a eg33b eg34a eg34b eg35b eg36b eg37_1 eg37_2 eg38a eg38b eg38c eg39a eg39b eg40_1 eg41_1 eg41_2 eg42a eg42c eg43a_1 eg43a_2 eg43b eg44_1 eg44_2 eg45_1 eg45_2 eg46a_1 eg46a_2 eg46b eg46c eg46d eg47a eg47b eg48_2 eg49_1 eg49_2 eg50b ps002 ps003 ps004 ps005 ps006 ps007 ps008 ps009 ps010 ps011 ps013 ps014 ps015 ps016 ps017 ps018 ps019 ps020 ps022 ps023 ps024 ps025 ps026 ps027 ps028 ps029 ps030 ps031 ps032 ps034 ps035 ps036 ps037 ps038 ps039 ps040 ps041 ps042 ps043 ps044 ps045 ps046 ps047 ps048 ps049 f_psych f_dev female years femxyrs logyrs
+2
+-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1 1 0 0 0 0
+0
+2
+f_psych
+aa4 aa50 aa54 aa55 aa56 aa57 aa60 aa65 aa68 aa69 aa71 aa72 aa102 aa104 aa203 aa205 bb5 bb6 cc4 cc8 cc11 cc12 cc13 cc20 cc25 cc26 cc33 cc54 cc60 cc62 cc65 cc68 cc69 cc78 cc80 cc83 cc85 cc87 cc89 dd103 dd221 dd299 eg5a eg5b eg6_1 eg6_2 eg16a_1 eg16a_2 eg16b eg16c eg17a eg17b eg18a eg18b eg23a eg23b eg24b eg25a eg25b eg26b eg37_1 eg37_2 eg38a eg38b eg38c eg39a eg39b eg40_1 eg41_1 eg41_2 eg43a_2 ps002 ps003 ps004 ps005 ps006 ps007 ps008 ps009 ps010 ps011 ps013 ps014 ps015 ps016 ps017 ps018 ps019 ps020 ps022 ps023 ps024 ps025 ps026 ps027 ps028 ps029 ps030 ps031 ps032 ps034 ps035 ps036 ps037 ps038 ps039 ps040 ps041 ps042 ps043 ps044 ps045 ps046 ps047 ps048 ps049
+f_dev
+aa5 aa6 aa7 aa9 aa11 aa12 aa13 aa14 aa15 aa17 aa19 aa20 aa21 aa24 aa26 aa27 aa28 aa29 aa30 aa31 aa34 aa36 aa38 aa41 aa43 aa46 aa47 aa49 bb201 cc5 cc6 cc9 cc10 cc14 cc15 cc16 cc17 cc18 cc19 cc21 cc27 cc28 cc29 cc30 cc31 cc32 cc34 cc35 cc36 cc37 cc39 cc40 cc41 cc42 cc43 cc45 cc46 cc48 cc50 cc51 cc52 cc53 cc56 cc61 cc64 cc66 cc67 cc71 cc72 cc74 cc75 cc76 cc79y cc84 dd15 dd19 dd205 dd207 eg1_1 eg1_2 eg2_1 eg3_1 eg4a_1 eg4b_2 eg7_1 eg7_2 eg8_1 eg8_2 eg9a eg10a eg11_1 eg12a eg13a eg14a eg14b eg15_1 eg15_2 eg19a_2 eg19a_3 eg19a_4 eg20a eg20b_1 eg20c eg20d eg20e_1 eg20e_2 eg21a eg21b eg22_1 eg22_2 eg27a eg27b_1 eg28a eg28b eg28c eg29a eg29b eg29c eg30a eg30c eg30d eg30e eg30f eg31a_1 eg31a_2 eg31b eg32a eg32b eg33a eg33b eg34a eg34b eg35b eg36b eg42a eg42c eg43a_1 eg43b eg44_1 eg44_2 eg45_1 eg45_2 eg46a_1 eg46a_2 eg46b eg46c eg46d eg47a eg47b eg48_2 eg49_1 eg49_2 eg50b
+1 1 f_psych aa4    0.309
+91 1 f_psych aa4 a001
+1 1 f_psych aa50    1.243
+91 1 f_psych aa50 a002
+1 1 f_psych aa54   -0.281
+91 1 f_psych aa54 a003
+1 1 f_psych aa55   -0.112
+91 1 f_psych aa55 a004
+1 1 f_psych aa56   -0.426
+91 1 f_psych aa56 a005
+1 1 f_psych aa57    0.663
+91 1 f_psych aa57 a006
+1 1 f_psych aa60   -0.151
+91 1 f_psych aa60 a007
+1 1 f_psych aa65    0.518
+91 1 f_psych aa65 a008
+1 1 f_psych aa68    0.800
+91 1 f_psych aa68 a009
+1 1 f_psych aa69    0.382
+91 1 f_psych aa69 a010
+1 1 f_psych aa71    0.044
+91 1 f_psych aa71 a011
+1 1 f_psych aa72   -0.026
+91 1 f_psych aa72 a012
+1 1 f_psych aa102    1.310
+91 1 f_psych aa102 a013
+1 1 f_psych aa104    0.418
+91 1 f_psych aa104 a014
+1 1 f_psych aa203    1.140
+91 1 f_psych aa203 a015
+1 1 f_psych aa205    0.147
+91 1 f_psych aa205 a016
+1 1 f_psych bb5    0.085
+91 1 f_psych bb5 a017
+1 1 f_psych bb6    0.329
+91 1 f_psych bb6 a018
+1 1 f_psych cc4    0.620
+91 1 f_psych cc4 a019
+1 1 f_psych cc8    1.531
+91 1 f_psych cc8 a020
+1 1 f_psych cc11    0.786
+91 1 f_psych cc11 a021
+1 1 f_psych cc12    0.047
+91 1 f_psych cc12 a022
+1 1 f_psych cc13    0.620
+91 1 f_psych cc13 a023
+1 1 f_psych cc20    1.465
+91 1 f_psych cc20 a024
+1 1 f_psych cc25    0.543
+91 1 f_psych cc25 a025
+1 1 f_psych cc26    1.039
+91 1 f_psych cc26 a026
+1 1 f_psych cc33    0.544
+91 1 f_psych cc33 a027
+1 1 f_psych cc54    0.101
+91 1 f_psych cc54 a028
+1 1 f_psych cc60    0.006
+91 1 f_psych cc60 a029
+1 1 f_psych cc62    0.328
+91 1 f_psych cc62 a030
+1 1 f_psych cc65    0.308
+91 1 f_psych cc65 a031
+1 1 f_psych cc68    0.006
+91 1 f_psych cc68 a032
+1 1 f_psych cc69   -0.035
+91 1 f_psych cc69 a033
+1 1 f_psych cc78   -0.090
+91 1 f_psych cc78 a034
+1 1 f_psych cc80    0.410
+91 1 f_psych cc80 a035
+1 1 f_psych cc83   -0.052
+91 1 f_psych cc83 a036
+1 1 f_psych cc85    0.155
+91 1 f_psych cc85 a037
+1 1 f_psych cc87   -0.029
+91 1 f_psych cc87 a038
+1 1 f_psych cc89    0.643
+91 1 f_psych cc89 a039
+1 1 f_psych dd103    0.748
+91 1 f_psych dd103 a040
+1 1 f_psych dd221    1.289
+91 1 f_psych dd221 a041
+1 1 f_psych dd299    1.069
+91 1 f_psych dd299 a042
+1 1 f_psych eg5a    0.918
+91 1 f_psych eg5a a043
+1 1 f_psych eg5b    0.313
+91 1 f_psych eg5b a044
+1 1 f_psych eg6_1    0.268
+91 1 f_psych eg6_1 a045
+1 1 f_psych eg6_2    0.425
+91 1 f_psych eg6_2 a046
+1 1 f_psych eg16a_1    0.595
+91 1 f_psych eg16a_1 a047
+1 1 f_psych eg16a_2    0.845
+91 1 f_psych eg16a_2 a048
+1 1 f_psych eg16b    1.315
+91 1 f_psych eg16b a049
+1 1 f_psych eg16c    0.428
+91 1 f_psych eg16c a050
+1 1 f_psych eg17a    0.462
+91 1 f_psych eg17a a051
+1 1 f_psych eg17b    0.257
+91 1 f_psych eg17b a052
+1 1 f_psych eg18a    0.829
+91 1 f_psych eg18a a053
+1 1 f_psych eg18b    0.310
+91 1 f_psych eg18b a054
+1 1 f_psych eg23a    0.887
+91 1 f_psych eg23a a055
+1 1 f_psych eg23b    0.258
+91 1 f_psych eg23b a056
+1 1 f_psych eg24b    1.356
+91 1 f_psych eg24b a057
+1 1 f_psych eg25a    1.320
+91 1 f_psych eg25a a058
+1 1 f_psych eg25b    0.620
+91 1 f_psych eg25b a059
+1 1 f_psych eg26b    1.212
+91 1 f_psych eg26b a060
+1 1 f_psych eg37_1    0.662
+91 1 f_psych eg37_1 a061
+1 1 f_psych eg37_2    0.281
+91 1 f_psych eg37_2 a062
+1 1 f_psych eg38a    0.595
+91 1 f_psych eg38a a063
+1 1 f_psych eg38b    0.452
+91 1 f_psych eg38b a064
+1 1 f_psych eg38c    0.147
+91 1 f_psych eg38c a065
+1 1 f_psych eg39a   -1.051
+91 1 f_psych eg39a a066
+1 1 f_psych eg39b    0.312
+91 1 f_psych eg39b a067
+1 1 f_psych eg40_1    0.629
+91 1 f_psych eg40_1 a068
+1 1 f_psych eg41_1    0.726
+91 1 f_psych eg41_1 a069
+1 1 f_psych eg41_2   -0.430
+91 1 f_psych eg41_2 a070
+1 1 f_psych eg43a_2    0.434
+91 1 f_psych eg43a_2 a071
+1 1 f_psych ps002    1.031
+91 1 f_psych ps002 a072
+1 1 f_psych ps003    1.639
+91 1 f_psych ps003 a073
+1 1 f_psych ps004    1.395
+91 1 f_psych ps004 a074
+1 1 f_psych ps005    1.406
+91 1 f_psych ps005 a075
+1 1 f_psych ps006    1.526
+91 1 f_psych ps006 a076
+1 1 f_psych ps007    1.934
+91 1 f_psych ps007 a077
+1 1 f_psych ps008    1.629
+91 1 f_psych ps008 a078
+1 1 f_psych ps009    1.412
+91 1 f_psych ps009 a079
+1 1 f_psych ps010    1.236
+91 1 f_psych ps010 a080
+1 1 f_psych ps011    1.068
+91 1 f_psych ps011 a081
+1 1 f_psych ps013    1.012
+91 1 f_psych ps013 a082
+1 1 f_psych ps014    1.823
+91 1 f_psych ps014 a083
+1 1 f_psych ps015    2.427
+91 1 f_psych ps015 a084
+1 1 f_psych ps016    2.119
+91 1 f_psych ps016 a085
+1 1 f_psych ps017    1.629
+91 1 f_psych ps017 a086
+1 1 f_psych ps018    0.903
+91 1 f_psych ps018 a087
+1 1 f_psych ps019    1.311
+91 1 f_psych ps019 a088
+1 1 f_psych ps020    1.159
+91 1 f_psych ps020 a089
+1 1 f_psych ps022    2.119
+91 1 f_psych ps022 a090
+1 1 f_psych ps023    1.827
+91 1 f_psych ps023 a091
+1 1 f_psych ps024    2.288
+91 1 f_psych ps024 a092
+1 1 f_psych ps025    1.307
+91 1 f_psych ps025 a093
+1 1 f_psych ps026    2.041
+91 1 f_psych ps026 a094
+1 1 f_psych ps027    2.192
+91 1 f_psych ps027 a095
+1 1 f_psych ps028    1.515
+91 1 f_psych ps028 a096
+1 1 f_psych ps029    2.134
+91 1 f_psych ps029 a097
+1 1 f_psych ps030    1.070
+91 1 f_psych ps030 a098
+1 1 f_psych ps031    1.448
+91 1 f_psych ps031 a099
+1 1 f_psych ps032    2.300
+91 1 f_psych ps032 a100
+1 1 f_psych ps034    1.668
+91 1 f_psych ps034 a101
+1 1 f_psych ps035    1.296
+91 1 f_psych ps035 a102
+1 1 f_psych ps036    1.323
+91 1 f_psych ps036 a103
+1 1 f_psych ps037    2.041
+91 1 f_psych ps037 a104
+1 1 f_psych ps038    1.541
+91 1 f_psych ps038 a105
+1 1 f_psych ps039    1.580
+91 1 f_psych ps039 a106
+1 1 f_psych ps040    1.518
+91 1 f_psych ps040 a107
+1 1 f_psych ps041    2.390
+91 1 f_psych ps041 a108
+1 1 f_psych ps042    1.933
+91 1 f_psych ps042 a109
+1 1 f_psych ps043    2.100
+91 1 f_psych ps043 a110
+1 1 f_psych ps044    1.904
+91 1 f_psych ps044 a111
+1 1 f_psych ps045    2.618
+91 1 f_psych ps045 a112
+1 1 f_psych ps046    1.540
+91 1 f_psych ps046 a113
+1 1 f_psych ps047    1.259
+91 1 f_psych ps047 a114
+1 1 f_psych ps048    1.756
+91 1 f_psych ps048 a115
+1 1 f_psych ps049    2.223
+91 1 f_psych ps049 a116
+1 1 f_dev aa5    0.720
+91 1 f_dev aa5 b001
+1 1 f_dev aa6    1.022
+91 1 f_dev aa6 b002
+1 1 f_dev aa7    0.599
+91 1 f_dev aa7 b003
+1 1 f_dev aa9    0.546
+91 1 f_dev aa9 b004
+1 1 f_dev aa11    0.444
+91 1 f_dev aa11 b005
+1 1 f_dev aa12    0.363
+91 1 f_dev aa12 b006
+1 1 f_dev aa13    0.745
+91 1 f_dev aa13 b007
+1 1 f_dev aa14    0.598
+91 1 f_dev aa14 b008
+1 1 f_dev aa15    0.519
+91 1 f_dev aa15 b009
+1 1 f_dev aa17    2.052
+91 1 f_dev aa17 b010
+1 1 f_dev aa19    2.020
+91 1 f_dev aa19 b011
+1 1 f_dev aa20    2.691
+91 1 f_dev aa20 b012
+1 1 f_dev aa21    1.632
+91 1 f_dev aa21 b013
+1 1 f_dev aa24    1.124
+91 1 f_dev aa24 b014
+1 1 f_dev aa26    1.349
+91 1 f_dev aa26 b015
+1 1 f_dev aa27    1.224
+91 1 f_dev aa27 b016
+1 1 f_dev aa28    2.403
+91 1 f_dev aa28 b017
+1 1 f_dev aa29    1.808
+91 1 f_dev aa29 b018
+1 1 f_dev aa30    1.219
+91 1 f_dev aa30 b019
+1 1 f_dev aa31    1.082
+91 1 f_dev aa31 b020
+1 1 f_dev aa34    0.323
+91 1 f_dev aa34 b021
+1 1 f_dev aa36    1.969
+91 1 f_dev aa36 b022
+1 1 f_dev aa38    1.133
+91 1 f_dev aa38 b023
+1 1 f_dev aa41    1.780
+91 1 f_dev aa41 b024
+1 1 f_dev aa43    1.552
+91 1 f_dev aa43 b025
+1 1 f_dev aa46    1.037
+91 1 f_dev aa46 b026
+1 1 f_dev aa47    2.107
+91 1 f_dev aa47 b027
+1 1 f_dev aa49    1.064
+91 1 f_dev aa49 b028
+1 1 f_dev bb201    1.326
+91 1 f_dev bb201 b029
+1 1 f_dev cc5    1.351
+91 1 f_dev cc5 b030
+1 1 f_dev cc6    1.345
+91 1 f_dev cc6 b031
+1 1 f_dev cc9    1.335
+91 1 f_dev cc9 b032
+1 1 f_dev cc10    0.252
+91 1 f_dev cc10 b033
+1 1 f_dev cc14    1.152
+91 1 f_dev cc14 b034
+1 1 f_dev cc15    0.549
+91 1 f_dev cc15 b035
+1 1 f_dev cc16    0.103
+91 1 f_dev cc16 b036
+1 1 f_dev cc17    1.383
+91 1 f_dev cc17 b037
+1 1 f_dev cc18    0.887
+91 1 f_dev cc18 b038
+1 1 f_dev cc19    0.822
+91 1 f_dev cc19 b039
+1 1 f_dev cc21    0.560
+91 1 f_dev cc21 b040
+1 1 f_dev cc27    1.116
+91 1 f_dev cc27 b041
+1 1 f_dev cc28    0.981
+91 1 f_dev cc28 b042
+1 1 f_dev cc29    0.457
+91 1 f_dev cc29 b043
+1 1 f_dev cc30    1.044
+91 1 f_dev cc30 b044
+1 1 f_dev cc31    0.476
+91 1 f_dev cc31 b045
+1 1 f_dev cc32    0.701
+91 1 f_dev cc32 b046
+1 1 f_dev cc34    0.535
+91 1 f_dev cc34 b047
+1 1 f_dev cc35    0.966
+91 1 f_dev cc35 b048
+1 1 f_dev cc36    0.673
+91 1 f_dev cc36 b049
+1 1 f_dev cc37    1.183
+91 1 f_dev cc37 b050
+1 1 f_dev cc39    2.293
+91 1 f_dev cc39 b051
+1 1 f_dev cc40    3.376
+91 1 f_dev cc40 b052
+1 1 f_dev cc41    1.003
+91 1 f_dev cc41 b053
+1 1 f_dev cc42    1.464
+91 1 f_dev cc42 b054
+1 1 f_dev cc43    1.397
+91 1 f_dev cc43 b055
+1 1 f_dev cc45    2.867
+91 1 f_dev cc45 b056
+1 1 f_dev cc46    2.147
+91 1 f_dev cc46 b057
+1 1 f_dev cc48    3.034
+91 1 f_dev cc48 b058
+1 1 f_dev cc50    1.287
+91 1 f_dev cc50 b059
+1 1 f_dev cc51    1.399
+91 1 f_dev cc51 b060
+1 1 f_dev cc52    1.831
+91 1 f_dev cc52 b061
+1 1 f_dev cc53    0.849
+91 1 f_dev cc53 b062
+1 1 f_dev cc56    2.544
+91 1 f_dev cc56 b063
+1 1 f_dev cc61    1.675
+91 1 f_dev cc61 b064
+1 1 f_dev cc64    0.873
+91 1 f_dev cc64 b065
+1 1 f_dev cc66    1.223
+91 1 f_dev cc66 b066
+1 1 f_dev cc67    0.962
+91 1 f_dev cc67 b067
+1 1 f_dev cc71    1.303
+91 1 f_dev cc71 b068
+1 1 f_dev cc72    2.099
+91 1 f_dev cc72 b069
+1 1 f_dev cc74    1.753
+91 1 f_dev cc74 b070
+1 1 f_dev cc75    1.777
+91 1 f_dev cc75 b071
+1 1 f_dev cc76    0.686
+91 1 f_dev cc76 b072
+1 1 f_dev cc79y    1.751
+91 1 f_dev cc79y b073
+1 1 f_dev cc84    0.718
+91 1 f_dev cc84 b074
+1 1 f_dev dd15    0.944
+91 1 f_dev dd15 b075
+1 1 f_dev dd19    1.524
+91 1 f_dev dd19 b076
+1 1 f_dev dd205    1.021
+91 1 f_dev dd205 b077
+1 1 f_dev dd207    0.726
+91 1 f_dev dd207 b078
+1 1 f_dev eg1_1    1.442
+91 1 f_dev eg1_1 b079
+1 1 f_dev eg1_2    1.403
+91 1 f_dev eg1_2 b080
+1 1 f_dev eg2_1    2.014
+91 1 f_dev eg2_1 b081
+1 1 f_dev eg3_1    1.865
+91 1 f_dev eg3_1 b082
+1 1 f_dev eg4a_1    1.484
+91 1 f_dev eg4a_1 b083
+1 1 f_dev eg4b_2    1.147
+91 1 f_dev eg4b_2 b084
+1 1 f_dev eg7_1   -0.079
+91 1 f_dev eg7_1 b085
+1 1 f_dev eg7_2    0.616
+91 1 f_dev eg7_2 b086
+1 1 f_dev eg8_1    0.205
+91 1 f_dev eg8_1 b087
+1 1 f_dev eg8_2    1.161
+91 1 f_dev eg8_2 b088
+1 1 f_dev eg9a    0.487
+91 1 f_dev eg9a b089
+1 1 f_dev eg10a    2.247
+91 1 f_dev eg10a b090
+1 1 f_dev eg11_1    1.707
+91 1 f_dev eg11_1 b091
+1 1 f_dev eg12a    1.779
+91 1 f_dev eg12a b092
+1 1 f_dev eg13a    0.923
+91 1 f_dev eg13a b093
+1 1 f_dev eg14a    1.761
+91 1 f_dev eg14a b094
+1 1 f_dev eg14b    1.047
+91 1 f_dev eg14b b095
+1 1 f_dev eg15_1    1.169
+91 1 f_dev eg15_1 b096
+1 1 f_dev eg15_2    1.393
+91 1 f_dev eg15_2 b097
+1 1 f_dev eg19a_2    2.620
+91 1 f_dev eg19a_2 b098
+1 1 f_dev eg19a_3    2.183
+91 1 f_dev eg19a_3 b099
+1 1 f_dev eg19a_4    2.448
+91 1 f_dev eg19a_4 b100
+1 1 f_dev eg20a    1.476
+91 1 f_dev eg20a b101
+1 1 f_dev eg20b_1    0.862
+91 1 f_dev eg20b_1 b102
+1 1 f_dev eg20c    1.701
+91 1 f_dev eg20c b103
+1 1 f_dev eg20d    1.661
+91 1 f_dev eg20d b104
+1 1 f_dev eg20e_1    1.377
+91 1 f_dev eg20e_1 b105
+1 1 f_dev eg20e_2    1.434
+91 1 f_dev eg20e_2 b106
+1 1 f_dev eg21a    1.260
+91 1 f_dev eg21a b107
+1 1 f_dev eg21b    1.455
+91 1 f_dev eg21b b108
+1 1 f_dev eg22_1    1.848
+91 1 f_dev eg22_1 b109
+1 1 f_dev eg22_2    1.684
+91 1 f_dev eg22_2 b110
+1 1 f_dev eg27a    1.160
+91 1 f_dev eg27a b111
+1 1 f_dev eg27b_1    1.413
+91 1 f_dev eg27b_1 b112
+1 1 f_dev eg28a    2.263
+91 1 f_dev eg28a b113
+1 1 f_dev eg28b    2.224
+91 1 f_dev eg28b b114
+1 1 f_dev eg28c    2.263
+91 1 f_dev eg28c b115
+1 1 f_dev eg29a    1.183
+91 1 f_dev eg29a b116
+1 1 f_dev eg29b    1.262
+91 1 f_dev eg29b b117
+1 1 f_dev eg29c    1.199
+91 1 f_dev eg29c b118
+1 1 f_dev eg30a    1.340
+91 1 f_dev eg30a b119
+1 1 f_dev eg30c    1.147
+91 1 f_dev eg30c b120
+1 1 f_dev eg30d   -1.938
+91 1 f_dev eg30d b121
+1 1 f_dev eg30e   -1.748
+91 1 f_dev eg30e b122
+1 1 f_dev eg30f    0.796
+91 1 f_dev eg30f b123
+1 1 f_dev eg31a_1    1.322
+91 1 f_dev eg31a_1 b124
+1 1 f_dev eg31a_2    1.082
+91 1 f_dev eg31a_2 b125
+1 1 f_dev eg31b    1.748
+91 1 f_dev eg31b b126
+1 1 f_dev eg32a    1.376
+91 1 f_dev eg32a b127
+1 1 f_dev eg32b    1.503
+91 1 f_dev eg32b b128
+1 1 f_dev eg33a    1.498
+91 1 f_dev eg33a b129
+1 1 f_dev eg33b    1.198
+91 1 f_dev eg33b b130
+1 1 f_dev eg34a    0.855
+91 1 f_dev eg34a b131
+1 1 f_dev eg34b    1.094
+91 1 f_dev eg34b b132
+1 1 f_dev eg35b    0.697
+91 1 f_dev eg35b b133
+1 1 f_dev eg36b    0.831
+91 1 f_dev eg36b b134
+1 1 f_dev eg42a    1.615
+91 1 f_dev eg42a b135
+1 1 f_dev eg42c    1.788
+91 1 f_dev eg42c b136
+1 1 f_dev eg43a_1    0.997
+91 1 f_dev eg43a_1 b137
+1 1 f_dev eg43b    1.312
+91 1 f_dev eg43b b138
+1 1 f_dev eg44_1    1.048
+91 1 f_dev eg44_1 b139
+1 1 f_dev eg44_2   -1.364
+91 1 f_dev eg44_2 b140
+1 1 f_dev eg45_1    1.506
+91 1 f_dev eg45_1 b141
+1 1 f_dev eg45_2    1.585
+91 1 f_dev eg45_2 b142
+1 1 f_dev eg46a_1    1.762
+91 1 f_dev eg46a_1 b143
+1 1 f_dev eg46a_2    2.233
+91 1 f_dev eg46a_2 b144
+1 1 f_dev eg46b    0.706
+91 1 f_dev eg46b b145
+1 1 f_dev eg46c    1.762
+91 1 f_dev eg46c b146
+1 1 f_dev eg46d    1.606
+91 1 f_dev eg46d b147
+1 1 f_dev eg47a    2.758
+91 1 f_dev eg47a b148
+1 1 f_dev eg47b    2.560
+91 1 f_dev eg47b b149
+1 1 f_dev eg48_2    1.802
+91 1 f_dev eg48_2 b150
+1 1 f_dev eg49_1    1.111
+91 1 f_dev eg49_1 b151
+1 1 f_dev eg49_2    1.693
+91 1 f_dev eg49_2 b152
+1 1 f_dev eg50b    1.576
+91 1 f_dev eg50b b153
+1 1 female f_psych    0.098
+1 1 years f_psych    0.591
+1 1 femxyrs f_psych    0.026
+1 1 logyrs f_psych   -2.536
+1 1 female f_dev    0.250
+1 1 years f_dev   -0.451
+1 1 femxyrs f_dev   -0.030
+1 1 logyrs f_dev    6.455
+2 1 f_psych f_dev    0.060
+4 1 f_psych    1.000
+4 1 f_dev    1.000
+2 1 female years  999.000
+2 1 female femxyrs  999.000
+2 1 female logyrs  999.000
+2 1 years femxyrs  999.000
+2 1 years logyrs  999.000
+2 1 femxyrs logyrs  999.000

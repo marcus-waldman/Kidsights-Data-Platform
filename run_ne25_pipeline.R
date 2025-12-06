@@ -81,8 +81,9 @@ if (pipeline_result$success) {
     cat("\n🎯 PROCESSING METRICS:\n")
     cat(paste("  • Records processed:", metrics$records_processed), "\n")
     cat(paste("  • Eligible participants:", metrics$records_eligible), "\n")
-    cat(paste("  • Authentic participants:", metrics$records_authentic), "\n")
-    cat(paste("  • Included participants:", metrics$records_included), "\n")
+    if (!is.null(metrics$records_influential)) {
+      cat(paste("  • Influential observations:", metrics$records_influential), "\n")
+    }
     cat(paste("  • Processing time:", round(metrics$processing_duration, 1), "seconds"), "\n")
 
     cat("\n⏱️ TOTAL EXECUTION TIME:", round(metrics$total_duration, 1), "seconds\n")

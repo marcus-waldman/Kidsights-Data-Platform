@@ -1,0 +1,84 @@
+---
+title: "Manual Screening and Cleaning"
+author: "Marcus Waldman"
+date: "2025-12-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Stage 1: Ensure all reverse coding is applied and applied correctly
+
+
+
+* Fit Model 1a (fit in Mplus): Within each domain, all loadings are set to be equal
+```{r model1a}
+library(tidyverse)
+library(MplusAutomation)
+
+wd = "scripts/authenticity_screening/manual_screening/"
+
+source("scripts/authenticity_screening/manual_screening/00_load_item_response_data.R")
+
+# Obtain wide item response dataset
+out_list_00<-load_stage1_data()
+wide_dat = out_list_00$wide_data
+person_dat = out_list_00$person_data
+
+mplus_dat = wide_dat %>%
+  safe_left_join(person_dat %>% dplyr::select(id,female,years), by_vars = "id") %>% 
+  dplyr::relocate(id,female,years) %>% 
+  dplyr::mutate(
+    id = stringr::str_replace_all(id,"_",".") %>% as.numeric(),
+    female = as.integer(female)
+  )
+
+setwd("")
+MplusAutomation::prepareMplusData(
+  mplus_dat, 
+  filename = "scripts/authenticity_screening/manual_screening/mplus/model_1a/model_1a.dat", 
+  inpfile = F)
+
+
+
+
+```
+ 
+
+* Fit Model 1b (fit in Mplus): Free all loadings, but place a N(0,1) prior on the loadings. Use the values from Model 1a as starting values.
+* Fit Model 1c (fit in Mplus): Set all loadings from Model 1b < 0 to be equal to zero, and place a N(0,5) loading on all remaining free loadings. Save out the factor score. 
+* If ANY loadings were fixed to zero in Model 1c, proceed with Stage 1 Follow-up A. Otherwise, proceed to Stage 2.
+
+
+
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(tidyverse)
+library(MplusAutomation)
+
+source("scripts/authenticity_screening/manual_screening/00_load_item_response_data.R")
+
+# Obtain wide item response dataset
+out_list_00<-load_stage1_data()
+wide_dat = out_list_00$wide_data
+person_dat = out_list_00$person_data
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
