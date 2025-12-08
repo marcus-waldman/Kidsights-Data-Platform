@@ -441,6 +441,13 @@ pip install pyreadstat
   - Pipeline creates `influential` column (TRUE if observation manually identified as high-leverage)
   - Pipeline creates `overall_influence_cutoff` column (influence score threshold used for flagging)
 - **Storage:** Local DuckDB with 11 tables, 7,812 records
+- **GSED Person-Fit Scores (Step 6.7):** Joins manually calibrated person-fit scores from 2023 scale
+  - 7 domain scores: General GSED, Feeding, Externalizing, Internalizing, Sleeping, Social Competency, Overall Kidsights
+  - Created via fixed item calibration in Mplus (171 fixed + 53 free items)
+  - Scores stored in `ne25_kidsights_gsed_pf_scores_2022_scale` table (2,831 records)
+  - Conditional standard errors (`_csem`) included for all domains
+  - Also joins `ne25_too_few_items` exclusion flags (718 records)
+  - See `calibration/ne25/manual_2023_scale/` for workflow
 
 ### ✅ ACS Pipeline - Complete
 - **API Integration:** Direct IPUMS USA API extraction via ipumspy
@@ -528,6 +535,27 @@ pip install pyreadstat
 - **Database:** `ne25_calibration` table with 2 indexes (id, years)
 - **Execution Time:** ~5-10 seconds (Step 11)
 - **Purpose:** Optimized source for combined IRT calibration dataset with authenticity weighting
+
+### ✅ Manual 2023 Scale Calibration - Complete (December 2025)
+- **Purpose:** Fixed item calibration to maintain continuity with 2023 GSED scale
+- **Method:** Mplus graded response model with 171 fixed parameters from 2023 mirt + 53 new free items
+- **Calibration Dataset:** 2,785 NE25 participants (after influential observation exclusions)
+- **Person-Fit Scores Generated:**
+  - Overall: `kidsights_2022`, `kidsights_2022_csem`
+  - General GSED: `general_gsed_pf_2022`, `general_gsed_pf_2022_csem`
+  - Feeding: `feeding_gsed_pf_2022`, `feeding_gsed_pf_2022_csem`
+  - Externalizing: `externalizing_gsed_pf_2022`, `externalizing_gsed_pf_2022_csem`
+  - Internalizing: `internalizing_gsed_pf_2022`, `internalizing_gsed_pf_2022_csem`
+  - Sleeping: `sleeping_gsed_pf_2022`, `sleeping_gsed_pf_2022_csem`
+  - Social Competency: `social_competency_gsed_pf_2022`, `social_competency_gsed_pf_2022_csem`
+- **Database Tables:**
+  - `ne25_kidsights_gsed_pf_scores_2022_scale` - Person-fit scores (2,831 records with scores)
+  - `ne25_too_few_items` - Exclusion flags for insufficient item responses (718 records)
+- **Pipeline Integration:** Automatically joined in NE25 pipeline Step 6.7 (if tables exist)
+- **Workflow Location:** `calibration/ne25/manual_2023_scale/`
+- **Orchestrator Script:** `run_manual_calibration.R`
+- **Execution:** Manual workflow (run separately before NE25 pipeline)
+- **Documentation:** See [Manual 2023 Scale Calibration](docs/irt_scoring/MANUAL_2023_SCALE_CALIBRATION.md)
 
 ### 🚧 HRTL Scoring - In Development (November 2025)
 - **Status:** **IN DEVELOPMENT** - Functional but pending validation (see GitHub Issue #9)

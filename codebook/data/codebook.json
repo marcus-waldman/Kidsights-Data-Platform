@@ -22281,14 +22281,14 @@
         "added_date": "2025-10-01",
         "modified_date": "2025-12-02",
         "reverse_coding_correction": {
-          "date": "2025-12-02",
-          "note": "Reverse coding flag corrected based on manual screening analysis in scripts/authenticity_screening/manual_screening/Manual Cleaning and Screening.Rmd. ICC analysis with Cook's D influence diagnostics revealed incorrect coding direction."
+          "date": "2025-12-06",
+          "note": "Reverse coding flag changed to FALSE based on manual calibration analysis on 2023 scale. Item does not require reverse coding."
         }
       },
       "instruments": [
         "Kidsights Measurement Tool"
       ],
-      "reverse_coded": true
+      "reverse_coded": false
     },
     "EG42a": {
       "id": 223,

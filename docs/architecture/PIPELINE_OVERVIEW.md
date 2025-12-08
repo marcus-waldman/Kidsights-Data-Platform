@@ -42,9 +42,28 @@ REDCap (4 projects) → R: Extract/Transform → Feather Files → Python: Datab
 - **Rich error context** (no more segfaults)
 - **Perfect data type preservation** R ↔ Python
 
+### Pipeline Stages (September 2025 - Updated December 2025)
+
+The NE25 pipeline executes **12 steps** with optional conditional joins:
+
+```
+Step 1: Extract REDCap Data → Feather
+Step 2-4: Initial Validation → Feature Engineering
+Step 5: Influential Observations Join (optional)
+Step 6.5: Metadata Generation
+Step 6.7: GSED Person-Fit Scores Join (optional, NEW)  ← Join manually calibrated scores
+Step 7: Store Transformed Data → DuckDB
+Step 8-11: Calibration Prep
+Step 12: IRT Calibration Table Creation
+```
+
+**New in December 2025:** Step 6.7 automatically joins person-fit scores from manual 2023 scale calibration (if tables exist in database). This adds 17 columns (14 person-fit scores + 3 exclusion flags) to the transformed data.
+
 ### Design Rationale
 
 The hybrid architecture was adopted in September 2025 to eliminate persistent segmentation faults when using R's DuckDB driver. By delegating all database operations to Python while keeping R for its strengths (REDCap extraction, statistical transformations), we achieved complete stability without sacrificing functionality.
+
+**December 2025 Update:** Manual 2023 scale calibration workflow now produces person-fit scores that are conditionally joined in Step 6.7, enabling continuity with the 2023 GSED scale baseline.
 
 ### Technical Components
 
@@ -811,10 +830,18 @@ The Kidsights Data Platform operates **six independent, standalone pipelines**:
 ### How They Work Together
 
 ```
+Manual 2023 Scale Calibration (Optional, One-Time Setup)
+         ↓
+calibration/ne25/manual_2023_scale/run_manual_calibration.R
+         ↓
+ne25_kidsights_gsed_pf_scores_2022_scale (2,831 records)
+ne25_too_few_items (718 records)
+         ↓
+         ↓
 NE25 Pipeline          ACS Pipeline       NHIS Pipeline      NSCH Pipeline
      ↓                      ↓                   ↓                  ↓
 ne25_raw                acs_raw            nhis_raw          nsch_2023_raw
-ne25_transformed            ↓                   ↓                  ↓
+ne25_transformed (+ GSED scores joined in Step 6.7)
      ↓                      ↓                   ↓                  ↓
      ↓                      └───────────────────┴──────────────────┘
      ↓                                      ↓

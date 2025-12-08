@@ -1,8 +1,8 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-12-06 10:45:30  
+**Generated:** 2025-12-08 12:50:37  
 **Total Records:** 4966  
-**Total Variables:** 665  
+**Total Variables:** 682  
 **Categories:** 16  
 
 ## Overview
@@ -27,7 +27,7 @@ for race/ethnicity, education categories, and other demographic variables.
 - [Geography](#geography) (28 variables)
 - [Mental_Health](#mental_health) (10 variables)
 - [Motor](#motor) (74 variables)
-- [Other](#other) (310 variables)
+- [Other](#other) (327 variables)
 - [Psychosocial_Problems_General](#psychosocial_problems_general) (16 variables)
 - [Socemo](#socemo) (55 variables)
 
@@ -353,7 +353,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
 | `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251206_104355) |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251208_124857) |
 | `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.3% | N/A |
 | `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
@@ -480,9 +480,9 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 **Description:** No description available
 
-**Variables:** 310  
-**Average Missing:** 39.1%  
-**Data Types:** 3 factors, 274 numeric, 1 logical, 32 character
+**Variables:** 327  
+**Average Missing:** 39.7%  
+**Data Types:** 4 factors, 289 numeric, 2 logical, 32 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
@@ -593,6 +593,9 @@ Use the slider to select a value that best represents this value. | numeric | 35
 A primary caregiver, most often a parent or guardian, is a person who is often responsible for the care of the child, spends a significant amount of time with the child (at least 40 hours per week), and can speak to what the child can do and how the child behaves.  | numeric | 25.1% | N/A |
 | `eq003` | Are you 19 years of age or older? | numeric | 24.9% | N/A |
 | `eq004a` | <div class="rich-text-field-label"><p>Please confirm your child's date of birth<br><span style="color: #e03e2d;">Please enter the birthdate in MM/DD/YYYY format (e.g., 12/31/2000)</span></p></div> | character | 40.6% | N/A |
+| `exclusion_reason` | Exclusion Reason | factor | 85.5% | 1 (Insufficient responses (n=0, threshold=5)), 2 (Insufficient responses (n=1, threshold=5)), 3 (Insufficient responses (n=2, threshold=5)), 4 (Insufficient responses (n=3, threshold=5)) |
+| `externalizing_gsed_pf_2022` | Externalizing Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `externalizing_gsed_pf_2022_csem` | Externalizing Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
 | `fci_a_1` | About how many books are there in the home, including schoolbooks, novels, and religious books?
 
 Do not include books meant for very young children, such as picture books. | numeric | 39.8% | N/A |
@@ -622,6 +625,8 @@ Do not include books meant for very young children, such as picture books. | num
 | `fci_d_7` | Draw or paint things with your child? | numeric | 40.5% | N/A |
 | `fci_d_8` | Construct things with your child? | numeric | 40.6% | N/A |
 | `fci_d_9` | Do any household chores with your child and talk while doing the work? For example, child put things away, sweep, set the table, do dishes, cook. | numeric | 40.7% | N/A |
+| `feeding_gsed_pf_2022` | Feeding Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `feeding_gsed_pf_2022_csem` | Feeding Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
 | `financial_compensation_be_sent_to_a_nebraska_residential_address___1` | Financial Compensation Be Sent To A Nebraska Residential Address   1 | numeric | 0.0% | N/A |
 | `first_5_nos_1097_2191` | First 5 Consecutive Nos | numeric | 61.9% | N/A |
 | `first_5_nos_180_364` | First 5 Nos count | numeric | 94.9% | N/A |
@@ -635,6 +640,8 @@ Do not include books meant for very young children, such as picture books. | num
 | `fqlive1_1` | Children, birth through 18 years | numeric | 36.7% | N/A |
 | `fqlive1_2` | Adults, 19- 65 years of age | numeric | 37.0% | N/A |
 | `fqlive1_3` | Adults, 66 years or older | numeric | 54.0% | N/A |
+| `general_gsed_pf_2022` | General Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `general_gsed_pf_2022_csem` | General Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
 | `inc99` | Inc99 | numeric | 35.4% | N/A |
 | `ineligible_flag` | Ineligible Flag:
 
@@ -644,6 +651,10 @@ AND CHILD identified as non-Hispanic
 AND CHILD is 1096 days OR older
 AND the responding caregiver has a Bachelors  degree OR a masters degree OR a doctorate
 Otherwise, proceed with the survey | numeric | 98.6% | N/A |
+| `internalizing_gsed_pf_2022` | Internalizing Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `internalizing_gsed_pf_2022_csem` | Internalizing Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
+| `kidsights_2022` | Kidsights 2022 | numeric | 43.9% | N/A |
+| `kidsights_2022_csem` | Kidsights 2022 Csem | numeric | 43.9% | N/A |
 | `kidsights_data_reviews_all_responses_for_quality___1` | Kidsights Data Reviews All Responses For Quality   1 | numeric | 0.0% | N/A |
 | `mmi000` | This question asks about your child's primary childcare arrangement. 
 
@@ -727,6 +738,7 @@ Enter 0 if you receive no such financial support. | numeric | 74.2% | N/A |
 Enter 0 if you receive no such financial support.
 
 Use the slider to select a value that best represents this value $[mrw003_2] | numeric | 66.0% | N/A |
+| `n_kidsight_psychosocial_responses` | N Kidsight Psychosocial Responses | numeric | 85.5% | N/A |
 | `nom044` | To what extent do your child's health conditions or problems affect their ability to do things? | numeric | 100.0% | N/A |
 | `nom046x` | How would you describe the condition of your child's teeth? | numeric | 39.4% | N/A |
 | `nom047` | How often does this child show concern when they see others are hurt or unhappy? | numeric | 98.7% | N/A |
@@ -817,6 +829,10 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `redcap_survey_identifier` | Redcap Survey Identifier | numeric | 93.9% | N/A |
 | `sf018` | While your child is on his/her back, can he/she bring his/her hands together such that the hands touch each other? | numeric | 99.5% | N/A |
 | `sf019` | Does your child move excitedly, kick legs, move arms or trunk, or make coo noises when a known person enters the room or speaks to him/her? | numeric | 99.5% | N/A |
+| `sleeping_gsed_pf_2022` | Sleeping Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `sleeping_gsed_pf_2022_csem` | Sleeping Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
+| `social_competency_gsed_pf_2022` | Social Competency Gsed Pf 2022 | numeric | 43.9% | N/A |
+| `social_competency_gsed_pf_2022_csem` | Social Competency Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
 | `source_project` | Source Project | factor | 0.0% | 1 (kidsights_data_survey), 2 (kidsights_email_registration), 3 (kidsights_public), 4 (kidsights_public_birth) |
 | `sq001` | Please enter your 5-digit zip code. | character | 25.4% | N/A |
 | `sq002___1` | Sq002   1 | numeric | 0.0% | N/A |
@@ -837,6 +853,7 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `sq002___9` | Sq002   9 | numeric | 0.0% | N/A |
 | `sq003` | Are you of Hispanic, Latino or Spanish origin? | numeric | 36.4% | N/A |
 | `survey_stop` | survey Stop | numeric | 99.4% | N/A |
+| `too_few_item_responses` | Too Few Item Responses | logical | 85.5% | N/A |
 | `urban_pct` | Percentage of ZIP population in urban areas (0-100) | numeric | 27.9% | N/A |
 
 ## Psychosocial_Problems_General
@@ -941,4 +958,4 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-12-06 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-12-08 by the Kidsights Data Platform*

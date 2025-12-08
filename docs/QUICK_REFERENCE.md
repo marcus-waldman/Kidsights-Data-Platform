@@ -31,6 +31,9 @@ This document provides a quick reference cheatsheet for common Kidsights Data Pl
 **What it does:**
 - Extracts data from 4 REDCap projects
 - Transforms data (99 derived variables)
+- Joins influential observations (if available)
+- Joins GSED person-fit scores from 2023 scale calibration (if available)
+- Flags participants with too few item responses (if available)
 - Stores in DuckDB database
 - Generates documentation
 
@@ -454,6 +457,92 @@ result <- generate_kidsights_model_syntax(
 **Documentation:**
 - [calibration/README.md](irt_scoring/calibration/README.md) - Complete syntax generation guide
 - [CONSTRAINT_SPECIFICATION.md](irt_scoring/CONSTRAINT_SPECIFICATION.md) - Constraint types reference
+
+---
+
+### Manual 2023 Scale Calibration (One-Time Setup)
+
+**Purpose:** Fixed-item calibration of new NE25 items to the 2023 GSED scale baseline via Mplus
+
+**Prerequisites:**
+1. NE25 pipeline must be run first to create `ne25_transformed` table
+2. No other preparation needed - workflow is fully automated
+
+```bash
+# Run manual calibration workflow (creates person-fit scores)
+cd calibration/ne25/manual_2023_scale
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" run_manual_calibration.R
+```
+
+**What it does:**
+- Loads NE25 item response data from `ne25_transformed` table
+- Filters influential observations (Cook's D > 5.5, optional)
+- Imputes missing covariates using CART algorithm
+- Creates Mplus dataset with 171 fixed + 53 free item parameters
+- Runs Mplus fixed-item calibration (graded response model)
+- Generates person-fit scores for 7 GSED domains + overall kidsights score
+- Writes results to database tables (`ne25_kidsights_gsed_pf_scores_2022_scale`, `ne25_too_few_items`)
+
+**Timing:** 3-5 minutes
+
+**Output Database Tables:**
+1. **`ne25_kidsights_gsed_pf_scores_2022_scale`** (2,831 records)
+   - Overall kidsights score: `kidsights_2022`, `kidsights_2022_csem`
+   - 6 domain scores: general, feeding, externalizing, internalizing, sleeping, social_competency
+   - Each domain has person-fit score and conditional standard error (CSEM)
+   - Created via fixed-item IRT calibration (171 anchored + 53 estimated items)
+
+2. **`ne25_too_few_items`** (718 records)
+   - Exclusion flags for participants with <5 valid item responses
+   - Columns: `too_few_item_responses`, `n_kidsight_psychosocial_responses`, `exclusion_reason`
+   - Automatically joined in NE25 pipeline Step 6.7
+
+**Automatic Integration:**
+After running this workflow, the next execution of the NE25 pipeline will automatically:
+- Detect the two tables in the database
+- Join GSED person-fit scores in Step 6.7 (adds 14 columns)
+- Join too-few-items exclusion flags (adds 3 columns)
+- No manual configuration needed
+
+**Technical Details:**
+- **Fixed-item calibration:** 171 items anchored to 2023 mirt parameters, 53 new items estimated
+- **Graded response model (GRM):** Ordinal categorical IRT for developmental items
+- **CSEM:** Conditional standard error of measurement for person-specific precision
+- **Reverse coding:** PS (psychosocial) items converted to developmental outcome scale
+- **Parameterization:** τ_Mplus = -d_mirt (sign flip for threshold conversion)
+
+**Directory Structure:**
+```
+calibration/ne25/manual_2023_scale/
+├── run_manual_calibration.R           ← Entry point (run this)
+├── utils/
+│   ├── 00_load_item_response_data.R   ← Data loading
+│   └── generate_mplus_model_block.R   ← Mplus MODEL block generator
+├── data/                              ← Intermediate datasets
+│   ├── stage1_wide.rds
+│   ├── stage1_person_data.rds
+│   └── stage1_item_metadata.rds
+└── mplus/                             ← Mplus files
+    ├── all_2023_calibration_ne25.inp  ← Mplus input
+    ├── mplus_dat.dat                  ← Mplus data (generated)
+    └── mplus_model_block.txt          ← MODEL section (generated)
+```
+
+**Record Counts:**
+| Item | Count | Notes |
+|------|-------|-------|
+| NE25 total participants | 4,966 | From REDCap |
+| Eligible (meets_inclusion) | 3,507 | Inclusion criteria met |
+| Calibration sample (≥5 items) | 2,785 | Used for Mplus |
+| Person-fit scores generated | 2,831 | 56.1% coverage |
+| Too few items (<5) | 718 | 14.5% flagged |
+| Fixed item parameters | 171 | From 2023 mirt |
+| Free item parameters | 53 | Estimated from NE25 |
+
+**Documentation:**
+- [MANUAL_2023_SCALE_CALIBRATION.md](../../../docs/irt_scoring/MANUAL_2023_SCALE_CALIBRATION.md) - Complete workflow guide
+- [README.md](./README.md) - Quick start guide and directory overview
+- [calibration/ne25/manual_2023_scale/](calibration/ne25/manual_2023_scale/) - Full workflow implementation
 
 ---
 

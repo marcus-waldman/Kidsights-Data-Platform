@@ -20,6 +20,7 @@ source("R/transform/ne25_transforms.R")
 source("R/documentation/generate_data_dictionary.R")
 source("R/documentation/generate_interactive_dictionary.R")
 source("R/utils/environment_config.R")
+source("R/utils/safe_joins.R")
 
 #' Convert REDCap dictionary list to data frame
 #'
@@ -630,6 +631,76 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     influential_time <- as.numeric(Sys.time() - influential_start)
     metrics$influential_duration <- influential_time
     message(paste("Influential observations joining completed in", round(influential_time, 2), "seconds"))
+
+    # STEP 6.7: JOIN GSED PERSON-FIT SCORES AND TOO-FEW-ITEMS FLAGS
+    message("\n--- Step 6.7: Joining GSED Scores and Item Insufficiency Flags ---")
+    person_scores_start <- Sys.time()
+
+    tryCatch({
+      library(DBI)
+      library(duckdb)
+
+      con <- DBI::dbConnect(duckdb::duckdb(), dbdir = config$output$database_path, read_only = TRUE)
+
+      # ===== TABLE 1: GSED Person-Fit Scores =====
+      gsed_table_exists <- DBI::dbExistsTable(con, "ne25_kidsights_gsed_pf_scores_2022_scale")
+
+      if (gsed_table_exists) {
+        message("Loading GSED person-fit scores from database...")
+        gsed_scores <- DBI::dbGetQuery(con, "SELECT * FROM ne25_kidsights_gsed_pf_scores_2022_scale")
+
+        # Join GSED scores to final_data (exclude year, fips, state - already in final_data)
+        final_data <- final_data %>%
+          safe_left_join(
+            gsed_scores %>% dplyr::select(pid, record_id, dplyr::starts_with("kidsights_"), dplyr::starts_with("general_"), dplyr::starts_with("feeding_"), dplyr::starts_with("externalizing_"), dplyr::starts_with("internalizing_"), dplyr::starts_with("sleeping_"), dplyr::starts_with("social_")),
+            by_vars = c("pid", "record_id")
+          )
+
+        n_gsed <- sum(!is.na(final_data$kidsights_2022), na.rm = TRUE)
+        message(sprintf("  - Records with GSED scores: %d (%.1f%%)",
+                       n_gsed, 100 * n_gsed / nrow(final_data)))
+
+      } else {
+        message("  - GSED scores table not found (skipping)")
+      }
+
+      # ===== TABLE 2: Too-Few-Items Flags =====
+      too_few_table_exists <- DBI::dbExistsTable(con, "ne25_too_few_items")
+
+      if (too_few_table_exists) {
+        message("Loading too-few-items flags from database...")
+        too_few <- DBI::dbGetQuery(con, "SELECT * FROM ne25_too_few_items")
+
+        # Join too-few-items flags to final_data (exclude year, fips, state - already in final_data)
+        final_data <- final_data %>%
+          safe_left_join(
+            too_few %>% dplyr::select(pid, record_id, too_few_item_responses, n_kidsight_psychosocial_responses, exclusion_reason),
+            by_vars = c("pid", "record_id")
+          )
+
+        n_too_few <- sum(final_data$too_few_item_responses == TRUE, na.rm = TRUE)
+        message(sprintf("  - Records with too few items: %d (%.1f%%)",
+                       n_too_few, 100 * n_too_few / nrow(final_data)))
+
+      } else {
+        message("  - Too-few-items table not found (skipping)")
+      }
+
+      DBI::dbDisconnect(con, shutdown = TRUE)
+
+    }, error = function(e) {
+      warning(paste("Failed to load person-fit tables:", e$message))
+      message("  - Continuing without GSED scores and item flags")
+    })
+
+    # Cache result
+    message("DEBUG: Caching after person-fit joins...")
+    saveRDS(final_data, file.path(cache_dir, "step6.7_person_fit_joins.rds"))
+    message("DEBUG: Cached person-fit data (", nrow(final_data), " records)")
+
+    person_scores_time <- as.numeric(Sys.time() - person_scores_start)
+    metrics$person_scores_duration <- person_scores_time
+    message(paste("Person-fit joins completed in", round(person_scores_time, 2), "seconds"))
 
     # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS
     message("\n--- Step 7: Storing Transformed Data ---")

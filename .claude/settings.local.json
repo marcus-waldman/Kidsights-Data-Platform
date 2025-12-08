@@ -53,7 +53,11 @@
       "Bash(ls:*)",
       "Bash(git mv:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" C:/Users/marcu/git-repositories/Kidsights-Data-Platform/calibration/ne25/manual_2023_scale/utils/generate_mplus_model_block.R)",
+      "Bash(cp:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": [
       "Glob(data/**)",

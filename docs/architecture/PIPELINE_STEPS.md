@@ -117,6 +117,79 @@ python pipelines/python/init_database.py --config config/sources/ne25.yaml
 - Creates HTML data dictionary
 - Produces Markdown documentation
 
+#### 6.7. Join GSED Person-Fit Scores & Too-Few-Items Flags
+
+**Executed by:** `pipelines/orchestration/ne25_pipeline.R` (Lines 635-703)
+
+**Purpose:**
+- Join person-fit scores from manual 2023 scale calibration (if available)
+- Flag participants with insufficient item responses for exclusion
+
+**Conditional Execution:**
+- This step only executes if calibration tables exist in database
+- Pipeline continues normally if tables don't exist (graceful skip)
+- Tables are created separately via `calibration/ne25/manual_2023_scale/run_manual_calibration.R`
+
+**Tables Joined:**
+
+1. **`ne25_kidsights_gsed_pf_scores_2022_scale`** (Person-Fit Scores)
+   - Contains 7 GSED domain scores + overall kidsights score
+   - Each score includes conditional standard error (`_csem`)
+   - 2,831 records (participants with `meets_inclusion=TRUE`)
+   - Created via fixed item calibration in Mplus
+
+2. **`ne25_too_few_items`** (Item Insufficiency Flags)
+   - Boolean flag for participants with <5 item responses
+   - Includes response count and exclusion reason
+   - 718 records (14.5% of total)
+
+**Variables Added:**
+
+**Person-Fit Scores (14 columns):**
+- `kidsights_2022` - Overall Kidsights developmental score (2022 scale)
+- `kidsights_2022_csem` - Conditional standard error of measurement
+- `general_gsed_pf_2022` - General GSED person-fit score
+- `general_gsed_pf_2022_csem` - CSEM for general GSED
+- `feeding_gsed_pf_2022` - Feeding domain score
+- `feeding_gsed_pf_2022_csem` - CSEM for feeding
+- `externalizing_gsed_pf_2022` - Externalizing problems score
+- `externalizing_gsed_pf_2022_csem` - CSEM for externalizing
+- `internalizing_gsed_pf_2022` - Internalizing problems score
+- `internalizing_gsed_pf_2022_csem` - CSEM for internalizing
+- `sleeping_gsed_pf_2022` - Sleeping domain score
+- `sleeping_gsed_pf_2022_csem` - CSEM for sleeping
+- `social_competency_gsed_pf_2022` - Social competency score
+- `social_competency_gsed_pf_2022_csem` - CSEM for social competency
+
+**Exclusion Flags (3 columns):**
+- `too_few_item_responses` - Boolean: TRUE if <5 valid item responses
+- `n_kidsight_psychosocial_responses` - Integer: Count of valid responses
+- `exclusion_reason` - Text: "Fewer than 5 responses"
+
+**Technical Implementation:**
+- Uses `safe_left_join()` with composite key `c("pid", "record_id")`
+- Excludes redundant geographic columns (`year`, `fips`, `state`) from source tables
+- Wrapped in `tryCatch()` for graceful failure if tables don't exist
+- Read-only database connection
+- Reports join statistics: "Records with GSED scores: 2785 (56.1%)"
+
+**Execution Time:** ~0.9 seconds (if tables exist), ~0.4 seconds (if tables don't exist)
+
+**Manual Calibration Workflow:**
+See `calibration/ne25/manual_2023_scale/README.md` for complete workflow documentation.
+
+**Expected Output:**
+```
+--- Step 6.7: Joining GSED Scores and Item Insufficiency Flags ---
+Loading GSED person-fit scores from database...
+  - Records with GSED scores: 2785 (56.1%)
+Loading too-few-items flags from database...
+  - Records with too few items: 718 (14.5%)
+DEBUG: Caching after person-fit joins...
+DEBUG: Cached person-fit data (4966 records)
+Person-fit joins completed in 0.9 seconds
+```
+
 #### 11. NE25 Calibration Table Creation
 **Executed by:** `scripts/irt_scoring/create_ne25_calibration_table.R`
 **What it does:**

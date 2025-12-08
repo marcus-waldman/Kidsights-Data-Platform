@@ -300,6 +300,73 @@ See [GEOGRAPHIC_CROSSWALKS.md](GEOGRAPHIC_CROSSWALKS.md) for complete documentat
 
 ---
 
+## Joined External Scores (Not Part of 99 Derived Variables)
+
+The NE25 pipeline also joins **externally computed scores** that are NOT derived variables. These scores are created through separate specialized workflows and integrated into the final dataset via **Step 6.7** if the corresponding database tables exist.
+
+### GSED Person-Fit Scores (14 columns)
+
+**Source:** Manual 2023 scale calibration workflow
+**Table:** `ne25_kidsights_gsed_pf_scores_2022_scale`
+**Joined in:** NE25 Pipeline Step 6.7 (conditional - only if table exists)
+**Created by:** `calibration/ne25/manual_2023_scale/run_manual_calibration.R`
+
+**Purpose:** Item response theory (IRT) trait estimates for 7 GSED developmental domains calibrated to the 2023 scale baseline using fixed-item calibration in Mplus.
+
+**Method:**
+- **Fixed-item calibration:** 171 items anchored to 2023 mirt parameters, 53 new items estimated
+- **Graded response model (GRM):** Ordinal categorical IRT model for developmental/behavioral items
+- **Sample:** 2,785 NE25 participants with ≥5 item responses
+- **Person-fit scores:** Conditional trait estimates (theta) for each participant on each domain
+- **CSEM:** Conditional standard error of measurement for person-specific measurement precision
+
+**Variables Added (14 columns):**
+
+| Variable | Type | Range | Description |
+|----------|------|-------|-------------|
+| `kidsights_2022` | Numeric | -4 to +4 | Overall Kidsights developmental score (2022 scale) |
+| `kidsights_2022_csem` | Numeric | 0 to +2 | Conditional SEM for overall score |
+| `general_gsed_pf_2022` | Numeric | -4 to +4 | General GSED domain score |
+| `general_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for general GSED |
+| `feeding_gsed_pf_2022` | Numeric | -4 to +4 | Feeding domain score |
+| `feeding_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for feeding |
+| `externalizing_gsed_pf_2022` | Numeric | -4 to +4 | Externalizing problems score |
+| `externalizing_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for externalizing |
+| `internalizing_gsed_pf_2022` | Numeric | -4 to +4 | Internalizing problems score |
+| `internalizing_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for internalizing |
+| `sleeping_gsed_pf_2022` | Numeric | -4 to +4 | Sleeping domain score |
+| `sleeping_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for sleeping |
+| `social_competency_gsed_pf_2022` | Numeric | -4 to +4 | Social competency score |
+| `social_competency_gsed_pf_2022_csem` | Numeric | 0 to +2 | CSEM for social competency |
+
+**Coverage:** 2,831 participants (56.1% of eligible sample) have person-fit scores
+
+**Technical Details:**
+- **Parameterization:** Threshold parameters converted from mirt (τ_Mplus = -d_mirt)
+- **Reverse coding:** Psychosocial items (PS*) converted from behavioral problems scale to developmental outcome scale
+- **Missing handling:** Participants with <5 valid item responses excluded (see `ne25_too_few_items` table)
+- **IRT interpretation:** Higher scores indicate better developmental outcomes
+
+**Related Exclusion Flags (3 columns):**
+
+The pipeline also joins item insufficiency exclusion flags from `ne25_too_few_items`:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `too_few_item_responses` | Logical | TRUE if <5 valid item responses |
+| `n_kidsight_psychosocial_responses` | Numeric | Count of valid responses |
+| `exclusion_reason` | Character | "Fewer than 5 responses" |
+
+**Note:** These person-fit scores are **not derived variables** because they are:
+1. Computed external to the NE25 pipeline via a separate Mplus workflow
+2. Based on IRT trait estimation (not simple linear transformations)
+3. Anchored to historical 2023 scale parameters (not independently estimated from NE25 data alone)
+4. Conditionally joined only if the calibration tables exist in the database
+
+**Documentation:** See [Manual 2023 Scale Calibration](../../irt_scoring/MANUAL_2023_SCALE_CALIBRATION.md) for complete workflow details.
+
+---
+
 ## Configuration System
 
 ### config/derived_variables.yaml
