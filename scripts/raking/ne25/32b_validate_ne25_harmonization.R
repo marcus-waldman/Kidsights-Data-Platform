@@ -24,6 +24,12 @@ cat("========================================\n")
 cat("Validation: NE25 Harmonized Datasets\n")
 cat("========================================\n\n")
 
+# Database path (for reference, not needed for validation)
+db_path <- Sys.getenv("KIDSIGHTS_DB_PATH")
+if (db_path == "") {
+  db_path <- "data/duckdb/kidsights_local.duckdb"
+}
+
 # ==============================================================================
 # SECTION 1: Load Harmonized Datasets
 # ==============================================================================

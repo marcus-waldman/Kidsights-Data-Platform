@@ -37,8 +37,10 @@ cat("========================================\n\n")
 # ==============================================================================
 
 # Database path
-db_path <- Sys.getenv("KIDSIGHTS_DB_PATH",
-                      default = "data/duckdb/kidsights_local.duckdb")
+db_path <- Sys.getenv("KIDSIGHTS_DB_PATH")
+if (db_path == "") {
+  db_path <- "data/duckdb/kidsights_local.duckdb"
+}
 
 # Output directory
 weights_dir <- "data/raking/ne25"

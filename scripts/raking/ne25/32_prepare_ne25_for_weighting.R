@@ -39,8 +39,10 @@ source("scripts/raking/ne25/utils/harmonize_ne25_outcomes.R")
 source("R/utils/safe_joins.R")
 
 # Database path (from environment or default)
-db_path <- Sys.getenv("KIDSIGHTS_DB_PATH",
-                      default = "data/duckdb/kidsights_local.duckdb")
+db_path <- Sys.getenv("KIDSIGHTS_DB_PATH")
+if (db_path == "") {
+  db_path <- "data/duckdb/kidsights_local.duckdb"
+}
 
 # Output directory
 output_dir <- "data/raking/ne25/ne25_harmonized"
@@ -66,7 +68,6 @@ load_base_ne25 <- function(db_path) {
     SELECT
       pid,
       record_id,
-      study_id,
       years_old,
       female,
       raceG,
@@ -76,11 +77,14 @@ load_base_ne25 <- function(db_path) {
       phq2_total,
       gad2_total,
       child_ace_total,
-      mmi100,
-      authenticity_weight
+      mmi100
     FROM ne25_transformed
     WHERE eligible = TRUE
   ")
+
+  # Add constants
+  base_data$study_id <- "ne25"
+  base_data$authenticity_weight <- 1.0  # Placeholder - all weights = 1 for now
 
   dbDisconnect(con)
 
