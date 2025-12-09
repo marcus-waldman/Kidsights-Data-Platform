@@ -117,7 +117,6 @@ load_base_data <- function(db_path, eligible_only = TRUE) {
       family_size,
 
       -- Auxiliary variables (complete or mostly complete)
-      authentic,
       age_in_days,
       consent_date,
       mom_a1,

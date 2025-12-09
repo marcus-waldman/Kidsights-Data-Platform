@@ -21,11 +21,11 @@
 # Derived Variables (1 total, computed after imputation):
 #   - child_ace_total - Sum of 8 ACE items (0-8 scale)
 #
-# Auxiliary Variables (11 total):
+# Auxiliary Variables (10 total):
 #   - puma (from geography imputation m)
 #   - raceG, educ_mom, income, family_size, fplcat (from sociodem imputation m if imputed, else base)
 #   - phq2_positive, gad2_positive (from mental health imputation m if imputed, else base)
-#   - authentic, age_in_days, female (from base data)
+#   - age_in_days, female (from base data)
 
 # =============================================================================
 # SETUP
@@ -127,7 +127,6 @@ load_base_child_aces_data <- function(db_path, eligible_only = TRUE) {
       cqr024,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic\",
       age_in_days,
       female,
 

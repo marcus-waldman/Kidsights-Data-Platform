@@ -16,9 +16,8 @@
 #   - Impute type and hours for this filtered subset
 #   - Records with cc_receives_care = "No" are skipped (type/hours remain NULL)
 #
-# Auxiliary Variables (10 total):
+# Auxiliary Variables (9 total):
 #   - puma (from geography imputation m)
-#   - authentic (from base data)
 #   - female, raceG, educ_mom, educ_a2, income, family_size, fplcat (from sociodem imputation m)
 #   - cc_receives_care (from Stage 1 imputation m)
 
@@ -145,7 +144,6 @@ load_base_childcare_type_hours <- function(db_path, eligible_only = TRUE) {
       cc_receives_care,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic\",
       age_in_days,
       consent_date,
 

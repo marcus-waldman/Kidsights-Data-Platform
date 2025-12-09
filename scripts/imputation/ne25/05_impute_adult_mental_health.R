@@ -19,10 +19,9 @@
 #   - phq2_positive - PHQ-2 positive screen (sum >= 3)
 #   - gad2_positive - GAD-2 positive screen (sum >= 3)
 #
-# Auxiliary Variables (7 total):
+# Auxiliary Variables (6 total):
 #   - puma (from geography imputation m)
 #   - a1_raceG, educ_a1, income (from sociodem imputation m if imputed, else base)
-#   - authentic (from base data, also used as defensive filter)
 #   - female_a1, a1_years_old (from base data)
 
 # =============================================================================
@@ -131,7 +130,6 @@ load_base_mental_health_data <- function(db_path, eligible_only = TRUE) {
       gad2_positive,
 
       -- Auxiliary variables (complete or mostly complete)
-      \"authentic\",
       age_in_days,
       consent_date,
 

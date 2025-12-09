@@ -12,7 +12,7 @@
 #
 # Auxiliary Variables (10 total):
 #   - puma (from geography imputation m)
-#   - authentic, age_in_days (from base data)
+#   - age_in_days (from base data)
 #   - female, raceG, educ_mom, educ_a2, income, family_size, fplcat (from sociodem imputation m)
 
 # =============================================================================
@@ -103,7 +103,6 @@ load_base_childcare_data <- function(db_path, eligible_only = TRUE) {
       cc_receives_care,
 
       -- Auxiliary variables (complete or mostly complete)
-      authentic,
       age_in_days,
       consent_date,
 
