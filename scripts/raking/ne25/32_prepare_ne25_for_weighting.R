@@ -1,26 +1,24 @@
 # ==============================================================================
 # Script: 32_prepare_ne25_for_weighting.R
-# Purpose: Create M=5 harmonized NE25 datasets matching unified moment structure
-#          for KL divergence weighting
+# Purpose: Create M=1 harmonized NE25 dataset matching unified moment structure
+#          for KL divergence weighting using single CART imputation
 #
 # Overview:
-#   For each imputation m=1 to m=5:
-#     1. Load base NE25 data (meets_inclusion=TRUE, n=2,831)
-#     2. Merge 30 imputed variable tables (geography, sociodem, mental health, ACEs)
+#     1. Load base NE25 data (meets_inclusion=TRUE, n=2,785)
+#     2. Impute missing values using CART (mice package, M=1)
 #     3. Harmonize to 13-variable structure (8 Block 1 + 2 Block 2 + 3 Block 3)
 #     4. Validate data quality
-#     5. Save ne25_harmonized_m#.feather
+#     5. Save ne25_harmonized_m1.feather
 #
 # Output:
-#   - ne25_harmonized_m1.feather through ne25_harmonized_m5.feather
-#   - Each: 2,831 rows × 16 columns (pid, record_id, study_id + 13 vars)
+#   - ne25_harmonized_m1.feather (2,785 rows × 16 columns)
+#   - Columns: pid, record_id, study_id + 13 harmonized variables
 #
 # Dependencies:
 #   - ne25_transformed table (base data)
-#   - ne25_imputed_* tables (M=5 imputations for 30 variables)
+#   - mice package (for CART imputation)
 #   - harmonize_ne25_demographics.R
 #   - harmonize_ne25_outcomes.R
-#   - R/utils/safe_joins.R
 #
 # ==============================================================================
 
@@ -31,12 +29,11 @@
 library(duckdb)
 library(dplyr)
 library(arrow)
-library(stringr)
+library(mice)  # For CART imputation
 
 # Source utility functions
 source("scripts/raking/ne25/utils/harmonize_ne25_demographics.R")
 source("scripts/raking/ne25/utils/harmonize_ne25_outcomes.R")
-source("R/utils/safe_joins.R")
 
 # Database path (from environment or default)
 db_path <- Sys.getenv("KIDSIGHTS_DB_PATH")
@@ -58,300 +55,258 @@ cat("========================================\n\n")
 # SECTION 1: Load Base NE25 Data
 # ==============================================================================
 
-load_base_ne25 <- function(db_path) {
-  cat("[1] Loading base NE25 data...\n")
+cat("[1] Loading base NE25 data...\n")
 
-  con <- dbConnect(duckdb(), db_path)
+con <- dbConnect(duckdb(), db_path)
 
-  # Load records with meets_inclusion filter (eligible + non-NA authenticity_weight)
-  base_data <- dbGetQuery(con, "
-    SELECT
-      pid,
-      record_id,
-      years_old,
-      female,
-      raceG,
-      educ_mom,
-      fpl,
-      cbsa,
-      phq2_total,
-      gad2_total,
-      child_ace_total,
-      mmi100
-    FROM ne25_transformed
-    WHERE meets_inclusion = TRUE
-  ")
+# Load records with meets_inclusion filter
+# Select only variables needed for harmonization
+base_data <- dbGetQuery(con, "
+  SELECT
+    pid,
+    record_id,
+    years_old,
+    female,
+    raceG,
+    educ_mom,
+    fpl,
+    cbsa,
+    phq2_total,
+    gad2_total,
+    child_ace_total,
+    mmi100
+  FROM ne25_transformed
+  WHERE meets_inclusion = TRUE
+")
 
-  # Add constants
-  base_data$study_id <- "ne25"
-  base_data$authenticity_weight <- 1.0  # Placeholder - all weights = 1 for now
+dbDisconnect(con)
 
-  dbDisconnect(con)
+cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
 
-  cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
-
-  return(as.data.frame(base_data))
+# Report missing data before imputation
+cat("\n[1.1] Missing data summary (before imputation):\n")
+missing_counts <- colSums(is.na(base_data))
+missing_pct <- round(missing_counts / nrow(base_data) * 100, 2)
+for (var in names(missing_counts)[missing_counts > 0]) {
+  cat(sprintf("      %s: %d (%.1f%%)\n", var, missing_counts[var], missing_pct[var]))
 }
 
 # ==============================================================================
-# SECTION 2: Merge Imputed Variables for Imputation m
+# SECTION 2: Preprocess CBSA (Extract First Value from Semicolon-Delimited)
 # ==============================================================================
 
-merge_imputations_m <- function(base_data, db_path, m) {
-  cat(sprintf("  [2.%d] Merging imputations for m=%d...\n", m, m))
+cat("\n[2] Preprocessing CBSA (extract first value)...\n")
 
-  con <- dbConnect(duckdb(), db_path)
+# CBSA can have semicolon-delimited values (e.g., "30700; 13100")
+# Extract first CBSA code for harmonization
+base_data$cbsa_clean <- sapply(base_data$cbsa, function(x) {
+  if (is.na(x)) return(NA_character_)
+  # Split by semicolon and take first value
+  first_val <- stringr::str_split(x, ";")[[1]][1]
+  return(stringr::str_trim(first_val))
+})
 
-  # Helper function to safely query imputed table
-  get_imputed_var <- function(con, var_name, m, base_ids) {
-    query <- sprintf("
-      SELECT
-        pid,
-        record_id,
-        %s as %s
-      FROM ne25_imputed_%s
-      WHERE imputation_m = %d AND study_id = 'ne25'
-    ", var_name, var_name, var_name, m)
+cat(sprintf("    ✓ Extracted first CBSA for %d records\n",
+            sum(!is.na(base_data$cbsa_clean))))
 
-    tryCatch(
-      dbGetQuery(con, query),
-      error = function(e) {
-        cat(sprintf("      Warning: Could not load ne25_imputed_%s\n", var_name))
-        return(NULL)
-      }
-    )
+# ==============================================================================
+# SECTION 3: Impute Missing Values with CART
+# ==============================================================================
+
+cat("\n[3] Imputing missing values using CART...\n")
+
+# Prepare data for mice
+# Exclude CBSA from imputation (it's already preprocessed)
+# Exclude identifiers
+impute_data <- base_data %>%
+  dplyr::select(years_old, female, raceG, educ_mom, fpl,
+                phq2_total, gad2_total, child_ace_total, mmi100)
+
+# Run mice with CART method, M=1 imputation
+set.seed(20251209)  # For reproducibility
+
+cat("    Running mice (CART, M=1, maxit=5)...\n")
+imputed <- mice::mice(
+  impute_data,
+  m = 1,                    # Single imputation
+  method = "cart",          # CART method for all variables
+  maxit = 5,                # 5 iterations
+  printFlag = FALSE         # Suppress iteration output
+)
+
+cat("    ✓ Imputation complete\n")
+
+# Extract completed data
+imputed_data <- mice::complete(imputed, 1)
+
+# Add back identifiers and CBSA
+imputed_data$pid <- base_data$pid
+imputed_data$record_id <- base_data$record_id
+imputed_data$cbsa <- base_data$cbsa_clean  # Use preprocessed CBSA
+imputed_data$study_id <- "ne25"
+imputed_data$authenticity_weight <- 1.0  # Placeholder
+
+# Report missing data after imputation (CBSA may still have NAs)
+cat("\n[3.1] Missing data summary (after imputation):\n")
+missing_after <- colSums(is.na(imputed_data))
+if (sum(missing_after) == 0) {
+  cat("      ✓ No missing values remaining\n")
+} else {
+  cat("      Note: Some variables may retain missing values:\n")
+  for (var in names(missing_after)[missing_after > 0]) {
+    pct <- round(missing_after[var] / nrow(imputed_data) * 100, 1)
+    cat(sprintf("        %s: %d (%.1f%%)\n", var, missing_after[var], pct))
   }
+}
 
-  # Define imputed variables by category
-  geo_vars <- c("puma", "county", "census_tract")
-  sociodem_vars <- c("female", "raceG", "educ_mom", "income", "family_size", "fplcat")
-  mh_vars <- c("phq2_interest", "phq2_depressed", "gad2_nervous", "gad2_worry")
-  ace_vars <- c("child_ace_total")
+# ==============================================================================
+# SECTION 4: Harmonize to 13-Variable Structure
+# ==============================================================================
 
-  all_imputed_vars <- c(geo_vars, sociodem_vars, mh_vars, ace_vars)
+cat("\n[4] Harmonizing to 13-variable structure...\n")
 
-  # Load and join each imputed variable
-  merged_data <- base_data
+# Block 1: Demographics (8 variables)
+cat("    Harmonizing Block 1 (demographics)...\n")
 
-  for (var in all_imputed_vars) {
-    imputed_df <- get_imputed_var(con, var, m, base_data[, c("pid", "record_id")])
+block1_input <- dplyr::tibble(
+  female = imputed_data$female,
+  years_old = imputed_data$years_old,
+  raceG = imputed_data$raceG,
+  educ_mom = imputed_data$educ_mom,
+  fpl = imputed_data$fpl,
+  cbsa = imputed_data$cbsa
+)
 
-    if (!is.null(imputed_df) && nrow(imputed_df) > 0) {
-      # Use safe_left_join to handle collisions
-      merged_data <- safe_left_join(
-        merged_data,
-        imputed_df,
-        by_vars = c("pid", "record_id"),
-        allow_collision = FALSE,
-        auto_fix = TRUE
-      )
-    }
+block1 <- harmonize_ne25_block1(block1_input)
+
+# Block 2: Mental Health (2 variables)
+cat("    Harmonizing Block 2 (mental health)...\n")
+
+block2 <- dplyr::tibble(
+  phq2_total = imputed_data$phq2_total,
+  gad2_total = imputed_data$gad2_total
+)
+
+# Block 3: Child Outcomes (3 variables)
+cat("    Harmonizing Block 3 (child outcomes)...\n")
+
+block3 <- dplyr::bind_cols(
+  harmonize_ne25_child_aces(imputed_data$child_ace_total),
+  dplyr::tibble(
+    excellent_health = harmonize_ne25_excellent_health(imputed_data$mmi100)
+  )
+)
+
+# Combine all blocks
+harmonized <- dplyr::bind_cols(
+  dplyr::select(imputed_data, pid, record_id, study_id),
+  block1,
+  block2,
+  block3
+)
+
+cat("    ✓ Harmonization complete\n")
+
+# ==============================================================================
+# SECTION 5: Validation
+# ==============================================================================
+
+cat("\n[5] Validating harmonized data...\n")
+
+# Check completeness
+missing_harmonized <- colSums(is.na(harmonized))
+if (sum(missing_harmonized) > 0) {
+  cat("    ⚠ Warning: Missing values in harmonized data:\n")
+  for (var in names(missing_harmonized)[missing_harmonized > 0]) {
+    pct <- round(missing_harmonized[var] / nrow(harmonized) * 100, 2)
+    cat(sprintf("      %s: %d (%.1f%%)\n", var, missing_harmonized[var], pct))
   }
-
-  dbDisconnect(con)
-
-  cat(sprintf("      ✓ Merged %d imputed variables for m=%d\n",
-              length(all_imputed_vars), m))
-
-  return(merged_data)
+} else {
+  cat("    ✓ No missing values in harmonized data\n")
 }
 
-# ==============================================================================
-# SECTION 3: Harmonize to 13-Variable Structure
-# ==============================================================================
+# Check variable ranges
+cat("\n[5.1] Range validation:\n")
 
-harmonize_block1 <- function(data_m) {
-  cat("      Harmonizing Block 1 (demographics)...\n")
+range_checks <- list(
+  male = c(0, 1),
+  age = c(0, 6),
+  white_nh = c(0, 1),
+  black = c(0, 1),
+  hispanic = c(0, 1),
+  educ_years = c(2, 20),
+  poverty_ratio = c(0, 999),
+  principal_city = c(0, 1),
+  phq2_total = c(0, 6),
+  gad2_total = c(0, 6),
+  child_ace_1 = c(0, 1),
+  child_ace_2plus = c(0, 1),
+  excellent_health = c(0, 1)
+)
 
-  # Note: safe_left_join with auto_fix=TRUE removes duplicate columns from the
-  # imputed table to avoid .x/.y suffixes. After merge, only the base versions
-  # of female, raceG, educ_mom exist (either observed or imputed, not both).
-  # The coalesce logic is already handled by the merge strategy.
+range_issues <- 0
+for (var in names(range_checks)) {
+  if (var %in% names(harmonized)) {
+    vals <- harmonized[[var]][!is.na(harmonized[[var]])]
+    if (length(vals) > 0) {
+      min_val <- min(vals)
+      max_val <- max(vals)
+      expected_min <- range_checks[[var]][1]
+      expected_max <- range_checks[[var]][2]
 
-  harmonized_block1 <- dplyr::tibble(
-    female = data_m$female,
-    years_old = data_m$years_old,
-    raceG = data_m$raceG,
-    educ_mom = data_m$educ_mom,
-    fpl = data_m$fpl,
-    cbsa = data_m$cbsa
-  )
-
-  # Apply harmonization functions to create 8 Block 1 variables
-  block1 <- harmonize_ne25_block1(harmonized_block1)
-
-  return(block1)
-}
-
-harmonize_block2 <- function(data_m) {
-  cat("      Harmonizing Block 2 (mental health)...\n")
-
-  # Create PHQ-2 and GAD-2 totals with observed/imputed preference
-  block2_data <- dplyr::tibble(
-    phq2_total_observed = data_m$phq2_total,
-    phq2_interest_imputed = data_m$phq2_interest,
-    phq2_depressed_imputed = data_m$phq2_depressed,
-    gad2_total_observed = data_m$gad2_total,
-    gad2_nervous_imputed = data_m$gad2_nervous,
-    gad2_worry_imputed = data_m$gad2_worry
-  )
-
-  block2 <- harmonize_ne25_mental_health(
-    phq2_total_observed = block2_data$phq2_total_observed,
-    phq2_interest_imputed = block2_data$phq2_interest_imputed,
-    phq2_depressed_imputed = block2_data$phq2_depressed_imputed,
-    gad2_total_observed = block2_data$gad2_total_observed,
-    gad2_nervous_imputed = block2_data$gad2_nervous_imputed,
-    gad2_worry_imputed = block2_data$gad2_worry_imputed
-  )
-
-  return(block2)
-}
-
-harmonize_block3 <- function(data_m) {
-  cat("      Harmonizing Block 3 (child outcomes)...\n")
-
-  # Create child ACE binary categories and health status
-  block3 <- dplyr::bind_cols(
-    harmonize_ne25_child_aces(data_m$child_ace_total),
-    dplyr::tibble(
-      excellent_health = harmonize_ne25_excellent_health(data_m$mmi100)
-    )
-  )
-
-  return(block3)
-}
-
-# ==============================================================================
-# SECTION 4: Validation
-# ==============================================================================
-
-validate_harmonized_data <- function(harmonized_m, m) {
-  cat(sprintf("      Validating m=%d...\n", m))
-
-  # Check Block 1 (demographics) completeness
-  block1_vars <- c("male", "age", "white_nh", "black", "hispanic",
-                   "educ_years", "poverty_ratio", "principal_city")
-  block1_missing <- colSums(is.na(harmonized_m[, block1_vars, drop = FALSE]))
-
-  block1_pct_missing <- (block1_missing / nrow(harmonized_m)) * 100
-
-  if (any(block1_pct_missing > 5)) {
-    warning_vars <- names(block1_pct_missing[block1_pct_missing > 5])
-    cat(sprintf("        ⚠ Block 1 vars with >5%% missing: %s\n",
-                paste(warning_vars, collapse = ", ")))
-  }
-
-  # Check Block 2 (mental health) missingness
-  block2_vars <- c("phq2_total", "gad2_total")
-  block2_missing <- colSums(is.na(harmonized_m[, block2_vars, drop = FALSE]))
-  block2_pct_missing <- (block2_missing / nrow(harmonized_m)) * 100
-
-  cat(sprintf("        Block 2 missingness: phq2_total=%.1f%%, gad2_total=%.1f%%\n",
-              block2_pct_missing["phq2_total"],
-              block2_pct_missing["gad2_total"]))
-
-  # Check Block 3 (child outcomes) missingness
-  block3_vars <- c("child_ace_1", "child_ace_2plus", "excellent_health")
-  block3_missing <- colSums(is.na(harmonized_m[, block3_vars, drop = FALSE]))
-  block3_pct_missing <- (block3_missing / nrow(harmonized_m)) * 100
-
-  cat(sprintf("        Block 3 missingness: ace_1=%.1f%%, ace_2plus=%.1f%%, excellent=%.1f%%\n",
-              block3_pct_missing["child_ace_1"],
-              block3_pct_missing["child_ace_2plus"],
-              block3_pct_missing["excellent_health"]))
-
-  # Check variable ranges
-  range_checks <- list(
-    male = c(0, 1),
-    age = c(0, 6),
-    white_nh = c(0, 1),
-    black = c(0, 1),
-    hispanic = c(0, 1),
-    educ_years = c(2, 20),
-    poverty_ratio = c(0, 999),
-    principal_city = c(0, 1),
-    phq2_total = c(0, 6),
-    gad2_total = c(0, 6),
-    child_ace_1 = c(0, 1),
-    child_ace_2plus = c(0, 1),
-    excellent_health = c(0, 1)
-  )
-
-  for (var in names(range_checks)) {
-    if (var %in% names(harmonized_m)) {
-      vals <- harmonized_m[[var]][!is.na(harmonized_m[[var]])]
-      if (length(vals) > 0) {
-        min_val <- min(vals)
-        max_val <- max(vals)
-        expected_min <- range_checks[[var]][1]
-        expected_max <- range_checks[[var]][2]
-
-        if (min_val < expected_min || max_val > expected_max) {
-          warning(sprintf("Variable %s has values outside expected range [%d, %d]: found [%d, %d]",
-                          var, expected_min, expected_max, min_val, max_val))
-        }
+      if (min_val < expected_min || max_val > expected_max) {
+        cat(sprintf("      ⚠ %s: [%.2f, %.2f] outside expected [%d, %d]\n",
+                    var, min_val, max_val, expected_min, expected_max))
+        range_issues <- range_issues + 1
       }
     }
   }
+}
 
-  cat(sprintf("        ✓ Validation complete for m=%d\n", m))
+if (range_issues == 0) {
+  cat("    ✓ All variables within expected ranges\n")
+}
+
+# Check dimensions
+cat(sprintf("\n[5.2] Final dimensions: %d rows × %d columns\n",
+            nrow(harmonized), ncol(harmonized)))
+
+expected_cols <- c("pid", "record_id", "study_id",
+                   "male", "age", "white_nh", "black", "hispanic",
+                   "educ_years", "poverty_ratio", "principal_city",
+                   "phq2_total", "gad2_total",
+                   "child_ace_1", "child_ace_2plus", "excellent_health")
+
+if (length(setdiff(expected_cols, names(harmonized))) == 0) {
+  cat("    ✓ All expected columns present\n")
+} else {
+  cat("    ⚠ Missing columns:\n")
+  print(setdiff(expected_cols, names(harmonized)))
 }
 
 # ==============================================================================
-# SECTION 5: Main Loop (M=5 Imputations)
+# SECTION 6: Save Output
 # ==============================================================================
 
-cat("\nProcessing M=5 imputations...\n\n")
+cat("\n[6] Saving harmonized dataset...\n")
 
-for (m in 1:5) {
-  cat(sprintf("=== IMPUTATION m=%d ===\n", m))
+output_path <- file.path(output_dir, "ne25_harmonized_m1.feather")
+arrow::write_feather(harmonized, output_path)
 
-  # Load base
-  base <- load_base_ne25(db_path)
+file_size_mb <- file.size(output_path) / (1024^2)
+cat(sprintf("    ✓ Saved: %s (%.1f MB)\n", output_path, file_size_mb))
 
-  # Merge imputations
-  merged <- merge_imputations_m(base, db_path, m)
+# ==============================================================================
+# SECTION 7: Final Summary
+# ==============================================================================
 
-  # Harmonize
-  cat("  [3] Harmonizing to 13-variable structure...\n")
-
-  block1 <- harmonize_block1(merged)
-  block2 <- harmonize_block2(merged)
-  block3 <- harmonize_block3(merged)
-
-  # Combine all blocks
-  harmonized <- dplyr::bind_cols(
-    dplyr::select(base, pid, record_id, study_id),
-    block1,
-    block2,
-    block3
-  )
-
-  # Validate
-  cat("  [4] Validating...\n")
-  validate_harmonized_data(harmonized, m)
-
-  # Save
-  cat("  [5] Saving...\n")
-  output_path <- sprintf("%s/ne25_harmonized_m%d.feather", output_dir, m)
-  arrow::write_feather(harmonized, output_path)
-
-  cat(sprintf("      ✓ Saved: %s (%d rows × %d cols)\n\n",
-              output_path, nrow(harmonized), ncol(harmonized)))
-}
-
-cat("========================================\n")
-cat("✓ All M=5 harmonized datasets created\n")
+cat("\n========================================\n")
+cat("✓ NE25 Harmonization Complete\n")
 cat("========================================\n\n")
 
-cat("Output files:\n")
-for (m in 1:5) {
-  output_path <- sprintf("%s/ne25_harmonized_m%d.feather", output_dir, m)
-  if (file.exists(output_path)) {
-    file_size_mb <- file.size(output_path) / (1024^2)
-    cat(sprintf("  [m=%d] %s (%.1f MB)\n", m, output_path, file_size_mb))
-  }
-}
-
+cat("Summary:\n")
+cat(sprintf("  Sample size: %d\n", nrow(harmonized)))
+cat(sprintf("  Variables: %d\n", ncol(harmonized)))
+cat(sprintf("  Imputation method: CART (M=1)\n"))
+cat(sprintf("  Output: %s\n", output_path))
 cat("\nReady for Phase 2: KL divergence weighting (script 33_compute_kl_weights_ne25.R)\n")
