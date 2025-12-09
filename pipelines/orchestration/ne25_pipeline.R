@@ -578,7 +578,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       library(DBI)
       library(duckdb)
 
-      con <- DBI::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = TRUE)
+      con <- DBI::dbConnect(duckdb::duckdb(), dbdir = config$output$database_path, read_only = TRUE)
 
       # Check if table exists
       table_exists <- DBI::dbExistsTable(con, "ne25_flagged_observations")
@@ -588,14 +588,27 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
         influential_obs <- DBI::dbGetQuery(con, "SELECT * FROM ne25_flagged_observations")
         DBI::dbDisconnect(con, shutdown = TRUE)
 
+        # Handle column name variations (recordid vs record_id)
+        if ("recordid" %in% names(influential_obs) && !"record_id" %in% names(influential_obs)) {
+          influential_obs <- influential_obs %>%
+            dplyr::rename(record_id = recordid)
+          message("  - Renamed 'recordid' column to 'record_id' for consistency")
+        }
+
+        # Create influential flag based on presence in table
+        # Note: Table only contains flagged observations, so any match = influential
+        influential_ids <- influential_obs %>%
+          dplyr::select(pid, record_id) %>%
+          dplyr::mutate(influential = TRUE)
+
         # Join influential observations to final_data
         final_data <- final_data %>%
           dplyr::left_join(
-            influential_obs %>% dplyr::select(pid, record_id, overall_influence_cutoff),
+            influential_ids,
             by = c("pid", "record_id")
           ) %>%
           dplyr::mutate(
-            influential = !is.na(overall_influence_cutoff)
+            influential = dplyr::coalesce(influential, FALSE)
           )
 
         n_influential <- sum(final_data$influential, na.rm = TRUE)
@@ -611,7 +624,6 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
         # Create empty influential column
         final_data$influential <- FALSE
-        final_data$overall_influence_cutoff <- NA_real_
         metrics$records_influential <- 0
       }
 
@@ -619,7 +631,6 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       warning(paste("Failed to load influential observations:", e$message))
       message("  - Continuing without influential observations")
       final_data$influential <- FALSE
-      final_data$overall_influence_cutoff <- NA_real_
       metrics$records_influential <- 0
     })
 
@@ -701,6 +712,46 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     person_scores_time <- as.numeric(Sys.time() - person_scores_start)
     metrics$person_scores_duration <- person_scores_time
     message(paste("Person-fit joins completed in", round(person_scores_time, 2), "seconds"))
+
+    # STEP 6.8: CREATE MEETS_INCLUSION COLUMN
+    message("\n--- Step 6.8: Creating meets_inclusion Column ---")
+    inclusion_start <- Sys.time()
+
+    # Define meets_inclusion as: eligible=TRUE & influential=FALSE & too_few_item_responses=FALSE
+    # Note: too_few_item_responses is NA for most records (not TRUE), so we treat NA as FALSE
+    # Ensure influential column exists (create if missing)
+    if (!"influential" %in% names(final_data)) {
+      message("  - WARNING: influential column not found, creating with all FALSE")
+      final_data$influential <- FALSE
+    }
+
+    final_data <- final_data %>%
+      dplyr::mutate(
+        meets_inclusion = (eligible == TRUE) &
+                         (influential == FALSE | is.na(influential)) &
+                         (dplyr::coalesce(too_few_item_responses, FALSE) == FALSE)
+      )
+
+    n_meets_inclusion <- sum(final_data$meets_inclusion, na.rm = TRUE)
+    message(sprintf("  - Records meeting inclusion criteria: %d (%.1f%%)",
+                   n_meets_inclusion, 100 * n_meets_inclusion / nrow(final_data)))
+
+    # Breakdown of exclusions
+    n_ineligible <- sum(final_data$eligible == FALSE, na.rm = TRUE)
+    n_influential_only <- sum(final_data$eligible == TRUE & final_data$influential == TRUE, na.rm = TRUE)
+    n_too_few_only <- sum(final_data$eligible == TRUE & final_data$influential == FALSE &
+                          dplyr::coalesce(final_data$too_few_item_responses, FALSE) == TRUE, na.rm = TRUE)
+
+    message("  Exclusion breakdown:")
+    message(sprintf("    - Ineligible: %d", n_ineligible))
+    message(sprintf("    - Influential: %d", n_influential_only))
+    message(sprintf("    - Too few item responses: %d", n_too_few_only))
+
+    metrics$records_meets_inclusion <- n_meets_inclusion
+
+    inclusion_time <- as.numeric(Sys.time() - inclusion_start)
+    metrics$inclusion_duration <- inclusion_time
+    message(paste("meets_inclusion column created in", round(inclusion_time, 2), "seconds"))
 
     # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS
     message("\n--- Step 7: Storing Transformed Data ---")
