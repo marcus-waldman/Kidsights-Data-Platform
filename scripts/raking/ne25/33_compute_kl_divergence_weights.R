@@ -194,7 +194,7 @@ calibration_result <- calibrate_weights_simplex_factorized_stan(
   calibration_vars = calibration_vars,
   min_weight = 1E-2,         # Minimum weight per observation
   max_weight = 100,        # Maximum weight per observation
-  concentration = 1.0,      # Dirichlet prior (1.0 = uniform)
+  concentration = 1,      # Dirichlet prior (1.0 = uniform)
   verbose = TRUE, 
   history_size = 500, 
   refresh = 20, 

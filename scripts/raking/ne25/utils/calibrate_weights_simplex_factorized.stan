@@ -56,11 +56,22 @@ transformed parameters {
     vector[N] wgt_scaled = min_wgt + (max_wgt - min_wgt) * wgt_raw;
     wgt = wgt_scaled / sum(wgt_scaled);  // Renormalize to ensure sum = 1
   }
+  
+  // Final weights (scaled by N)
+  vector[N] wgt_final = N * wgt;
+  
+   // Effective sample size (Kish)
+  vector[N] wgt_squared = wgt_final .* wgt_final;
+  real weight_sum = sum(wgt_final);              // Should be N
+  real n_eff = (weight_sum * weight_sum) / sum(wgt_squared);
+  real efficiency_pct = (n_eff / N) * 100;
+  
 }
 
 model {
   // Dirichlet prior on raw simplex weights
   wgt_raw ~ dirichlet(rep_vector(concentration, N));
+  efficiency_pct~normal(100,75);
 
   // Compute achieved mean and covariance from weighted sample
   // Note: wgt sums to 1, so weight_sum = 1.0
@@ -119,8 +130,7 @@ model {
 }
 
 generated quantities {
-  // Final weights (scaled by N)
-  vector[N] wgt_final = N * wgt;
+  
 
   // Achieved mean and covariance (using simplex weights)
   vector[K] achieved_mean_final;
@@ -167,17 +177,13 @@ generated quantities {
   real total_loss_final = 0.5 * (mahalanobis_final + cov_loss_final);
 
   // Weight diagnostics
-  real weight_sum = sum(wgt_final);              // Should be N
   real min_weight = min(wgt_final);
   real max_weight = max(wgt_final);
   real mean_weight = mean(wgt_final);             // Should be 1.0
   real median_weight = quantile(wgt_final, 0.5);
   real weight_ratio = max_weight / min_weight;
 
-  // Effective sample size (Kish)
-  vector[N] wgt_squared = wgt_final .* wgt_final;
-  real n_eff = (weight_sum * weight_sum) / sum(wgt_squared);
-  real efficiency_pct = (n_eff / N) * 100;
+ 
 
   // Diagnostics: observed covariance coverage
   int n_total_cov = K * K;
