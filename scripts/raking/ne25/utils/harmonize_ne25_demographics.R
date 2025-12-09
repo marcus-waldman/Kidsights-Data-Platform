@@ -51,7 +51,19 @@ harmonize_ne25_education <- function(educ_mom_factor) {
   educ_char <- as.character(educ_mom_factor)
 
   # Map education categories to continuous years
+  # Handle both old labels (Less than HS) and new NE25 labels (8th grade or less)
   educ_years <- dplyr::case_when(
+    # NE25 actual labels (from ne25_transformed)
+    educ_char == "8th grade or less" ~ 8.0,
+    educ_char == "9th-12th grade, No diploma" ~ 10.0,
+    educ_char == "High School Graduate or GED Completed" ~ 12.0,
+    educ_char == "Completed a vocational, trade, or business school program" ~ 13.0,
+    educ_char == "Some College Credit, but No Degree" ~ 13.0,
+    educ_char == "Associate Degree (AA, AS)" ~ 14.0,
+    educ_char == "Bachelor's Degree (BA, BS, AB)" ~ 16.0,
+    educ_char == "Master's Degree (MA, MS, MSW, MBA)" ~ 18.0,
+    educ_char == "Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)" ~ 20.0,
+    # Legacy labels (for compatibility)
     educ_char == "Less than HS" ~ 10.0,
     educ_char == "HS graduate" ~ 12.0,
     educ_char == "Some college" ~ 13.0,
@@ -100,12 +112,15 @@ harmonize_ne25_race <- function(raceG_factor) {
   raceG_char <- as.character(raceG_factor)
 
   # Create binary dummies
+  # Handle both old labels (White NH) and NE25 actual labels (White, non-Hisp.)
   white_nh <- dplyr::case_when(
+    raceG_char == "White, non-Hisp." ~ 1L,
     raceG_char == "White NH" ~ 1L,
     TRUE ~ 0L
   )
 
   black <- dplyr::case_when(
+    raceG_char == "Black or African American, non-Hisp." ~ 1L,
     raceG_char == "Black NH" ~ 1L,
     TRUE ~ 0L
   )
@@ -166,6 +181,9 @@ harmonize_ne25_poverty <- function(fpl_observed,
     !is.na(fpl_observed) ~ fpl_observed,
     TRUE ~ NA_real_
   )
+
+  # Cap at 999 to prevent extreme values from dominating covariance
+  poverty_ratio <- pmin(poverty_ratio, 999, na.rm = FALSE)
 
   # If FPL missing but income + family_size available, could recalculate
   # (This is optional - currently we rely on observed FPL)
