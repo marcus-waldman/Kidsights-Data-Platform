@@ -19,12 +19,17 @@ source("scripts/raking/ne25/utils/impute_missing.R")
 cat("    ✓ Utilities loaded\n\n")
 
 # Variable names (block structure)
-# Block 1: Common demographics (8 variables)
+# Block 1: Common demographics (7 variables, no principal_city)
 block1_common <- c("male", "age", "white_nh", "black", "hispanic",
-                   "educ_years", "poverty_ratio", "principal_city")
+                   "educ_years", "poverty_ratio")
+
+# PUMA dummies (14 geographic categories, ACS-only)
+puma_codes <- c(100, 200, 300, 400, 500, 600, 701, 702, 801, 802, 901, 902, 903, 904)
+puma_names <- sprintf("puma_%d", puma_codes)
 
 # Source-specific variable sets
-acs_vars <- block1_common  # 8 variables (includes principal_city)
+# ACS: 21 variables (7 Block 1 demographics + 14 PUMA dummies)
+acs_vars <- c(block1_common, puma_names)
 nhis_vars <- c(block1_common[1:6], "married", block1_common[7],  # 8 Block 1 (7 common without principal_city + married)
                "phq2_total", "gad2_total")  # 2 Block 2
 nsch_vars <- c(block1_common,  # 8 Block 1 (includes principal_city)
@@ -53,7 +58,7 @@ cat("[2] Extracting design matrix (X) and weights (w)...\n")
 X_acs <- as.matrix(acs_design[, acs_vars])
 w_acs <- acs_design$survey_weight
 
-cat("    X dimensions:", nrow(X_acs), "×", ncol(X_acs), "(8 Block 1 demographics)\n")
+cat("    X dimensions:", nrow(X_acs), "×", ncol(X_acs), "(7 Block 1 demographics + 14 PUMA dummies)\n")
 cat("    Weight sum:", format(sum(w_acs), big.mark = ","), "\n")
 cat("    Weight range:", round(min(w_acs), 2), "to", round(max(w_acs), 2), "\n\n")
 

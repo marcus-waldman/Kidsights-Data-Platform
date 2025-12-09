@@ -6,11 +6,11 @@
 # Strategy: Map both to common midpoint scale for calibration
 # This ensures ACS targets match NHIS coding scheme
 
-harmonize_nhis_poverty <- function(poverty_code) {
+harmonize_nhis_poverty <- function(poverty_code, cap_at_400 = FALSE) {
   # Map NHIS categorical codes to midpoint percentages
   # Multiply by 100 to convert ratio to percentage (to match ACS 1-501 scale)
 
-  dplyr::case_when(
+  poverty_ratio <- dplyr::case_when(
     poverty_code == 11 ~ 25,   # Under 0.50 → midpoint 0.25 → 25% FPL
     poverty_code == 12 ~ 62,   # 0.50 to 0.74 → midpoint 0.62 → 62% FPL
     poverty_code == 13 ~ 87,   # 0.75 to 0.99 → midpoint 0.87 → 87% FPL
@@ -26,15 +26,22 @@ harmonize_nhis_poverty <- function(poverty_code) {
     poverty_code == 32 ~ 275,  # 2.50 to 2.99 → midpoint 2.75 → 275% FPL
     poverty_code == 33 ~ 325,  # 3.00 to 3.49 → midpoint 3.25 → 325% FPL
     poverty_code == 34 ~ 375,  # 3.50 to 3.99 → midpoint 3.75 → 375% FPL
-    poverty_code == 35 ~ 425,  # 4.00 to 4.49 → midpoint 4.25 → 425% FPL
-    poverty_code == 36 ~ 475,  # 4.50 to 4.99 → midpoint 4.75 → 475% FPL
-    poverty_code == 37 ~ 501,  # 5.00 and over → use ACS top-code 501 (500%+ FPL)
+    poverty_code == 35 ~ 400,  # 4.00 to 4.49 → CAPPED AT 400% FPL
+    poverty_code == 36 ~ 400,  # 4.50 to 4.99 → CAPPED AT 400% FPL
+    poverty_code == 37 ~ 400,  # 5.00 and over → CAPPED AT 400% FPL
     poverty_code == 38 ~ 350,  # 2.00 and over (no detail) → rough midpoint 3.50 → 350% FPL
 
     poverty_code == 98 ~ NA_real_,  # Undefinable
     poverty_code == 99 ~ NA_real_,  # Unknown
     TRUE ~ NA_real_  # Any other value
   )
+
+  # Apply capping if requested (for consistency with NSCH 50-400 range)
+  if (cap_at_400) {
+    poverty_ratio <- pmin(poverty_ratio, 400, na.rm = FALSE)
+  }
+
+  return(poverty_ratio)
 }
 
 # Harmonize ACS POVERTY continuous values to match NHIS categorical midpoints

@@ -1,6 +1,6 @@
-# Phase 4a, Task 1: Extract ACS North Central States Data
-# Loads ACS children ages 0-5 from all 12 North Central states (2019-2023 pooled)
-# Purpose: Serve as source population for Nebraska propensity model estimation
+# Phase 4a, Task 1: Extract ACS Nebraska Data
+# Loads ACS children ages 0-5 from Nebraska only (2019-2023 pooled)
+# Purpose: Serve as population reference for raking targets (geographic stratification via PUMA)
 
 library(DBI)
 library(duckdb)
@@ -8,29 +8,8 @@ library(dplyr)
 library(arrow)
 
 cat("\n========================================\n")
-cat("Task 4a.1: Extract ACS North Central States\n")
+cat("Task 4a.1: Extract ACS Nebraska Data\n")
 cat("========================================\n\n")
-
-# 1. Define North Central states (STATEFIP codes)
-cat("[1] Defining North Central region...\n")
-north_central_fips <- c(
-  17,  # Illinois
-  18,  # Indiana
-  19,  # Iowa
-  20,  # Kansas
-  26,  # Michigan
-  27,  # Minnesota
-  29,  # Missouri
-  31,  # Nebraska (target state)
-  38,  # North Dakota
-  39,  # Ohio
-  46,  # South Dakota
-  55   # Wisconsin
-)
-
-cat("    North Central states (n=12):\n")
-cat("      IL(17), IN(18), IA(19), KS(20), MI(26), MN(27)\n")
-cat("      MO(29), NE(31), ND(38), OH(39), SD(46), WI(55)\n\n")
 
 # 2. Connect to database
 cat("[2] Connecting to database...\n")
@@ -75,7 +54,8 @@ cat("    Using table:", acs_table, "\n\n")
 # 5. Extract North Central children ages 0-5
 cat("[4] Extracting North Central children (ages 0-5, 2019-2023)...\n")
 
-# Query to get all relevant variables for propensity model
+# Query to get all relevant variables for Nebraska propensity model
+# Filter for Nebraska (STATEFIP=31) only
 query <- sprintf("
   SELECT
     STATEFIP,
@@ -87,13 +67,14 @@ query <- sprintf("
     EDUC_MOM,
     MARST_HEAD,
     METRO,
+    PUMA,
     PERWT,
     MULTYEAR
   FROM %s
-  WHERE STATEFIP IN (%s)
+  WHERE STATEFIP = 31
     AND AGE <= 5
     AND AGE >= 0
-", acs_table, paste(north_central_fips, collapse = ", "))
+", acs_table)
 
 acs_nc <- DBI::dbGetQuery(con, query)
 DBI::dbDisconnect(con, shutdown = TRUE)
@@ -111,47 +92,17 @@ if (!acs_validation$valid) {
   cat("Continuing with analysis, but review issues above\n\n")
 }
 
-# 6. Sample size by state
-cat("[5] Sample size by state:\n")
-state_summary <- acs_nc %>%
-  dplyr::group_by(STATEFIP) %>%
-  dplyr::summarise(
-    n = dplyr::n(),
-    weighted_n = sum(PERWT, na.rm = TRUE),
-    .groups = "drop"
-  ) %>%
-  dplyr::arrange(STATEFIP)
-
-# Add state names
-state_names <- c(
-  "17" = "Illinois",
-  "18" = "Indiana",
-  "19" = "Iowa",
-  "20" = "Kansas",
-  "26" = "Michigan",
-  "27" = "Minnesota",
-  "29" = "Missouri",
-  "31" = "Nebraska",
-  "38" = "North Dakota",
-  "39" = "Ohio",
-  "46" = "South Dakota",
-  "55" = "Wisconsin"
-)
-
-state_summary$state_name <- state_names[as.character(state_summary$STATEFIP)]
-
-print(state_summary)
-
-nebraska_n <- state_summary$n[state_summary$STATEFIP == 31]
-total_n <- sum(state_summary$n)
-cat("\n    Nebraska proportion:", round(nebraska_n / total_n * 100, 2), "%\n\n")
+# 6. Basic sample summary
+cat("[5] Sample summary:\n")
+cat("    Total Nebraska children (0-5):", nrow(acs_nc), "\n")
+cat("    Weighted population:", format(sum(acs_nc$PERWT, na.rm = TRUE), big.mark = ","), "\n\n")
 
 # 7. Check for missing values in key variables
 cat("[6] Checking data quality...\n")
 
 # Variables needed for propensity model
 key_vars <- c("STATEFIP", "AGE", "SEX", "RACE", "HISPAN", "POVERTY",
-              "EDUC_MOM", "MARST_HEAD", "PERWT")
+              "EDUC_MOM", "MARST_HEAD", "PUMA", "PERWT")
 
 missing_summary <- data.frame(
   variable = key_vars,
@@ -177,8 +128,7 @@ original_n <- nrow(acs_nc)
 
 acs_nc_clean <- acs_nc %>%
   dplyr::filter(
-    # Valid state code
-    STATEFIP %in% north_central_fips,
+    # Already filtered to Nebraska (STATEFIP=31)
     # Valid age
     AGE >= 0 & AGE <= 5,
     # Valid sex (1=Male, 2=Female)
@@ -219,16 +169,14 @@ cat("    Dimensions:", nrow(acs_nc_clean), "rows x", ncol(acs_nc_clean), "column
 
 # 10. Summary statistics
 cat("[9] Summary statistics:\n")
-cat("    Total North Central children (0-5):", nrow(acs_nc_clean), "\n")
-cat("    Nebraska children:", sum(acs_nc_clean$STATEFIP == 31), "\n")
-cat("    Weighted population (North Central):",
-    format(sum(acs_nc_clean$PERWT), big.mark = ","), "\n")
+cat("    Total Nebraska children (0-5):", nrow(acs_nc_clean), "\n")
 cat("    Weighted population (Nebraska):",
-    format(sum(acs_nc_clean$PERWT[acs_nc_clean$STATEFIP == 31]), big.mark = ","), "\n")
-cat("    Years included:", paste(sort(unique(acs_nc_clean$MULTYEAR)), collapse = ", "), "\n\n")
+    format(sum(acs_nc_clean$PERWT), big.mark = ","), "\n")
+cat("    Years included:", paste(sort(unique(acs_nc_clean$MULTYEAR)), collapse = ", "), "\n")
+cat("    Geographic coverage: 14 Nebraska PUMAs\n\n")
 
 cat("========================================\n")
-cat("Task 4a.1 Complete: ACS North Central Extracted\n")
+cat("Task 4a.1 Complete: ACS Nebraska Extracted\n")
 cat("========================================\n\n")
 
-cat("Ready for Task 4a.2: Estimate Nebraska propensity model\n\n")
+cat("Next: Use for PUMA-stratified raking targets (script 27)\n\n")

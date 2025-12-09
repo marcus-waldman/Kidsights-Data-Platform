@@ -1,9 +1,9 @@
 # Phase 4b: Create Design Matrices for Covariance Computation
 # Combines ACS (Nebraska), NHIS (NC calibrated to Nebraska), NSCH (NC calibrated to Nebraska)
 # Block structure:
-#   - ACS: 8 variables (Block 1 demographics including principal_city)
+#   - ACS: 22 variables (Block 1: 7 common demos + 14 PUMA + 1 principal_city)
 #   - NHIS: 10 variables (Block 1: 7 common + married, NO principal_city + Block 2: 2 mental health)
-#   - NSCH: 11 variables (Block 1: 8 demographics including principal_city + Block 3: 3 child outcomes)
+#   - NSCH: 10 variables (Block 1: 8 demographics NO principal_city + Block 3: 2 child outcomes, NO ACEs)
 
 library(dplyr)
 library(arrow)
@@ -18,6 +18,7 @@ source("scripts/raking/ne25/utils/harmonize_race_ethnicity.R")
 source("scripts/raking/ne25/utils/harmonize_education.R")
 source("scripts/raking/ne25/utils/harmonize_marital_status.R")
 source("scripts/raking/ne25/utils/harmonize_principal_city.R")
+source("scripts/raking/ne25/utils/harmonize_puma.R")
 source("scripts/raking/ne25/utils/weighted_covariance.R")
 cat("    ✓ Utilities loaded\n\n")
 
@@ -57,16 +58,23 @@ acs_ne$hispanic <- race_dummies$hispanic
 
 acs_ne$educ_years <- harmonize_acs_education(acs_ne$EDUC_MOM)
 acs_ne$poverty_ratio <- acs_ne$POVERTY
+
+# Add PUMA harmonization (14 binary dummies)
+puma_dummies <- harmonize_puma(acs_ne$PUMA)
+acs_ne <- dplyr::bind_cols(acs_ne, puma_dummies)
+
 acs_ne$principal_city <- harmonize_acs_principal_city(acs_ne$METRO)
 
-cat("    ✓ 8 Block 1 variables created\n\n")
+cat("    ✓ 7 demographics + 14 PUMA + 1 principal_city = 22 Block 1 variables created\n\n")
 
 # 4. Remove missing values
 cat("[4] Removing records with missing harmonized variables...\n")
 
-# Block 1: Demographics (8 variables)
+# Block 1: Demographics (7) + PUMA (14) + principal_city (1) = 22 variables
+puma_codes <- c(100, 200, 300, 400, 500, 600, 701, 702, 801, 802, 901, 902, 903, 904)
+puma_names <- sprintf("puma_%d", puma_codes)
 acs_design_vars <- c("male", "age", "white_nh", "black", "hispanic",
-                     "educ_years", "poverty_ratio", "principal_city")
+                     "educ_years", "poverty_ratio", puma_names, "principal_city")
 
 original_n <- nrow(acs_ne)
 

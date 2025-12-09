@@ -16,6 +16,7 @@ source("scripts/raking/ne25/utils/harmonize_race_ethnicity.R")
 source("scripts/raking/ne25/utils/harmonize_education.R")
 source("scripts/raking/ne25/utils/harmonize_marital_status.R")
 source("scripts/raking/ne25/utils/harmonize_poverty.R")
+source("scripts/raking/ne25/utils/harmonize_puma.R")
 source("scripts/raking/ne25/utils/weighted_covariance.R")
 source("scripts/raking/ne25/utils/validate_raw_inputs.R")
 source("scripts/raking/ne25/utils/calibrate_weights_cmdstan.R")
@@ -54,10 +55,14 @@ acs_ne <- acs_ne %>%
     hispanic = race_dummies$hispanic,
     educ_years = harmonize_acs_education(EDUC_MOM),
     married = harmonize_acs_marital(MARST_HEAD),
-    poverty_ratio = harmonize_acs_poverty(POVERTY)
+    poverty_ratio = harmonize_acs_poverty(POVERTY, cap_at_400 = TRUE)  # Cap at 400 for consistency
   )
 
-cat("    ✓ Harmonized variables created\n\n")
+# Add PUMA dummies (14 geographic categories)
+puma_dummies <- harmonize_puma(acs_ne$PUMA)
+acs_ne <- dplyr::bind_cols(acs_ne, puma_dummies)
+
+cat("    ✓ Harmonized variables created (including 14 PUMA dummies)\n\n")
 
 # ============================================================================
 # Step 3: Compute ACS Nebraska target mean and covariance
@@ -65,9 +70,11 @@ cat("    ✓ Harmonized variables created\n\n")
 
 cat("[4] Computing target moments from ACS Nebraska...\n")
 
-# Block 1 demographics only (mental health and ACEs not used for calibration)
+# Block 1: demographics + PUMA dummies (mental health and ACEs not used for calibration)
+puma_codes <- c(100, 200, 300, 400, 500, 600, 701, 702, 801, 802, 901, 902, 903, 904)
+puma_names <- sprintf("puma_%d", puma_codes)
 calibration_vars <- c("male", "age", "white_nh", "black", "hispanic",
-                      "educ_years", "married", "poverty_ratio")
+                      "educ_years", "married", "poverty_ratio", puma_names)
 
 # Compute weighted mean vector
 target_mean_list <- list()
@@ -176,7 +183,7 @@ poverty_var <- ifelse("POVERTY" %in% names(nhis), "POVERTY",
                       ifelse("POVERTY_parent" %in% names(nhis), "POVERTY_parent", NA))
 
 if (!is.na(poverty_var)) {
-  nhis$poverty_ratio <- harmonize_nhis_poverty(nhis[[poverty_var]])
+  nhis$poverty_ratio <- harmonize_nhis_poverty(nhis[[poverty_var]], cap_at_400 = TRUE)
 } else {
   cat("    WARNING: No poverty variable found\n")
   nhis$poverty_ratio <- NA_real_

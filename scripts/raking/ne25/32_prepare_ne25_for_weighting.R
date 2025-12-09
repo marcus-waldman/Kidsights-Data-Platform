@@ -5,18 +5,20 @@
 #
 # Overview:
 #     1. Load base NE25 data (meets_inclusion=TRUE, n=2,785)
-#     2. Impute missing values using CART (mice package, M=1)
-#     3. Harmonize to 13-variable structure (8 Block 1 + 2 Block 2 + 3 Block 3)
-#     4. Validate data quality
-#     5. Save ne25_harmonized_m1.feather
+#     2. Preprocess CBSA and PUMA (extract first value from semicolon-delimited strings)
+#     3. Impute missing values using CART (mice package, M=1)
+#     4. Harmonize to 24-variable structure (7 demo + 14 PUMA + 2 mental health + 1 outcome)
+#     5. Validate data quality
+#     6. Save ne25_harmonized_m1.feather
 #
 # Output:
-#   - ne25_harmonized_m1.feather (2,785 rows × 16 columns)
-#   - Columns: pid, record_id, study_id + 13 harmonized variables
+#   - ne25_harmonized_m1.feather (2,785 rows × 27 columns)
+#   - Columns: pid, record_id, study_id + 24 harmonized variables
 #
 # Dependencies:
 #   - ne25_transformed table (base data)
 #   - mice package (for CART imputation)
+#   - harmonize_puma.R (PUMA binary dummies)
 #   - harmonize_ne25_demographics.R
 #   - harmonize_ne25_outcomes.R
 #
@@ -32,6 +34,7 @@ library(arrow)
 library(mice)  # For CART imputation
 
 # Source utility functions
+source("scripts/raking/ne25/utils/harmonize_puma.R")
 source("scripts/raking/ne25/utils/harmonize_ne25_demographics.R")
 source("scripts/raking/ne25/utils/harmonize_ne25_outcomes.R")
 
@@ -71,6 +74,7 @@ base_data <- dbGetQuery(con, "
     educ_mom,
     fpl,
     cbsa,
+    puma,
     phq2_total,
     gad2_total,
     child_ace_total,
@@ -110,6 +114,24 @@ cat(sprintf("    ✓ Extracted first CBSA for %d records\n",
             sum(!is.na(base_data$cbsa_clean))))
 
 # ==============================================================================
+# SECTION 2.5: Preprocess PUMA (Extract First Value from Semicolon-Delimited)
+# ==============================================================================
+
+cat("\n[2.5] Preprocessing PUMA (extract first value)...\n")
+
+# PUMA can have semicolon-delimited values (e.g., "00100; 00200")
+# Extract first PUMA code for harmonization
+base_data$puma_clean <- sapply(base_data$puma, function(x) {
+  if (is.na(x)) return(NA_character_)
+  # Split by semicolon and take first value
+  first_val <- stringr::str_split(x, ";")[[1]][1]
+  return(stringr::str_trim(first_val))
+})
+
+cat(sprintf("    ✓ Extracted first PUMA for %d records\n",
+            sum(!is.na(base_data$puma_clean))))
+
+# ==============================================================================
 # SECTION 3: Impute Missing Values with CART
 # ==============================================================================
 
@@ -139,10 +161,11 @@ cat("    ✓ Imputation complete\n")
 # Extract completed data
 imputed_data <- mice::complete(imputed, 1)
 
-# Add back identifiers and CBSA
+# Add back identifiers, CBSA, and PUMA
 imputed_data$pid <- base_data$pid
 imputed_data$record_id <- base_data$record_id
 imputed_data$cbsa <- base_data$cbsa_clean  # Use preprocessed CBSA
+imputed_data$puma <- base_data$puma_clean  # Use preprocessed PUMA
 imputed_data$study_id <- "ne25"
 imputed_data$authenticity_weight <- 1.0  # Placeholder
 
@@ -160,13 +183,13 @@ if (sum(missing_after) == 0) {
 }
 
 # ==============================================================================
-# SECTION 4: Harmonize to 13-Variable Structure
+# SECTION 4: Harmonize to 24-Variable Structure
 # ==============================================================================
 
-cat("\n[4] Harmonizing to 13-variable structure...\n")
+cat("\n[4] Harmonizing to 24-variable structure...\n")
 
-# Block 1: Demographics (8 variables)
-cat("    Harmonizing Block 1 (demographics)...\n")
+# Block 1: Demographics (7 variables) + PUMA (14 binary dummies) = 21 variables
+cat("    Harmonizing Block 1 (demographics + PUMA)...\n")
 
 block1_input <- dplyr::tibble(
   female = imputed_data$female,
@@ -177,7 +200,15 @@ block1_input <- dplyr::tibble(
   cbsa = imputed_data$cbsa
 )
 
-block1 <- harmonize_ne25_block1(block1_input)
+# Harmonize demographics (7 variables)
+block1_demo_full <- harmonize_ne25_block1(block1_input)
+block1_demo <- dplyr::select(block1_demo_full, -principal_city)  # 7 variables
+
+# Harmonize PUMA to 14 binary dummies (ACS-only)
+block1_puma <- harmonize_puma(imputed_data$puma)  # 14 variables
+
+# Combine: demographics (1-7) + PUMA (8-21) = 21 variables
+block1 <- dplyr::bind_cols(block1_demo, block1_puma)
 
 # Block 2: Mental Health (2 variables)
 cat("    Harmonizing Block 2 (mental health)...\n")
@@ -187,14 +218,11 @@ block2 <- dplyr::tibble(
   gad2_total = imputed_data$gad2_total
 )
 
-# Block 3: Child Outcomes (3 variables)
-cat("    Harmonizing Block 3 (child outcomes)...\n")
+# Block 3: Child Outcome (1 variable, no ACEs)
+cat("    Harmonizing Block 3 (child outcome)...\n")
 
-block3 <- dplyr::bind_cols(
-  harmonize_ne25_child_aces(imputed_data$child_ace_total),
-  dplyr::tibble(
-    excellent_health = harmonize_ne25_excellent_health(imputed_data$mmi100)
-  )
+block3 <- dplyr::tibble(
+  excellent_health = harmonize_ne25_excellent_health(imputed_data$mmi100)
 )
 
 # Combine all blocks
@@ -236,11 +264,8 @@ range_checks <- list(
   hispanic = c(0, 1),
   educ_years = c(2, 20),
   poverty_ratio = c(50, 400),  # NSCH standard range
-  principal_city = c(0, 1),
   phq2_total = c(0, 6),
   gad2_total = c(0, 6),
-  child_ace_1 = c(0, 1),
-  child_ace_2plus = c(0, 1),
   excellent_health = c(0, 1)
 )
 
@@ -267,15 +292,46 @@ if (range_issues == 0) {
   cat("    ✓ All variables within expected ranges\n")
 }
 
+# Check PUMA dummies
+cat("\n[5.2] PUMA consistency check:\n")
+puma_cols <- grep("^puma_", names(harmonized), value = TRUE)
+if (length(puma_cols) > 0) {
+  # Each row should have at most one PUMA = 1 (or all NA)
+  puma_sums <- rowSums(harmonized[, puma_cols], na.rm = TRUE)
+  invalid_puma <- sum(puma_sums > 1, na.rm = TRUE)
+  if (invalid_puma > 0) {
+    cat(sprintf("      ⚠ %d records with multiple PUMA = 1\n", invalid_puma))
+  } else {
+    cat("      ✓ PUMA dummies are mutually exclusive (0 or 1 per record)\n")
+  }
+
+  # Check range [0, 1]
+  puma_range_invalid <- 0
+  for (col in puma_cols) {
+    vals <- harmonized[[col]][!is.na(harmonized[[col]])]
+    if (any(vals < 0 | vals > 1)) {
+      puma_range_invalid <- puma_range_invalid + 1
+    }
+  }
+  if (puma_range_invalid == 0) {
+    cat("      ✓ All PUMA variables in range [0, 1]\n")
+  }
+} else {
+  cat("      ⚠ No PUMA variables found\n")
+}
+
 # Check dimensions
-cat(sprintf("\n[5.2] Final dimensions: %d rows × %d columns\n",
+cat(sprintf("\n[5.3] Final dimensions: %d rows × %d columns\n",
             nrow(harmonized), ncol(harmonized)))
 
+puma_codes <- c(100, 200, 300, 400, 500, 600, 701, 702, 801, 802, 901, 902, 903, 904)
+puma_names <- sprintf("puma_%d", puma_codes)
 expected_cols <- c("pid", "record_id", "study_id",
                    "male", "age", "white_nh", "black", "hispanic",
-                   "educ_years", "poverty_ratio", "principal_city",
+                   "educ_years", "poverty_ratio",
+                   puma_names,
                    "phq2_total", "gad2_total",
-                   "child_ace_1", "child_ace_2plus", "excellent_health")
+                   "excellent_health")
 
 if (length(setdiff(expected_cols, names(harmonized))) == 0) {
   cat("    ✓ All expected columns present\n")
@@ -306,7 +362,12 @@ cat("========================================\n\n")
 
 cat("Summary:\n")
 cat(sprintf("  Sample size: %d\n", nrow(harmonized)))
-cat(sprintf("  Variables: %d\n", ncol(harmonized)))
+cat(sprintf("  Total variables: %d\n", ncol(harmonized)))
+cat("  Structure:\n")
+cat("    - 3 identifiers (pid, record_id, study_id)\n")
+cat("    - 21 Block 1 (7 demographics + 14 PUMA dummies)\n")
+cat("    - 2 Block 2 (phq2_total, gad2_total)\n")
+cat("    - 1 Block 3 (excellent_health)\n")
 cat(sprintf("  Imputation method: CART (M=1)\n"))
 cat(sprintf("  Output: %s\n", output_path))
 cat("\nReady for Phase 2: KL divergence weighting (script 33_compute_kl_weights_ne25.R)\n")

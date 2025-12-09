@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated": "2025-12-08T12:50:37.999891",
-    "total_variables": 682,
+    "generated": "2025-12-09T11:39:30.473826",
+    "total_variables": 684,
     "total_categories": 16,
     "data_source": "NE25 transformed dataset"
   },
@@ -19,7 +19,7 @@
       "max_value": 1.0,
       "mean_value": 0.1953381483913329,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.073032",
+      "creation_date": "2025-12-09T11:39:27.609645",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -36,7 +36,7 @@
       "max_value": 1.0,
       "mean_value": 0.1912729658792651,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.079946",
+      "creation_date": "2025-12-09T11:39:27.614926",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -53,7 +53,7 @@
       "max_value": 1.0,
       "mean_value": 0.13302901858493643,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.074429",
+      "creation_date": "2025-12-09T11:39:27.610955",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -70,7 +70,7 @@
       "max_value": 1.0,
       "mean_value": 0.28492527615334634,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.070259",
+      "creation_date": "2025-12-09T11:39:27.607012",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -87,7 +87,7 @@
       "max_value": 1.0,
       "mean_value": 0.1654769630110318,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.065882",
+      "creation_date": "2025-12-09T11:39:27.604387",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -104,7 +104,7 @@
       "max_value": 1.0,
       "mean_value": 0.27058443655150144,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.068938",
+      "creation_date": "2025-12-09T11:39:27.605737",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -121,7 +121,7 @@
       "max_value": 1.0,
       "mean_value": 0.2219664584018415,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.077743",
+      "creation_date": "2025-12-09T11:39:27.613629",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -138,7 +138,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.084775",
+      "creation_date": "2025-12-09T11:39:27.618976",
       "value_labels": {
         "1": "1 ACE",
         "2": "2-3 ACEs",
@@ -161,7 +161,7 @@
       "max_value": 1.0,
       "mean_value": 0.13030602171767028,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.081839",
+      "creation_date": "2025-12-09T11:39:27.616231",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -178,7 +178,7 @@
       "max_value": 1.0,
       "mean_value": 0.25178687459389215,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.071624",
+      "creation_date": "2025-12-09T11:39:27.608353",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -195,7 +195,7 @@
       "max_value": 10.0,
       "mean_value": 2.0789185239313115,
       "unique_values": 11,
-      "creation_date": "2025-12-08T12:50:35.083121",
+      "creation_date": "2025-12-09T11:39:27.617547",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -212,7 +212,7 @@
       "max_value": 1.0,
       "mean_value": 0.3599737962659679,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.075827",
+      "creation_date": "2025-12-09T11:39:27.612299",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -229,7 +229,7 @@
       "max_value": 99.0,
       "mean_value": 2.54401519949335,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.382429",
+      "creation_date": "2025-12-09T11:39:26.929146",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -246,7 +246,7 @@
       "max_value": 99.0,
       "mean_value": 3.4018453706649696,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.395305",
+      "creation_date": "2025-12-09T11:39:26.941159",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -263,7 +263,7 @@
       "max_value": 99.0,
       "mean_value": 2.1162864385297846,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.383872",
+      "creation_date": "2025-12-09T11:39:26.930393",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -280,7 +280,7 @@
       "max_value": 99.0,
       "mean_value": 2.5718819422405588,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.385189",
+      "creation_date": "2025-12-09T11:39:26.931771",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -297,7 +297,7 @@
       "max_value": 99.0,
       "mean_value": 2.23241006049029,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.386516",
+      "creation_date": "2025-12-09T11:39:26.933090",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -314,7 +314,7 @@
       "max_value": 99.0,
       "mean_value": 3.12265052564511,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.387847",
+      "creation_date": "2025-12-09T11:39:26.934429",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -331,7 +331,7 @@
       "max_value": 99.0,
       "mean_value": 2.4007645747053203,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.389179",
+      "creation_date": "2025-12-09T11:39:26.935772",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -348,7 +348,7 @@
       "max_value": 99.0,
       "mean_value": 3.001275103602168,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.390566",
+      "creation_date": "2025-12-09T11:39:26.937115",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -365,7 +365,7 @@
       "max_value": 99.0,
       "mean_value": 3.0306709265175718,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.391881",
+      "creation_date": "2025-12-09T11:39:26.938454",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -382,7 +382,7 @@
       "max_value": 99.0,
       "mean_value": 3.0557502389295954,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.393216",
+      "creation_date": "2025-12-09T11:39:26.939946",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -399,7 +399,7 @@
       "max_value": 1.0,
       "mean_value": 0.047106325706594884,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.095991",
+      "creation_date": "2025-12-09T11:39:27.629429",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -416,7 +416,7 @@
       "max_value": 1.0,
       "mean_value": 0.05927921859211856,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.090002",
+      "creation_date": "2025-12-09T11:39:27.624235",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -433,7 +433,7 @@
       "max_value": 1.0,
       "mean_value": 0.09493243243243243,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.092647",
+      "creation_date": "2025-12-09T11:39:27.626738",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -450,7 +450,7 @@
       "max_value": 1.0,
       "mean_value": 0.04893688828889639,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.091252",
+      "creation_date": "2025-12-09T11:39:27.625438",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -467,7 +467,7 @@
       "max_value": 1.0,
       "mean_value": 0.03790674270379067,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.087226",
+      "creation_date": "2025-12-09T11:39:27.621459",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -484,7 +484,7 @@
       "max_value": 1.0,
       "mean_value": 0.11432414256893074,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.085995",
+      "creation_date": "2025-12-09T11:39:27.620175",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -501,7 +501,7 @@
       "max_value": 1.0,
       "mean_value": 0.06313301823092506,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.088681",
+      "creation_date": "2025-12-09T11:39:27.622767",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -518,7 +518,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.098890",
+      "creation_date": "2025-12-09T11:39:27.632293",
       "value_labels": {
         "1": "1 ACE",
         "2": "2-3 ACEs",
@@ -541,7 +541,7 @@
       "max_value": 1.0,
       "mean_value": 0.07939189189189189,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.094440",
+      "creation_date": "2025-12-09T11:39:27.628044",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -558,7 +558,7 @@
       "max_value": 8.0,
       "mean_value": 0.5323033707865169,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:35.097269",
+      "creation_date": "2025-12-09T11:39:27.630696",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -575,7 +575,7 @@
       "max_value": 60.0,
       "mean_value": 32.53764406240051,
       "unique_values": 53,
-      "creation_date": "2025-12-08T12:50:35.006217",
+      "creation_date": "2025-12-09T11:39:27.546572",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -592,7 +592,7 @@
       "max_value": 365533.0,
       "mean_value": 1559.245150862069,
       "unique_values": 1839,
-      "creation_date": "2025-12-08T12:50:34.249514",
+      "creation_date": "2025-12-09T11:39:26.797151",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -609,7 +609,7 @@
       "max_value": 365533.0,
       "mean_value": 1559.245150862069,
       "unique_values": 1839,
-      "creation_date": "2025-12-08T12:50:35.002272",
+      "creation_date": "2025-12-09T11:39:27.542595",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -626,7 +626,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.242737",
+      "creation_date": "2025-12-09T11:39:26.754345",
       "value_labels": {
         "1": "en",
         "2": "es",
@@ -647,7 +647,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 0,
-      "creation_date": "2025-12-08T12:50:34.967775",
+      "creation_date": "2025-12-09T11:39:27.509325",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -664,7 +664,7 @@
       "max_value": 12009.297741273102,
       "mean_value": 51.22776676343553,
       "unique_values": 1839,
-      "creation_date": "2025-12-08T12:50:35.004917",
+      "creation_date": "2025-12-09T11:39:27.545228",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -681,7 +681,7 @@
       "max_value": 1000.7748117727584,
       "mean_value": 4.268980563619627,
       "unique_values": 1839,
-      "creation_date": "2025-12-08T12:50:35.003606",
+      "creation_date": "2025-12-09T11:39:27.543927",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -698,7 +698,7 @@
       "max_value": 2.0,
       "mean_value": 1.0596053161498187,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.941011",
+      "creation_date": "2025-12-09T11:39:27.483030",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -715,7 +715,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2617,
-      "creation_date": "2025-12-08T12:50:34.876002",
+      "creation_date": "2025-12-09T11:39:27.419818",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -732,7 +732,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.977798",
+      "creation_date": "2025-12-09T11:39:27.518789",
       "value_labels": {
         "1": "Biological or Adoptive Parent",
         "2": "Foster Parent",
@@ -757,7 +757,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.979380",
+      "creation_date": "2025-12-09T11:39:27.520116",
       "value_labels": {
         "1": "Biological or Adoptive Parent",
         "2": "Foster Parent",
@@ -782,7 +782,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.100138",
+      "creation_date": "2025-12-09T11:39:27.633495",
       "value_labels": {
         "1": "Did not need childcare",
         "2": "Missing",
@@ -806,7 +806,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.129775",
+      "creation_date": "2025-12-09T11:39:27.660035",
       "value_labels": {
         "1": "No",
         "2": "Yes"
@@ -826,7 +826,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:35.101482",
+      "creation_date": "2025-12-09T11:39:27.634837",
       "value_labels": {
         "1": "Cost too high",
         "2": "Hours not suitable",
@@ -853,7 +853,7 @@
       "max_value": 4000.0,
       "mean_value": 294.77716966379984,
       "unique_values": 81,
-      "creation_date": "2025-12-08T12:50:35.110158",
+      "creation_date": "2025-12-09T11:39:27.642654",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -870,7 +870,7 @@
       "max_value": 4000.0,
       "mean_value": 244.11590774689532,
       "unique_values": 81,
-      "creation_date": "2025-12-08T12:50:35.111789",
+      "creation_date": "2025-12-09T11:39:27.643909",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -887,7 +887,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.115492",
+      "creation_date": "2025-12-09T11:39:27.646694",
       "value_labels": {
         "1": "Missing",
         "2": "No",
@@ -909,7 +909,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.126383",
+      "creation_date": "2025-12-09T11:39:27.657382",
       "value_labels": {
         "1": "No",
         "2": "Yes",
@@ -930,7 +930,7 @@
       "max_value": 15000.0,
       "mean_value": 41.205077010838565,
       "unique_values": 63,
-      "creation_date": "2025-12-08T12:50:35.118172",
+      "creation_date": "2025-12-09T11:39:27.649255",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -947,7 +947,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:35.127946",
+      "creation_date": "2025-12-09T11:39:27.658754",
       "value_labels": {
         "1": "Extended (>50 hrs)",
         "2": "Full-time (30-50 hrs)",
@@ -969,7 +969,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.119568",
+      "creation_date": "2025-12-09T11:39:27.650668",
       "value_labels": {
         "1": "Missing",
         "2": "No",
@@ -991,7 +991,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.125046",
+      "creation_date": "2025-12-09T11:39:27.656027",
       "value_labels": {
         "1": "Missing",
         "2": "No",
@@ -1013,7 +1013,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:35.104156",
+      "creation_date": "2025-12-09T11:39:27.637429",
       "value_labels": {
         "1": "Childcare center",
         "2": "Head Start/Early Head Start",
@@ -1039,7 +1039,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.116750",
+      "creation_date": "2025-12-09T11:39:27.648053",
       "value_labels": {
         "1": "Dissatisfied",
         "2": "Missing",
@@ -1064,7 +1064,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.102757",
+      "creation_date": "2025-12-09T11:39:27.636078",
       "value_labels": {
         "1": "Missing",
         "2": "No",
@@ -1086,7 +1086,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.113915",
+      "creation_date": "2025-12-09T11:39:27.645341",
       "value_labels": {
         "1": "Missing",
         "2": "No",
@@ -1108,7 +1108,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.122258",
+      "creation_date": "2025-12-09T11:39:27.653412",
       "value_labels": {
         "1": "Dissatisfied",
         "2": "Missing",
@@ -1133,7 +1133,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.123650",
+      "creation_date": "2025-12-09T11:39:27.654865",
       "value_labels": {
         "1": "Dissatisfied",
         "2": "Missing",
@@ -1158,7 +1158,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.120930",
+      "creation_date": "2025-12-09T11:39:27.652033",
       "value_labels": {
         "1": "Dissatisfied",
         "2": "Missing",
@@ -1183,7 +1183,7 @@
       "max_value": 4000.0,
       "mean_value": 646.6061080657792,
       "unique_values": 105,
-      "creation_date": "2025-12-08T12:50:35.105382",
+      "creation_date": "2025-12-09T11:39:27.638609",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1200,7 +1200,7 @@
       "max_value": 4000.0,
       "mean_value": 441.43276570757484,
       "unique_values": 80,
-      "creation_date": "2025-12-08T12:50:35.106721",
+      "creation_date": "2025-12-09T11:39:27.639952",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1217,7 +1217,7 @@
       "max_value": 4000.0,
       "mean_value": 483.3689205219454,
       "unique_values": 83,
-      "creation_date": "2025-12-08T12:50:35.108366",
+      "creation_date": "2025-12-09T11:39:27.641261",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1234,7 +1234,7 @@
       "max_value": 1.0,
       "mean_value": 0.9259259259259259,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.528477",
+      "creation_date": "2025-12-09T11:39:27.075763",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1251,7 +1251,7 @@
       "max_value": 1.0,
       "mean_value": 0.8518518518518519,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.536346",
+      "creation_date": "2025-12-09T11:39:27.083606",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1268,7 +1268,7 @@
       "max_value": 1.0,
       "mean_value": 0.8076923076923077,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.544214",
+      "creation_date": "2025-12-09T11:39:27.091457",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1285,7 +1285,7 @@
       "max_value": 1.0,
       "mean_value": 0.9230769230769231,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.527140",
+      "creation_date": "2025-12-09T11:39:27.074394",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1302,7 +1302,7 @@
       "max_value": 1.0,
       "mean_value": 0.8333333333333334,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.546948",
+      "creation_date": "2025-12-09T11:39:27.094041",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1319,7 +1319,7 @@
       "max_value": 1.0,
       "mean_value": 0.6875,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.570847",
+      "creation_date": "2025-12-09T11:39:27.116744",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1336,7 +1336,7 @@
       "max_value": 1.0,
       "mean_value": 0.6428571428571429,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.579169",
+      "creation_date": "2025-12-09T11:39:27.124814",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1353,7 +1353,7 @@
       "max_value": 1.0,
       "mean_value": 0.9375,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.564086",
+      "creation_date": "2025-12-09T11:39:27.110004",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1370,7 +1370,7 @@
       "max_value": 1.0,
       "mean_value": 0.5957446808510638,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.573677",
+      "creation_date": "2025-12-09T11:39:27.119417",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1387,7 +1387,7 @@
       "max_value": 1.0,
       "mean_value": 0.5384615384615384,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.591263",
+      "creation_date": "2025-12-09T11:39:27.137146",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1404,7 +1404,7 @@
       "max_value": 1.0,
       "mean_value": 0.44,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.593961",
+      "creation_date": "2025-12-09T11:39:27.139704",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1421,7 +1421,7 @@
       "max_value": 1.0,
       "mean_value": 0.46875,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.589911",
+      "creation_date": "2025-12-09T11:39:27.135622",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1438,7 +1438,7 @@
       "max_value": 1.0,
       "mean_value": 0.8816326530612245,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.609932",
+      "creation_date": "2025-12-09T11:39:27.155768",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1455,7 +1455,7 @@
       "max_value": 1.0,
       "mean_value": 0.7631578947368421,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.615220",
+      "creation_date": "2025-12-09T11:39:27.160957",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1472,7 +1472,7 @@
       "max_value": 1.0,
       "mean_value": 0.5588235294117647,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.628496",
+      "creation_date": "2025-12-09T11:39:27.174063",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1489,7 +1489,7 @@
       "max_value": 1.0,
       "mean_value": 0.7070422535211267,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.640400",
+      "creation_date": "2025-12-09T11:39:27.185952",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1506,7 +1506,7 @@
       "max_value": 1.0,
       "mean_value": 0.6830985915492958,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.654955",
+      "creation_date": "2025-12-09T11:39:27.200689",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1523,7 +1523,7 @@
       "max_value": 1.0,
       "mean_value": 0.5100671140939598,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.680163",
+      "creation_date": "2025-12-09T11:39:27.225687",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1540,7 +1540,7 @@
       "max_value": 1.0,
       "mean_value": 0.6431372549019608,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.665553",
+      "creation_date": "2025-12-09T11:39:27.211235",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1557,7 +1557,7 @@
       "max_value": 1.0,
       "mean_value": 0.4794520547945205,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.684161",
+      "creation_date": "2025-12-09T11:39:27.229712",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1574,7 +1574,7 @@
       "max_value": 1.0,
       "mean_value": 0.5658263305322129,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.708295",
+      "creation_date": "2025-12-09T11:39:27.254845",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1591,7 +1591,7 @@
       "max_value": 1.0,
       "mean_value": 0.5304347826086957,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.690853",
+      "creation_date": "2025-12-09T11:39:27.236367",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1608,7 +1608,7 @@
       "max_value": 1.0,
       "mean_value": 0.5670731707317073,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.674920",
+      "creation_date": "2025-12-09T11:39:27.220414",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1625,7 +1625,7 @@
       "max_value": 1.0,
       "mean_value": 0.6330532212885154,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.705628",
+      "creation_date": "2025-12-09T11:39:27.252134",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1642,7 +1642,7 @@
       "max_value": 1.0,
       "mean_value": 0.7204968944099379,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.673567",
+      "creation_date": "2025-12-09T11:39:27.219113",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1659,7 +1659,7 @@
       "max_value": 1.0,
       "mean_value": 0.44594594594594594,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.682823",
+      "creation_date": "2025-12-09T11:39:27.228366",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1676,7 +1676,7 @@
       "max_value": 1.0,
       "mean_value": 0.5588235294117647,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.685470",
+      "creation_date": "2025-12-09T11:39:27.231062",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1693,7 +1693,7 @@
       "max_value": 1.0,
       "mean_value": 0.6430769230769231,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.710970",
+      "creation_date": "2025-12-09T11:39:27.257511",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1710,7 +1710,7 @@
       "max_value": 1.0,
       "mean_value": 0.6602209944751382,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.706943",
+      "creation_date": "2025-12-09T11:39:27.253502",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1727,7 +1727,7 @@
       "max_value": 1.0,
       "mean_value": 0.5833333333333334,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.719096",
+      "creation_date": "2025-12-09T11:39:27.265675",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1744,7 +1744,7 @@
       "max_value": 1.0,
       "mean_value": 0.554006968641115,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.720416",
+      "creation_date": "2025-12-09T11:39:27.267042",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1761,7 +1761,7 @@
       "max_value": 1.0,
       "mean_value": 0.6347305389221557,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.737776",
+      "creation_date": "2025-12-09T11:39:27.284505",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1778,7 +1778,7 @@
       "max_value": 1.0,
       "mean_value": 0.569060773480663,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.741745",
+      "creation_date": "2025-12-09T11:39:27.288430",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1795,7 +1795,7 @@
       "max_value": 1.0,
       "mean_value": 0.546916890080429,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.760198",
+      "creation_date": "2025-12-09T11:39:27.305640",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1812,7 +1812,7 @@
       "max_value": 1.0,
       "mean_value": 0.5489690721649485,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.758882",
+      "creation_date": "2025-12-09T11:39:27.304317",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1829,7 +1829,7 @@
       "max_value": 1.0,
       "mean_value": 0.6463414634146342,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.746783",
+      "creation_date": "2025-12-09T11:39:27.292420",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1846,7 +1846,7 @@
       "max_value": 1.0,
       "mean_value": 0.6066252587991718,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.739086",
+      "creation_date": "2025-12-09T11:39:27.285816",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1863,7 +1863,7 @@
       "max_value": 1.0,
       "mean_value": 0.5439814814814815,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.756205",
+      "creation_date": "2025-12-09T11:39:27.301648",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1880,7 +1880,7 @@
       "max_value": 1.0,
       "mean_value": 0.5686274509803921,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.761533",
+      "creation_date": "2025-12-09T11:39:27.307063",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1897,7 +1897,7 @@
       "max_value": 1.0,
       "mean_value": 0.3980263157894737,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.765501",
+      "creation_date": "2025-12-09T11:39:27.311017",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1914,7 +1914,7 @@
       "max_value": 1.0,
       "mean_value": 0.5842696629213483,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.762890",
+      "creation_date": "2025-12-09T11:39:27.308330",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1931,7 +1931,7 @@
       "max_value": 1.0,
       "mean_value": 0.5298013245033113,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.713714",
+      "creation_date": "2025-12-09T11:39:27.260251",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1948,7 +1948,7 @@
       "max_value": 1.0,
       "mean_value": 0.46735395189003437,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.770811",
+      "creation_date": "2025-12-09T11:39:27.316562",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1965,7 +1965,7 @@
       "max_value": 1.0,
       "mean_value": 0.47038327526132406,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.764187",
+      "creation_date": "2025-12-09T11:39:27.309799",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1982,7 +1982,7 @@
       "max_value": 1.0,
       "mean_value": 0.3807531380753138,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.776103",
+      "creation_date": "2025-12-09T11:39:27.321896",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -1999,7 +1999,7 @@
       "max_value": 1.0,
       "mean_value": 0.43902439024390244,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.773489",
+      "creation_date": "2025-12-09T11:39:27.319183",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2016,7 +2016,7 @@
       "max_value": 1.0,
       "mean_value": 0.5033557046979866,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.768484",
+      "creation_date": "2025-12-09T11:39:27.313706",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2033,7 +2033,7 @@
       "max_value": 1.0,
       "mean_value": 0.45320197044334976,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.796079",
+      "creation_date": "2025-12-09T11:39:27.341950",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2050,7 +2050,7 @@
       "max_value": 1.0,
       "mean_value": 0.47836538461538464,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.790730",
+      "creation_date": "2025-12-09T11:39:27.336585",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2067,7 +2067,7 @@
       "max_value": 1.0,
       "mean_value": 0.8076923076923077,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.728547",
+      "creation_date": "2025-12-09T11:39:27.275213",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2084,7 +2084,7 @@
       "max_value": 1.0,
       "mean_value": 0.5983263598326359,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.774798",
+      "creation_date": "2025-12-09T11:39:27.320578",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2101,7 +2101,7 @@
       "max_value": 1.0,
       "mean_value": 0.48690539818278994,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.824458",
+      "creation_date": "2025-12-09T11:39:27.370493",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2118,7 +2118,7 @@
       "max_value": 1.0,
       "mean_value": 0.522,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.782727",
+      "creation_date": "2025-12-09T11:39:27.328515",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2135,7 +2135,7 @@
       "max_value": 1.0,
       "mean_value": 0.7067137809187279,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.725772",
+      "creation_date": "2025-12-09T11:39:27.272475",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2152,7 +2152,7 @@
       "max_value": 4.0,
       "mean_value": 2.3412162162162162,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.839753",
+      "creation_date": "2025-12-09T11:39:27.385226",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2169,7 +2169,7 @@
       "max_value": 4.0,
       "mean_value": 2.3550051599587203,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.841032",
+      "creation_date": "2025-12-09T11:39:27.386708",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2186,7 +2186,7 @@
       "max_value": 4.0,
       "mean_value": 2.2036199095022626,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.845605",
+      "creation_date": "2025-12-09T11:39:27.390526",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2203,7 +2203,7 @@
       "max_value": 4.0,
       "mean_value": 2.2650103519668736,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.847012",
+      "creation_date": "2025-12-09T11:39:27.391843",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2220,7 +2220,7 @@
       "max_value": 4.0,
       "mean_value": 1.935374149659864,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.848372",
+      "creation_date": "2025-12-09T11:39:27.393159",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2237,7 +2237,7 @@
       "max_value": 3.0,
       "mean_value": 1.696687370600414,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.849747",
+      "creation_date": "2025-12-09T11:39:27.394486",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2254,7 +2254,7 @@
       "max_value": 4.0,
       "mean_value": 2.3464912280701755,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.794729",
+      "creation_date": "2025-12-09T11:39:27.340593",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2271,7 +2271,7 @@
       "max_value": 1.0,
       "mean_value": 0.38768115942028986,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.727095",
+      "creation_date": "2025-12-09T11:39:27.273863",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2288,7 +2288,7 @@
       "max_value": 1.0,
       "mean_value": 0.5686274509803921,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.789395",
+      "creation_date": "2025-12-09T11:39:27.335341",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2305,7 +2305,7 @@
       "max_value": 5.0,
       "mean_value": 1.7303921568627452,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.804164",
+      "creation_date": "2025-12-09T11:39:27.350099",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2322,7 +2322,7 @@
       "max_value": 4.0,
       "mean_value": 1.9751243781094527,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.805525",
+      "creation_date": "2025-12-09T11:39:27.351484",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2339,7 +2339,7 @@
       "max_value": 1.0,
       "mean_value": 0.5393258426966292,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.798784",
+      "creation_date": "2025-12-09T11:39:27.344646",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2356,7 +2356,7 @@
       "max_value": 1.0,
       "mean_value": 0.4669260700389105,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.786662",
+      "creation_date": "2025-12-09T11:39:27.332486",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2373,7 +2373,7 @@
       "max_value": 4.0,
       "mean_value": 1.6929133858267718,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.788062",
+      "creation_date": "2025-12-09T11:39:27.333825",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2390,7 +2390,7 @@
       "max_value": 4.0,
       "mean_value": 1.4790011350737797,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.851042",
+      "creation_date": "2025-12-09T11:39:27.395841",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2407,7 +2407,7 @@
       "max_value": 4.0,
       "mean_value": 1.8043478260869565,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.852428",
+      "creation_date": "2025-12-09T11:39:27.397176",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2424,7 +2424,7 @@
       "max_value": 4.0,
       "mean_value": 1.1902439024390243,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.853690",
+      "creation_date": "2025-12-09T11:39:27.398486",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2441,7 +2441,7 @@
       "max_value": 1.0,
       "mean_value": 0.8704954954954955,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.834364",
+      "creation_date": "2025-12-09T11:39:27.379937",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2458,7 +2458,7 @@
       "max_value": 4.0,
       "mean_value": 3.218331616889804,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.835691",
+      "creation_date": "2025-12-09T11:39:27.381271",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2475,7 +2475,7 @@
       "max_value": 1.0,
       "mean_value": 0.5259009009009009,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.837101",
+      "creation_date": "2025-12-09T11:39:27.382601",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2492,7 +2492,7 @@
       "max_value": 3.0,
       "mean_value": 1.1522842639593909,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.816180",
+      "creation_date": "2025-12-09T11:39:27.362339",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2509,7 +2509,7 @@
       "max_value": 4.0,
       "mean_value": 1.76,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.817483",
+      "creation_date": "2025-12-09T11:39:27.363833",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2526,7 +2526,7 @@
       "max_value": 4.0,
       "mean_value": 2.795528898582334,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.865973",
+      "creation_date": "2025-12-09T11:39:27.410400",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2543,7 +2543,7 @@
       "max_value": 1.0,
       "mean_value": 0.6506666666666666,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.754859",
+      "creation_date": "2025-12-09T11:39:27.300332",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2560,7 +2560,7 @@
       "max_value": 1.0,
       "mean_value": 0.49019607843137253,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.769479",
+      "creation_date": "2025-12-09T11:39:27.315051",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2577,7 +2577,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.990154",
+      "creation_date": "2025-12-09T11:39:27.530609",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2600,7 +2600,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.991568",
+      "creation_date": "2025-12-09T11:39:27.531908",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2623,7 +2623,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.988824",
+      "creation_date": "2025-12-09T11:39:27.529316",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2646,7 +2646,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.992888",
+      "creation_date": "2025-12-09T11:39:27.533369",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2669,7 +2669,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.995605",
+      "creation_date": "2025-12-09T11:39:27.536094",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2694,7 +2694,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.996935",
+      "creation_date": "2025-12-09T11:39:27.537269",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2719,7 +2719,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.994276",
+      "creation_date": "2025-12-09T11:39:27.534731",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2744,7 +2744,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.998293",
+      "creation_date": "2025-12-09T11:39:27.538614",
       "value_labels": {
         "1": "Less than High School Graduate",
         "2": "High School Graduate (including Equivalency)",
@@ -2769,7 +2769,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:34.984798",
+      "creation_date": "2025-12-09T11:39:27.525401",
       "value_labels": {
         "1": "Bachelor's Degree (BA, BS, AB)",
         "2": "Master's Degree (MA, MS, MSW, MBA)",
@@ -2797,7 +2797,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:34.986152",
+      "creation_date": "2025-12-09T11:39:27.526739",
       "value_labels": {
         "1": "Bachelor's Degree (BA, BS, AB)",
         "2": "High School Graduate or GED Completed",
@@ -2825,7 +2825,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:34.983487",
+      "creation_date": "2025-12-09T11:39:27.524087",
       "value_labels": {
         "1": "Bachelor's Degree (BA, BS, AB)",
         "2": "Master's Degree (MA, MS, MSW, MBA)",
@@ -2853,7 +2853,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 8,
-      "creation_date": "2025-12-08T12:50:34.987528",
+      "creation_date": "2025-12-09T11:39:27.528043",
       "value_labels": {
         "1": "Master's Degree (MA, MS, MSW, MBA)",
         "2": "Doctorate (PhD, EdD) or Professional Degree (MD, DDS, DVM, JD)",
@@ -2881,7 +2881,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.981808",
+      "creation_date": "2025-12-09T11:39:27.522528",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2898,7 +2898,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.134982",
+      "creation_date": "2025-12-09T11:39:27.665340",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -2915,7 +2915,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 19,
-      "creation_date": "2025-12-08T12:50:35.050234",
+      "creation_date": "2025-12-09T11:39:27.590139",
       "value_labels": {
         "1": "0.0006 ",
         "2": "0.0044 ",
@@ -2953,7 +2953,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 14,
-      "creation_date": "2025-12-08T12:50:35.047592",
+      "creation_date": "2025-12-09T11:39:27.587474",
       "value_labels": {
         "1": "1590",
         "2": "2550",
@@ -2986,7 +2986,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 14,
-      "creation_date": "2025-12-08T12:50:35.048869",
+      "creation_date": "2025-12-09T11:39:27.588777",
       "value_labels": {
         "1": "Cherokee Tribe of Northeast Alabama SDTSA",
         "2": "Chickasaw OTSA",
@@ -3019,7 +3019,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 117,
-      "creation_date": "2025-12-08T12:50:35.026491",
+      "creation_date": "2025-12-09T11:39:27.567146",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3036,7 +3036,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 95,
-      "creation_date": "2025-12-08T12:50:35.029132",
+      "creation_date": "2025-12-09T11:39:27.569808",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3053,7 +3053,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 117,
-      "creation_date": "2025-12-08T12:50:35.027807",
+      "creation_date": "2025-12-09T11:39:27.568475",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3070,7 +3070,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 48,
-      "creation_date": "2025-12-08T12:50:35.046072",
+      "creation_date": "2025-12-09T11:39:27.586001",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3087,7 +3087,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:35.044985",
+      "creation_date": "2025-12-09T11:39:27.585050",
       "value_labels": {
         "1": "01",
         "2": "01; 02",
@@ -3115,7 +3115,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 224,
-      "creation_date": "2025-12-08T12:50:35.019790",
+      "creation_date": "2025-12-09T11:39:27.560650",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3132,7 +3132,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 170,
-      "creation_date": "2025-12-08T12:50:35.022442",
+      "creation_date": "2025-12-09T11:39:27.563053",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3149,7 +3149,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 224,
-      "creation_date": "2025-12-08T12:50:35.021138",
+      "creation_date": "2025-12-09T11:39:27.561735",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3166,7 +3166,7 @@
       "max_value": 1.0,
       "mean_value": 0.9981081081081081,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.248589",
+      "creation_date": "2025-12-09T11:39:26.794355",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3183,9 +3183,9 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1,
-      "creation_date": "2025-12-08T12:50:34.962968",
+      "creation_date": "2025-12-09T11:39:27.504587",
       "value_labels": {
-        "1": "ne25_20251208_124857"
+        "1": "ne25_20251209_113751"
       },
       "summary_statistics": {}
     },
@@ -3202,7 +3202,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 53,
-      "creation_date": "2025-12-08T12:50:35.017079",
+      "creation_date": "2025-12-09T11:39:27.557547",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3219,7 +3219,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 83,
-      "creation_date": "2025-12-08T12:50:35.018432",
+      "creation_date": "2025-12-09T11:39:27.558900",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3236,7 +3236,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 310,
-      "creation_date": "2025-12-08T12:50:35.037356",
+      "creation_date": "2025-12-09T11:39:27.577980",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3253,7 +3253,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 331,
-      "creation_date": "2025-12-08T12:50:35.034593",
+      "creation_date": "2025-12-09T11:39:27.575268",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3270,7 +3270,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 331,
-      "creation_date": "2025-12-08T12:50:35.036057",
+      "creation_date": "2025-12-09T11:39:27.576728",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3287,7 +3287,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1,
-      "creation_date": "2025-12-08T12:50:35.038879",
+      "creation_date": "2025-12-09T11:39:27.579507",
       "value_labels": {
         "1": " ",
         "NA": "Missing/Not Available"
@@ -3307,7 +3307,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 8,
-      "creation_date": "2025-12-08T12:50:35.040357",
+      "creation_date": "2025-12-09T11:39:27.581020",
       "value_labels": {
         "1": "0.2759 ",
         "2": "0.7528 ",
@@ -3334,7 +3334,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 145,
-      "creation_date": "2025-12-08T12:50:35.041386",
+      "creation_date": "2025-12-09T11:39:27.582050",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3351,7 +3351,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 168,
-      "creation_date": "2025-12-08T12:50:35.042764",
+      "creation_date": "2025-12-09T11:39:27.583389",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3368,7 +3368,7 @@
       "max_value": 1.0,
       "mean_value": 0.887434554973822,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.244193",
+      "creation_date": "2025-12-09T11:39:26.755791",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3385,7 +3385,7 @@
       "max_value": 1.0,
       "mean_value": 0.8884414015304067,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.243242",
+      "creation_date": "2025-12-09T11:39:26.754843",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3402,7 +3402,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 345,
-      "creation_date": "2025-12-08T12:50:35.024342",
+      "creation_date": "2025-12-09T11:39:27.564614",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3419,7 +3419,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 292,
-      "creation_date": "2025-12-08T12:50:35.025325",
+      "creation_date": "2025-12-09T11:39:27.565879",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3436,7 +3436,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.030848",
+      "creation_date": "2025-12-09T11:39:27.571511",
       "value_labels": {
         "1": "R",
         "2": "R; U",
@@ -3459,7 +3459,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 97,
-      "creation_date": "2025-12-08T12:50:35.031834",
+      "creation_date": "2025-12-09T11:39:27.572515",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3476,7 +3476,7 @@
       "max_value": 1000.0,
       "mean_value": 11.762883235485976,
       "unique_values": 22,
-      "creation_date": "2025-12-08T12:50:35.010281",
+      "creation_date": "2025-12-09T11:39:27.550702",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3493,7 +3493,7 @@
       "max_value": 5510150.0,
       "mean_value": 75142.62778505898,
       "unique_values": 21,
-      "creation_date": "2025-12-08T12:50:35.011619",
+      "creation_date": "2025-12-09T11:39:27.552038",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3510,7 +3510,7 @@
       "max_value": 2428.0,
       "mean_value": 390.32994090610634,
       "unique_values": 456,
-      "creation_date": "2025-12-08T12:50:35.014290",
+      "creation_date": "2025-12-09T11:39:27.554794",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3527,7 +3527,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.013423",
+      "creation_date": "2025-12-09T11:39:27.553906",
       "value_labels": {
         "1": "guideline_2025",
         "2": "guideline_2025_family_9plus"
@@ -3547,7 +3547,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:35.015801",
+      "creation_date": "2025-12-09T11:39:27.556314",
       "value_labels": {
         "1": "<100% FPL",
         "2": "100-199% FPL",
@@ -3571,7 +3571,7 @@
       "max_value": 500000.0,
       "mean_value": 122507.01153007167,
       "unique_values": 96,
-      "creation_date": "2025-12-08T12:50:35.007614",
+      "creation_date": "2025-12-09T11:39:27.547963",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3588,7 +3588,7 @@
       "max_value": 3.0,
       "mean_value": 0.7112452350698857,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.058086",
+      "creation_date": "2025-12-09T11:39:27.597791",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3605,7 +3605,7 @@
       "max_value": 1.0,
       "mean_value": 0.17191977077363896,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.062216",
+      "creation_date": "2025-12-09T11:39:27.601722",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3622,7 +3622,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.063803",
+      "creation_date": "2025-12-09T11:39:27.603184",
       "value_labels": {
         "1": "Mild",
         "2": "Minimal/None",
@@ -3645,7 +3645,7 @@
       "max_value": 6.0,
       "mean_value": 1.303088188475008,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:35.060859",
+      "creation_date": "2025-12-09T11:39:27.600410",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3662,7 +3662,7 @@
       "max_value": 3.0,
       "mean_value": 0.591254752851711,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.059433",
+      "creation_date": "2025-12-09T11:39:27.599098",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3679,7 +3679,7 @@
       "max_value": 3.0,
       "mean_value": 0.46793650793650793,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.052690",
+      "creation_date": "2025-12-09T11:39:27.592475",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3696,7 +3696,7 @@
       "max_value": 3.0,
       "mean_value": 0.4993678887484197,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.051420",
+      "creation_date": "2025-12-09T11:39:27.591194",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3713,7 +3713,7 @@
       "max_value": 1.0,
       "mean_value": 0.13623372499206096,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.055408",
+      "creation_date": "2025-12-09T11:39:27.595122",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3730,7 +3730,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:35.057066",
+      "creation_date": "2025-12-09T11:39:27.596790",
       "value_labels": {
         "1": "Mild",
         "2": "Minimal/None",
@@ -3752,7 +3752,7 @@
       "max_value": 6.0,
       "mean_value": 0.9685614480787551,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:35.054136",
+      "creation_date": "2025-12-09T11:39:27.593817",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3769,7 +3769,7 @@
       "max_value": 1.0,
       "mean_value": 0.84,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.535039",
+      "creation_date": "2025-12-09T11:39:27.082300",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3786,7 +3786,7 @@
       "max_value": 1.0,
       "mean_value": 0.8461538461538461,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.529784",
+      "creation_date": "2025-12-09T11:39:27.077080",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3803,7 +3803,7 @@
       "max_value": 1.0,
       "mean_value": 0.875,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.538966",
+      "creation_date": "2025-12-09T11:39:27.086209",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3820,7 +3820,7 @@
       "max_value": 1.0,
       "mean_value": 0.6923076923076923,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.537672",
+      "creation_date": "2025-12-09T11:39:27.084915",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3837,7 +3837,7 @@
       "max_value": 1.0,
       "mean_value": 0.8888888888888888,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.533730",
+      "creation_date": "2025-12-09T11:39:27.080989",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3854,7 +3854,7 @@
       "max_value": 1.0,
       "mean_value": 0.7391304347826086,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.550873",
+      "creation_date": "2025-12-09T11:39:27.098040",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3871,7 +3871,7 @@
       "max_value": 1.0,
       "mean_value": 0.5675675675675675,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.585852",
+      "creation_date": "2025-12-09T11:39:27.131625",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3888,7 +3888,7 @@
       "max_value": 1.0,
       "mean_value": 0.8888888888888888,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.568119",
+      "creation_date": "2025-12-09T11:39:27.114046",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3905,7 +3905,7 @@
       "max_value": 1.0,
       "mean_value": 0.7391304347826086,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.569507",
+      "creation_date": "2025-12-09T11:39:27.115381",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3922,7 +3922,7 @@
       "max_value": 1.0,
       "mean_value": 0.7083333333333334,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.580509",
+      "creation_date": "2025-12-09T11:39:27.126336",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3939,7 +3939,7 @@
       "max_value": 1.0,
       "mean_value": 0.631578947368421,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.581812",
+      "creation_date": "2025-12-09T11:39:27.127533",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3956,7 +3956,7 @@
       "max_value": 1.0,
       "mean_value": 0.6666666666666666,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.575095",
+      "creation_date": "2025-12-09T11:39:27.120755",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3973,7 +3973,7 @@
       "max_value": 1.0,
       "mean_value": 0.8951612903225806,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.604609",
+      "creation_date": "2025-12-09T11:39:27.150395",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -3990,7 +3990,7 @@
       "max_value": 1.0,
       "mean_value": 0.8,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.565519",
+      "creation_date": "2025-12-09T11:39:27.111331",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4007,7 +4007,7 @@
       "max_value": 1.0,
       "mean_value": 0.4878048780487805,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.583136",
+      "creation_date": "2025-12-09T11:39:27.128895",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4024,7 +4024,7 @@
       "max_value": 1.0,
       "mean_value": 0.52,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.592624",
+      "creation_date": "2025-12-09T11:39:27.138359",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4041,7 +4041,7 @@
       "max_value": 1.0,
       "mean_value": 0.4666666666666667,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.588548",
+      "creation_date": "2025-12-09T11:39:27.134291",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4058,7 +4058,7 @@
       "max_value": 1.0,
       "mean_value": 0.5263157894736842,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.595291",
+      "creation_date": "2025-12-09T11:39:27.141015",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4075,7 +4075,7 @@
       "max_value": 1.0,
       "mean_value": 0.6875,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.576410",
+      "creation_date": "2025-12-09T11:39:27.122096",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4092,7 +4092,7 @@
       "max_value": 1.0,
       "mean_value": 0.5405405405405406,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.587199",
+      "creation_date": "2025-12-09T11:39:27.132976",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4109,7 +4109,7 @@
       "max_value": 1.0,
       "mean_value": 0.6097560975609756,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.584510",
+      "creation_date": "2025-12-09T11:39:27.130240",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4126,7 +4126,7 @@
       "max_value": 1.0,
       "mean_value": 0.5,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.596622",
+      "creation_date": "2025-12-09T11:39:27.142349",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4143,7 +4143,7 @@
       "max_value": 1.0,
       "mean_value": 0.9392712550607287,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.605967",
+      "creation_date": "2025-12-09T11:39:27.151732",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4160,7 +4160,7 @@
       "max_value": 1.0,
       "mean_value": 0.9578059071729957,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.608626",
+      "creation_date": "2025-12-09T11:39:27.154403",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4177,7 +4177,7 @@
       "max_value": 1.0,
       "mean_value": 0.799163179916318,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.613902",
+      "creation_date": "2025-12-09T11:39:27.159657",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4194,7 +4194,7 @@
       "max_value": 1.0,
       "mean_value": 0.6639676113360324,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.611251",
+      "creation_date": "2025-12-09T11:39:27.157047",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4211,7 +4211,7 @@
       "max_value": 1.0,
       "mean_value": 0.586046511627907,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.623187",
+      "creation_date": "2025-12-09T11:39:27.168833",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4228,7 +4228,7 @@
       "max_value": 1.0,
       "mean_value": 0.7008547008547008,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.619203",
+      "creation_date": "2025-12-09T11:39:27.164953",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4245,7 +4245,7 @@
       "max_value": 1.0,
       "mean_value": 0.6334841628959276,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.621867",
+      "creation_date": "2025-12-09T11:39:27.167505",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4262,7 +4262,7 @@
       "max_value": 1.0,
       "mean_value": 0.8186274509803921,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.617877",
+      "creation_date": "2025-12-09T11:39:27.163606",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4279,7 +4279,7 @@
       "max_value": 1.0,
       "mean_value": 0.5616438356164384,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.624529",
+      "creation_date": "2025-12-09T11:39:27.170178",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4296,7 +4296,7 @@
       "max_value": 1.0,
       "mean_value": 0.4146341463414634,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.627230",
+      "creation_date": "2025-12-09T11:39:27.172766",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4313,7 +4313,7 @@
       "max_value": 1.0,
       "mean_value": 0.6563380281690141,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.643033",
+      "creation_date": "2025-12-09T11:39:27.188613",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4330,7 +4330,7 @@
       "max_value": 1.0,
       "mean_value": 0.6747720364741642,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.637779",
+      "creation_date": "2025-12-09T11:39:27.183414",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4347,7 +4347,7 @@
       "max_value": 1.0,
       "mean_value": 0.8401639344262295,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.612612",
+      "creation_date": "2025-12-09T11:39:27.158344",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4364,7 +4364,7 @@
       "max_value": 1.0,
       "mean_value": 0.7585301837270341,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.636442",
+      "creation_date": "2025-12-09T11:39:27.181920",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4381,7 +4381,7 @@
       "max_value": 1.0,
       "mean_value": 0.6656534954407295,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.648309",
+      "creation_date": "2025-12-09T11:39:27.193979",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4398,7 +4398,7 @@
       "max_value": 1.0,
       "mean_value": 0.6524390243902439,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.649627",
+      "creation_date": "2025-12-09T11:39:27.195423",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4415,7 +4415,7 @@
       "max_value": 1.0,
       "mean_value": 0.6656346749226006,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.652322",
+      "creation_date": "2025-12-09T11:39:27.198060",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4432,7 +4432,7 @@
       "max_value": 1.0,
       "mean_value": 0.6705882352941176,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.645697",
+      "creation_date": "2025-12-09T11:39:27.191307",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4449,7 +4449,7 @@
       "max_value": 1.0,
       "mean_value": 0.6421725239616614,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.641709",
+      "creation_date": "2025-12-09T11:39:27.187301",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4466,7 +4466,7 @@
       "max_value": 1.0,
       "mean_value": 0.3588709677419355,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.666879",
+      "creation_date": "2025-12-09T11:39:27.212609",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4483,7 +4483,7 @@
       "max_value": 1.0,
       "mean_value": 0.662379421221865,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.653653",
+      "creation_date": "2025-12-09T11:39:27.199385",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4500,7 +4500,7 @@
       "max_value": 1.0,
       "mean_value": 0.5789473684210527,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.657629",
+      "creation_date": "2025-12-09T11:39:27.203329",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4517,7 +4517,7 @@
       "max_value": 1.0,
       "mean_value": 0.7415730337078652,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.639077",
+      "creation_date": "2025-12-09T11:39:27.184631",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4534,7 +4534,7 @@
       "max_value": 1.0,
       "mean_value": 0.5104602510460251,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.661608",
+      "creation_date": "2025-12-09T11:39:27.207254",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4551,7 +4551,7 @@
       "max_value": 1.0,
       "mean_value": 0.3476190476190476,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.669540",
+      "creation_date": "2025-12-09T11:39:27.215153",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4568,7 +4568,7 @@
       "max_value": 1.0,
       "mean_value": 0.6916299559471366,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.664232",
+      "creation_date": "2025-12-09T11:39:27.209877",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4585,7 +4585,7 @@
       "max_value": 1.0,
       "mean_value": 0.4026548672566372,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.670843",
+      "creation_date": "2025-12-09T11:39:27.216600",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4602,7 +4602,7 @@
       "max_value": 1.0,
       "mean_value": 0.480225988700565,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.702933",
+      "creation_date": "2025-12-09T11:39:27.249441",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4619,7 +4619,7 @@
       "max_value": 1.0,
       "mean_value": 0.610989010989011,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.752207",
+      "creation_date": "2025-12-09T11:39:27.297708",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4636,7 +4636,7 @@
       "max_value": 1.0,
       "mean_value": 0.5375,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.668229",
+      "creation_date": "2025-12-09T11:39:27.213850",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4653,7 +4653,7 @@
       "max_value": 1.0,
       "mean_value": 0.44385026737967914,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.757545",
+      "creation_date": "2025-12-09T11:39:27.302986",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4670,7 +4670,7 @@
       "max_value": 1.0,
       "mean_value": 0.4796747967479675,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.689505",
+      "creation_date": "2025-12-09T11:39:27.235039",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4687,7 +4687,7 @@
       "max_value": 1.0,
       "mean_value": 0.6232394366197183,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.715017",
+      "creation_date": "2025-12-09T11:39:27.261618",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4704,7 +4704,7 @@
       "max_value": 1.0,
       "mean_value": 0.6008146639511202,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.745014",
+      "creation_date": "2025-12-09T11:39:27.291116",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4721,7 +4721,7 @@
       "max_value": 1.0,
       "mean_value": 0.5381062355658198,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.750884",
+      "creation_date": "2025-12-09T11:39:27.296431",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4738,7 +4738,7 @@
       "max_value": 1.0,
       "mean_value": 0.37170263788968827,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.802810",
+      "creation_date": "2025-12-09T11:39:27.348773",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4755,7 +4755,7 @@
       "max_value": 1.0,
       "mean_value": 0.5921348314606741,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.827401",
+      "creation_date": "2025-12-09T11:39:27.373232",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4772,7 +4772,7 @@
       "max_value": 1.0,
       "mean_value": 0.5164835164835165,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.784040",
+      "creation_date": "2025-12-09T11:39:27.329941",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4789,7 +4789,7 @@
       "max_value": 1.0,
       "mean_value": 0.6378132118451025,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.743084",
+      "creation_date": "2025-12-09T11:39:27.289858",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4806,7 +4806,7 @@
       "max_value": 4.0,
       "mean_value": 1.9917525773195877,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.838384",
+      "creation_date": "2025-12-09T11:39:27.383910",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4823,7 +4823,7 @@
       "max_value": 1.0,
       "mean_value": 0.735,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.812173",
+      "creation_date": "2025-12-09T11:39:27.358308",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4840,7 +4840,7 @@
       "max_value": 1.0,
       "mean_value": 0.785,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.809556",
+      "creation_date": "2025-12-09T11:39:27.355570",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4857,7 +4857,7 @@
       "max_value": 3.0,
       "mean_value": 1.5771144278606966,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.810856",
+      "creation_date": "2025-12-09T11:39:27.356940",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4874,7 +4874,7 @@
       "max_value": 1.0,
       "mean_value": 0.6463414634146342,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.677530",
+      "creation_date": "2025-12-09T11:39:27.223024",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4891,7 +4891,7 @@
       "max_value": 1.0,
       "mean_value": 0.2488479262672811,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.800113",
+      "creation_date": "2025-12-09T11:39:27.346033",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4908,7 +4908,7 @@
       "max_value": 3.0,
       "mean_value": 0.9912280701754386,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.801468",
+      "creation_date": "2025-12-09T11:39:27.347439",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4925,7 +4925,7 @@
       "max_value": 1.0,
       "mean_value": 0.16080402010050251,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.813510",
+      "creation_date": "2025-12-09T11:39:27.359644",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4942,7 +4942,7 @@
       "max_value": 3.0,
       "mean_value": 0.84,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.814840",
+      "creation_date": "2025-12-09T11:39:27.361019",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4959,7 +4959,7 @@
       "max_value": 1.0,
       "mean_value": 0.9053905390539054,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.829027",
+      "creation_date": "2025-12-09T11:39:27.374523",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4976,7 +4976,7 @@
       "max_value": 2.0,
       "mean_value": 1.6206543967280163,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.830359",
+      "creation_date": "2025-12-09T11:39:27.375859",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -4993,7 +4993,7 @@
       "max_value": 3.0,
       "mean_value": 2.0439024390243903,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.854998",
+      "creation_date": "2025-12-09T11:39:27.399783",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5010,7 +5010,7 @@
       "max_value": 1.0,
       "mean_value": 0.7641509433962265,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.616575",
+      "creation_date": "2025-12-09T11:39:27.162298",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5027,7 +5027,7 @@
       "max_value": 4.0,
       "mean_value": 1.2122074636306135,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.311243",
+      "creation_date": "2025-12-09T11:39:26.858619",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5044,7 +5044,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1002,
-      "creation_date": "2025-12-08T12:50:34.955756",
+      "creation_date": "2025-12-09T11:39:27.497548",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5061,7 +5061,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.134018",
+      "creation_date": "2025-12-09T11:39:27.664495",
       "value_labels": {
         "1": "Fail",
         "2": "Pass"
@@ -5081,7 +5081,7 @@
       "max_value": 5.0,
       "mean_value": 1.4682539682539681,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.629830",
+      "creation_date": "2025-12-09T11:39:27.175383",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5098,7 +5098,7 @@
       "max_value": 5.0,
       "mean_value": 3.131443298969072,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.697642",
+      "creation_date": "2025-12-09T11:39:27.243968",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5115,7 +5115,7 @@
       "max_value": 5.0,
       "mean_value": 1.2332439678284182,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.729899",
+      "creation_date": "2025-12-09T11:39:27.276565",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5132,7 +5132,7 @@
       "max_value": 5.0,
       "mean_value": 2.7787162162162162,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.777448",
+      "creation_date": "2025-12-09T11:39:27.323398",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5149,7 +5149,7 @@
       "max_value": 5.0,
       "mean_value": 2.5961538461538463,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.599282",
+      "creation_date": "2025-12-09T11:39:27.145137",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5166,7 +5166,7 @@
       "max_value": 5.0,
       "mean_value": 0.9152215799614644,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.818982",
+      "creation_date": "2025-12-09T11:39:27.365074",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5183,7 +5183,7 @@
       "max_value": 5.0,
       "mean_value": 0.7142857142857143,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.554833",
+      "creation_date": "2025-12-09T11:39:27.102042",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5200,7 +5200,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 156,
-      "creation_date": "2025-12-08T12:50:34.248942",
+      "creation_date": "2025-12-09T11:39:26.795651",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5217,7 +5217,7 @@
       "max_value": 2.0,
       "mean_value": 1.6282722513089005,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.245120",
+      "creation_date": "2025-12-09T11:39:26.756751",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5234,7 +5234,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3966,
-      "creation_date": "2025-12-08T12:50:34.241611",
+      "creation_date": "2025-12-09T11:39:26.753247",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5251,7 +5251,7 @@
       "max_value": 5.0,
       "mean_value": 0.41419929958611906,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.307266",
+      "creation_date": "2025-12-09T11:39:26.854723",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5268,7 +5268,7 @@
       "max_value": 4.0,
       "mean_value": 3.425531914893617,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.440554",
+      "creation_date": "2025-12-09T11:39:26.986808",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5285,7 +5285,7 @@
       "max_value": 3.0,
       "mean_value": 0.8750786658275646,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.347927",
+      "creation_date": "2025-12-09T11:39:26.893957",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5302,7 +5302,7 @@
       "max_value": 3.0,
       "mean_value": 0.4558359621451104,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.361044",
+      "creation_date": "2025-12-09T11:39:26.907459",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5319,7 +5319,7 @@
       "max_value": 5.0,
       "mean_value": 0.573413324913167,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.335858",
+      "creation_date": "2025-12-09T11:39:26.882183",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5336,7 +5336,7 @@
       "max_value": 1.0,
       "mean_value": 0.8363235757003462,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.319248",
+      "creation_date": "2025-12-09T11:39:26.866455",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5353,7 +5353,7 @@
       "max_value": 1.0,
       "mean_value": 0.43536045106725735,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.320517",
+      "creation_date": "2025-12-09T11:39:26.867672",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5370,7 +5370,7 @@
       "max_value": 1.0,
       "mean_value": 0.4113975030205397,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.321897",
+      "creation_date": "2025-12-09T11:39:26.868971",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5387,7 +5387,7 @@
       "max_value": 1.0,
       "mean_value": 0.09202577527184858,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.323323",
+      "creation_date": "2025-12-09T11:39:26.870266",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5404,7 +5404,7 @@
       "max_value": 1.0,
       "mean_value": 0.10169150221506243,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.324585",
+      "creation_date": "2025-12-09T11:39:26.871568",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5421,7 +5421,7 @@
       "max_value": 1.0,
       "mean_value": 0.0743052758759565,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.325979",
+      "creation_date": "2025-12-09T11:39:26.872971",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5438,7 +5438,7 @@
       "max_value": 1.0,
       "mean_value": 0.07309706000805477,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.327875",
+      "creation_date": "2025-12-09T11:39:26.874190",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5455,7 +5455,7 @@
       "max_value": 6.0,
       "mean_value": 4.298800799467022,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.448430",
+      "creation_date": "2025-12-09T11:39:26.994698",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5472,7 +5472,7 @@
       "max_value": 4.0,
       "mean_value": 1.276796973518285,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.312601",
+      "creation_date": "2025-12-09T11:39:26.859924",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5489,7 +5489,7 @@
       "max_value": 1.0,
       "mean_value": 0.5919920582395765,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.410158",
+      "creation_date": "2025-12-09T11:39:26.956038",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5506,7 +5506,7 @@
       "max_value": 1.0,
       "mean_value": 0.2173354735152488,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.349124",
+      "creation_date": "2025-12-09T11:39:26.895329",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5523,7 +5523,7 @@
       "max_value": 3.0,
       "mean_value": 0.950063211125158,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.337176",
+      "creation_date": "2025-12-09T11:39:26.883416",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5540,7 +5540,7 @@
       "max_value": 3.0,
       "mean_value": 0.9232477006026008,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.338516",
+      "creation_date": "2025-12-09T11:39:26.884727",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5557,7 +5557,7 @@
       "max_value": 3.0,
       "mean_value": 0.6228679722046747,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.339900",
+      "creation_date": "2025-12-09T11:39:26.886046",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5574,7 +5574,7 @@
       "max_value": 3.0,
       "mean_value": 0.9251743817374762,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.341177",
+      "creation_date": "2025-12-09T11:39:26.887364",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5591,7 +5591,7 @@
       "max_value": 3.0,
       "mean_value": 0.4993678887484197,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.373039",
+      "creation_date": "2025-12-09T11:39:26.919742",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5608,7 +5608,7 @@
       "max_value": 3.0,
       "mean_value": 0.46793650793650793,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.374396",
+      "creation_date": "2025-12-09T11:39:26.920956",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5625,7 +5625,7 @@
       "max_value": 3.0,
       "mean_value": 0.7112452350698857,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.377082",
+      "creation_date": "2025-12-09T11:39:26.923627",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5642,7 +5642,7 @@
       "max_value": 3.0,
       "mean_value": 0.591254752851711,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.375728",
+      "creation_date": "2025-12-09T11:39:26.922284",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5659,7 +5659,7 @@
       "max_value": 1.0,
       "mean_value": 0.15808823529411764,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.449722",
+      "creation_date": "2025-12-09T11:39:26.996162",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5676,7 +5676,7 @@
       "max_value": 1.0,
       "mean_value": 0.2115987460815047,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.283200",
+      "creation_date": "2025-12-09T11:39:26.831140",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5693,7 +5693,7 @@
       "max_value": 60.0,
       "mean_value": 32.53764406240051,
       "unique_values": 53,
-      "creation_date": "2025-12-08T12:50:34.281818",
+      "creation_date": "2025-12-09T11:39:26.829753",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5710,7 +5710,7 @@
       "max_value": 8.0,
       "mean_value": 5.182472613458529,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:34.250566",
+      "creation_date": "2025-12-09T11:39:26.798465",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5727,7 +5727,7 @@
       "max_value": 500000.0,
       "mean_value": 122507.01153007167,
       "unique_values": 96,
-      "creation_date": "2025-12-08T12:50:34.346481",
+      "creation_date": "2025-12-09T11:39:26.892641",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5744,7 +5744,7 @@
       "max_value": 1.0,
       "mean_value": 0.225130890052356,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.351690",
+      "creation_date": "2025-12-09T11:39:26.897932",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5761,7 +5761,7 @@
       "max_value": 1.0,
       "mean_value": 0.05014095851792187,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.353042",
+      "creation_date": "2025-12-09T11:39:26.899371",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5778,7 +5778,7 @@
       "max_value": 1.0,
       "mean_value": 0.027990334273056788,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.354444",
+      "creation_date": "2025-12-09T11:39:26.900600",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5795,7 +5795,7 @@
       "max_value": 1.0,
       "mean_value": 0.10692710430930326,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.355641",
+      "creation_date": "2025-12-09T11:39:26.901957",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5812,7 +5812,7 @@
       "max_value": 1.0,
       "mean_value": 0.10330245670559807,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.356964",
+      "creation_date": "2025-12-09T11:39:26.903339",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5829,7 +5829,7 @@
       "max_value": 1.0,
       "mean_value": 0.05416834474426097,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.358285",
+      "creation_date": "2025-12-09T11:39:26.904639",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5846,7 +5846,7 @@
       "max_value": 1.0,
       "mean_value": 0.12988320579943616,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.359640",
+      "creation_date": "2025-12-09T11:39:26.906001",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5863,7 +5863,7 @@
       "max_value": 5.0,
       "mean_value": 0.10564490696941028,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.330571",
+      "creation_date": "2025-12-09T11:39:26.876880",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5880,7 +5880,7 @@
       "max_value": 1.0,
       "mean_value": 0.49036544850498337,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.399199",
+      "creation_date": "2025-12-09T11:39:26.945270",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5897,7 +5897,7 @@
       "max_value": 1.0,
       "mean_value": 0.4919452275473218,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.251843",
+      "creation_date": "2025-12-09T11:39:26.799702",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5914,7 +5914,7 @@
       "max_value": 1.0,
       "mean_value": 0.002013693113169553,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.265402",
+      "creation_date": "2025-12-09T11:39:26.813194",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5931,7 +5931,7 @@
       "max_value": 1.0,
       "mean_value": 0.0016109544905356424,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.266775",
+      "creation_date": "2025-12-09T11:39:26.814517",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5948,7 +5948,7 @@
       "max_value": 1.0,
       "mean_value": 0.0006041079339508659,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.268149",
+      "creation_date": "2025-12-09T11:39:26.815842",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5965,7 +5965,7 @@
       "max_value": 1.0,
       "mean_value": 0.0002013693113169553,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.269514",
+      "creation_date": "2025-12-09T11:39:26.817274",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5982,7 +5982,7 @@
       "max_value": 1.0,
       "mean_value": 0.0010068465565847766,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.270907",
+      "creation_date": "2025-12-09T11:39:26.818800",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -5999,7 +5999,7 @@
       "max_value": 1.0,
       "mean_value": 0.03161498187676198,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.272282",
+      "creation_date": "2025-12-09T11:39:26.820167",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6016,7 +6016,7 @@
       "max_value": 1.0,
       "mean_value": 0.0002013693113169553,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.262709",
+      "creation_date": "2025-12-09T11:39:26.810462",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6033,7 +6033,7 @@
       "max_value": 1.0,
       "mean_value": 0.08860249697946034,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.253179",
+      "creation_date": "2025-12-09T11:39:26.801027",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6050,7 +6050,7 @@
       "max_value": 1.0,
       "mean_value": 0.01973419250906162,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.254513",
+      "creation_date": "2025-12-09T11:39:26.802376",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6067,7 +6067,7 @@
       "max_value": 1.0,
       "mean_value": 0.009061619009262988,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.255877",
+      "creation_date": "2025-12-09T11:39:26.804205",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6084,7 +6084,7 @@
       "max_value": 1.0,
       "mean_value": 0.00644381796214257,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.257263",
+      "creation_date": "2025-12-09T11:39:26.805159",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6101,7 +6101,7 @@
       "max_value": 1.0,
       "mean_value": 0.00724929520741039,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.258614",
+      "creation_date": "2025-12-09T11:39:26.806445",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6118,7 +6118,7 @@
       "max_value": 1.0,
       "mean_value": 0.0012082158679017317,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.259951",
+      "creation_date": "2025-12-09T11:39:26.807785",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6135,7 +6135,7 @@
       "max_value": 1.0,
       "mean_value": 0.0030205396697543293,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.261341",
+      "creation_date": "2025-12-09T11:39:26.809122",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6152,7 +6152,7 @@
       "max_value": 1.0,
       "mean_value": 0.008860249697946033,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.264047",
+      "creation_date": "2025-12-09T11:39:26.811787",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6169,7 +6169,7 @@
       "max_value": 1.0,
       "mean_value": 0.2112908550676791,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.273765",
+      "creation_date": "2025-12-09T11:39:26.821672",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6186,7 +6186,7 @@
       "max_value": 1.0,
       "mean_value": 0.15642833165491776,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.437871",
+      "creation_date": "2025-12-09T11:39:26.984194",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6203,7 +6203,7 @@
       "max_value": 4.0,
       "mean_value": 3.3984037246425007,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.441835",
+      "creation_date": "2025-12-09T11:39:26.988140",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6220,7 +6220,7 @@
       "max_value": 1.0,
       "mean_value": 0.16073825503355704,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.444454",
+      "creation_date": "2025-12-09T11:39:26.990754",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6237,7 +6237,7 @@
       "max_value": 1.0,
       "mean_value": 0.10364426613172852,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.445748",
+      "creation_date": "2025-12-09T11:39:26.992054",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6254,7 +6254,7 @@
       "max_value": 1.0,
       "mean_value": 0.11432414256893074,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.465676",
+      "creation_date": "2025-12-09T11:39:27.012069",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6271,7 +6271,7 @@
       "max_value": 1.0,
       "mean_value": 0.03790674270379067,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.466998",
+      "creation_date": "2025-12-09T11:39:27.013410",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6288,7 +6288,7 @@
       "max_value": 1.0,
       "mean_value": 0.06313301823092506,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.468329",
+      "creation_date": "2025-12-09T11:39:27.014786",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6305,7 +6305,7 @@
       "max_value": 1.0,
       "mean_value": 0.05927921859211856,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.469708",
+      "creation_date": "2025-12-09T11:39:27.016122",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6322,7 +6322,7 @@
       "max_value": 1.0,
       "mean_value": 0.04893688828889639,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.471040",
+      "creation_date": "2025-12-09T11:39:27.017457",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6339,7 +6339,7 @@
       "max_value": 1.0,
       "mean_value": 0.09493243243243243,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.472551",
+      "creation_date": "2025-12-09T11:39:27.018867",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6356,7 +6356,7 @@
       "max_value": 1.0,
       "mean_value": 0.07939189189189189,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.473777",
+      "creation_date": "2025-12-09T11:39:27.020182",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6373,7 +6373,7 @@
       "max_value": 1.0,
       "mean_value": 0.047106325706594884,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.475080",
+      "creation_date": "2025-12-09T11:39:27.021532",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6390,7 +6390,7 @@
       "max_value": 1.0,
       "mean_value": 0.2241206030150754,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.439351",
+      "creation_date": "2025-12-09T11:39:26.985523",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6407,7 +6407,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.132180",
+      "creation_date": "2025-12-09T11:39:27.662610",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6424,7 +6424,7 @@
       "max_value": 1.0,
       "mean_value": 0.9983073798239676,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.520559",
+      "creation_date": "2025-12-09T11:39:27.067727",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6441,7 +6441,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1823,
-      "creation_date": "2025-12-08T12:50:34.247478",
+      "creation_date": "2025-12-09T11:39:26.791618",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6458,7 +6458,7 @@
       "max_value": 1.0,
       "mean_value": 0.7631296891747053,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.519219",
+      "creation_date": "2025-12-09T11:39:27.066417",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6475,7 +6475,7 @@
       "max_value": 9.0,
       "mean_value": 0.9695945945945946,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.772128",
+      "creation_date": "2025-12-09T11:39:27.317836",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6492,7 +6492,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.131413",
+      "creation_date": "2025-12-09T11:39:27.661730",
       "value_labels": {
         "1": "Fail",
         "2": "Pass"
@@ -6512,7 +6512,7 @@
       "max_value": 2.0,
       "mean_value": 1.4957712444623439,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.279031",
+      "creation_date": "2025-12-09T11:39:26.826978",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6529,7 +6529,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3677,
-      "creation_date": "2025-12-08T12:50:34.245957",
+      "creation_date": "2025-12-09T11:39:26.757566",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6546,7 +6546,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 747,
-      "creation_date": "2025-12-08T12:50:34.965221",
+      "creation_date": "2025-12-09T11:39:27.506706",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6563,7 +6563,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1639,
-      "creation_date": "2025-12-08T12:50:34.957285",
+      "creation_date": "2025-12-09T11:39:27.498912",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6580,7 +6580,7 @@
       "max_value": 2.0,
       "mean_value": 1.9948849104859334,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.966535",
+      "creation_date": "2025-12-09T11:39:27.508078",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6597,7 +6597,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 716,
-      "creation_date": "2025-12-08T12:50:34.963799",
+      "creation_date": "2025-12-09T11:39:27.505388",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6614,7 +6614,7 @@
       "max_value": 1.0,
       "mean_value": 1.0,
       "unique_values": 1,
-      "creation_date": "2025-12-08T12:50:34.247024",
+      "creation_date": "2025-12-09T11:39:26.790355",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6631,7 +6631,7 @@
       "max_value": 1.0,
       "mean_value": 0.9991928974979822,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.248017",
+      "creation_date": "2025-12-09T11:39:26.793017",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6648,7 +6648,7 @@
       "max_value": 1.0,
       "mean_value": 0.9986584384223236,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.246497",
+      "creation_date": "2025-12-09T11:39:26.789050",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6665,7 +6665,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1557,
-      "creation_date": "2025-12-08T12:50:34.517779",
+      "creation_date": "2025-12-09T11:39:27.064991",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6682,7 +6682,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.158847",
+      "creation_date": "2025-12-09T11:39:27.690187",
       "value_labels": {
         "1": "Insufficient responses (n=0, threshold=5)",
         "2": "Insufficient responses (n=1, threshold=5)",
@@ -6705,7 +6705,7 @@
       "max_value": 2.8,
       "mean_value": 0.20395224416517055,
       "unique_values": 1717,
-      "creation_date": "2025-12-08T12:50:35.144860",
+      "creation_date": "2025-12-09T11:39:27.676333",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6722,7 +6722,7 @@
       "max_value": 1.008,
       "mean_value": 0.6259712746858168,
       "unique_values": 472,
-      "creation_date": "2025-12-08T12:50:35.146102",
+      "creation_date": "2025-12-09T11:39:27.677648",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6739,7 +6739,7 @@
       "max_value": 5.0,
       "mean_value": 4.069946452476573,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.479119",
+      "creation_date": "2025-12-09T11:39:27.025600",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6756,7 +6756,7 @@
       "max_value": 5.0,
       "mean_value": 1.6394328156650912,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.480441",
+      "creation_date": "2025-12-09T11:39:27.026945",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6773,7 +6773,7 @@
       "max_value": 5.0,
       "mean_value": 2.4140835579514826,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.481787",
+      "creation_date": "2025-12-09T11:39:27.028251",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6790,7 +6790,7 @@
       "max_value": 1.0,
       "mean_value": 0.9623601220752798,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.483101",
+      "creation_date": "2025-12-09T11:39:27.029599",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6807,7 +6807,7 @@
       "max_value": 5.0,
       "mean_value": 4.3226148409894,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.484486",
+      "creation_date": "2025-12-09T11:39:27.030983",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6824,7 +6824,7 @@
       "max_value": 9.0,
       "mean_value": 0.8346244526776693,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.488453",
+      "creation_date": "2025-12-09T11:39:27.035000",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6841,7 +6841,7 @@
       "max_value": 9.0,
       "mean_value": 1.0585844903487978,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.500440",
+      "creation_date": "2025-12-09T11:39:27.047541",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6858,7 +6858,7 @@
       "max_value": 9.0,
       "mean_value": 0.6235254465790361,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.485819",
+      "creation_date": "2025-12-09T11:39:27.032329",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6875,7 +6875,7 @@
       "max_value": 9.0,
       "mean_value": 1.0269088462832157,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.489749",
+      "creation_date": "2025-12-09T11:39:27.036435",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6892,7 +6892,7 @@
       "max_value": 9.0,
       "mean_value": 0.9582632110400539,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.491124",
+      "creation_date": "2025-12-09T11:39:27.037671",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6909,7 +6909,7 @@
       "max_value": 9.0,
       "mean_value": 1.0033624747814391,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.492490",
+      "creation_date": "2025-12-09T11:39:27.039095",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6926,7 +6926,7 @@
       "max_value": 9.0,
       "mean_value": 0.9585439838220424,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.493789",
+      "creation_date": "2025-12-09T11:39:27.040365",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6943,7 +6943,7 @@
       "max_value": 9.0,
       "mean_value": 1.0359078590785908,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.495140",
+      "creation_date": "2025-12-09T11:39:27.041734",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6960,7 +6960,7 @@
       "max_value": 9.0,
       "mean_value": 1.003728813559322,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.496443",
+      "creation_date": "2025-12-09T11:39:27.043357",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6977,7 +6977,7 @@
       "max_value": 9.0,
       "mean_value": 1.0219372257846777,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.497747",
+      "creation_date": "2025-12-09T11:39:27.044959",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -6994,7 +6994,7 @@
       "max_value": 9.0,
       "mean_value": 1.0165652467883706,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.499070",
+      "creation_date": "2025-12-09T11:39:27.046210",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7011,7 +7011,7 @@
       "max_value": 9.0,
       "mean_value": 1.0023608768971333,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.501746",
+      "creation_date": "2025-12-09T11:39:27.048855",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7028,7 +7028,7 @@
       "max_value": 9.0,
       "mean_value": 0.993912749408184,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.513701",
+      "creation_date": "2025-12-09T11:39:27.060734",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7045,7 +7045,7 @@
       "max_value": 9.0,
       "mean_value": 1.0111486486486487,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.487125",
+      "creation_date": "2025-12-09T11:39:27.033689",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7062,7 +7062,7 @@
       "max_value": 9.0,
       "mean_value": 1.0479082321187585,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.503107",
+      "creation_date": "2025-12-09T11:39:27.050143",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7079,7 +7079,7 @@
       "max_value": 9.0,
       "mean_value": 1.0098706603131382,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.504450",
+      "creation_date": "2025-12-09T11:39:27.051440",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7096,7 +7096,7 @@
       "max_value": 9.0,
       "mean_value": 0.9952622673434857,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.505768",
+      "creation_date": "2025-12-09T11:39:27.052740",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7113,7 +7113,7 @@
       "max_value": 9.0,
       "mean_value": 1.024373730534868,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.507096",
+      "creation_date": "2025-12-09T11:39:27.054076",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7130,7 +7130,7 @@
       "max_value": 9.0,
       "mean_value": 1.013166779203241,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.508415",
+      "creation_date": "2025-12-09T11:39:27.055363",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7147,7 +7147,7 @@
       "max_value": 9.0,
       "mean_value": 0.8598984771573605,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.509759",
+      "creation_date": "2025-12-09T11:39:27.056688",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7164,7 +7164,7 @@
       "max_value": 9.0,
       "mean_value": 0.9284745762711865,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.511057",
+      "creation_date": "2025-12-09T11:39:27.057994",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7181,7 +7181,7 @@
       "max_value": 9.0,
       "mean_value": 0.9524456521739131,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.512381",
+      "creation_date": "2025-12-09T11:39:27.059295",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7198,7 +7198,7 @@
       "max_value": 2.8,
       "mean_value": 0.20395224416517055,
       "unique_values": 1717,
-      "creation_date": "2025-12-08T12:50:35.142074",
+      "creation_date": "2025-12-09T11:39:27.673684",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7215,7 +7215,7 @@
       "max_value": 1.008,
       "mean_value": 0.6259712746858168,
       "unique_values": 472,
-      "creation_date": "2025-12-08T12:50:35.143402",
+      "creation_date": "2025-12-09T11:39:27.674962",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7232,7 +7232,7 @@
       "max_value": 1.0,
       "mean_value": 0.8868304470398711,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.243727",
+      "creation_date": "2025-12-09T11:39:26.755327",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7249,7 +7249,7 @@
       "max_value": 5.0,
       "mean_value": 0.06342494714587738,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.873023",
+      "creation_date": "2025-12-09T11:39:27.417059",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7266,7 +7266,7 @@
       "max_value": 5.0,
       "mean_value": 0.16666666666666666,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.631138",
+      "creation_date": "2025-12-09T11:39:27.176691",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7283,7 +7283,7 @@
       "max_value": 5.0,
       "mean_value": 0.48711340206185566,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.698960",
+      "creation_date": "2025-12-09T11:39:27.245334",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7300,7 +7300,7 @@
       "max_value": 5.0,
       "mean_value": 0.9436997319034852,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.731198",
+      "creation_date": "2025-12-09T11:39:27.277862",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7317,7 +7317,7 @@
       "max_value": 5.0,
       "mean_value": 0.3783783783783784,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.778808",
+      "creation_date": "2025-12-09T11:39:27.324576",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7334,7 +7334,7 @@
       "max_value": 3.0,
       "mean_value": 0.17307692307692307,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.597956",
+      "creation_date": "2025-12-09T11:39:27.143832",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7351,7 +7351,7 @@
       "max_value": 5.0,
       "mean_value": 0.5491329479768786,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.820192",
+      "creation_date": "2025-12-09T11:39:27.366458",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7368,7 +7368,7 @@
       "max_value": 93.0,
       "mean_value": 40.958164642375166,
       "unique_values": 90,
-      "creation_date": "2025-12-08T12:50:34.276444",
+      "creation_date": "2025-12-09T11:39:26.824379",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7385,7 +7385,7 @@
       "max_value": 1.0,
       "mean_value": 0.18018018018018017,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.436558",
+      "creation_date": "2025-12-09T11:39:26.982887",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7402,7 +7402,7 @@
       "max_value": 999.0,
       "mean_value": 12.754056633789373,
       "unique_values": 12,
-      "creation_date": "2025-12-08T12:50:34.342540",
+      "creation_date": "2025-12-09T11:39:26.888685",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7419,7 +7419,7 @@
       "max_value": 999.0,
       "mean_value": 16.721867007672635,
       "unique_values": 12,
-      "creation_date": "2025-12-08T12:50:34.343840",
+      "creation_date": "2025-12-09T11:39:26.890153",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7436,7 +7436,7 @@
       "max_value": 999.0,
       "mean_value": 15.163309982486865,
       "unique_values": 12,
-      "creation_date": "2025-12-08T12:50:34.345175",
+      "creation_date": "2025-12-09T11:39:26.891446",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7453,7 +7453,7 @@
       "max_value": 4.165,
       "mean_value": 0.052822980251346484,
       "unique_values": 1999,
-      "creation_date": "2025-12-08T12:50:35.139449",
+      "creation_date": "2025-12-09T11:39:27.670965",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7470,7 +7470,7 @@
       "max_value": 1.1,
       "mean_value": 0.4908283662477559,
       "unique_values": 416,
-      "creation_date": "2025-12-08T12:50:35.140830",
+      "creation_date": "2025-12-09T11:39:27.672289",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7487,7 +7487,7 @@
       "max_value": 258958.98177141053,
       "mean_value": 63364.02676839416,
       "unique_values": 393,
-      "creation_date": "2025-12-08T12:50:35.008920",
+      "creation_date": "2025-12-09T11:39:27.549502",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7504,7 +7504,24 @@
       "max_value": 1.0,
       "mean_value": 0.10294117647058823,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.275105",
+      "creation_date": "2025-12-09T11:39:26.823004",
+      "value_labels": {},
+      "summary_statistics": {}
+    },
+    {
+      "variable_name": "influential",
+      "category": "other",
+      "variable_label": "Influential",
+      "data_type": "logical",
+      "storage_mode": "logical",
+      "n_total": 4966,
+      "n_missing": 0,
+      "missing_percentage": 0.0,
+      "min_value": null,
+      "max_value": null,
+      "mean_value": null,
+      "unique_values": 2,
+      "creation_date": "2025-12-09T11:39:27.666715",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7521,7 +7538,7 @@
       "max_value": 4.322,
       "mean_value": 0.28386678635547574,
       "unique_values": 1889,
-      "creation_date": "2025-12-08T12:50:35.147495",
+      "creation_date": "2025-12-09T11:39:27.679011",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7538,7 +7555,7 @@
       "max_value": 1.326,
       "mean_value": 0.6903691202872532,
       "unique_values": 643,
-      "creation_date": "2025-12-08T12:50:35.148791",
+      "creation_date": "2025-12-09T11:39:27.680373",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7555,7 +7572,7 @@
       "max_value": 7.345,
       "mean_value": 1.0990973070017953,
       "unique_values": 2405,
-      "creation_date": "2025-12-08T12:50:35.136601",
+      "creation_date": "2025-12-09T11:39:27.668285",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7572,7 +7589,7 @@
       "max_value": 1.339,
       "mean_value": 0.3734010771992819,
       "unique_values": 514,
-      "creation_date": "2025-12-08T12:50:35.137877",
+      "creation_date": "2025-12-09T11:39:27.669578",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7589,7 +7606,24 @@
       "max_value": 1.0,
       "mean_value": 0.887434554973822,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.244659",
+      "creation_date": "2025-12-09T11:39:26.756284",
+      "value_labels": {},
+      "summary_statistics": {}
+    },
+    {
+      "variable_name": "meets_inclusion",
+      "category": "other",
+      "variable_label": "Meets Inclusion",
+      "data_type": "logical",
+      "storage_mode": "logical",
+      "n_total": 4966,
+      "n_missing": 0,
+      "missing_percentage": 0.0,
+      "min_value": null,
+      "max_value": null,
+      "mean_value": null,
+      "unique_values": 2,
+      "creation_date": "2025-12-09T11:39:27.691205",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7606,7 +7640,7 @@
       "max_value": 5.0,
       "mean_value": 1.6767847105115232,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.423608",
+      "creation_date": "2025-12-09T11:39:26.969684",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7623,7 +7657,7 @@
       "max_value": 4000.0,
       "mean_value": 441.43276570757484,
       "unique_values": 80,
-      "creation_date": "2025-12-08T12:50:34.432646",
+      "creation_date": "2025-12-09T11:39:26.978892",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7640,7 +7674,7 @@
       "max_value": 4000.0,
       "mean_value": 483.3689205219454,
       "unique_values": 83,
-      "creation_date": "2025-12-08T12:50:34.433941",
+      "creation_date": "2025-12-09T11:39:26.980202",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7657,7 +7691,7 @@
       "max_value": 1.0,
       "mean_value": 0.32272727272727275,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.408449",
+      "creation_date": "2025-12-09T11:39:26.954704",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7674,7 +7708,7 @@
       "max_value": 3.0,
       "mean_value": 1.1311258278145695,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.401982",
+      "creation_date": "2025-12-09T11:39:26.947882",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7691,7 +7725,7 @@
       "max_value": 6.0,
       "mean_value": 1.6645367412140575,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.403166",
+      "creation_date": "2025-12-09T11:39:26.949378",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7708,7 +7742,7 @@
       "max_value": 1.0,
       "mean_value": 0.18863636363636363,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.427413",
+      "creation_date": "2025-12-09T11:39:26.973743",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7725,7 +7759,7 @@
       "max_value": 4.0,
       "mean_value": 2.897280966767372,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.428689",
+      "creation_date": "2025-12-09T11:39:26.974950",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7742,7 +7776,7 @@
       "max_value": 4.0,
       "mean_value": 2.9487951807228914,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.429995",
+      "creation_date": "2025-12-09T11:39:26.976259",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7759,7 +7793,7 @@
       "max_value": 4.0,
       "mean_value": 2.978787878787879,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.431295",
+      "creation_date": "2025-12-09T11:39:26.977562",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7776,7 +7810,7 @@
       "max_value": 1.0,
       "mean_value": 0.19746919746919747,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.400513",
+      "creation_date": "2025-12-09T11:39:26.946573",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7793,7 +7827,7 @@
       "max_value": 9.0,
       "mean_value": 0.24254914394419785,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.350443",
+      "creation_date": "2025-12-09T11:39:26.896812",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7810,7 +7844,7 @@
       "max_value": 3.0,
       "mean_value": 0.546625974906748,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.460375",
+      "creation_date": "2025-12-09T11:39:27.006757",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7827,7 +7861,7 @@
       "max_value": 3.0,
       "mean_value": 0.7531366564937267,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.461687",
+      "creation_date": "2025-12-09T11:39:27.008073",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7844,7 +7878,7 @@
       "max_value": 3.0,
       "mean_value": 0.33219993199591974,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.463015",
+      "creation_date": "2025-12-09T11:39:27.009417",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7861,7 +7895,7 @@
       "max_value": 3.0,
       "mean_value": 0.33853989813242785,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.464342",
+      "creation_date": "2025-12-09T11:39:27.010733",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7878,7 +7912,7 @@
       "max_value": 3.0,
       "mean_value": 0.5852968897266729,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.313920",
+      "creation_date": "2025-12-09T11:39:26.861219",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7895,7 +7929,7 @@
       "max_value": 3.0,
       "mean_value": 0.584017687934302,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.315244",
+      "creation_date": "2025-12-09T11:39:26.862589",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7912,7 +7946,7 @@
       "max_value": 3.0,
       "mean_value": 0.6664554957237884,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.316564",
+      "creation_date": "2025-12-09T11:39:26.863838",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7929,7 +7963,7 @@
       "max_value": 3.0,
       "mean_value": 0.6442399238337035,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.317901",
+      "creation_date": "2025-12-09T11:39:26.865168",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7946,7 +7980,7 @@
       "max_value": 1.0,
       "mean_value": 0.41694630872483224,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.362360",
+      "creation_date": "2025-12-09T11:39:26.908816",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7963,7 +7997,7 @@
       "max_value": 1.0,
       "mean_value": 0.5856540084388185,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.363714",
+      "creation_date": "2025-12-09T11:39:26.910204",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7980,7 +8014,7 @@
       "max_value": 1.0,
       "mean_value": 0.6025316455696202,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.365045",
+      "creation_date": "2025-12-09T11:39:26.911527",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -7997,7 +8031,7 @@
       "max_value": 1.0,
       "mean_value": 0.28064243448858833,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.366356",
+      "creation_date": "2025-12-09T11:39:26.912870",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8014,7 +8048,7 @@
       "max_value": 1.0,
       "mean_value": 0.3721518987341772,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.367679",
+      "creation_date": "2025-12-09T11:39:26.914313",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8031,7 +8065,7 @@
       "max_value": 1.0,
       "mean_value": 0.23693086003372682,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.369053",
+      "creation_date": "2025-12-09T11:39:26.915566",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8048,7 +8082,7 @@
       "max_value": 1.0,
       "mean_value": 0.30522765598650925,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.370355",
+      "creation_date": "2025-12-09T11:39:26.916917",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8065,7 +8099,7 @@
       "max_value": 1.0,
       "mean_value": 0.15580016934801016,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.371731",
+      "creation_date": "2025-12-09T11:39:26.918306",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8082,7 +8116,7 @@
       "max_value": 99.0,
       "mean_value": 1.6741894469167196,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.309912",
+      "creation_date": "2025-12-09T11:39:26.857316",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8099,7 +8133,7 @@
       "max_value": 2.0,
       "mean_value": 1.287958115183246,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.396441",
+      "creation_date": "2025-12-09T11:39:26.942461",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8116,7 +8150,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3172,
-      "creation_date": "2025-12-08T12:50:34.280686",
+      "creation_date": "2025-12-09T11:39:26.828600",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8133,7 +8167,7 @@
       "max_value": 2.0,
       "mean_value": 1.2315747080144985,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.476314",
+      "creation_date": "2025-12-09T11:39:27.022800",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8150,7 +8184,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 3039,
-      "creation_date": "2025-12-08T12:50:34.398063",
+      "creation_date": "2025-12-09T11:39:26.944123",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8167,7 +8201,7 @@
       "max_value": 2.0,
       "mean_value": 1.211437776882803,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.514989",
+      "creation_date": "2025-12-09T11:39:27.062346",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8184,7 +8218,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2987,
-      "creation_date": "2025-12-08T12:50:34.477995",
+      "creation_date": "2025-12-09T11:39:27.024448",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8201,7 +8235,7 @@
       "max_value": 2.0,
       "mean_value": 1.1868707209021345,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.521777",
+      "creation_date": "2025-12-09T11:39:27.069081",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8218,7 +8252,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2920,
-      "creation_date": "2025-12-08T12:50:34.516638",
+      "creation_date": "2025-12-09T11:39:27.063964",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8235,7 +8269,7 @@
       "max_value": 2.0,
       "mean_value": 0.011276681433749497,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.558724",
+      "creation_date": "2025-12-09T11:39:27.105893",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8252,7 +8286,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 28,
-      "creation_date": "2025-12-08T12:50:34.523088",
+      "creation_date": "2025-12-09T11:39:27.070329",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8269,7 +8303,7 @@
       "max_value": 2.0,
       "mean_value": 0.7607732581554572,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.874323",
+      "creation_date": "2025-12-09T11:39:27.418273",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8286,7 +8320,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1884,
-      "creation_date": "2025-12-08T12:50:34.823216",
+      "creation_date": "2025-12-09T11:39:27.369241",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8303,7 +8337,7 @@
       "max_value": 2.0,
       "mean_value": 0.10068465565847765,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.632369",
+      "creation_date": "2025-12-09T11:39:27.177922",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8320,7 +8354,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 251,
-      "creation_date": "2025-12-08T12:50:34.603155",
+      "creation_date": "2025-12-09T11:39:27.148978",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8337,7 +8371,7 @@
       "max_value": 2.0,
       "mean_value": 0.1550543697140556,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.700179",
+      "creation_date": "2025-12-09T11:39:27.246957",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8354,7 +8388,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 386,
-      "creation_date": "2025-12-08T12:50:34.633697",
+      "creation_date": "2025-12-09T11:39:27.179258",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8371,7 +8405,7 @@
       "max_value": 2.0,
       "mean_value": 0.14941602899718082,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.732445",
+      "creation_date": "2025-12-09T11:39:27.279091",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8388,7 +8422,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 372,
-      "creation_date": "2025-12-08T12:50:34.701523",
+      "creation_date": "2025-12-09T11:39:27.248116",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8405,7 +8439,7 @@
       "max_value": 2.0,
       "mean_value": 0.23842126459927507,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.779980",
+      "creation_date": "2025-12-09T11:39:27.325799",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8422,7 +8456,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 591,
-      "creation_date": "2025-12-08T12:50:34.733731",
+      "creation_date": "2025-12-09T11:39:27.280408",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8439,7 +8473,7 @@
       "max_value": 2.0,
       "mean_value": 0.020942408376963352,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.601842",
+      "creation_date": "2025-12-09T11:39:27.147633",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8456,7 +8490,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 52,
-      "creation_date": "2025-12-08T12:50:34.560077",
+      "creation_date": "2025-12-09T11:39:27.107230",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8473,7 +8507,7 @@
       "max_value": 2.0,
       "mean_value": 0.20861860652436567,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.821675",
+      "creation_date": "2025-12-09T11:39:27.367701",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8490,7 +8524,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 518,
-      "creation_date": "2025-12-08T12:50:34.781333",
+      "creation_date": "2025-12-09T11:39:27.327141",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8507,7 +8541,7 @@
       "max_value": 2.0,
       "mean_value": 0.9883205799436166,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.959798",
+      "creation_date": "2025-12-09T11:39:27.501430",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8524,7 +8558,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2451,
-      "creation_date": "2025-12-08T12:50:34.953178",
+      "creation_date": "2025-12-09T11:39:27.495020",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8541,7 +8575,7 @@
       "max_value": 2.0,
       "mean_value": 0.9967780910189287,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.951696",
+      "creation_date": "2025-12-09T11:39:27.493535",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8558,7 +8592,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2472,
-      "creation_date": "2025-12-08T12:50:34.942609",
+      "creation_date": "2025-12-09T11:39:27.484543",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8575,7 +8609,7 @@
       "max_value": 1.0,
       "mean_value": 0.43754130865829477,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.404458",
+      "creation_date": "2025-12-09T11:39:26.950672",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8592,7 +8626,7 @@
       "max_value": 4000.0,
       "mean_value": 646.6061080657792,
       "unique_values": 105,
-      "creation_date": "2025-12-08T12:50:34.405784",
+      "creation_date": "2025-12-09T11:39:26.952011",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8609,7 +8643,7 @@
       "max_value": 4000.0,
       "mean_value": 294.77716966379984,
       "unique_values": 81,
-      "creation_date": "2025-12-08T12:50:34.407160",
+      "creation_date": "2025-12-09T11:39:26.953342",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8626,7 +8660,7 @@
       "max_value": 4000.0,
       "mean_value": 244.11590774689532,
       "unique_values": 81,
-      "creation_date": "2025-12-08T12:50:34.435247",
+      "creation_date": "2025-12-09T11:39:26.981666",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8643,7 +8677,7 @@
       "max_value": 3.0,
       "mean_value": 0.011142061281337047,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:35.157124",
+      "creation_date": "2025-12-09T11:39:27.688590",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8660,7 +8694,7 @@
       "max_value": 1.0,
       "mean_value": 1.0,
       "unique_values": 1,
-      "creation_date": "2025-12-08T12:50:34.443139",
+      "creation_date": "2025-12-09T11:39:26.989442",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8677,7 +8711,7 @@
       "max_value": 5.0,
       "mean_value": 3.8498837595483226,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.447119",
+      "creation_date": "2025-12-09T11:39:26.993359",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8694,7 +8728,7 @@
       "max_value": 4.0,
       "mean_value": 2.59375,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.694911",
+      "creation_date": "2025-12-09T11:39:27.241369",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8711,7 +8745,7 @@
       "max_value": 5.0,
       "mean_value": 0.7142857142857143,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.556133",
+      "creation_date": "2025-12-09T11:39:27.103317",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8728,7 +8762,7 @@
       "max_value": 3.0,
       "mean_value": 2.326923076923077,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.600631",
+      "creation_date": "2025-12-09T11:39:27.146361",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8745,7 +8779,7 @@
       "max_value": 1.0,
       "mean_value": 0.7701112877583466,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.331892",
+      "creation_date": "2025-12-09T11:39:26.878172",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8762,7 +8796,7 @@
       "max_value": 5.0,
       "mean_value": 0.15943824865757952,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.333223",
+      "creation_date": "2025-12-09T11:39:26.879521",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8779,7 +8813,7 @@
       "max_value": 8.0,
       "mean_value": 4.804635761589404,
       "unique_values": 9,
-      "creation_date": "2025-12-08T12:50:34.334553",
+      "creation_date": "2025-12-09T11:39:26.880811",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8796,7 +8830,7 @@
       "max_value": 2.0,
       "mean_value": 1.6034214618973561,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.877192",
+      "creation_date": "2025-12-09T11:39:27.421083",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8813,7 +8847,7 @@
       "max_value": 2.0,
       "mean_value": 1.49824698091157,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.878597",
+      "creation_date": "2025-12-09T11:39:27.422322",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8830,7 +8864,7 @@
       "max_value": 2.0,
       "mean_value": 1.6293271100739013,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.879977",
+      "creation_date": "2025-12-09T11:39:27.423613",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8847,7 +8881,7 @@
       "max_value": 2.0,
       "mean_value": 1.7145638629283488,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.881381",
+      "creation_date": "2025-12-09T11:39:27.424915",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8864,7 +8898,7 @@
       "max_value": 2.0,
       "mean_value": 1.674098094852047,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.882703",
+      "creation_date": "2025-12-09T11:39:27.426262",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8881,7 +8915,7 @@
       "max_value": 2.0,
       "mean_value": 1.5064377682403434,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.884334",
+      "creation_date": "2025-12-09T11:39:27.427714",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8898,7 +8932,7 @@
       "max_value": 2.0,
       "mean_value": 1.5536964980544747,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.885917",
+      "creation_date": "2025-12-09T11:39:27.428951",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8915,7 +8949,7 @@
       "max_value": 2.0,
       "mean_value": 1.5402254178002333,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.887183",
+      "creation_date": "2025-12-09T11:39:27.430295",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8932,7 +8966,7 @@
       "max_value": 2.0,
       "mean_value": 1.6223259432127577,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.888466",
+      "creation_date": "2025-12-09T11:39:27.431632",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8949,7 +8983,7 @@
       "max_value": 2.0,
       "mean_value": 1.5993004275165177,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.889834",
+      "creation_date": "2025-12-09T11:39:27.432968",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8966,7 +9000,7 @@
       "max_value": 2.0,
       "mean_value": 1.4726426076833528,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.891213",
+      "creation_date": "2025-12-09T11:39:27.434302",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -8983,7 +9017,7 @@
       "max_value": 2.0,
       "mean_value": 1.604199066874028,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.892540",
+      "creation_date": "2025-12-09T11:39:27.435762",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9000,7 +9034,7 @@
       "max_value": 2.0,
       "mean_value": 1.7926829268292683,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.893902",
+      "creation_date": "2025-12-09T11:39:27.437007",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9017,7 +9051,7 @@
       "max_value": 2.0,
       "mean_value": 1.73359375,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.895403",
+      "creation_date": "2025-12-09T11:39:27.438388",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9034,7 +9068,7 @@
       "max_value": 2.0,
       "mean_value": 1.7511811023622048,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.896616",
+      "creation_date": "2025-12-09T11:39:27.439756",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9051,7 +9085,7 @@
       "max_value": 2.0,
       "mean_value": 1.6725490196078432,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.898022",
+      "creation_date": "2025-12-09T11:39:27.441057",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9068,7 +9102,7 @@
       "max_value": 2.0,
       "mean_value": 1.3572823115970325,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.899494",
+      "creation_date": "2025-12-09T11:39:27.442468",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9085,7 +9119,7 @@
       "max_value": 2.0,
       "mean_value": 1.646417445482866,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.900987",
+      "creation_date": "2025-12-09T11:39:27.443806",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9102,7 +9136,7 @@
       "max_value": 2.0,
       "mean_value": 1.084375,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.902299",
+      "creation_date": "2025-12-09T11:39:27.445131",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9119,7 +9153,7 @@
       "max_value": 2.0,
       "mean_value": 1.7568627450980392,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.903661",
+      "creation_date": "2025-12-09T11:39:27.446468",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9136,7 +9170,7 @@
       "max_value": 2.0,
       "mean_value": 1.6806590819929383,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.905000",
+      "creation_date": "2025-12-09T11:39:27.447811",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9153,7 +9187,7 @@
       "max_value": 2.0,
       "mean_value": 1.803522504892368,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.906363",
+      "creation_date": "2025-12-09T11:39:27.449192",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9170,7 +9204,7 @@
       "max_value": 2.0,
       "mean_value": 1.4724286272976144,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.907774",
+      "creation_date": "2025-12-09T11:39:27.450524",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9187,7 +9221,7 @@
       "max_value": 2.0,
       "mean_value": 1.7503912363067293,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.909139",
+      "creation_date": "2025-12-09T11:39:27.452027",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9204,7 +9238,7 @@
       "max_value": 2.0,
       "mean_value": 1.70859375,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.910665",
+      "creation_date": "2025-12-09T11:39:27.453232",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9221,7 +9255,7 @@
       "max_value": 2.0,
       "mean_value": 1.3697610654132393,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.912429",
+      "creation_date": "2025-12-09T11:39:27.454559",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9238,7 +9272,7 @@
       "max_value": 2.0,
       "mean_value": 1.7999215378579836,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.913892",
+      "creation_date": "2025-12-09T11:39:27.455919",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9255,7 +9289,7 @@
       "max_value": 2.0,
       "mean_value": 1.2902848224736636,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.915274",
+      "creation_date": "2025-12-09T11:39:27.457326",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9272,7 +9306,7 @@
       "max_value": 2.0,
       "mean_value": 1.5503329416372895,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.916744",
+      "creation_date": "2025-12-09T11:39:27.458671",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9289,7 +9323,7 @@
       "max_value": 2.0,
       "mean_value": 1.8028224225793807,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.918222",
+      "creation_date": "2025-12-09T11:39:27.460061",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9306,7 +9340,7 @@
       "max_value": 2.0,
       "mean_value": 1.4779874213836477,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.919625",
+      "creation_date": "2025-12-09T11:39:27.461524",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9323,7 +9357,7 @@
       "max_value": 2.0,
       "mean_value": 1.509493670886076,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.921014",
+      "creation_date": "2025-12-09T11:39:27.462761",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9340,7 +9374,7 @@
       "max_value": 2.0,
       "mean_value": 1.5057562524811434,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.922408",
+      "creation_date": "2025-12-09T11:39:27.464124",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9357,7 +9391,7 @@
       "max_value": 2.0,
       "mean_value": 1.5355864811133202,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.923737",
+      "creation_date": "2025-12-09T11:39:27.465468",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9374,7 +9408,7 @@
       "max_value": 2.0,
       "mean_value": 1.3560545308740979,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.925060",
+      "creation_date": "2025-12-09T11:39:27.466807",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9391,7 +9425,7 @@
       "max_value": 2.0,
       "mean_value": 1.491110233109443,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.926521",
+      "creation_date": "2025-12-09T11:39:27.468145",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9408,7 +9442,7 @@
       "max_value": 2.0,
       "mean_value": 1.5821501014198782,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.927837",
+      "creation_date": "2025-12-09T11:39:27.469489",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9425,7 +9459,7 @@
       "max_value": 2.0,
       "mean_value": 1.7583465818759936,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.929148",
+      "creation_date": "2025-12-09T11:39:27.471015",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9442,7 +9476,7 @@
       "max_value": 2.0,
       "mean_value": 1.7482128673550437,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.930462",
+      "creation_date": "2025-12-09T11:39:27.472224",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9459,7 +9493,7 @@
       "max_value": 2.0,
       "mean_value": 1.8231132075471699,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.931786",
+      "creation_date": "2025-12-09T11:39:27.473558",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9476,7 +9510,7 @@
       "max_value": 2.0,
       "mean_value": 1.7989731437598737,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.933154",
+      "creation_date": "2025-12-09T11:39:27.474929",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9493,7 +9527,7 @@
       "max_value": 2.0,
       "mean_value": 1.8736717827626919,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.934468",
+      "creation_date": "2025-12-09T11:39:27.476281",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9510,7 +9544,7 @@
       "max_value": 2.0,
       "mean_value": 1.367103694874851,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.935891",
+      "creation_date": "2025-12-09T11:39:27.477634",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9527,7 +9561,7 @@
       "max_value": 2.0,
       "mean_value": 1.3752969121140142,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.937111",
+      "creation_date": "2025-12-09T11:39:27.478978",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9544,7 +9578,7 @@
       "max_value": 2.0,
       "mean_value": 1.7546132705143307,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.938526",
+      "creation_date": "2025-12-09T11:39:27.480323",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9561,7 +9595,7 @@
       "max_value": 2.0,
       "mean_value": 1.851030727343446,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.939755",
+      "creation_date": "2025-12-09T11:39:27.481645",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9578,7 +9612,7 @@
       "max_value": 1.0,
       "mean_value": 0.7326530612244898,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.954422",
+      "creation_date": "2025-12-09T11:39:27.496312",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9595,7 +9629,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 712,
-      "creation_date": "2025-12-08T12:50:34.958443",
+      "creation_date": "2025-12-09T11:39:27.500116",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9612,7 +9646,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1230,
-      "creation_date": "2025-12-08T12:50:34.943896",
+      "creation_date": "2025-12-09T11:39:27.485785",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9629,7 +9663,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1915,
-      "creation_date": "2025-12-08T12:50:34.945216",
+      "creation_date": "2025-12-09T11:39:27.487115",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9646,7 +9680,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2307,
-      "creation_date": "2025-12-08T12:50:34.946578",
+      "creation_date": "2025-12-09T11:39:27.488465",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9663,7 +9697,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 406,
-      "creation_date": "2025-12-08T12:50:34.947791",
+      "creation_date": "2025-12-09T11:39:27.489695",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9680,7 +9714,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 57,
-      "creation_date": "2025-12-08T12:50:34.949101",
+      "creation_date": "2025-12-09T11:39:27.490977",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9697,7 +9731,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 382,
-      "creation_date": "2025-12-08T12:50:34.950434",
+      "creation_date": "2025-12-09T11:39:27.492331",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9714,7 +9748,7 @@
       "max_value": 3.0,
       "mean_value": 2.4769425142135186,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.329261",
+      "creation_date": "2025-12-09T11:39:26.875578",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9731,7 +9765,7 @@
       "max_value": 4.0,
       "mean_value": 0.9901960784313726,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.378434",
+      "creation_date": "2025-12-09T11:39:26.924992",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9748,7 +9782,7 @@
       "max_value": 4.0,
       "mean_value": 0.8721780604133546,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.379811",
+      "creation_date": "2025-12-09T11:39:26.926340",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9765,7 +9799,7 @@
       "max_value": 4.0,
       "mean_value": 0.5944233206590621,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.381112",
+      "creation_date": "2025-12-09T11:39:26.927678",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9782,7 +9816,7 @@
       "max_value": 1.0,
       "mean_value": 0.04107933950865888,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.411625",
+      "creation_date": "2025-12-09T11:39:26.957276",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9799,7 +9833,7 @@
       "max_value": 1.0,
       "mean_value": 0.12585581957309705,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.412882",
+      "creation_date": "2025-12-09T11:39:26.958617",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9816,7 +9850,7 @@
       "max_value": 1.0,
       "mean_value": 0.03685058397100282,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.414251",
+      "creation_date": "2025-12-09T11:39:26.959988",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9833,7 +9867,7 @@
       "max_value": 1.0,
       "mean_value": 0.028191703584373742,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.415486",
+      "creation_date": "2025-12-09T11:39:26.961303",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9850,7 +9884,7 @@
       "max_value": 1.0,
       "mean_value": 0.22170761175996778,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.416787",
+      "creation_date": "2025-12-09T11:39:26.962648",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9867,7 +9901,7 @@
       "max_value": 1.0,
       "mean_value": 0.07047925896093435,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.418098",
+      "creation_date": "2025-12-09T11:39:26.964038",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9884,7 +9918,7 @@
       "max_value": 1.0,
       "mean_value": 0.009262988320579944,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.419405",
+      "creation_date": "2025-12-09T11:39:26.965437",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9901,7 +9935,7 @@
       "max_value": 1.0,
       "mean_value": 0.009665726943213854,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.420720",
+      "creation_date": "2025-12-09T11:39:26.966883",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9918,7 +9952,7 @@
       "max_value": 5.0,
       "mean_value": 0.7471783295711061,
       "unique_values": 6,
-      "creation_date": "2025-12-08T12:50:34.424799",
+      "creation_date": "2025-12-09T11:39:26.970979",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9935,7 +9969,7 @@
       "max_value": 4.0,
       "mean_value": 3.283050847457627,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.426244",
+      "creation_date": "2025-12-09T11:39:26.972282",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9952,7 +9986,7 @@
       "max_value": 6.0,
       "mean_value": 2.8881184998424203,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.308590",
+      "creation_date": "2025-12-09T11:39:26.856026",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9969,7 +10003,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 65,
-      "creation_date": "2025-12-08T12:50:34.422098",
+      "creation_date": "2025-12-09T11:39:26.968309",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -9986,7 +10020,7 @@
       "max_value": 1.0,
       "mean_value": 0.029399919452275474,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.452271",
+      "creation_date": "2025-12-09T11:39:26.998592",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10003,7 +10037,7 @@
       "max_value": 1.0,
       "mean_value": 0.09645590012082159,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.453594",
+      "creation_date": "2025-12-09T11:39:26.999951",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10020,7 +10054,7 @@
       "max_value": 1.0,
       "mean_value": 0.09242851389448248,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.454950",
+      "creation_date": "2025-12-09T11:39:27.001283",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10037,7 +10071,7 @@
       "max_value": 1.0,
       "mean_value": 0.039065646395489324,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.456273",
+      "creation_date": "2025-12-09T11:39:27.002616",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10054,7 +10088,7 @@
       "max_value": 1.0,
       "mean_value": 0.041280708819975837,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.457614",
+      "creation_date": "2025-12-09T11:39:27.003968",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10071,7 +10105,7 @@
       "max_value": 1.0,
       "mean_value": 0.027990334273056788,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.459047",
+      "creation_date": "2025-12-09T11:39:27.005285",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10088,7 +10122,7 @@
       "max_value": 1.0,
       "mean_value": 0.22855227882037535,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.451036",
+      "creation_date": "2025-12-09T11:39:26.997347",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10105,7 +10139,7 @@
       "max_value": 2.0,
       "mean_value": 1.2458471760797343,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.240606",
+      "creation_date": "2025-12-09T11:39:26.752261",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10122,7 +10156,7 @@
       "max_value": 1.0,
       "mean_value": 0.96,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.531128",
+      "creation_date": "2025-12-09T11:39:27.078381",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10139,7 +10173,7 @@
       "max_value": 1.0,
       "mean_value": 0.76,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.542924",
+      "creation_date": "2025-12-09T11:39:27.090250",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10156,7 +10190,7 @@
       "max_value": 3.035,
       "mean_value": 0.1404879712746858,
       "unique_values": 1701,
-      "creation_date": "2025-12-08T12:50:35.150209",
+      "creation_date": "2025-12-09T11:39:27.681749",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10173,7 +10207,7 @@
       "max_value": 1.02,
       "mean_value": 0.5704962298025135,
       "unique_values": 506,
-      "creation_date": "2025-12-08T12:50:35.151556",
+      "creation_date": "2025-12-09T11:39:27.683061",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10190,7 +10224,7 @@
       "max_value": 3.255,
       "mean_value": 0.35992710951526036,
       "unique_values": 1711,
-      "creation_date": "2025-12-08T12:50:35.152926",
+      "creation_date": "2025-12-09T11:39:27.684454",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10207,7 +10241,7 @@
       "max_value": 1.046,
       "mean_value": 0.6253597845601436,
       "unique_values": 526,
-      "creation_date": "2025-12-08T12:50:35.154294",
+      "creation_date": "2025-12-09T11:39:27.685796",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10224,7 +10258,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.961812",
+      "creation_date": "2025-12-09T11:39:27.503407",
       "value_labels": {
         "1": "kidsights_data_survey",
         "2": "kidsights_email_registration",
@@ -10246,7 +10280,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 548,
-      "creation_date": "2025-12-08T12:50:34.277913",
+      "creation_date": "2025-12-09T11:39:26.825839",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10263,7 +10297,7 @@
       "max_value": 1.0,
       "mean_value": 0.5014095851792187,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.284440",
+      "creation_date": "2025-12-09T11:39:26.832401",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10280,7 +10314,7 @@
       "max_value": 1.0,
       "mean_value": 0.007450664518727346,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.296511",
+      "creation_date": "2025-12-09T11:39:26.844194",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10297,7 +10331,7 @@
       "max_value": 1.0,
       "mean_value": 0.0024164317358034634,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.297847",
+      "creation_date": "2025-12-09T11:39:26.845511",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10314,7 +10348,7 @@
       "max_value": 1.0,
       "mean_value": 0.0024164317358034634,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.299185",
+      "creation_date": "2025-12-09T11:39:26.846823",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10331,7 +10365,7 @@
       "max_value": 1.0,
       "mean_value": 0.0008054772452678212,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.300516",
+      "creation_date": "2025-12-09T11:39:26.848126",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10348,7 +10382,7 @@
       "max_value": 1.0,
       "mean_value": 0.0008054772452678212,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.301854",
+      "creation_date": "2025-12-09T11:39:26.849429",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10365,7 +10399,7 @@
       "max_value": 1.0,
       "mean_value": 0.001409585179218687,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.303179",
+      "creation_date": "2025-12-09T11:39:26.850736",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10382,7 +10416,7 @@
       "max_value": 1.0,
       "mean_value": 0.038058799838904554,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.304500",
+      "creation_date": "2025-12-09T11:39:26.852056",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10399,7 +10433,7 @@
       "max_value": 1.0,
       "mean_value": 0.07511075312122432,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.285775",
+      "creation_date": "2025-12-09T11:39:26.833719",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10416,7 +10450,7 @@
       "max_value": 1.0,
       "mean_value": 0.017317760773258157,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.287254",
+      "creation_date": "2025-12-09T11:39:26.835035",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10433,7 +10467,7 @@
       "max_value": 1.0,
       "mean_value": 0.008658880386629078,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.288495",
+      "creation_date": "2025-12-09T11:39:26.836355",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10450,7 +10484,7 @@
       "max_value": 1.0,
       "mean_value": 0.005839710028191704,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.289824",
+      "creation_date": "2025-12-09T11:39:26.837674",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10467,7 +10501,7 @@
       "max_value": 1.0,
       "mean_value": 0.00644381796214257,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.291189",
+      "creation_date": "2025-12-09T11:39:26.838988",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10484,7 +10518,7 @@
       "max_value": 1.0,
       "mean_value": 0.0018123238018525976,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.292508",
+      "creation_date": "2025-12-09T11:39:26.840288",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10501,7 +10535,7 @@
       "max_value": 1.0,
       "mean_value": 0.002013693113169553,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.293842",
+      "creation_date": "2025-12-09T11:39:26.841589",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10518,7 +10552,7 @@
       "max_value": 1.0,
       "mean_value": 0.0018123238018525976,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.295175",
+      "creation_date": "2025-12-09T11:39:26.842895",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10535,7 +10569,7 @@
       "max_value": 1.0,
       "mean_value": 0.20766065210509654,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.305978",
+      "creation_date": "2025-12-09T11:39:26.853439",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10552,7 +10586,7 @@
       "max_value": 1.0,
       "mean_value": 0.14285714285714285,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.557455",
+      "creation_date": "2025-12-09T11:39:27.104708",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10569,7 +10603,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 1,
-      "creation_date": "2025-12-08T12:50:35.155621",
+      "creation_date": "2025-12-09T11:39:27.687097",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10586,7 +10620,7 @@
       "max_value": 100.0,
       "mean_value": 70.32997487437186,
       "unique_values": 99,
-      "creation_date": "2025-12-08T12:50:35.033218",
+      "creation_date": "2025-12-09T11:39:27.573823",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10603,7 +10637,7 @@
       "max_value": 1.0,
       "mean_value": 0.7412587412587412,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.678838",
+      "creation_date": "2025-12-09T11:39:27.224484",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10620,7 +10654,7 @@
       "max_value": 1.0,
       "mean_value": 0.7443946188340808,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.620531",
+      "creation_date": "2025-12-09T11:39:27.166193",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10637,7 +10671,7 @@
       "max_value": 1.0,
       "mean_value": 0.8888888888888888,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.660280",
+      "creation_date": "2025-12-09T11:39:27.205919",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10654,7 +10688,7 @@
       "max_value": 1.0,
       "mean_value": 0.943217665615142,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.647006",
+      "creation_date": "2025-12-09T11:39:27.192646",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10671,7 +10705,7 @@
       "max_value": 4.0,
       "mean_value": 2.4909090909090907,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.696248",
+      "creation_date": "2025-12-09T11:39:27.242684",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10688,7 +10722,7 @@
       "max_value": 2.0,
       "mean_value": 1.7171772428884027,
       "unique_values": 3,
-      "creation_date": "2025-12-08T12:50:34.868690",
+      "creation_date": "2025-12-09T11:39:27.413117",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10705,7 +10739,7 @@
       "max_value": 4.0,
       "mean_value": 3.0307692307692307,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.692208",
+      "creation_date": "2025-12-09T11:39:27.237733",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10722,7 +10756,7 @@
       "max_value": 4.0,
       "mean_value": 3.125,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.693563",
+      "creation_date": "2025-12-09T11:39:27.239491",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10739,7 +10773,7 @@
       "max_value": 4.0,
       "mean_value": 2.710065645514223,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.870099",
+      "creation_date": "2025-12-09T11:39:27.414400",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10756,7 +10790,7 @@
       "max_value": 4.0,
       "mean_value": 2.4841356673960613,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.871538",
+      "creation_date": "2025-12-09T11:39:27.415724",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10773,7 +10807,7 @@
       "max_value": 4.0,
       "mean_value": 2.389159891598916,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.856413",
+      "creation_date": "2025-12-09T11:39:27.401139",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10790,7 +10824,7 @@
       "max_value": 4.0,
       "mean_value": 3.144144144144144,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.842363",
+      "creation_date": "2025-12-09T11:39:27.387910",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10807,7 +10841,7 @@
       "max_value": 4.0,
       "mean_value": 2.6120455778621814,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.857738",
+      "creation_date": "2025-12-09T11:39:27.402457",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10824,7 +10858,7 @@
       "max_value": 4.0,
       "mean_value": 1.25,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.806853",
+      "creation_date": "2025-12-09T11:39:27.352813",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10841,7 +10875,7 @@
       "max_value": 3.0,
       "mean_value": 2.0696517412935322,
       "unique_values": 4,
-      "creation_date": "2025-12-08T12:50:34.808204",
+      "creation_date": "2025-12-09T11:39:27.354209",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10858,7 +10892,7 @@
       "max_value": 4.0,
       "mean_value": 2.6577946768060836,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.859091",
+      "creation_date": "2025-12-09T11:39:27.403761",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -10875,7 +10909,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.973380",
+      "creation_date": "2025-12-09T11:39:27.514759",
       "value_labels": {
         "1": "Hispanic",
         "2": "non-Hisp.",
@@ -10896,7 +10930,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.974783",
+      "creation_date": "2025-12-09T11:39:27.516133",
       "value_labels": {
         "1": "American Indian or Alaska Native",
         "2": "Asian or Pacific Islander",
@@ -10922,7 +10956,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.976157",
+      "creation_date": "2025-12-09T11:39:27.517483",
       "value_labels": {
         "1": "American Indian or Alaska Native, non-Hisp.",
         "2": "Asian or Pacific Islander, non-Hisp.",
@@ -10948,7 +10982,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.969638",
+      "creation_date": "2025-12-09T11:39:27.511113",
       "value_labels": {
         "1": "Hispanic",
         "2": "non-Hisp.",
@@ -10969,7 +11003,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.970730",
+      "creation_date": "2025-12-09T11:39:27.512227",
       "value_labels": {
         "1": "American Indian or Alaska Native",
         "2": "Asian or Pacific Islander",
@@ -10995,7 +11029,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 7,
-      "creation_date": "2025-12-08T12:50:34.972076",
+      "creation_date": "2025-12-09T11:39:27.513542",
       "value_labels": {
         "1": "American Indian or Alaska Native, non-Hisp.",
         "2": "Asian or Pacific Islander, non-Hisp.",
@@ -11021,7 +11055,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:35.000743",
+      "creation_date": "2025-12-09T11:39:27.541095",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11038,7 +11072,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.980456",
+      "creation_date": "2025-12-09T11:39:27.521204",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11055,7 +11089,7 @@
       "max_value": null,
       "mean_value": null,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.999623",
+      "creation_date": "2025-12-09T11:39:27.539900",
       "value_labels": {
         "1": "Female",
         "2": "Male",
@@ -11076,7 +11110,7 @@
       "max_value": 1.0,
       "mean_value": 0.8846153846153846,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.540290",
+      "creation_date": "2025-12-09T11:39:27.087508",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11093,7 +11127,7 @@
       "max_value": 1.0,
       "mean_value": 0.8,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.545680",
+      "creation_date": "2025-12-09T11:39:27.092739",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11110,7 +11144,7 @@
       "max_value": 1.0,
       "mean_value": 0.8695652173913043,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.548268",
+      "creation_date": "2025-12-09T11:39:27.095342",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11127,7 +11161,7 @@
       "max_value": 1.0,
       "mean_value": 0.9629629629629629,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.532436",
+      "creation_date": "2025-12-09T11:39:27.079693",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11144,7 +11178,7 @@
       "max_value": 1.0,
       "mean_value": 0.9642857142857143,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.524579",
+      "creation_date": "2025-12-09T11:39:27.071766",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11161,7 +11195,7 @@
       "max_value": 1.0,
       "mean_value": 0.6428571428571429,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.525829",
+      "creation_date": "2025-12-09T11:39:27.073093",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11178,7 +11212,7 @@
       "max_value": 1.0,
       "mean_value": 0.782608695652174,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.553507",
+      "creation_date": "2025-12-09T11:39:27.100697",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11195,7 +11229,7 @@
       "max_value": 1.0,
       "mean_value": 0.8627450980392157,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.566772",
+      "creation_date": "2025-12-09T11:39:27.112695",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11212,7 +11246,7 @@
       "max_value": 1.0,
       "mean_value": 0.875,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.562166",
+      "creation_date": "2025-12-09T11:39:27.108660",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11229,7 +11263,7 @@
       "max_value": 1.0,
       "mean_value": 0.8,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.572275",
+      "creation_date": "2025-12-09T11:39:27.118080",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11246,7 +11280,7 @@
       "max_value": 1.0,
       "mean_value": 0.6702127659574468,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.656287",
+      "creation_date": "2025-12-09T11:39:27.201988",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11263,7 +11297,7 @@
       "max_value": 1.0,
       "mean_value": 0.95,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.607263",
+      "creation_date": "2025-12-09T11:39:27.153188",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11280,7 +11314,7 @@
       "max_value": 1.0,
       "mean_value": 0.7354651162790697,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.644385",
+      "creation_date": "2025-12-09T11:39:27.189953",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11297,7 +11331,7 @@
       "max_value": 1.0,
       "mean_value": 0.7762803234501348,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.635120",
+      "creation_date": "2025-12-09T11:39:27.180624",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11314,7 +11348,7 @@
       "max_value": 1.0,
       "mean_value": 0.7681236673773987,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.825821",
+      "creation_date": "2025-12-09T11:39:27.371862",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11331,7 +11365,7 @@
       "max_value": 1.0,
       "mean_value": 0.828125,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.650951",
+      "creation_date": "2025-12-09T11:39:27.196696",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11348,7 +11382,7 @@
       "max_value": 1.0,
       "mean_value": 0.47783251231527096,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.672207",
+      "creation_date": "2025-12-09T11:39:27.217816",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11365,7 +11399,7 @@
       "max_value": 1.0,
       "mean_value": 0.5770114942528736,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.753552",
+      "creation_date": "2025-12-09T11:39:27.299019",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11382,7 +11416,7 @@
       "max_value": 1.0,
       "mean_value": 0.5589519650655022,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.748324",
+      "creation_date": "2025-12-09T11:39:27.293759",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11399,7 +11433,7 @@
       "max_value": 1.0,
       "mean_value": 0.6601423487544484,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.736460",
+      "creation_date": "2025-12-09T11:39:27.283192",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11416,7 +11450,7 @@
       "max_value": 1.0,
       "mean_value": 0.5925925925925926,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.724479",
+      "creation_date": "2025-12-09T11:39:27.271118",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11433,7 +11467,7 @@
       "max_value": 1.0,
       "mean_value": 0.6239316239316239,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.688135",
+      "creation_date": "2025-12-09T11:39:27.233710",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11450,7 +11484,7 @@
       "max_value": 1.0,
       "mean_value": 0.3932806324110672,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.785348",
+      "creation_date": "2025-12-09T11:39:27.331184",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11467,7 +11501,7 @@
       "max_value": 1.0,
       "mean_value": 0.8244897959183674,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.716383",
+      "creation_date": "2025-12-09T11:39:27.262963",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11484,7 +11518,7 @@
       "max_value": 1.0,
       "mean_value": 0.6363636363636364,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.552209",
+      "creation_date": "2025-12-09T11:39:27.099392",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11501,7 +11535,7 @@
       "max_value": 1.0,
       "mean_value": 0.7619047619047619,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.541614",
+      "creation_date": "2025-12-09T11:39:27.088808",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11518,7 +11552,7 @@
       "max_value": 1.0,
       "mean_value": 0.5609756097560976,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.577737",
+      "creation_date": "2025-12-09T11:39:27.123475",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11535,7 +11569,7 @@
       "max_value": 1.0,
       "mean_value": 0.48923076923076925,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.766849",
+      "creation_date": "2025-12-09T11:39:27.312349",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11552,7 +11586,7 @@
       "max_value": 1.0,
       "mean_value": 0.2054263565891473,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.662917",
+      "creation_date": "2025-12-09T11:39:27.208557",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11569,7 +11603,7 @@
       "max_value": 1.0,
       "mean_value": 0.782608695652174,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.686803",
+      "creation_date": "2025-12-09T11:39:27.232388",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11586,7 +11620,7 @@
       "max_value": 1.0,
       "mean_value": 0.5025641025641026,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.625847",
+      "creation_date": "2025-12-09T11:39:27.171480",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11603,7 +11637,7 @@
       "max_value": 1.0,
       "mean_value": 0.7640449438202247,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.658959",
+      "creation_date": "2025-12-09T11:39:27.204618",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11620,7 +11654,7 @@
       "max_value": 1.0,
       "mean_value": 0.6613418530351438,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.709633",
+      "creation_date": "2025-12-09T11:39:27.256165",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11637,7 +11671,7 @@
       "max_value": 1.0,
       "mean_value": 0.6968641114982579,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.723151",
+      "creation_date": "2025-12-09T11:39:27.269766",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11654,7 +11688,7 @@
       "max_value": 1.0,
       "mean_value": 0.7552447552447552,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.717682",
+      "creation_date": "2025-12-09T11:39:27.264319",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11671,7 +11705,7 @@
       "max_value": 1.0,
       "mean_value": 0.5773809523809523,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.676176",
+      "creation_date": "2025-12-09T11:39:27.221745",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11688,7 +11722,7 @@
       "max_value": 1.0,
       "mean_value": 0.7632311977715878,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.704255",
+      "creation_date": "2025-12-09T11:39:27.250766",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11705,7 +11739,7 @@
       "max_value": 1.0,
       "mean_value": 0.5990338164251208,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.797407",
+      "creation_date": "2025-12-09T11:39:27.343295",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11722,7 +11756,7 @@
       "max_value": 1.0,
       "mean_value": 0.6370106761565836,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.740700",
+      "creation_date": "2025-12-09T11:39:27.287125",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11739,7 +11773,7 @@
       "max_value": 1.0,
       "mean_value": 0.6936026936026936,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.712309",
+      "creation_date": "2025-12-09T11:39:27.259019",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11756,7 +11790,7 @@
       "max_value": 1.0,
       "mean_value": 0.8563922942206655,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.735146",
+      "creation_date": "2025-12-09T11:39:27.281959",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11773,7 +11807,7 @@
       "max_value": 1.0,
       "mean_value": 0.5680272108843537,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.721752",
+      "creation_date": "2025-12-09T11:39:27.268412",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11790,7 +11824,7 @@
       "max_value": 1.0,
       "mean_value": 0.7573033707865169,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.749575",
+      "creation_date": "2025-12-09T11:39:27.295066",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11807,7 +11841,7 @@
       "max_value": 4.0,
       "mean_value": 2.4608294930875574,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.793393",
+      "creation_date": "2025-12-09T11:39:27.339274",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11824,7 +11858,7 @@
       "max_value": 1.0,
       "mean_value": 0.8855885588558856,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.831652",
+      "creation_date": "2025-12-09T11:39:27.377205",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11841,7 +11875,7 @@
       "max_value": 4.0,
       "mean_value": 2.74077868852459,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.833027",
+      "creation_date": "2025-12-09T11:39:27.378557",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11858,7 +11892,7 @@
       "max_value": 4.0,
       "mean_value": 2.4832214765100673,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.792046",
+      "creation_date": "2025-12-09T11:39:27.337915",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11875,7 +11909,7 @@
       "max_value": 4.0,
       "mean_value": 2.490175801447777,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.844047",
+      "creation_date": "2025-12-09T11:39:27.389215",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11892,7 +11926,7 @@
       "max_value": 4.0,
       "mean_value": 2.403041825095057,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.860452",
+      "creation_date": "2025-12-09T11:39:27.405074",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11909,7 +11943,7 @@
       "max_value": 4.0,
       "mean_value": 2.869967355821545,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.861800",
+      "creation_date": "2025-12-09T11:39:27.406379",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11926,7 +11960,7 @@
       "max_value": 4.0,
       "mean_value": 2.632208922742111,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.863166",
+      "creation_date": "2025-12-09T11:39:27.407730",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11943,7 +11977,7 @@
       "max_value": 4.0,
       "mean_value": 2.7652505446623095,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.864707",
+      "creation_date": "2025-12-09T11:39:27.409096",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11960,7 +11994,7 @@
       "max_value": 4.0,
       "mean_value": 2.7797164667393677,
       "unique_values": 5,
-      "creation_date": "2025-12-08T12:50:34.867331",
+      "creation_date": "2025-12-09T11:39:27.411773",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11977,7 +12011,7 @@
       "max_value": 1.0,
       "mean_value": 0.7391304347826086,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.549553",
+      "creation_date": "2025-12-09T11:39:27.096720",
       "value_labels": {},
       "summary_statistics": {}
     },
@@ -11994,7 +12028,7 @@
       "max_value": 1.0,
       "mean_value": 0.32666666666666666,
       "unique_values": 2,
-      "creation_date": "2025-12-08T12:50:34.681508",
+      "creation_date": "2025-12-09T11:39:27.227019",
       "value_labels": {},
       "summary_statistics": {}
     }

@@ -1,8 +1,8 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-12-08 12:50:37  
+**Generated:** 2025-12-09 11:39:30  
 **Total Records:** 4966  
-**Total Variables:** 682  
+**Total Variables:** 684  
 **Categories:** 16  
 
 ## Overview
@@ -27,7 +27,7 @@ for race/ethnicity, education categories, and other demographic variables.
 - [Geography](#geography) (28 variables)
 - [Mental_Health](#mental_health) (10 variables)
 - [Motor](#motor) (74 variables)
-- [Other](#other) (327 variables)
+- [Other](#other) (329 variables)
 - [Psychosocial_Problems_General](#psychosocial_problems_general) (16 variables)
 - [Socemo](#socemo) (55 variables)
 
@@ -353,7 +353,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 | `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
 | `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251208_124857) |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251209_113751) |
 | `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.3% | N/A |
 | `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
 | `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
@@ -480,9 +480,9 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 **Description:** No description available
 
-**Variables:** 327  
-**Average Missing:** 39.7%  
-**Data Types:** 4 factors, 289 numeric, 2 logical, 32 character
+**Variables:** 329  
+**Average Missing:** 39.5%  
+**Data Types:** 4 factors, 289 numeric, 4 logical, 32 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
@@ -651,11 +651,13 @@ AND CHILD identified as non-Hispanic
 AND CHILD is 1096 days OR older
 AND the responding caregiver has a Bachelors  degree OR a masters degree OR a doctorate
 Otherwise, proceed with the survey | numeric | 98.6% | N/A |
+| `influential` | Influential | logical | 0.0% | N/A |
 | `internalizing_gsed_pf_2022` | Internalizing Gsed Pf 2022 | numeric | 43.9% | N/A |
 | `internalizing_gsed_pf_2022_csem` | Internalizing Gsed Pf 2022 Csem | numeric | 43.9% | N/A |
 | `kidsights_2022` | Kidsights 2022 | numeric | 43.9% | N/A |
 | `kidsights_2022_csem` | Kidsights 2022 Csem | numeric | 43.9% | N/A |
 | `kidsights_data_reviews_all_responses_for_quality___1` | Kidsights Data Reviews All Responses For Quality   1 | numeric | 0.0% | N/A |
+| `meets_inclusion` | Meets Inclusion | logical | 0.0% | N/A |
 | `mmi000` | This question asks about your child's primary childcare arrangement. 
 
 In a typical week, what type of childcare does your child receive the most? | numeric | 64.2% | N/A |
@@ -958,4 +960,4 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 - **Numeric variables** display min, max, and mean values where available
 - **Logical variables** show counts of TRUE and FALSE values
 
-*Generated automatically from metadata on 2025-12-08 by the Kidsights Data Platform*
+*Generated automatically from metadata on 2025-12-09 by the Kidsights Data Platform*
