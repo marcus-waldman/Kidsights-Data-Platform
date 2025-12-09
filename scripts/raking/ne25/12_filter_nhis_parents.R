@@ -1,9 +1,12 @@
-# Phase 3, Task 3.1: Filter to North Central Region Parents
-# Perform household linkage (parents → children 0-5) and filter to REGION = 2
+# Phase 3, Task 3.1: Filter to North Central + West Region Parents
+# Perform household linkage (parents → children 0-5) and filter to REGION = 2, 4
 
 library(DBI)
 library(duckdb)
 library(dplyr)
+
+# Source safe_left_join utility
+source("R/utils/safe_joins.R")
 
 cat("\n========================================\n")
 cat("Task 3.1: Filter NHIS Parents\n")
@@ -49,13 +52,13 @@ for (i in 1:length(region_table)) {
       " (", pct, "%)\n", sep = "")
 }
 
-# 3. Filter to North Central region (REGION = 2)
-cat("\n[3] Filtering to North Central region (REGION = 2)...\n")
+# 3. Filter to North Central + West regions (REGION = 2 or 4)
+cat("\n[3] Filtering to North Central + West regions (REGION = 2 or 4)...\n")
 
 nhis_north_central <- nhis_data %>%
-  dplyr::filter(REGION == 2)
+  dplyr::filter(REGION %in% c(2, 4))
 
-cat("    Records in North Central:", nrow(nhis_north_central), "\n")
+cat("    Records in North Central + West:", nrow(nhis_north_central), "\n")
 cat("    Reduction:", nrow(nhis_data) - nrow(nhis_north_central), "records removed\n")
 
 # 4. Identify children ages 0-5
@@ -94,7 +97,8 @@ cat("\n[6] Performing household linkage (children → parents)...\n")
 # Strategy: For each child with PAR1REL > 0, find their parent
 # Parent is identified by: same SERIAL (household) + PERNUM == child's PAR1REL
 
-# Create parent lookup: all adults in North Central households
+# Create parent lookup: all adults in North Central + West households
+# Rename parent variables with _parent suffix to avoid collision
 parent_pool <- nhis_north_central %>%
   dplyr::filter(AGE >= 18) %>%
   dplyr::select(SERIAL, PERNUM, AGE, SEX, YEAR,
@@ -102,17 +106,35 @@ parent_pool <- nhis_north_central %>%
                 GADANX, GADWORCTRL,
                 VIOLENEV, JAILEV, MENTDEPEV, ALCDRUGEV,
                 ADLTPUTDOWN, UNFAIRRACE, UNFAIRSEXOR, BASENEED,
-                SAMPWEIGHT, PSU, STRATA)
+                SAMPWEIGHT, PSU, STRATA) %>%
+  dplyr::rename(
+    AGE_parent = AGE,
+    SEX_parent = SEX,
+    PHQINTR_parent = PHQINTR,
+    PHQDEP_parent = PHQDEP,
+    GADANX_parent = GADANX,
+    GADWORCTRL_parent = GADWORCTRL,
+    VIOLENEV_parent = VIOLENEV,
+    JAILEV_parent = JAILEV,
+    MENTDEPEV_parent = MENTDEPEV,
+    ALCDRUGEV_parent = ALCDRUGEV,
+    ADLTPUTDOWN_parent = ADLTPUTDOWN,
+    UNFAIRRACE_parent = UNFAIRRACE,
+    UNFAIRSEXOR_parent = UNFAIRSEXOR,
+    BASENEED_parent = BASENEED,
+    SAMPWEIGHT_parent = SAMPWEIGHT,
+    PSU_parent = PSU,
+    STRATA_parent = STRATA
+  )
 
 cat("    Adult pool size:", nrow(parent_pool), "adults\n")
 
-# Join children to their parents
+# Join children to their parents (no collision since parent variables renamed)
 children_with_parents <- nhis_children %>%
   dplyr::filter(PAR1REL > 0) %>%
   safe_left_join(
     parent_pool,
-    by_vars = c("SERIAL" = "SERIAL", "PAR1REL" = "PERNUM", "YEAR" = "YEAR"),
-    allow_collision = TRUE  # Intentional _child/_parent suffixes
+    by_vars = c("SERIAL" = "SERIAL", "PAR1REL" = "PERNUM", "YEAR" = "YEAR")
   )
 
 cat("    Children successfully linked to parents:",
@@ -206,7 +228,7 @@ cat("\n========================================\n")
 cat("Task 3.1 Complete: NHIS Parents Filtered\n")
 cat("========================================\n")
 cat("\nSummary:\n")
-cat("  - Region: North Central (REGION = 2)\n")
+cat("  - Regions: North Central + West (REGION = 2, 4)\n")
 cat("  - Children ages 0-5:", nrow(nhis_children), "\n")
 cat("  - Parent-child pairs:", nrow(nhis_parent_child), "\n")
 cat("  - PHQ-2 available:", nrow(phq_data), "pairs\n")

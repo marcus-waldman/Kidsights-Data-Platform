@@ -25,22 +25,25 @@ harmonize_acs_marital <- function(MARST) {
 
 #' Convert NHIS Marital Status to Binary Married Indicator
 #'
-#' NHIS parental marital status (typically PAR1MARST or similar variable).
+#' NHIS parental marital status (PAR1MARST variable from IPUMS).
 #' Creates binary indicator: 1 = Married; 0 = otherwise
 #'
-#' @param marital_status NHIS marital status variable
-#'        Expected coding: 1=Married, 2=Widowed, 3=Divorced, 4=Separated, 5=Never married,
-#'        (exact coding may vary by NHIS year - verify from documentation)
+#' @param marital_status NHIS PAR1MARST variable
+#'        IPUMS coding: 0=NIU, 11=Married spouse present, 12=Married spouse absent,
+#'        13=Married spouse absent-other, 20=Widowed, 30=Divorced, 40=Separated,
+#'        50=Never married, 60=Living with partner, 99=Unknown
 #' @return Integer vector (0/1) or NA for missing
 #'
 #' @details
-#' Conservative approach: Only marital_status == 1 (Married) coded as 1.
-#' All other codes (2-5) and missing coded as 0 or NA respectively.
+#' PAR1MARST codes 11, 12, 13 (all types of married) coded as 1.
+#' Codes 20, 30, 40, 50, 60 (not married) coded as 0.
+#' Codes 0 (NIU) and 99 (Unknown) coded as NA.
 harmonize_nhis_marital <- function(marital_status) {
   dplyr::case_when(
-    is.na(marital_status) ~ NA_integer_,   # Missing
-    marital_status == 1 ~ 1L,              # Married
-    TRUE ~ 0L                              # All others (widowed, divorced, separated, never married)
+    marital_status %in% c(0, 99) ~ NA_integer_,  # NIU or Unknown
+    marital_status %in% c(11, 12, 13) ~ 1L,      # Married (any type)
+    marital_status %in% c(20, 30, 40, 50, 60) ~ 0L,  # Not married
+    TRUE ~ NA_integer_
   )
 }
 

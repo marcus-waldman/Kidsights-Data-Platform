@@ -1,0 +1,191 @@
+================================================================================
+RAKING TARGETS PIPELINE: VARIABLES BY EXTERNAL DATA SOURCE
+Nebraska 2025 (NE25) Study - 31 Estimands across 6 Age Groups (0-5 years)
+================================================================================
+
+QUICK REFERENCE TABLE - RAKING ESTIMANDS BY SOURCE:
+
+Variable / Estimand                              ACS    NHIS    NSCH
+─────────────────────────────────────────────────────────────────────
+
+DEMOGRAPHIC VARIABLES (from ACS):
+  Sex (Proportion Male)                          ✓
+
+Race/Ethnicity (3 estimands):
+  - White non-Hispanic                           ✓
+  - Black (any ethnicity)                        ✓
+  - Hispanic (any race)                          ✓
+
+Federal Poverty Level (5 estimands):
+  - 0-99% FPL                                    ✓
+  - 100-199% FPL                                 ✓
+  - 200-299% FPL                                 ✓
+  - 300-399% FPL                                 ✓
+  - 400%+ FPL                                    ✓
+
+PUMA Geography (14 estimands):
+  - 14 Public Use Microdata Areas                ✓
+
+Mother's Education                               ✓
+Mother's Marital Status                          ✓
+
+PARENTAL MENTAL HEALTH (from NHIS):
+  PHQ-2 Depression (≥3 positive screen)                 ✓
+  GAD-2 Anxiety (≥3 positive screen)                    ✓
+
+CHILD HEALTH & DEVELOPMENT (from NSCH):
+  Emotional/Behavioral Problems                               ✓
+  Excellent Health Status                                     ✓
+  Adverse Childhood Experiences                               ✓
+  Child Care Utilization                                      ✓
+
+SUMMARY:
+  ACS:   25 estimands (sex, race/ethnicity, poverty, PUMA, education, marital)
+  NHIS:  2 estimands (parental PHQ-2, GAD-2)
+  NSCH:  4 estimands (child health & development)
+  ────────────────────────────────────────────
+  TOTAL: 31 estimands × 6 age groups (0-5 years) = 186 rows
+
+================================================================================
+DETAILED SPECIFICATIONS BY SOURCE:
+================================================================================
+
+ACS (AMERICAN COMMUNITY SURVEY) - 25 Estimands
+───────────────────────────────────────────────
+Data Source:  IPUMS USA via ipumspy API
+Years:        2019-2023 pooled (multi-year samples)
+Geography:    Nebraska children ages 0-5
+Sample:       ~20,000+ ACS household records annually
+Design:       Complex survey with stratification and clustering
+Weights:      PERWT (person weights)
+Method:       GLM2 (generalized linear models)
+Variance Est: 4,096 bootstrap replicates per estimand (Rao-Wu-Yue-Beaumont)
+
+Key ACS Variables Used:
+  SEX           Child biological sex (1=Male, 2=Female)
+  RACE          Race (1=White, 2=Black, 3=American Indian, etc.)
+  HISPAN        Hispanic origin (0=Non-Hispanic, 1+=Hispanic)
+  POVERTY       % of federal poverty level (0-599, 600+=N/A)
+  PUMA          Public Use Microdata Area (14 in Nebraska)
+  EDUCM/EDUCD   Parent/householder education attainment
+  MARST         Marital status of household head
+  AGE           Child age in years (0-5)
+  MULTYEAR      Multi-year indicator (for temporal modeling)
+  PERWT         Person weight (survey design)
+
+ACS Estimands (25 total):
+  1. Sex: Proportion Male
+  2-4. Race/Ethnicity: White NH, Black, Hispanic
+  5-9. FPL: 0-99%, 100-199%, 200-299%, 300-399%, 400%+
+  10-23. PUMA: 14 geographic estimands (one per Nebraska PUMA)
+  24. Mother's Educational Attainment
+  25. Mother's Marital Status
+
+Output per estimand: 6 rows (one per age group: 0-5 years)
+Total ACS rows: 150 (25 × 6)
+
+
+NHIS (NATIONAL HEALTH INTERVIEW SURVEY) - 2 Estimands
+───────────────────────────────────────────────────────
+Data Source:  IPUMS Health Surveys via ipumspy API
+Years:        2019-2024 annual samples (6 years)
+Population:   Parents of Nebraska children ages 0-5
+Design:       Complex survey (stratified, multi-stage)
+Weights:      Survey design weights
+Method:       GLM2 with binary logistic regression
+Outcomes:     Parental mental health screening scales
+
+Key NHIS Variables:
+  PHQINTR       PHQ-2 interest/pleasure item (0-3 scale)
+  PHQDEP        PHQ-2 depressed mood item (0-3 scale)
+  PHQ2_POSITIVE Binary: PHQ-2 ≥3 (positive depression screening)
+  GADINTR       GAD-2 nervousness item (0-3 scale)
+  GADWORR       GAD-2 worry item (0-3 scale)
+  GAD2_POSITIVE Binary: GAD-2 ≥3 (positive anxiety screening)
+  YEAR          Survey year (2019-2024)
+
+NHIS Estimands (2 total):
+  1. PHQ-2 Depression (Parental): Proportion with PHQ-2 ≥3
+  2. GAD-2 Anxiety (Parental): Proportion with GAD-2 ≥3
+
+Output per estimand: 6 rows (one per age group: 0-5 years)
+Total NHIS rows: 12 (2 × 6)
+
+
+NSCH (NATIONAL SURVEY OF CHILDREN'S HEALTH) - 4 Estimands
+───────────────────────────────────────────────────────────
+Data Source:  CDC/HRSA NSCH public data portal
+Years:        2020-2023 pooled (4 years)
+Geography:    Nebraska children ages 0-5
+Population:   Child development and health outcomes
+Design:       Complex survey (stratified, multi-stage, clustered)
+Weights:      FWC (Final Weight - population-representative)
+Method:       GLM2 with binary classification
+Imputation:   MICE for missing ACE items
+
+Key NSCH Variables:
+  Survey Design:
+    FIPSST         State FIPS code (Nebraska = 31)
+    SC_AGE_YEARS   Child age in years (0-5)
+    HHID           Household ID
+    STRATUM        Survey stratum
+    FWC            Final weight (population-representative)
+
+  Outcomes:
+    ACE1-ACE11     Adverse Childhood Experience items (binary)
+                   * 9 items used (ACE1,3,4,5,6,7,8,9,10)
+                   * ACE11 added in 2021
+    MEDB10ScrQ5    Emotional/behavioral difficulty screening
+    K2Q01          Child overall health status
+    CC_RECEIVECARE Child care receipt (yes/no)
+
+NSCH Data Processing:
+  Step 1: Filter to Nebraska (FIPSST=31)
+  Step 2: Filter to ages 0-5 years
+  Step 3: Pool samples 2020-2023 with survey design
+  Step 4: MICE imputation for missing ACE items
+  Step 5: Binary classification for each outcome
+  Step 6: GLM2 estimation with survey weights (FWC)
+
+NSCH Estimands (4 total):
+  1. Emotional/Behavioral Problems: Proportion with MEDB10 difficulties
+  2. Excellent Health: Proportion with excellent/very good health
+  3. ACE Exposure: Proportion with 1+ adverse childhood experiences
+  4. Child Care Use: Proportion receiving child care
+
+Output per estimand: 6 rows (one per age group: 0-5 years)
+Total NSCH rows: 24 (4 × 6)
+
+================================================================================
+RAKING WORKFLOW & OUTPUT:
+================================================================================
+
+Output Database Table: raking_targets_ne25 (186 rows)
+
+Columns:
+  • age_years: Child age (0, 1, 2, 3, 4, 5)
+  • estimand: Name of raking target (31 unique estimands)
+  • estimate: Population-representative proportion/probability
+  • ci_lower: Lower confidence interval bound
+  • ci_upper: Upper confidence interval bound
+  • data_source: Source dataset (ACS, NHIS, or NSCH)
+  • variable_group: Category (demographic, socioeconomic, health, etc.)
+  • year_estimate: Year of estimate (or year range for pooled)
+  • estimation_date: Date estimates were calculated
+
+Usage in NE25 Analysis:
+  These raking targets are used for post-stratification weighting to ensure
+  the NE25 sample is representative of Nebraska's population across:
+    - Child demographics (sex, race/ethnicity)
+    - Family socioeconomics (poverty level, geography, education, marital status)
+    - Parental mental health (depression, anxiety)
+    - Child health and development (ACE exposure, health status, development)
+
+Execution:
+  "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" \
+    scripts/raking/ne25/run_raking_targets_pipeline.R
+
+  Expected time: 2-3 minutes
+  Output location: data/duckdb/kidsights_local.duckdb (raking_targets_ne25)
+
+================================================================================

@@ -1,5 +1,5 @@
 # Phase 4a, Task 4: Calibrate NSCH to Nebraska Demographics
-# Uses KL divergence minimization via Stan to reweight NSCH North Central
+# Uses KL divergence minimization via Stan to reweight NSCH (Nebraska + border states)
 # to match both ACS Nebraska marginal means AND covariance structure
 # Output: Calibrated NSCH weights (linear fixed effects model)
 
@@ -17,9 +17,11 @@ source("scripts/raking/ne25/utils/harmonize_race_ethnicity.R")
 source("scripts/raking/ne25/utils/harmonize_education.R")
 source("scripts/raking/ne25/utils/harmonize_marital_status.R")
 source("scripts/raking/ne25/utils/harmonize_poverty.R")
+source("scripts/raking/ne25/utils/harmonize_principal_city.R")
 source("scripts/raking/ne25/utils/weighted_covariance.R")
 source("scripts/raking/ne25/utils/validate_raw_inputs.R")
 source("scripts/raking/ne25/utils/calibrate_weights_cmdstan.R")
+source("scripts/raking/ne25/utils/score_rasch_outcomes.R")
 cat("    ✓ Utilities loaded\n\n")
 
 # ============================================================================
@@ -53,7 +55,8 @@ acs_ne <- acs_ne %>%
     black = race_dummies$black,
     hispanic = race_dummies$hispanic,
     educ_years = harmonize_acs_education(EDUC_MOM),
-    poverty_ratio = harmonize_acs_poverty(POVERTY, cap_at_400 = TRUE)  # Cap at 400 to match NSCH
+    poverty_ratio = harmonize_acs_poverty(POVERTY, cap_at_400 = TRUE),  # Cap at 400 to match NSCH
+    principal_city = harmonize_acs_principal_city(METRO)
   )
 
 cat("    ✓ Harmonized variables created\n\n")
@@ -64,8 +67,9 @@ cat("    ✓ Harmonized variables created\n\n")
 
 cat("[4] Computing target moments from ACS Nebraska...\n")
 
+# Block 1 demographics only (child outcomes not used for calibration)
 calibration_vars <- c("male", "age", "white_nh", "black", "hispanic",
-                      "educ_years", "poverty_ratio")
+                      "educ_years", "poverty_ratio", "principal_city")
 
 # Compute weighted mean vector
 target_mean_list <- list()
@@ -106,10 +110,10 @@ cat("    Target covariance matrix computed (", length(calibration_vars), "x",
     length(calibration_vars), ")\n\n")
 
 # ============================================================================
-# Step 4: Load NSCH North Central data (2021-2022 pooled)
+# Step 4: Load NSCH Nebraska + Border States data (2021-2022 pooled)
 # ============================================================================
 
-cat("[5] Loading NSCH North Central data (2021-2022 pooled)...\n")
+cat("[5] Loading NSCH Nebraska + border states data (2021-2022 pooled)...\n")
 
 # Connect to database
 con <- DBI::dbConnect(duckdb::duckdb(), dbdir = "data/duckdb/kidsights_local.duckdb", read_only = TRUE)
@@ -128,22 +132,30 @@ DBI::dbDisconnect(con, shutdown = TRUE)
 cat("    Loaded 2021 :", nrow(nsch_2021), "records\n")
 cat("    Loaded 2022 :", nrow(nsch_2022), "records\n")
 
-# Filter to North Central region, age 0-5, and combine
-# North Central FIPS codes: IA=19, KS=20, MN=27, MO=29, NE=31, ND=38, SD=46
-north_central_fips <- c(19, 20, 27, 29, 31, 38, 46)
+# Filter to Nebraska + bordering states, age 0-5, and combine
+# Nebraska (31) + borders: SD=46, IA=19, MO=29, KS=20, CO=08, WY=56
+nebraska_border_fips <- c(8, 19, 20, 29, 31, 46, 56)  # CO, IA, KS, MO, NE, SD, WY
 
+# Create unified race4 variable before combining years
 nsch_2021_nc <- nsch_2021 %>%
-  dplyr::filter(FIPSST %in% north_central_fips & SC_AGE_YEARS >= 0 & SC_AGE_YEARS <= 5) %>%
-  dplyr::mutate(year = 2021)
+  dplyr::filter(FIPSST %in% nebraska_border_fips & SC_AGE_YEARS >= 0 & SC_AGE_YEARS <= 5) %>%
+  dplyr::mutate(
+    year = 2021,
+    race4 = race4_21  # Rename to unified variable
+  )
 
 nsch_2022_nc <- nsch_2022 %>%
-  dplyr::filter(FIPSST %in% north_central_fips & SC_AGE_YEARS >= 0 & SC_AGE_YEARS <= 5) %>%
-  dplyr::mutate(year = 2022)
+  dplyr::filter(FIPSST %in% nebraska_border_fips & SC_AGE_YEARS >= 0 & SC_AGE_YEARS <= 5) %>%
+  dplyr::mutate(
+    year = 2022,
+    race4 = race4_22  # Rename to unified variable
+  )
 
 nsch_nc <- dplyr::bind_rows(nsch_2021_nc, nsch_2022_nc)
 
-cat("\n    Total North Central records:", nrow(nsch_nc), "\n")
+cat("\n    Total Nebraska + border states records:", nrow(nsch_nc), "\n")
 cat("    Nebraska records:", sum(nsch_nc$FIPSST == 31), "\n")
+cat("    Border states: CO, IA, KS, MO, SD, WY\n")
 cat("    Years:", paste(sort(unique(nsch_nc$year)), collapse = ", "), "\n\n")
 
 # ============================================================================
@@ -170,24 +182,27 @@ nsch_nc$male <- as.integer(nsch_nc$SC_SEX == 1)
 # Age: continuous (0-5 years)
 nsch_nc$age <- nsch_nc$SC_AGE_YEARS
 
-# Race/ethnicity: Use race4 variable (available in both years)
-race4_var <- ifelse("race4_21" %in% names(nsch_nc), "race4_21",
-                    ifelse("race4" %in% names(nsch_nc), "race4", NA))
+# Race/ethnicity: Use unified race4 variable (created during year combination)
+nsch_nc$race_harmonized <- harmonize_nsch_race(nsch_nc$race4)
+race_dummies_nsch <- create_race_dummies(nsch_nc$race_harmonized)
+nsch_nc$white_nh <- race_dummies_nsch$white_nh
+nsch_nc$black <- race_dummies_nsch$black
+nsch_nc$hispanic <- race_dummies_nsch$hispanic
 
-if (!is.na(race4_var)) {
-  nsch_nc$race_harmonized <- harmonize_nsch_race(nsch_nc[[race4_var]])
-  race_dummies_nsch <- create_race_dummies(nsch_nc$race_harmonized)
-  nsch_nc$white_nh <- race_dummies_nsch$white_nh
-  nsch_nc$black <- race_dummies_nsch$black
-  nsch_nc$hispanic <- race_dummies_nsch$hispanic
+# Education: Use A1_GRADE (responding adult's education)
+# Filter to female respondents (proxy for maternal education)
+# A1_SEX: 1=Male, 2=Female, 99=Missing
+if ("A1_GRADE" %in% names(nsch_nc) && "A1_SEX" %in% names(nsch_nc)) {
+  nsch_nc$educ_years <- dplyr::if_else(
+    nsch_nc$A1_SEX == 2,  # Female respondent
+    harmonize_nsch_education_numeric(nsch_nc$A1_GRADE),
+    NA_real_
+  )
+  cat("    ✓ Created educ_years from A1_GRADE (female respondents only)\n")
 } else {
-  stop("ERROR: No race4 variable found in NSCH data")
+  cat("    WARNING: A1_GRADE or A1_SEX not available\n")
+  nsch_nc$educ_years <- NA_real_
 }
-
-# Education: Not available in NSCH - set to median from ACS
-cat("    WARNING: No parent education variable in NSCH\n")
-cat("    Setting educ_years to ACS target median:", round(target_mean[6], 2), "\n")
-nsch_nc$educ_years <- target_mean[6]  # Use ACS target as constant
 
 # Poverty: Use FPL_I1 variable (continuous 50-400, already in % FPL)
 poverty_var <- ifelse("FPL_I1" %in% names(nsch_nc), "FPL_I1",
@@ -200,7 +215,16 @@ if (!is.na(poverty_var)) {
   stop("ERROR: No poverty variable found in NSCH data")
 }
 
-cat("    ✓ Created", length(calibration_vars), "harmonized variables\n\n")
+# Principal city: Harmonize from MPC_YN
+if ("MPC_YN" %in% names(nsch_nc)) {
+  nsch_nc$principal_city <- harmonize_nsch_principal_city(nsch_nc$MPC_YN)
+  cat("    ✓ Created principal_city indicator from MPC_YN\n")
+} else {
+  cat("    WARNING: No MPC_YN variable found\n")
+  nsch_nc$principal_city <- NA_integer_
+}
+
+cat("    ✓ Created", length(calibration_vars) + 1, "Block 1 demographic variables\n\n")
 
 # ============================================================================
 # Step 5: Filter to complete cases
@@ -216,12 +240,12 @@ missing_check <- data.frame(
 rownames(missing_check) <- missing_check$variable
 print(missing_check)
 
-# Filter to complete cases
+# Filter to Block 1 complete cases (demographics)
 nsch_complete <- nsch_nc %>%
   dplyr::filter(
     !is.na(male) & !is.na(age) & !is.na(white_nh) & !is.na(black) &
     !is.na(hispanic) & !is.na(educ_years) & !is.na(poverty_ratio) &
-    !is.na(FWC) & FWC > 0
+    !is.na(principal_city) & !is.na(FWC) & FWC > 0
   )
 
 cat(sprintf("\n    Records with complete data: %d / %d (%.1f%%)\n\n",
@@ -251,13 +275,88 @@ tryCatch({
 })
 
 # ============================================================================
+# Step 6b: Add Block 3 child outcome variables (NSCH-only)
+# ============================================================================
+
+cat("[9b] Adding Block 3 child outcome variables...\n")
+
+# Child ACE EAPsum: Rasch model from 10 child ACE binary indicators
+# ACE1, ACE3-ACE11 (ACE2 not measured in NSCH)
+ace_cols <- c("ACE1", "ACE3", "ACE4", "ACE5", "ACE6", "ACE7", "ACE8", "ACE9", "ACE10", "ACE11")
+
+# Check if ACE variables exist in calibrated data
+ace_available <- all(ace_cols %in% names(calib_result$data))
+
+if (ace_available) {
+  # Create binary indicators from ACE responses (1=Yes, 2=No, 95/99=Missing)
+  ace_binary_data <- calib_result$data %>%
+    dplyr::select(dplyr::all_of(ace_cols)) %>%
+    dplyr::mutate(dplyr::across(dplyr::everything(), ~dplyr::case_when(
+      . == 1 ~ 1L,         # Yes to ACE
+      . == 2 ~ 0L,         # No to ACE
+      . >= 90 ~ NA_integer_,  # Missing codes
+      TRUE ~ NA_integer_
+    )))
+
+  # Count total ACEs (row sums)
+  ace_total <- rowSums(ace_binary_data, na.rm = FALSE)  # NA if any item missing
+
+  # Create two binary indicators:
+  # child_ace_1: exactly 1 ACE (vs 0 or 2+)
+  # child_ace_2plus: 2 or more ACEs (vs 0 or 1)
+  calib_result$data$child_ace_1 <- dplyr::case_when(
+    is.na(ace_total) ~ NA_integer_,
+    ace_total == 1 ~ 1L,
+    TRUE ~ 0L
+  )
+
+  calib_result$data$child_ace_2plus <- dplyr::case_when(
+    is.na(ace_total) ~ NA_integer_,
+    ace_total >= 2 ~ 1L,
+    TRUE ~ 0L
+  )
+
+  n_ace_complete <- sum(!is.na(ace_total))
+  cat(sprintf("    ✓ Child ACE indicators created: %d complete (%.1f%%)\n",
+              n_ace_complete, n_ace_complete / nrow(calib_result$data) * 100))
+  cat(sprintf("      child_ace_1 (exactly 1): %.1f%%\n",
+              mean(calib_result$data$child_ace_1, na.rm = TRUE) * 100))
+  cat(sprintf("      child_ace_2plus (2+): %.1f%%\n",
+              mean(calib_result$data$child_ace_2plus, na.rm = TRUE) * 100))
+} else {
+  cat("    WARNING: ACE variables not available\n")
+  calib_result$data$child_ace_1 <- NA_integer_
+  calib_result$data$child_ace_2plus <- NA_integer_
+}
+
+# Excellent health: Binary indicator from K2Q01 (overall health rating)
+# K2Q01: 1=Excellent, 2=Very good, 3=Good, 4=Fair, 5=Poor, 95/99=Missing
+if ("K2Q01" %in% names(calib_result$data)) {
+  calib_result$data$excellent_health <- dplyr::case_when(
+    calib_result$data$K2Q01 == 1 ~ 1L,  # Excellent health
+    calib_result$data$K2Q01 %in% 2:5 ~ 0L,  # Not excellent
+    calib_result$data$K2Q01 >= 90 ~ NA_integer_,  # Missing
+    TRUE ~ NA_integer_
+  )
+
+  n_excellent <- sum(calib_result$data$excellent_health == 1, na.rm = TRUE)
+  cat(sprintf("    ✓ Excellent health indicator created: %d excellent (%.1f%%)\n\n",
+              n_excellent, n_excellent / nrow(calib_result$data) * 100))
+} else {
+  cat("    WARNING: K2Q01 (health rating) not available\n\n")
+  calib_result$data$excellent_health <- NA_integer_
+}
+
+# ============================================================================
 # Step 7: Save results
 # ============================================================================
 
 cat("[10] Saving calibrated NSCH data...\n")
 
+# Include Block 3 variables in saved data
 nsch_calibrated <- calib_result$data %>%
-  dplyr::select(dplyr::all_of(names(nsch_complete)), calibrated_weight)
+  dplyr::select(dplyr::all_of(names(nsch_complete)), calibrated_weight,
+                child_ace_1, child_ace_2plus, excellent_health)
 
 saveRDS(nsch_calibrated, "data/raking/ne25/nsch_calibrated.rds")
 cat("    ✓ Saved to: data/raking/ne25/nsch_calibrated.rds\n")

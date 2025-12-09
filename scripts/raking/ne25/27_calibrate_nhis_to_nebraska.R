@@ -19,6 +19,7 @@ source("scripts/raking/ne25/utils/harmonize_poverty.R")
 source("scripts/raking/ne25/utils/weighted_covariance.R")
 source("scripts/raking/ne25/utils/validate_raw_inputs.R")
 source("scripts/raking/ne25/utils/calibrate_weights_cmdstan.R")
+source("scripts/raking/ne25/utils/score_mental_health.R")
 cat("    ✓ Utilities loaded\n\n")
 
 # ============================================================================
@@ -52,6 +53,7 @@ acs_ne <- acs_ne %>%
     black = race_dummies$black,
     hispanic = race_dummies$hispanic,
     educ_years = harmonize_acs_education(EDUC_MOM),
+    married = harmonize_acs_marital(MARST_HEAD),
     poverty_ratio = harmonize_acs_poverty(POVERTY)
   )
 
@@ -63,8 +65,9 @@ cat("    ✓ Harmonized variables created\n\n")
 
 cat("[4] Computing target moments from ACS Nebraska...\n")
 
+# Block 1 demographics only (mental health and ACEs not used for calibration)
 calibration_vars <- c("male", "age", "white_nh", "black", "hispanic",
-                      "educ_years", "poverty_ratio")
+                      "educ_years", "married", "poverty_ratio")
 
 # Compute weighted mean vector
 target_mean_list <- list()
@@ -137,10 +140,12 @@ if (!nhis_validation$valid) {
 cat("[7] Creating harmonized demographic variables for NHIS...\n")
 
 # Sex: male indicator (1=Male in NHIS)
-nhis$male <- as.integer(nhis$SEX_child == 1)
+sex_col <- if ("SEX_child" %in% names(nhis)) "SEX_child" else "SEX"
+nhis$male <- as.integer(nhis[[sex_col]] == 1)
 
 # Age: continuous (child age 0-5)
-nhis$age <- nhis$AGE_child
+age_col <- if ("AGE_child" %in% names(nhis)) "AGE_child" else "AGE"
+nhis$age <- nhis[[age_col]]
 
 # Race/ethnicity: Use parent's race if available
 race_var <- ifelse("RACENEW_parent" %in% names(nhis), "RACENEW_parent", "RACENEW")
@@ -177,37 +182,132 @@ if (!is.na(poverty_var)) {
   nhis$poverty_ratio <- NA_real_
 }
 
-cat("    ✓ Created", length(calibration_vars), "harmonized variables\n\n")
+# Marital status: harmonize from PAR1MARST
+if ("PAR1MARST" %in% names(nhis)) {
+  nhis$married <- harmonize_nhis_marital(nhis$PAR1MARST)
+  cat("    ✓ Created married indicator from PAR1MARST\n")
+} else {
+  cat("    WARNING: No marital status variable found (PAR1MARST)\n")
+  nhis$married <- NA_real_
+}
+
+# Principal city: harmonize from METRO
+if ("METRO" %in% names(nhis)) {
+  nhis$principal_city <- harmonize_nhis_principal_city(nhis$METRO)
+  cat("    ✓ Created principal_city indicator from METRO\n")
+} else {
+  cat("    WARNING: No METRO variable found\n")
+  nhis$principal_city <- NA_integer_
+}
+
+cat("    ✓ Created", length(calibration_vars) + 1, "Block 1 demographic variables\n\n")
 
 # ============================================================================
-# Step 7: Filter to complete cases
+# Step 6b: Score mental health variables (Block 2)
 # ============================================================================
 
-cat("[8] Checking for missing values in harmonized variables...\n")
+cat("[7b] Scoring mental health variables (Block 2)...\n")
 
-missing_check <- data.frame(
+# PHQ-2 total score (0-6)
+# IPUMS variables: PHQINTR, PHQDEP (with or without _parent suffix)
+phqintr_var <- ifelse("PHQINTR_parent" %in% names(nhis), "PHQINTR_parent",
+                      ifelse("PHQINTR" %in% names(nhis), "PHQINTR", NA))
+phqdep_var <- ifelse("PHQDEP_parent" %in% names(nhis), "PHQDEP_parent",
+                     ifelse("PHQDEP" %in% names(nhis), "PHQDEP", NA))
+
+if (!is.na(phqintr_var) && !is.na(phqdep_var)) {
+  # Recode IPUMS missing codes to NA
+  nhis$phqintr_recoded <- recode_nhis_mh_item(nhis[[phqintr_var]])
+  nhis$phqdep_recoded <- recode_nhis_mh_item(nhis[[phqdep_var]])
+
+  # Score PHQ-2 total
+  nhis$phq2_total <- score_phq2_total(nhis$phqintr_recoded, nhis$phqdep_recoded)
+
+  n_phq2_complete <- sum(!is.na(nhis$phq2_total))
+  cat(sprintf("    ✓ PHQ-2 total scored (0-6 scale): %d complete (%.1f%%)\n",
+              n_phq2_complete, n_phq2_complete / nrow(nhis) * 100))
+} else {
+  cat("    WARNING: PHQ-2 items not found (PHQINTR, PHQDEP)\n")
+  nhis$phq2_total <- NA_real_
+}
+
+# GAD-2 total score (0-6)
+gadanx_var <- ifelse("GADANX_parent" %in% names(nhis), "GADANX_parent",
+                     ifelse("GADANX" %in% names(nhis), "GADANX", NA))
+gadworctrl_var <- ifelse("GADWORCTRL_parent" %in% names(nhis), "GADWORCTRL_parent",
+                         ifelse("GADWORCTRL" %in% names(nhis), "GADWORCTRL", NA))
+
+if (!is.na(gadanx_var) && !is.na(gadworctrl_var)) {
+  # Recode IPUMS missing codes to NA
+  nhis$gadanx_recoded <- recode_nhis_mh_item(nhis[[gadanx_var]])
+  nhis$gadworctrl_recoded <- recode_nhis_mh_item(nhis[[gadworctrl_var]])
+
+  # Score GAD-2 total
+  nhis$gad2_total <- score_gad2_total(nhis$gadanx_recoded, nhis$gadworctrl_recoded)
+
+  n_gad2_complete <- sum(!is.na(nhis$gad2_total))
+  cat(sprintf("    ✓ GAD-2 total scored (0-6 scale): %d complete (%.1f%%)\n\n",
+              n_gad2_complete, n_gad2_complete / nrow(nhis) * 100))
+} else {
+  cat("    WARNING: GAD-2 items not found (GADANX, GADWORCTRL)\n\n")
+  nhis$gad2_total <- NA_real_
+}
+
+# ============================================================================
+# Step 6c: Score parental ACEs (Block 3)
+# ============================================================================
+# NOTE: Parental ACEs (Block 3) removed from NHIS calibration
+# Reason: ACE questions only asked of sampled adults, not all household adults
+# Parent-child linkage results in mostly 0/NA values (parents weren't sampled adults)
+# NHIS covariance will be limited to Blocks 1-2 (demographics + mental health)
+# ============================================================================
+
+cat("[7c] Skipping parental ACEs (not available for linked parents)...\n")
+cat("    Block 3 (Parental ACEs) excluded from NHIS calibration\n")
+cat("    NHIS will contribute Blocks 1-2 only (demographics + mental health)\n\n")
+
+# ============================================================================
+# Step 7: Filter to Block 1 complete cases (demographics only)
+# ============================================================================
+
+cat("[8] Checking for missing values in Block 1 (demographics)...\n")
+
+missing_check_block1 <- data.frame(
   variable = calibration_vars,
   n_missing = sapply(calibration_vars, function(v) sum(is.na(nhis[[v]]))),
   pct_missing = sapply(calibration_vars, function(v) mean(is.na(nhis[[v]])) * 100)
 )
-rownames(missing_check) <- missing_check$variable
-print(missing_check)
+rownames(missing_check_block1) <- missing_check_block1$variable
+print(missing_check_block1)
 
-# Filter to complete cases
+# Filter to Block 1 complete cases (demographics)
+# Mental health and ACEs allowed to have missing values
+# Detect SAMPWEIGHT column name (with or without _child suffix)
+sampweight_col <- if ("SAMPWEIGHT_child" %in% names(nhis)) "SAMPWEIGHT_child" else "SAMPWEIGHT"
+
 nhis_complete <- nhis %>%
   dplyr::filter(
     !is.na(male) & !is.na(age) & !is.na(white_nh) & !is.na(black) &
-    !is.na(hispanic) & !is.na(educ_years) & !is.na(poverty_ratio) &
-    !is.na(SAMPWEIGHT_child) & SAMPWEIGHT_child > 0
+    !is.na(hispanic) & !is.na(educ_years) & !is.na(married) & !is.na(poverty_ratio) &
+    !is.na(.data[[sampweight_col]]) & .data[[sampweight_col]] > 0
   )
 
-cat(sprintf("\n    Records with complete data: %d / %d (%.1f%%)\n\n",
+cat(sprintf("\n    Records with complete Block 1 (demographics): %d / %d (%.1f%%)\n",
             nrow(nhis_complete), nrow(nhis),
             nrow(nhis_complete) / nrow(nhis) * 100))
 
 if (nrow(nhis_complete) == 0) {
   stop("ERROR: No complete cases after harmonization. Check variable mappings.")
 }
+
+# Report missingness for Block 2 (among Block 1 complete cases)
+cat("\n    Block 2 (Mental Health) missingness:\n")
+cat(sprintf("      phq2_total: %d / %d (%.1f%%)\n",
+            sum(is.na(nhis_complete$phq2_total)), nrow(nhis_complete),
+            mean(is.na(nhis_complete$phq2_total)) * 100))
+cat(sprintf("      gad2_total: %d / %d (%.1f%%)\n\n",
+            sum(is.na(nhis_complete$gad2_total)), nrow(nhis_complete),
+            mean(is.na(nhis_complete$gad2_total)) * 100))
 
 # ============================================================================
 # Step 8: Run calibration (linear fixed effects model)

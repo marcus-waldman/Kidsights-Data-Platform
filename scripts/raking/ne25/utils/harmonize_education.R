@@ -120,23 +120,59 @@ harmonize_nsch_education <- function(educ_cat) {
   )
 }
 
-#' Convert Numeric NSCH Education Code to Years
+#' Convert Numeric NSCH Education Code to Years (A1_GRADE variable)
 #'
-#' Alternative function if NSCH uses numeric education codes (e.g., 1-8)
-#' instead of character labels.
+#' Harmonizes NSCH A1_GRADE (responding adult's education) to years of schooling.
+#' Codes 90-99 (missing/suppressed) are converted to NA.
 #'
-#' @param educ_code Numeric vector (1=Less than HS, 2=HS, 3=Some college, etc.)
+#' @param educ_code Numeric vector (1-9 scale from NSCH A1_GRADE)
 #' @return Numeric vector with years of schooling or NA
 harmonize_nsch_education_numeric <- function(educ_code) {
   dplyr::case_when(
-    educ_code == 1 ~ 10,    # Less than HS
-    educ_code == 2 ~ 12,    # HS graduate
-    educ_code == 3 ~ 13,    # Some college
-    educ_code == 4 ~ 14,    # Associate's
-    educ_code == 5 ~ 16,    # Bachelor's
-    educ_code == 6 ~ 18,    # Master's
-    educ_code == 7 ~ 18.5,  # Professional
-    educ_code == 8 ~ 20,    # Doctorate
+    educ_code == 1 ~ 8,     # 8th grade or less
+    educ_code == 2 ~ 10,    # 9th-12th grade, no diploma
+    educ_code == 3 ~ 12,    # High school graduate or GED
+    educ_code == 4 ~ 13,    # Vocational/trade/business school
+    educ_code == 5 ~ 13,    # Some college credit, no degree
+    educ_code == 6 ~ 14,    # Associate degree (AA, AS)
+    educ_code == 7 ~ 16,    # Bachelor's degree (BA, BS, AB)
+    educ_code == 8 ~ 18,    # Master's degree (MA, MS, MSW, MBA)
+    educ_code == 9 ~ 20,    # Doctorate or professional degree
+    educ_code >= 90 ~ NA_real_,  # Missing codes (90-99)
+    TRUE ~ NA_real_
+  )
+}
+
+#' Convert ACS Marital Status to Binary Married Indicator
+#'
+#' Harmonizes ACS MARST_HEAD variable to binary married indicator.
+#'
+#' @param MARST_HEAD ACS marital status variable (1=Married spouse present,
+#'        2=Married spouse absent, 3=Separated, 4=Divorced, 5=Widowed, 6=Never married)
+#' @return Binary indicator (1=married, 0=not married, NA=missing)
+harmonize_acs_marital <- function(MARST_HEAD) {
+  dplyr::case_when(
+    MARST_HEAD %in% c(1, 2) ~ 1,  # Married (spouse present or absent)
+    MARST_HEAD %in% c(3, 4, 5, 6) ~ 0,  # Not married
+    TRUE ~ NA_real_
+  )
+}
+
+#' Convert NHIS Marital Status to Binary Married Indicator
+#'
+#' Harmonizes NHIS PAR1MARST variable to binary married indicator.
+#' Treats cohabiting (living with partner) as not married.
+#'
+#' @param PAR1MARST NHIS marital status variable
+#'        (0=NIU, 11=Married spouse present, 12=Married spouse absent,
+#'         13=Married spouse absent-other, 20=Widowed, 30=Divorced,
+#'         40=Separated, 50=Never married, 60=Living with partner, 99=Unknown)
+#' @return Binary indicator (1=married, 0=not married, NA=missing/NIU)
+harmonize_nhis_marital <- function(PAR1MARST) {
+  dplyr::case_when(
+    PAR1MARST %in% c(0, 99) ~ NA_real_,  # NIU or Unknown
+    PAR1MARST %in% c(11, 12, 13) ~ 1,    # Married (any type)
+    PAR1MARST %in% c(20, 30, 40, 50, 60) ~ 0,  # Not married
     TRUE ~ NA_real_
   )
 }
