@@ -34,7 +34,8 @@
       "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" -e \"library(duckdb); library(dplyr); con <- dbConnect(duckdb(), ''data/duckdb/kidsights_local.duckdb''); dat <- dbGetQuery(con, ''SELECT cbsa, cbsa_name, urban_rural, puma FROM ne25_transformed WHERE meets_inclusion = TRUE LIMIT 0''); cat(''Schema for geographic variables:\\n''); print(str(dat)); cbsa_vals <- dbGetQuery(con, ''SELECT DISTINCT cbsa, cbsa_name FROM ne25_transformed WHERE meets_inclusion = TRUE ORDER BY cbsa''); cat(''\\n\\nDistinct CBSA values:\\n''); print(cbsa_vals); dbDisconnect(con)\")",
       "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" -e \"library(duckdb); con <- dbConnect(duckdb(), ''data/duckdb/kidsights_local.duckdb''); cbsa_vals <- dbGetQuery(con, ''SELECT DISTINCT cbsa, cbsa_name FROM ne25_transformed WHERE eligible = TRUE ORDER BY cbsa_name''); cat(''Distinct CBSA values in NE25:\\n''); print(cbsa_vals); cat(''\\n''); urban_vals <- dbGetQuery(con, ''SELECT DISTINCT urban_rural FROM ne25_transformed WHERE eligible = TRUE ORDER BY urban_rural''); cat(''\\nDistinct urban_rural values:\\n''); print(urban_vals); dbDisconnect(con)\")",
       "Bash(\"C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe\" -e \"library(duckdb); con <- dbConnect(duckdb(), ''data/duckdb/kidsights_local.duckdb''); cat(''Looking up Omaha and Lincoln CBSAs...\\n''); omaha <- dbGetQuery(con, \"\"SELECT cbsa FROM ne25_transformed WHERE county_name LIKE ''%Douglas%'' AND eligible = TRUE LIMIT 1\"\"); cat(''\\nOmaha metro (Douglas County) CBSA:\\n''); print(omaha); lincoln <- dbGetQuery(con, \"\"SELECT cbsa FROM ne25_transformed WHERE county_name LIKE ''%Lancaster%'' AND eligible = TRUE LIMIT 1\"\"); cat(''\\nLincoln metro (Lancaster County) CBSA:\\n''); print(lincoln); dbDisconnect(con)\")",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
