@@ -5,7 +5,7 @@
 #
 # Overview:
 #   For each imputation m=1 to m=5:
-#     1. Load base NE25 data (eligible=TRUE, n=3,507)
+#     1. Load base NE25 data (meets_inclusion=TRUE, n=2,831)
 #     2. Merge 30 imputed variable tables (geography, sociodem, mental health, ACEs)
 #     3. Harmonize to 13-variable structure (8 Block 1 + 2 Block 2 + 3 Block 3)
 #     4. Validate data quality
@@ -13,7 +13,7 @@
 #
 # Output:
 #   - ne25_harmonized_m1.feather through ne25_harmonized_m5.feather
-#   - Each: 3,507 rows × 16 columns (pid, record_id, study_id + 13 vars)
+#   - Each: 2,831 rows × 16 columns (pid, record_id, study_id + 13 vars)
 #
 # Dependencies:
 #   - ne25_transformed table (base data)
@@ -63,7 +63,7 @@ load_base_ne25 <- function(db_path) {
 
   con <- dbConnect(duckdb(), db_path)
 
-  # Load eligible records with key demographic and outcome variables
+  # Load records with meets_inclusion filter (eligible + non-NA authenticity_weight)
   base_data <- dbGetQuery(con, "
     SELECT
       pid,
@@ -79,7 +79,7 @@ load_base_ne25 <- function(db_path) {
       child_ace_total,
       mmi100
     FROM ne25_transformed
-    WHERE eligible = TRUE
+    WHERE meets_inclusion = TRUE
   ")
 
   # Add constants
@@ -88,7 +88,7 @@ load_base_ne25 <- function(db_path) {
 
   dbDisconnect(con)
 
-  cat(sprintf("    ✓ Loaded %d eligible NE25 records\n", nrow(base_data)))
+  cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
 
   return(as.data.frame(base_data))
 }
