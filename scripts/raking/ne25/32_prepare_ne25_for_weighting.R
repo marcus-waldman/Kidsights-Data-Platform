@@ -235,7 +235,7 @@ range_checks <- list(
   black = c(0, 1),
   hispanic = c(0, 1),
   educ_years = c(2, 20),
-  poverty_ratio = c(0, 999),
+  poverty_ratio = c(50, 400),  # NSCH standard range
   principal_city = c(0, 1),
   phq2_total = c(0, 6),
   gad2_total = c(0, 6),

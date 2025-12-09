@@ -182,8 +182,9 @@ harmonize_ne25_poverty <- function(fpl_observed,
     TRUE ~ NA_real_
   )
 
-  # Cap at 999 to prevent extreme values from dominating covariance
-  poverty_ratio <- pmin(poverty_ratio, 999, na.rm = FALSE)
+  # Cap at NSCH standard range: 50-400% FPL
+  # This matches NSCH's poverty_ratio range for consistency in unified moments
+  poverty_ratio <- pmin(pmax(poverty_ratio, 50, na.rm = FALSE), 400, na.rm = FALSE)
 
   # If FPL missing but income + family_size available, could recalculate
   # (This is optional - currently we rely on observed FPL)
