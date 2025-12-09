@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** January 2025 | **Version:** 3.4.0
+**Last Updated:** December 2025 | **Version:** 3.5.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -476,19 +476,24 @@ pip install pyreadstat
 - **Method:** Rao-Wu-Yue-Beaumont bootstrap with shared design across all 25 ACS estimands
 - **Execution Time:** ~15-20 minutes (4096 replicates, 16 parallel workers)
 
-### ✅ Imputation Pipeline - Production Ready (October 2025)
+### ✅ Imputation Pipeline - Production Ready (December 2025)
 - **Multi-Study Architecture:** Independent studies (ne25, ia26, co27) with shared codebase
 - **Multiple Imputations:** M=5 imputations (easily scalable to M=20+)
-- **Inclusion Criteria:** Uses `meets_inclusion` filter (eligible + non-NA authenticity_weight) - **2,831 participants** for ne25
-- **Geographic Variables:** 878 PUMA, 1,054 county, 3,164 census tract imputations (ne25)
-- **Sociodemographic Variables:** 7 variables imputed via mice (female, raceG, educ_mom, educ_a2, income, family_size, fplcat)
+- **Inclusion Criteria:** Uses `meets_inclusion` filter (eligible=TRUE & influential=FALSE & too_few_item_responses=FALSE) - **2,785 participants** for ne25
+- **Geographic Variables:** 3 variables via probabilistic allocation (PUMA, County, Census Tract)
+- **Sociodemographic Variables:** 6 variables via MICE (female, raceG, educ_mom, educ_a2, income, family_size)
 - **Childcare Variables:** 4 variables via 3-stage sequential imputation (cc_receives_care, cc_primary_type, cc_hours_per_week, childcare_10hrs_nonfamily)
 - **Mental Health & Parenting:** 7 variables via CART imputation (phq2_interest, phq2_depressed, gad2_nervous, gad2_worry, q1502, phq2_positive, gad2_positive)
 - **Child ACEs:** 9 variables via random forest imputation (8 ACE items + child_ace_total)
-- **Storage Efficiency:** Study-specific variable tables (`{study_id}_imputed_{variable}`) with **storage convention:** only imputed/derived values stored
-- **Language Support:** Python native + R via reticulate (single source of truth)
-- **Database:** 85,746 total imputation rows (25,480 geography + 26,438 sociodem + 30,658 childcare + 825 mental health + 2,345 child ACEs) for ne25
-- **Execution Time:** ~3 minutes for complete pipeline (11 stages)
+- **Storage Pattern:** Study-specific variable tables (`ne25_imputed_{variable}`) with **storage convention:** only imputed/derived values stored (observed values remain in base table)
+- **Total Variables:** 29 imputed variables (3 geo + 6 sociodem + 4 childcare + 7 mental health + 9 ACEs)
+- **Database Tables:** 32 imputation tables created with 5 imputations each (M=5)
+- **Execution Time:** 195.2 seconds (3.3 minutes) for complete 11-stage pipeline
+- **Recent Updates (December 2025):**
+  - Removed `authentic` column references (replaced by `authenticity_weight` in NE25 pipeline)
+  - Updated inclusion criteria to triple-criterion filter: eligible=TRUE & influential=FALSE & too_few_items=FALSE
+  - Verified all 11 stages execute successfully with proper database insertions
+  - Child ACEs stage validated: 2,585 total rows across 9 ACE tables with binary/valid range checks passing
 
 ### 🚧 IRT Calibration Pipeline - In Development (November 2025)
 - **Multi-Study Dataset:** 47,084 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
