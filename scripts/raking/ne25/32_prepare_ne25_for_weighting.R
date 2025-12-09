@@ -163,15 +163,15 @@ merge_imputations_m <- function(base_data, db_path, m) {
 harmonize_block1 <- function(data_m) {
   cat("      Harmonizing Block 1 (demographics)...\n")
 
-  # Handle observed vs imputed preference for base variables
-  # Prefer observed from base table, use imputed if missing
+  # Note: safe_left_join with auto_fix=TRUE removes duplicate columns from the
+  # imputed table to avoid .x/.y suffixes. After merge, only the base versions
+  # of female, raceG, educ_mom exist (either observed or imputed, not both).
+  # The coalesce logic is already handled by the merge strategy.
 
   harmonized_block1 <- dplyr::tibble(
-    # Use base female if available, else imputed
-    female = coalesce(data_m$female.x, data_m$female.y),
+    female = data_m$female,
     years_old = data_m$years_old,
-    # Use base raceG if available, else imputed
-    raceG = coalesce(data_m$raceG.x, data_m$raceG.y),
+    raceG = data_m$raceG,
     educ_mom = data_m$educ_mom,
     fpl = data_m$fpl,
     cbsa = data_m$cbsa
