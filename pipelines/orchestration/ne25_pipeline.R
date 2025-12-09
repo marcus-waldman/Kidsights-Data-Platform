@@ -77,6 +77,7 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   6. Eligibility validation
 #'   6.5. Join manual influential observations (if available)
 #'   7. Store transformed data
+#'   7.5. Join calibrated KL divergence weights (if available)
 #'   8. Generate variable metadata
 #'   9. Generate data dictionary
 #'
@@ -93,6 +94,17 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   1. Run manual influence diagnostics workflow
 #'   2. Save influential observations to database
 #'   3. Re-run pipeline to incorporate influential flags
+#'
+#' @section Calibrated Weights:
+#' Step 7.5 optionally joins KL divergence calibrated weights from
+#' `data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather` if the file exists.
+#' If weights are not available, the pipeline continues normally without them.
+#'
+#' To generate calibrated weights:
+#'   1. Run raking targets pipeline (scripts 25-30b)
+#'   2. Run harmonization (script 32)
+#'   3. Run weight estimation (script 33)
+#'   4. Re-run NE25 pipeline to automatically integrate weights
 #'
 #' @return List with execution results and metrics
 run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
@@ -778,6 +790,52 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("Transformed data stored successfully")
     }
     metrics$records_transformed <- nrow(final_data)
+
+    # STEP 7.5: OPTIONAL - JOIN CALIBRATED WEIGHTS IF AVAILABLE
+    message("\n--- Step 7.5: Checking for Calibrated Weights ---")
+    weights_file <- "data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather"
+
+    if (file.exists(weights_file)) {
+      message("Found calibrated weights file. Attempting to join...")
+
+      tryCatch({
+        # Load weights
+        weights_data <- arrow::read_feather(weights_file)
+
+        # Extract weight column and join key
+        weights_to_join <- weights_data %>%
+          dplyr::select(pid, record_id, calibrated_weight)
+
+        message(sprintf("  - Loaded %d weight records", nrow(weights_to_join)))
+
+        # Join to final_data via (pid, record_id)
+        n_before <- nrow(final_data)
+        final_data <- final_data %>%
+          dplyr::left_join(
+            weights_to_join,
+            by = c("pid", "record_id"),
+            relationship = "one-to-one"
+          )
+
+        n_matched <- sum(!is.na(final_data$calibrated_weight))
+        message(sprintf("  - Matched weights to %d records (%.1f%% of %d total)",
+                       n_matched, 100 * n_matched / n_before, n_before))
+
+        if (n_matched < n_before) {
+          message(sprintf("  - WARNING: %d records have no matching weight", n_before - n_matched))
+        }
+
+        message("  ✓ Calibrated weights successfully joined to transformed data")
+
+      }, error = function(e) {
+        message(paste("  ✗ Error joining weights:", e$message))
+        message("  Continuing without weights")
+      })
+    } else {
+      message("  - No calibrated weights file found. Continuing without weights.")
+      message(sprintf("    Expected location: %s", weights_file))
+      message("    To generate weights, run scripts 25-33 in the raking pipeline.")
+    }
 
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
