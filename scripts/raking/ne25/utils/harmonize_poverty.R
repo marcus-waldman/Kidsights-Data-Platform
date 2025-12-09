@@ -43,26 +43,38 @@ harmonize_nhis_poverty <- function(poverty_code) {
 # We bin it into NHIS-compatible categories and assign midpoint values
 # This creates comparable distributions for calibration
 
-harmonize_acs_poverty <- function(poverty_pct) {
-  # Bin continuous poverty percentages into NHIS-compatible categories
-  # and assign same midpoint values as NHIS harmonization
+harmonize_acs_poverty <- function(poverty_pct, cap_at_400 = FALSE) {
+  # ACS POVERTY is continuous (1-501 representing % of FPL)
+  #
+  # For NHIS calibration: Bin into categorical midpoints to match NHIS coding
+  # For NSCH calibration: Keep continuous, cap at 400 to match NSCH FPL_I1 range (50-400)
 
-  dplyr::case_when(
-    is.na(poverty_pct) ~ NA_real_,
-    poverty_pct < 50 ~ 25,      # Under 0.50 → 25% FPL
-    poverty_pct < 75 ~ 62,      # 0.50 to 0.74 → 62% FPL
-    poverty_pct < 100 ~ 87,     # 0.75 to 0.99 → 87% FPL
-    poverty_pct < 125 ~ 112,    # 1.00 to 1.24 → 112% FPL
-    poverty_pct < 150 ~ 137,    # 1.25 to 1.49 → 137% FPL
-    poverty_pct < 175 ~ 162,    # 1.50 to 1.74 → 162% FPL
-    poverty_pct < 200 ~ 187,    # 1.75 to 1.99 → 187% FPL
-    poverty_pct < 250 ~ 225,    # 2.00 to 2.49 → 225% FPL
-    poverty_pct < 300 ~ 275,    # 2.50 to 2.99 → 275% FPL
-    poverty_pct < 350 ~ 325,    # 3.00 to 3.49 → 325% FPL
-    poverty_pct < 400 ~ 375,    # 3.50 to 3.99 → 375% FPL
-    poverty_pct < 450 ~ 425,    # 4.00 to 4.49 → 425% FPL
-    poverty_pct < 500 ~ 475,    # 4.50 to 4.99 → 475% FPL
-    poverty_pct >= 500 ~ 501,   # 5.00 and over → 501% FPL (top-code)
-    TRUE ~ NA_real_
-  )
+  if (cap_at_400) {
+    # Keep continuous, cap at 400 for NSCH compatibility
+    dplyr::case_when(
+      is.na(poverty_pct) ~ NA_real_,
+      poverty_pct > 400 ~ 400,  # Cap at 400% FPL to match NSCH range
+      TRUE ~ poverty_pct         # Otherwise keep original value
+    )
+  } else {
+    # Bin into NHIS-compatible categorical midpoints
+    dplyr::case_when(
+      is.na(poverty_pct) ~ NA_real_,
+      poverty_pct < 50 ~ 25,      # Under 0.50 → 25% FPL
+      poverty_pct < 75 ~ 62,      # 0.50 to 0.74 → 62% FPL
+      poverty_pct < 100 ~ 87,     # 0.75 to 0.99 → 87% FPL
+      poverty_pct < 125 ~ 112,    # 1.00 to 1.24 → 112% FPL
+      poverty_pct < 150 ~ 137,    # 1.25 to 1.49 → 137% FPL
+      poverty_pct < 175 ~ 162,    # 1.50 to 1.74 → 162% FPL
+      poverty_pct < 200 ~ 187,    # 1.75 to 1.99 → 187% FPL
+      poverty_pct < 250 ~ 225,    # 2.00 to 2.49 → 225% FPL
+      poverty_pct < 300 ~ 275,    # 2.50 to 2.99 → 275% FPL
+      poverty_pct < 350 ~ 325,    # 3.00 to 3.49 → 325% FPL
+      poverty_pct < 400 ~ 375,    # 3.50 to 3.99 → 375% FPL
+      poverty_pct < 450 ~ 425,    # 4.00 to 4.49 → 425% FPL
+      poverty_pct < 500 ~ 475,    # 4.50 to 4.99 → 475% FPL
+      poverty_pct >= 500 ~ 501,   # 5.00 and over → 501% FPL (top-code)
+      TRUE ~ NA_real_
+    )
+  }
 }
