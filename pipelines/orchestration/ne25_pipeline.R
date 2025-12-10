@@ -1125,16 +1125,89 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     message("\n--- Step 7.8: Joining HRTL Domain Scores ---")
     hrtl_join_start <- Sys.time()
 
-    # HRTL scores are now available in database tables:
-    # - ne25_hrtl_domain_scores: 4 domains × ~1,886 children = ~7,544 records
-    # - ne25_hrtl_overall: Summary stats per child (1,886 records)
-    # These tables are indexed by pid + record_id for efficient querying
-    message("  - HRTL domain and overall scores saved to database tables")
-    message("  - Access via: SELECT * FROM ne25_hrtl_domain_scores WHERE pid = ? AND record_id = ?")
-    message("  - Tables indexed on (pid, record_id, domain) for efficient lookups")
+    tryCatch({
+      # Load HRTL tables from database
+      hrtl_con <- duckdb::dbConnect(duckdb::duckdb(),
+                                    dbdir = "data/duckdb/kidsights_local.duckdb",
+                                    read_only = TRUE)
+
+      message("  - Loading HRTL domain scores from database...")
+      hrtl_domain_scores <- DBI::dbGetQuery(hrtl_con, "SELECT * FROM ne25_hrtl_domain_scores")
+
+      message("  - Loading overall HRTL from database...")
+      hrtl_overall <- DBI::dbGetQuery(hrtl_con, "SELECT pid, record_id, n_on_track, n_needs_support, hrtl FROM ne25_hrtl_overall")
+
+      duckdb::dbDisconnect(hrtl_con, shutdown = TRUE)
+
+      # Pivot domain scores to wide format (one row per child, columns per domain)
+      # Columns: early_learning_classification, health_classification, etc.
+      hrtl_wide <- hrtl_domain_scores %>%
+        tidyr::pivot_wider(
+          id_cols = c(pid, record_id),
+          names_from = domain,
+          values_from = c(classification, avg_code),
+          names_glue = "{tolower(gsub(' ', '_', domain))}_{.value}"
+        )
+
+      # Rename columns to be more readable
+      names(hrtl_wide) <- tolower(gsub("_classification", "", gsub("_avg_code", "_score", names(hrtl_wide))))
+
+      # Join domain scores to final_data
+      message("  - Joining HRTL domain scores to final_data...")
+      final_data <- final_data %>%
+        safe_left_join(
+          hrtl_wide,
+          by_vars = c("pid", "record_id")
+        )
+
+      # Join overall HRTL to final_data
+      message("  - Joining overall HRTL to final_data...")
+      final_data <- final_data %>%
+        safe_left_join(
+          hrtl_overall,
+          by_vars = c("pid", "record_id")
+        )
+
+      message(sprintf("  - HRTL columns added: %d children with scores",
+                     sum(!is.na(final_data$hrtl), na.rm = TRUE)))
+
+    }, error = function(e) {
+      warning(paste("Failed to join HRTL scores:", e$message))
+      message("  - Continuing without HRTL joins")
+    })
 
     hrtl_join_time <- as.numeric(Sys.time() - hrtl_join_start)
     message(paste("HRTL join completed in", round(hrtl_join_time, 2), "seconds"))
+
+    # Write updated final_data with HRTL joins back to ne25_transformed
+    message("  - Writing updated ne25_transformed with HRTL joins...")
+    tryCatch({
+      # Write the updated final_data as feather and reload into database
+      transformed_feather_updated <- file.path(temp_dir, "ne25_transformed_with_hrtl.feather")
+      arrow::write_feather(final_data, transformed_feather_updated)
+
+      # Use Python to update the database (replace mode)
+      update_result <- system2(
+        python_path,
+        args = c(
+          "pipelines/python/insert_raw_data.py",
+          "--data-file", transformed_feather_updated,
+          "--table-name", "ne25_transformed",
+          "--data-type", "raw",
+          "--config", config_path
+        ),
+        stdout = TRUE,
+        stderr = TRUE
+      )
+
+      if (attr(update_result, "status") != 0 && !is.null(attr(update_result, "status"))) {
+        warning(paste("HRTL update had issues:", paste(update_result, collapse = "\n")))
+      } else {
+        message("  - ne25_transformed successfully updated with HRTL scores")
+      }
+    }, error = function(e) {
+      warning(paste("Failed to update ne25_transformed with HRTL:", e$message))
+    })
 
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
