@@ -1,8 +1,8 @@
 # NE25 Data Dictionary
 
-**Generated:** 2025-12-09 11:39:30  
+**Generated:** 2025-12-09 18:17:57  
 **Total Records:** 4966  
-**Total Variables:** 684  
+**Total Variables:** 660  
 **Categories:** 16  
 
 ## Overview
@@ -24,7 +24,7 @@ for race/ethnicity, education categories, and other demographic variables.
 - [Childcare](#childcare) (21 variables)
 - [Coglan](#coglan) (79 variables)
 - [Eligibility](#eligibility) (1 variables)
-- [Geography](#geography) (28 variables)
+- [Geography](#geography) (4 variables)
 - [Mental_Health](#mental_health) (10 variables)
 - [Motor](#motor) (74 variables)
 - [Other](#other) (329 variables)
@@ -335,40 +335,16 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 **Description:** No description available
 
-**Variables:** 28  
-**Average Missing:** 34.3%  
-**Data Types:** 8 factors, 3 numeric, 0 logical, 17 character
+**Variables:** 4  
+**Average Missing:** 6.4%  
+**Data Types:** 1 factors, 3 numeric, 0 logical, 0 character
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
-| `aiannh_afact` | ZIP to AIANNH allocation factor(s) - semicolon-separated, ordered by likelihood | factor | 98.3% | 1 (0.0006 ), 2 (0.0044 ), 3 (0.006 ), 4 (0.0063 ), 5 (0.0161 )... |
-| `aiannh_code` | Native lands (AIANNH) code(s) - semicolon-separated if ZIP spans multiple areas (2021) | factor | 98.3% | 1 (1590), 2 (2550), 3 (2550; 4625), 4 (2625), 5 (2810)... |
-| `aiannh_name` | Native lands (AIANNH) name(s) - semicolon-separated if ZIP spans multiple areas | factor | 98.3% | 1 (Cherokee Tribe of Northeast Alabama SDTSA), 2 (Chickasaw OTSA), 3 (Choctaw OTSA), 4 (Iowa (KS-NE) Reservation / Off-Reservation Trust Land), 5 (Omaha Reservation)... |
-| `cbsa` | Core-Based Statistical Area code(s) - semicolon-separated if ZIP spans multiple CBSAs | character | 27.9% | N/A |
-| `cbsa_afact` | ZIP to CBSA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 27.9% | N/A |
-| `cbsa_name` | CBSA name(s) - semicolon-separated if ZIP spans multiple CBSAs | character | 27.9% | N/A |
-| `congress_afact` | ZIP to congressional district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
-| `congress_dist` | US Congressional district code(s) - semicolon-separated if ZIP spans multiple districts (119th Congress) | factor | 31.3% | 1 (01), 2 (01; 02), 3 (01; 02; 03), 4 (01; 03), 5 (02)... |
-| `county` | County FIPS code(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
-| `county_afact` | ZIP to county allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
-| `county_name` | County name(s) - semicolon-separated if ZIP spans multiple counties | character | 31.3% | N/A |
 | `eqstate` | Do you and your child currently live in the state of Nebraska? | numeric | 25.5% | N/A |
-| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251209_113751) |
-| `puma` | Public Use Microdata Area(s) - semicolon-separated if ZIP spans multiple PUMAs (2020 Census) | character | 31.3% | N/A |
-| `puma_afact` | ZIP to PUMA allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
-| `school_afact` | ZIP to school district allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
-| `school_dist` | School district code(s) - semicolon-separated if ZIP spans multiple districts (2020) | character | 31.3% | N/A |
-| `school_name` | School district name(s) - semicolon-separated if ZIP spans multiple districts | character | 31.3% | N/A |
-| `sldl` | State legislative district (lower/house) code(s) - semicolon-separated if ZIP spans multiple districts (2024) | factor | 31.3% | 1 ( ) |
-| `sldl_afact` | ZIP to state leg lower allocation factor(s) - semicolon-separated, ordered by likelihood | factor | 31.3% | 1 (0.2759 ), 2 (0.7528 ), 3 (0.8492 ), 4 (0.8945 ), 5 (0.9756 )... |
-| `sldu` | State legislative district (upper/senate) code(s) - semicolon-separated if ZIP spans multiple districts (2024) | character | 31.3% | N/A |
-| `sldu_afact` | ZIP to state leg upper allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
+| `extraction_id` | Extraction Id | factor | 0.0% | 1 (ne25_20251209_181621) |
 | `state_law_prohibits_sending_compensation_electronically___1` | State Law Prohibits Sending Compensation Electronically   1 | numeric | 0.0% | N/A |
 | `state_law_requires_that_kidsights_data_collect_my_name___1` | State Law Requires That Kidsights Data Collect My Name   1 | numeric | 0.0% | N/A |
-| `tract` | Census tract FIPS code(s) - semicolon-separated if ZIP spans multiple tracts | character | 31.3% | N/A |
-| `tract_afact` | ZIP to census tract allocation factor(s) - semicolon-separated, ordered by likelihood | character | 31.3% | N/A |
-| `urban_rural` | Urban/Rural classification(s) (U=Urban, R=Rural) - semicolon-separated if ZIP is mixed (2022 Census) | factor | 27.9% | 1 (R), 2 (R; U), 3 (U), 4 (U; R) |
-| `urban_rural_afact` | Urban/Rural allocation factor(s) - semicolon-separated, ordered by likelihood | character | 27.9% | N/A |
 
 ## Mental_Health
 
@@ -486,6 +462,7 @@ For example, can this child come up with the words "sock" and "sun"? | numeric |
 
 | Variable | Label | Type | Missing | Details |
 |----------|-------|------|---------|---------|
+| `calibrated_weight` | Calibrated Weight | numeric | 43.9% | N/A |
 | `cfqb001` | In general, how is your physical health? | numeric | 36.3% | N/A |
 | `cname1` | What is this child's name? (First name or nickname ONLY)
 
@@ -856,7 +833,6 @@ Please enter a number, such as 20. | character | 64.7% | N/A |
 | `sq003` | Are you of Hispanic, Latino or Spanish origin? | numeric | 36.4% | N/A |
 | `survey_stop` | survey Stop | numeric | 99.4% | N/A |
 | `too_few_item_responses` | Too Few Item Responses | logical | 85.5% | N/A |
-| `urban_pct` | Percentage of ZIP population in urban areas (0-100) | numeric | 27.9% | N/A |
 
 ## Psychosocial_Problems_General
 
