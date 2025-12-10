@@ -138,10 +138,11 @@ cat(sprintf("    ✓ Extracted first PUMA for %d records\n",
 cat("\n[3] Imputing missing values using CART...\n")
 
 # Prepare data for mice
-# Exclude CBSA from imputation (it's already preprocessed)
+# Include puma_clean for imputation (geographic data needs to be imputed)
+# Exclude CBSA from imputation (not needed for calibration)
 # Exclude identifiers
 impute_data <- base_data %>%
-  dplyr::select(years_old, female, raceG, educ_mom, fpl,
+  dplyr::select(years_old, female, raceG, educ_mom, fpl, puma_clean,
                 phq2_total, gad2_total, child_ace_total, mmi100)
 
 # Run mice with CART method, M=1 imputation
@@ -161,11 +162,11 @@ cat("    ✓ Imputation complete\n")
 # Extract completed data
 imputed_data <- mice::complete(imputed, 1)
 
-# Add back identifiers, CBSA, and PUMA
+# Add back identifiers and CBSA
 imputed_data$pid <- base_data$pid
 imputed_data$record_id <- base_data$record_id
-imputed_data$cbsa <- base_data$cbsa_clean  # Use preprocessed CBSA
-imputed_data$puma <- base_data$puma_clean  # Use preprocessed PUMA
+imputed_data$cbsa <- base_data$cbsa_clean  # Use preprocessed CBSA (not imputed)
+# puma_clean now comes from imputed_data (imputed if necessary)
 imputed_data$study_id <- "ne25"
 imputed_data$authenticity_weight <- 1.0  # Placeholder
 
@@ -205,7 +206,7 @@ block1_demo_full <- harmonize_ne25_block1(block1_input)
 block1_demo <- dplyr::select(block1_demo_full, -principal_city)  # 7 variables
 
 # Harmonize PUMA to 14 binary dummies (ACS-only)
-block1_puma <- harmonize_puma(imputed_data$puma)  # 14 variables
+block1_puma <- harmonize_puma(imputed_data$puma_clean)  # 14 variables (now imputed)
 
 # Combine: demographics (1-7) + PUMA (8-21) = 21 variables
 block1 <- dplyr::bind_cols(block1_demo, block1_puma)
