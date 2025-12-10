@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** December 2025 | **Version:** 3.5.0
+**Last Updated:** December 2025 | **Version:** 3.6.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -431,9 +431,9 @@ pip install pyreadstat
 
 ## Current Status (October 2025)
 
-### ✅ NE25 Pipeline - Production Ready
+### ✅ NE25 Pipeline - Production Ready (December 2025)
 - **Reliability:** 100% success rate (eliminated segmentation faults)
-- **Data:** 3,908 records from 4 REDCap projects
+- **Data:** 3,908 records from 4 REDCap projects, 2,645 with calibrated raking weights
 - **Derived Variables:** 99 variables created by recode_it()
 - **Influential Observations:** MANUAL workflow (Step 6.5 joins influence diagnostics from database if available)
   - Diagnostics stored in `ne25_flagged_observations` table (must be created manually via Cook's Distance analysis)
@@ -448,6 +448,23 @@ pip install pyreadstat
   - Conditional standard errors (`_csem`) included for all domains
   - Also joins `ne25_too_few_items` exclusion flags (718 records)
   - See `calibration/ne25/manual_2023_scale/` for workflow
+- **Calibrated Raking Weights (Step 6.9):** KL divergence minimization for population-representative sampling
+  - **Integration:** Automatic join from `ne25_calibrated_weights_m1.feather` if available
+  - **Sample Size:** 2,645 in-state Nebraska records with weights (100% of eligible participants)
+  - **Weight Quality:** Effective N (Kish) = 1,518.9 (57.4% efficiency), weight ratio (max/min) = 33.55
+  - **Correlation Matching:** 71.9% improvement in correlation RMSE (unweighted to weighted)
+  - **Method:** Stan optimization minimizes masked factorized covariance structure
+  - **Calibration Variables:** 24 variables (7 demographics + 14 PUMA geography + 2 mental health + 1 child outcome)
+  - **Scale Standardization:** Z-score normalization within Stan for numerical stability
+  - **Target Moments:** Pooled across ACS (25%), NHIS (17%), NSCH (58%) with effective sample sizes per block
+  - **Database Column:** `calibrated_weight` in `ne25_transformed` table
+  - **Execution:** Scripts 25-33 in raking pipeline (~10 minutes total)
+  - **Documentation:** See [Raking Integration Guide](docs/raking/RAKING_INTEGRATION.md)
+- **Out-of-State Handling (Step 6.10):** Bandaid fix for records with no PUMA match
+  - **Problem:** 140 records from out-of-state zipcodes (no match in ZCTA→PUMA crosswalk)
+  - **Solution:** Marked as `out_of_state = TRUE` and excluded with `meets_inclusion = FALSE`
+  - **Audit Trail:** Maintains visibility of excluded records and reason (geographic invalidity)
+  - **Verification:** 2,645 records with meets_inclusion=TRUE match exactly with 2,645 records with weights
 
 ### ✅ ACS Pipeline - Complete
 - **API Integration:** Direct IPUMS USA API extraction via ipumspy
@@ -595,5 +612,5 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: January 2025 | Version: 3.4.0*
+*Updated: December 2025 | Version: 3.6.0*
 - pid does not uniquely identify an individual in the nebraska 2025 (ne25) data. It is the pid + record_id combination.

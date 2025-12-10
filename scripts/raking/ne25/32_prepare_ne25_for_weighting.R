@@ -1,23 +1,25 @@
 # ==============================================================================
 # Script: 32_prepare_ne25_for_weighting.R
 # Purpose: Create M=1 harmonized NE25 dataset matching unified moment structure
-#          for KL divergence weighting using single CART imputation
+#          for KL divergence weighting using database-imputed PUMA + CART
 #
 # Overview:
 #     1. Load base NE25 data (meets_inclusion=TRUE, n=2,785)
-#     2. Preprocess CBSA and PUMA (extract first value from semicolon-delimited strings)
-#     3. Impute missing values using CART (mice package, M=1)
-#     4. Harmonize to 24-variable structure (7 demo + 14 PUMA + 2 mental health + 1 outcome)
-#     5. Validate data quality
-#     6. Save ne25_harmonized_m1.feather
+#     2. Join imputed PUMA from ne25_imputed_puma table (M=1)
+#     3. Preprocess CBSA (extract first value from semicolon-delimited strings)
+#     4. Impute remaining missing values using CART (mice package, M=1)
+#     5. Harmonize to 24-variable structure (7 demo + 14 PUMA + 2 mental health + 1 outcome)
+#     6. Validate data quality
+#     7. Save ne25_harmonized_m1.feather
 #
 # Output:
 #   - ne25_harmonized_m1.feather (2,785 rows × 27 columns)
 #   - Columns: pid, record_id, study_id + 24 harmonized variables
 #
 # Dependencies:
-#   - ne25_transformed table (base data)
-#   - mice package (for CART imputation)
+#   - ne25_transformed table (base data without geography)
+#   - ne25_imputed_puma table (from imputation pipeline)
+#   - mice package (for CART imputation of non-geographic variables)
 #   - harmonize_puma.R (PUMA binary dummies)
 #   - harmonize_ne25_demographics.R
 #   - harmonize_ne25_outcomes.R
@@ -55,26 +57,24 @@ cat("Phase 1: Prepare NE25 for KL Weighting\n")
 cat("========================================\n\n")
 
 # ==============================================================================
-# SECTION 1: Load Base NE25 Data
+# SECTION 1: Load Base NE25 Data and Derive PUMA from ZIP Code
 # ==============================================================================
 
-cat("[1] Loading base NE25 data...\n")
+cat("[1] Loading base NE25 data with ZIP codes...\n")
 
 con <- dbConnect(duckdb(), db_path)
 
-# Load records with meets_inclusion filter
-# Select only variables needed for harmonization
+# Load records with meets_inclusion filter including sq001 (ZIP code)
 base_data <- dbGetQuery(con, "
   SELECT
     pid,
     record_id,
+    sq001 as zipcode,
     years_old,
     female,
     raceG,
     educ_mom,
     fpl,
-    cbsa,
-    puma,
     phq2_total,
     gad2_total,
     child_ace_total,
@@ -83,9 +83,107 @@ base_data <- dbGetQuery(con, "
   WHERE meets_inclusion = TRUE
 ")
 
+cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
+
+# ==============================================================================
+# SECTION 1.1: Join PUMA from ZIP Code Crosswalk
+# ==============================================================================
+
+cat("\n[1.1] Deriving PUMA from ZIP codes...\n")
+
+# Query geo_zip_to_puma crosswalk
+zip_to_puma <- dbGetQuery(con, "
+  SELECT
+    zcta as zipcode,
+    puma22 as puma,
+    afact,
+    ROW_NUMBER() OVER (PARTITION BY zcta ORDER BY afact DESC) as puma_rank
+  FROM geo_zip_to_puma
+")
+
+# Count ZIPs with single vs multiple PUMAs
+zip_puma_counts <- zip_to_puma %>%
+  dplyr::group_by(zipcode) %>%
+  dplyr::summarise(n_pumas = dplyr::n(), .groups = "drop")
+
+n_single_puma_zips <- sum(zip_puma_counts$n_pumas == 1)
+n_multi_puma_zips <- sum(zip_puma_counts$n_pumas > 1)
+
+cat(sprintf("    Crosswalk: %d ZIPs with single PUMA, %d ZIPs with multiple PUMAs\n",
+            n_single_puma_zips, n_multi_puma_zips))
+
+# For deterministic matching, take highest afact PUMA for each ZIP
+zip_to_puma_primary <- zip_to_puma %>%
+  dplyr::filter(puma_rank == 1) %>%
+  dplyr::select(zipcode, puma, afact)
+
+# Join primary PUMA to base data
+base_data <- base_data %>%
+  dplyr::mutate(zipcode = as.character(zipcode)) %>%
+  dplyr::left_join(zip_to_puma_primary, by = "zipcode")
+
+n_puma_from_zip <- sum(!is.na(base_data$puma))
+cat(sprintf("    ✓ Matched PUMA from ZIP for %d/%d records (%.1f%%)\n",
+            n_puma_from_zip, nrow(base_data),
+            100 * n_puma_from_zip / nrow(base_data)))
+
+# ==============================================================================
+# SECTION 1.2: Use Imputed PUMA for Ambiguous Cases
+# ==============================================================================
+
+cat("\n[1.2] Using imputed PUMA for ambiguous ZIP-to-PUMA mappings...\n")
+
+# Load imputed PUMA for records with multiple possible PUMAs
+imputed_puma <- dbGetQuery(con, "
+  SELECT
+    pid,
+    record_id,
+    puma as puma_imputed
+  FROM ne25_imputed_puma
+  WHERE imputation_m = 1
+")
+
+cat(sprintf("    ✓ Loaded %d imputed PUMA records (for ambiguous cases)\n",
+            nrow(imputed_puma)))
+
 dbDisconnect(con)
 
-cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
+# Join imputed PUMA
+base_data <- base_data %>%
+  dplyr::left_join(imputed_puma, by = c("pid", "record_id"))
+
+# Use imputed PUMA if available (for ambiguous cases), otherwise use ZIP-derived PUMA
+base_data <- base_data %>%
+  dplyr::mutate(
+    puma_final = dplyr::coalesce(puma_imputed, puma),
+    puma_source = dplyr::case_when(
+      !is.na(puma_imputed) ~ "imputed",
+      !is.na(puma) ~ "zipcode",
+      TRUE ~ "missing"
+    )
+  )
+
+# Report PUMA coverage
+puma_summary <- base_data %>%
+  dplyr::group_by(puma_source) %>%
+  dplyr::summarise(count = dplyr::n(), .groups = "drop")
+
+cat("\n    PUMA derivation summary:\n")
+for (i in 1:nrow(puma_summary)) {
+  cat(sprintf("      %s: %d records\n",
+              puma_summary$puma_source[i],
+              puma_summary$count[i]))
+}
+
+# Replace puma with final derived value
+base_data$puma <- base_data$puma_final
+base_data <- base_data %>%
+  dplyr::select(-puma_imputed, -puma_final, -puma_source, -afact)
+
+n_puma_final <- sum(!is.na(base_data$puma))
+cat(sprintf("\n    ✓ Final PUMA coverage: %d/%d records (%.1f%%)\n",
+            n_puma_final, nrow(base_data),
+            100 * n_puma_final / nrow(base_data)))
 
 # Report missing data before imputation
 cat("\n[1.1] Missing data summary (before imputation):\n")
@@ -96,39 +194,15 @@ for (var in names(missing_counts)[missing_counts > 0]) {
 }
 
 # ==============================================================================
-# SECTION 2: Preprocess CBSA (Extract First Value from Semicolon-Delimited)
+# SECTION 2: Prepare PUMA for Harmonization
 # ==============================================================================
 
-cat("\n[2] Preprocessing CBSA (extract first value)...\n")
+cat("\n[2] Preparing PUMA for harmonization...\n")
 
-# CBSA can have semicolon-delimited values (e.g., "30700; 13100")
-# Extract first CBSA code for harmonization
-base_data$cbsa_clean <- sapply(base_data$cbsa, function(x) {
-  if (is.na(x)) return(NA_character_)
-  # Split by semicolon and take first value
-  first_val <- stringr::str_split(x, ";")[[1]][1]
-  return(stringr::str_trim(first_val))
-})
+# Rename PUMA for consistency with downstream harmonization code
+base_data$puma_clean <- base_data$puma
 
-cat(sprintf("    ✓ Extracted first CBSA for %d records\n",
-            sum(!is.na(base_data$cbsa_clean))))
-
-# ==============================================================================
-# SECTION 2.5: Preprocess PUMA (Extract First Value from Semicolon-Delimited)
-# ==============================================================================
-
-cat("\n[2.5] Preprocessing PUMA (extract first value)...\n")
-
-# PUMA can have semicolon-delimited values (e.g., "00100; 00200")
-# Extract first PUMA code for harmonization
-base_data$puma_clean <- sapply(base_data$puma, function(x) {
-  if (is.na(x)) return(NA_character_)
-  # Split by semicolon and take first value
-  first_val <- stringr::str_split(x, ";")[[1]][1]
-  return(stringr::str_trim(first_val))
-})
-
-cat(sprintf("    ✓ Extracted first PUMA for %d records\n",
+cat(sprintf("    ✓ PUMA ready for %d records\n",
             sum(!is.na(base_data$puma_clean))))
 
 # ==============================================================================
@@ -138,11 +212,11 @@ cat(sprintf("    ✓ Extracted first PUMA for %d records\n",
 cat("\n[3] Imputing missing values using CART...\n")
 
 # Prepare data for mice
-# Include puma_clean for imputation (geographic data needs to be imputed)
+# PUMA already imputed from database - exclude from MICE
 # Exclude CBSA from imputation (not needed for calibration)
 # Exclude identifiers
 impute_data <- base_data %>%
-  dplyr::select(years_old, female, raceG, educ_mom, fpl, puma_clean,
+  dplyr::select(years_old, female, raceG, educ_mom, fpl,
                 phq2_total, gad2_total, child_ace_total, mmi100)
 
 # Run mice with CART method, M=1 imputation
@@ -162,11 +236,10 @@ cat("    ✓ Imputation complete\n")
 # Extract completed data
 imputed_data <- mice::complete(imputed, 1)
 
-# Add back identifiers and CBSA
+# Add back identifiers and PUMA
 imputed_data$pid <- base_data$pid
 imputed_data$record_id <- base_data$record_id
-imputed_data$cbsa <- base_data$cbsa_clean  # Use preprocessed CBSA (not imputed)
-# puma_clean now comes from imputed_data (imputed if necessary)
+imputed_data$puma_clean <- base_data$puma_clean # Use ZIP/imputed PUMA (not MICE)
 imputed_data$study_id <- "ne25"
 imputed_data$authenticity_weight <- 1.0  # Placeholder
 
@@ -184,36 +257,36 @@ if (sum(missing_after) == 0) {
 }
 
 # ==============================================================================
-# [3.2] Fill Remaining Missing PUMA Values (MICE may not impute all)
+# [3.2] Drop Records Without PUMA (Out-of-State Participants)
 # ==============================================================================
 
-cat("\n[3.2] Checking PUMA completeness after MICE...\n")
+cat("\n[3.2] Dropping records without PUMA (out-of-state participants)...\n")
 
 n_puma_missing <- sum(is.na(imputed_data$puma_clean))
+n_before <- nrow(imputed_data)
 
 if (n_puma_missing > 0) {
-  cat(sprintf("      Note: %d records still have missing PUMA after MICE\n", n_puma_missing))
-  cat("            Using probabilistic allocation based on observed PUMA distribution...\n")
+  cat(sprintf("      Found %d records without PUMA (likely out-of-state ZIP codes)\n", n_puma_missing))
 
-  # Get distribution of non-missing PUMA values
-  puma_dist <- table(imputed_data$puma_clean[!is.na(imputed_data$puma_clean)])
-  puma_probs <- puma_dist / sum(puma_dist)
-  puma_codes <- as.numeric(names(puma_probs))
+  # Filter to records with complete PUMA
+  imputed_data <- imputed_data %>%
+    dplyr::filter(!is.na(puma_clean))
 
-  # Set seed for reproducibility
-  set.seed(20251209)
-
-  # Fill missing PUMA with random draw from observed distribution
-  missing_indices <- which(is.na(imputed_data$puma_clean))
-  imputed_data$puma_clean[missing_indices] <- sample(puma_codes,
-                                                       size = length(missing_indices),
-                                                       prob = puma_probs,
-                                                       replace = TRUE)
-
-  n_filled <- sum(!is.na(imputed_data$puma_clean))
-  cat(sprintf("      ✓ Filled missing PUMA: now %d records with complete PUMA\n", n_filled))
+  n_after <- nrow(imputed_data)
+  cat(sprintf("      ✓ Dropped %d out-of-state records\n", n_before - n_after))
+  cat(sprintf("      ✓ Retained %d Nebraska records with complete PUMA\n", n_after))
 } else {
-  cat("      ✓ All records have complete PUMA\n")
+  cat(sprintf("      ✓ All %d records have complete PUMA\n", nrow(imputed_data)))
+}
+
+# Verify 100% PUMA coverage
+n_puma_final <- sum(!is.na(imputed_data$puma_clean))
+if (n_puma_final == nrow(imputed_data)) {
+  cat(sprintf("\n      [OK] 100%% PUMA coverage: %d/%d records\n",
+              n_puma_final, nrow(imputed_data)))
+} else {
+  stop(sprintf("ERROR: Expected 100%% PUMA coverage but got %d/%d",
+               n_puma_final, nrow(imputed_data)))
 }
 
 # ==============================================================================
@@ -225,21 +298,46 @@ cat("\n[4] Harmonizing to 24-variable structure...\n")
 # Block 1: Demographics (7 variables) + PUMA (14 binary dummies) = 21 variables
 cat("    Harmonizing Block 1 (demographics + PUMA)...\n")
 
-block1_input <- dplyr::tibble(
-  female = imputed_data$female,
-  years_old = imputed_data$years_old,
-  raceG = imputed_data$raceG,
-  educ_mom = imputed_data$educ_mom,
-  fpl = imputed_data$fpl,
-  cbsa = imputed_data$cbsa
+# Harmonize demographics directly (skip CBSA/principal_city)
+block1_demo <- dplyr::tibble(
+  # Variable 1: male (invert female)
+  male = as.integer(!imputed_data$female),
+
+  # Variable 2: age (direct mapping)
+  age = imputed_data$years_old,
+
+  # Variables 3-5: race dummies (from raceG)
+  white_nh = as.integer(imputed_data$raceG == "White, non-Hisp."),
+  black = as.integer(imputed_data$raceG %in% c("Black or African American, non-Hisp.", "Black or African American, Hispanic")),
+  hispanic = as.integer(grepl("Hispanic", as.character(imputed_data$raceG))),
+
+  # Variable 6: education years (from educ_mom)
+  # IMPORTANT: CART imputation in lines 73-84 produces text strings from REDCap education categories.
+  # The following regex patterns MUST cover ALL variations or records with unmatched patterns get
+  # listwise deletion in script 33. Pattern history:
+  #   - "Less than|8th grade|9th-12th|Some High School" (added "8th grade|9th-12th" Dec 2025)
+  #   - "vocational|trade|business school" (added Dec 2025, was missing ~14 records)
+  # These two patterns fixed ~336 missing values (12.7% → 0% completion rate).
+  # Verify: missing_check <- ne25_harmonized %>% dplyr::select(educ_years) %>%
+  #         dplyr::summarise(n_missing = sum(is.na(.)))  # Should be 0
+  educ_years = dplyr::case_when(
+    grepl("Less than|8th grade|9th-12th|Some High School", as.character(imputed_data$educ_mom)) ~ 10,
+    grepl("High School Graduate|GED", as.character(imputed_data$educ_mom)) ~ 12,
+    grepl("Some College", as.character(imputed_data$educ_mom)) ~ 14,
+    grepl("vocational|trade|business school", as.character(imputed_data$educ_mom)) ~ 13,
+    grepl("Associate", as.character(imputed_data$educ_mom)) ~ 14,
+    grepl("Bachelor", as.character(imputed_data$educ_mom)) ~ 16,
+    grepl("Master", as.character(imputed_data$educ_mom)) ~ 18,
+    grepl("Doctorate|Professional", as.character(imputed_data$educ_mom)) ~ 20,
+    TRUE ~ NA_real_
+  ),
+
+  # Variable 7: poverty ratio (from fpl, capped at [50, 400])
+  poverty_ratio = pmin(pmax(imputed_data$fpl, 50), 400)
 )
 
-# Harmonize demographics (7 variables)
-block1_demo_full <- harmonize_ne25_block1(block1_input)
-block1_demo <- dplyr::select(block1_demo_full, -principal_city)  # 7 variables
-
-# Harmonize PUMA to 14 binary dummies (ACS-only)
-block1_puma <- harmonize_puma(imputed_data$puma_clean)  # 14 variables (now imputed)
+# Harmonize PUMA to 14 binary dummies
+block1_puma <- harmonize_puma(imputed_data$puma_clean)  # 14 variables
 
 # Combine: demographics (1-7) + PUMA (8-21) = 21 variables
 block1 <- dplyr::bind_cols(block1_demo, block1_puma)
