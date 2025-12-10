@@ -1041,6 +1041,67 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     metrics$hrtl_scoring_duration <- hrtl_time
     message(paste("HRTL scoring completed in", round(hrtl_time, 2), "seconds"))
 
+    # ===========================================================================
+    # STEP 7.8: JOIN HRTL DOMAIN SCORES INTO FINAL_DATA
+    # ===========================================================================
+    message("\n--- Step 7.8: Joining HRTL Domain Scores ---")
+    hrtl_join_start <- Sys.time()
+
+    tryCatch({
+      # Pivot domain scores to wide format (one row per child)
+      if (nrow(hrtl_results$domain_scores) > 0) {
+        message("Pivoting HRTL domain scores to wide format...")
+
+        hrtl_wide <- hrtl_results$domain_scores %>%
+          dplyr::select(pid, record_id, domain, classification, avg_code) %>%
+          tidyr::pivot_wider(
+            names_from = domain,
+            values_from = classification,
+            names_prefix = "hrtl_"
+          )
+
+        # Also create avg_code columns
+        hrtl_avg_codes <- hrtl_results$domain_scores %>%
+          dplyr::select(pid, record_id, domain, avg_code) %>%
+          tidyr::pivot_wider(
+            names_from = domain,
+            values_from = avg_code,
+            names_prefix = "hrtl_avg_code_"
+          )
+
+        # Combine with overall HRTL summary
+        hrtl_for_join <- hrtl_wide %>%
+          safe_left_join(
+            hrtl_avg_codes,
+            by_vars = c("pid", "record_id")
+          ) %>%
+          safe_left_join(
+            hrtl_results$hrtl_overall %>%
+              dplyr::select(pid, record_id, n_on_track, n_emerging, n_needs_support, n_unable, hrtl),
+            by_vars = c("pid", "record_id")
+          )
+
+        # Join into final_data
+        final_data <- final_data %>%
+          safe_left_join(
+            hrtl_for_join,
+            by_vars = c("pid", "record_id")
+          )
+
+        message(sprintf("  - Joined HRTL scores for %d children",
+                       nrow(hrtl_for_join)))
+      } else {
+        message("  - No HRTL scores to join")
+      }
+
+    }, error = function(e) {
+      warning(paste("Failed to join HRTL scores:", e$message))
+      message("  - Continuing without HRTL scores in final_data")
+    })
+
+    hrtl_join_time <- as.numeric(Sys.time() - hrtl_join_start)
+    message(paste("HRTL join completed in", round(hrtl_join_time, 2), "seconds"))
+
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
     metadata_start <- Sys.time()

@@ -35,7 +35,9 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
   }
 
   # Filter to HRTL age range (3-5 years)
+  # CRITICAL: Add row_index to track original positions for imputed data extraction
   data_hrtl <- data %>%
+    dplyr::mutate(row_index = dplyr::row_number()) %>%
     dplyr::filter(!is.na(years_old), years_old >= 3, years_old < 6) %>%
     dplyr::mutate(age_years = floor(years_old))
 
@@ -89,10 +91,9 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
     domain_result <- data_hrtl %>%
       dplyr::select(pid, record_id, years_old, age_years)
 
-    # Extract imputed items for HRTL-eligible children
-    imputed_hrtl <- imputed_items[data_hrtl %>%
-                                   dplyr::mutate(rn = dplyr::row_number()) %>%
-                                   dplyr::pull(rn), ]
+    # Extract imputed items for HRTL-eligible children using ORIGINAL row positions
+    # (imputed_items has rows aligned with the original unfiltered data)
+    imputed_hrtl <- imputed_items[data_hrtl$row_index, ]
 
     # Initialize item codes (will be 1=Needs Support, 2=Emerging, 3=On-Track)
     item_codes <- data.frame(matrix(NA, nrow = nrow(domain_result), ncol = length(domain_items)))
