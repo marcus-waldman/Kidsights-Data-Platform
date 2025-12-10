@@ -35,9 +35,7 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
   }
 
   # Filter to HRTL age range (3-5 years)
-  # CRITICAL: Add row_index to track original positions for imputed data extraction
   data_hrtl <- data %>%
-    dplyr::mutate(row_index = dplyr::row_number()) %>%
     dplyr::filter(!is.na(years_old), years_old >= 3, years_old < 6) %>%
     dplyr::mutate(age_years = floor(years_old))
 
@@ -79,21 +77,35 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
     }
 
     # Match imputed data to children in HRTL age range
-    # Assuming rows align with ne25_transformed
-    if (nrow(imputed_items) != nrow(data)) {
-      if (verbose) {
-        message(sprintf("  [WARN] Row mismatch - imputed data has %d rows, input has %d\n",
-                       nrow(imputed_items), nrow(data)))
-      }
+    # Get pid/record_id from domain_datasets (they were filtered to create imputed data)
+    domain_data_full <- domain_datasets[[domain]]$data
+
+    if (is.null(domain_data_full)) {
+      message(sprintf("    [ERROR] Cannot get pid/record_id mapping for %s\n", domain))
+      next
     }
+
+    # Create mapping of pid+record_id to row numbers in the original domain data
+    domain_pids <- domain_data_full %>%
+      dplyr::select(pid, record_id) %>%
+      dplyr::mutate(row_in_domain_data = dplyr::row_number())
 
     # Start with child identifiers
     domain_result <- data_hrtl %>%
       dplyr::select(pid, record_id, years_old, age_years)
 
-    # Extract imputed items for HRTL-eligible children using ORIGINAL row positions
-    # (imputed_items has rows aligned with the original unfiltered data)
-    imputed_hrtl <- imputed_items[data_hrtl$row_index, ]
+    # For each child in HRTL age range, find their row in the domain data
+    # Then extract imputed items from that row
+    domain_result <- domain_result %>%
+      dplyr::left_join(
+        domain_pids,
+        by = c("pid", "record_id")
+      )
+
+    # Extract imputed items using row positions in domain data
+    imputed_hrtl <- imputed_items[domain_result$row_in_domain_data, ]
+    # Reset row names for safety
+    rownames(imputed_hrtl) <- NULL
 
     # Initialize item codes (will be 1=Needs Support, 2=Emerging, 3=On-Track)
     item_codes <- data.frame(matrix(NA, nrow = nrow(domain_result), ncol = length(domain_items)))
