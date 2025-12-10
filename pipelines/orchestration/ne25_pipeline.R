@@ -924,6 +924,49 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     message(paste("CREDI scoring completed in", round(credi_time, 2), "seconds"))
 
     # ===========================================================================
+    # STEP 7.5a: JOIN CREDI SCORES INTO FINAL_DATA
+    # ===========================================================================
+    message("\n--- Step 7.5a: Joining CREDI Scores ---")
+    credi_join_start <- Sys.time()
+
+    tryCatch({
+      # Load CREDI scores from database
+      credi_con <- duckdb::dbConnect(duckdb::duckdb(),
+                                     dbdir = "data/duckdb/kidsights_local.duckdb",
+                                     read_only = TRUE)
+
+      message("  - Loading CREDI scores from database...")
+      credi_scores_db <- DBI::dbGetQuery(credi_con, "SELECT * FROM ne25_credi_scores")
+
+      duckdb::dbDisconnect(credi_con, shutdown = TRUE)
+
+      # Add credi_ prefix to all score columns
+      credi_renamed <- credi_scores_db %>%
+        dplyr::rename_with(
+          ~paste0("credi_", tolower(.x)),
+          -c(pid, record_id)
+        )
+
+      # Join CREDI scores to final_data
+      message("  - Joining CREDI scores to final_data...")
+      final_data <- final_data %>%
+        safe_left_join(
+          credi_renamed,
+          by_vars = c("pid", "record_id")
+        )
+
+      message(sprintf("  - CREDI columns added: %d children with scores",
+                     sum(!is.na(final_data$credi_overall), na.rm = TRUE)))
+
+    }, error = function(e) {
+      warning(paste("Failed to join CREDI scores:", e$message))
+      message("  - Continuing without CREDI joins")
+    })
+
+    credi_join_time <- as.numeric(Sys.time() - credi_join_start)
+    message(paste("CREDI join completed in", round(credi_join_time, 2), "seconds"))
+
+    # ===========================================================================
     # STEP 7.6: GSED D-SCORE CALCULATION (ALL ELIGIBLE AGES)
     # ===========================================================================
     message("\n--- Step 7.6: GSED D-score Calculation ---")
@@ -973,6 +1016,49 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     dscore_time <- as.numeric(difftime(dscore_end, dscore_start, units = "secs"))
     metrics$dscore_scoring_duration <- dscore_time
     message(paste("GSED D-score calculation completed in", round(dscore_time, 2), "seconds"))
+
+    # ===========================================================================
+    # STEP 7.6a: JOIN D-SCORE DATA INTO FINAL_DATA
+    # ===========================================================================
+    message("\n--- Step 7.6a: Joining D-Score Data ---")
+    dscore_join_start <- Sys.time()
+
+    tryCatch({
+      # Load D-score data from database
+      dscore_con <- duckdb::dbConnect(duckdb::duckdb(),
+                                      dbdir = "data/duckdb/kidsights_local.duckdb",
+                                      read_only = TRUE)
+
+      message("  - Loading D-score data from database...")
+      dscore_data_db <- DBI::dbGetQuery(dscore_con, "SELECT * FROM ne25_dscore_scores")
+
+      duckdb::dbDisconnect(dscore_con, shutdown = TRUE)
+
+      # Add dscore_ prefix to all score columns
+      dscore_renamed <- dscore_data_db %>%
+        dplyr::rename_with(
+          ~paste0("dscore_", tolower(.x)),
+          -c(pid, record_id)
+        )
+
+      # Join D-score data to final_data
+      message("  - Joining D-score data to final_data...")
+      final_data <- final_data %>%
+        safe_left_join(
+          dscore_renamed,
+          by_vars = c("pid", "record_id")
+        )
+
+      message(sprintf("  - D-score columns added: %d children with scores",
+                     sum(!is.na(final_data$dscore_d), na.rm = TRUE)))
+
+    }, error = function(e) {
+      warning(paste("Failed to join D-score data:", e$message))
+      message("  - Continuing without D-score joins")
+    })
+
+    dscore_join_time <- as.numeric(Sys.time() - dscore_join_start)
+    message(paste("D-score join completed in", round(dscore_join_time, 2), "seconds"))
 
     # ===========================================================================
     # STEP 7.7: HRTL SCORING (FULL PIPELINE: EXTRACT -> RASCH -> IMPUTE -> SCORE)
