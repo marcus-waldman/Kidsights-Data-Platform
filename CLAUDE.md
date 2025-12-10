@@ -465,6 +465,16 @@ pip install pyreadstat
   - **Solution:** Marked as `out_of_state = TRUE` and excluded with `meets_inclusion = FALSE`
   - **Audit Trail:** Maintains visibility of excluded records and reason (geographic invalidity)
   - **Verification:** 2,645 records with meets_inclusion=TRUE match exactly with 2,645 records with weights
+- **CREDI Developmental Scoring (Step 7.5):** Automated CREDI scoring for children under 4 years old
+  - **Eligibility:** Children with years_old < 4 AND meets_inclusion = TRUE
+  - **Eligible Sample:** 1,678 children
+  - **Scored Sample:** 884 children (52.7% with sufficient item responses)
+  - **Items Mapped:** 60 CREDI Long Form (LF) items from codebook.json
+  - **Output Scores (15 columns):** 5 domain scores (COG, LANG, MOT, SEM, OVERALL) + 5 Z-scores + 5 standard errors
+  - **Database Table:** `ne25_credi_scores` with pid, record_id, and 15 score columns
+  - **Execution Time:** ~2.5 seconds
+  - **Implementation:** R/credi/score_credi.R with graceful error handling
+  - **Documentation:** See [CREDI Integration Guide](docs/CREDI_SCORING.md)
 
 ### ✅ ACS Pipeline - Complete
 - **API Integration:** Direct IPUMS USA API extraction via ipumspy

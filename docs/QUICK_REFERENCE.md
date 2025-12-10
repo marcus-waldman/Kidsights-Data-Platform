@@ -1,6 +1,6 @@
 # Quick Reference Guide
 
-**Last Updated:** October 2025
+**Last Updated:** December 2025
 
 This document provides a quick reference cheatsheet for common Kidsights Data Platform operations. For detailed documentation, see the linked guides.
 
@@ -34,6 +34,9 @@ This document provides a quick reference cheatsheet for common Kidsights Data Pl
 - Joins influential observations (if available)
 - Joins GSED person-fit scores from 2023 scale calibration (if available)
 - Flags participants with too few item responses (if available)
+- **Computes CREDI developmental scores** for children under 4 years old
+  - Scores 884/1678 eligible children (52.7%)
+  - Generates 15 scores (5 domains + Z-scores + standard errors)
 - Stores in DuckDB database
 - Generates documentation
 

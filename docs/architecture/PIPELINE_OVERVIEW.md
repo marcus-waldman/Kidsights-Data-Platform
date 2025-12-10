@@ -1,6 +1,6 @@
 # Pipeline Architecture Overview
 
-**Last Updated:** January 2025
+**Last Updated:** December 2025
 
 This document provides detailed architecture documentation for all seven data pipelines in the Kidsights Data Platform. Each pipeline is designed as an independent, standalone system with specific data sources and use cases.
 
@@ -44,20 +44,25 @@ REDCap (4 projects) → R: Extract/Transform → Feather Files → Python: Datab
 
 ### Pipeline Stages (September 2025 - Updated December 2025)
 
-The NE25 pipeline executes **12 steps** with optional conditional joins:
+The NE25 pipeline executes **13 steps** with optional conditional joins:
 
 ```
 Step 1: Extract REDCap Data → Feather
 Step 2-4: Initial Validation → Feature Engineering
 Step 5: Influential Observations Join (optional)
 Step 6.5: Metadata Generation
-Step 6.7: GSED Person-Fit Scores Join (optional, NEW)  ← Join manually calibrated scores
+Step 6.7: GSED Person-Fit Scores Join (optional)      ← Join manually calibrated scores
 Step 7: Store Transformed Data → DuckDB
-Step 8-11: Calibration Prep
-Step 12: IRT Calibration Table Creation
+Step 7.5: CREDI Developmental Scoring (NEW)            ← Automated CREDI scoring for children < 4 years
+Step 8: Metadata Generation
+Step 9: Data Dictionary Generation
+Step 10: Interactive Dictionary Generation
+Step 11: IRT Calibration Table Creation
 ```
 
-**New in December 2025:** Step 6.7 automatically joins person-fit scores from manual 2023 scale calibration (if tables exist in database). This adds 17 columns (14 person-fit scores + 3 exclusion flags) to the transformed data.
+**New in December 2025:**
+- Step 6.7 automatically joins person-fit scores from manual 2023 scale calibration (if tables exist in database). This adds 17 columns (14 person-fit scores + 3 exclusion flags) to the transformed data.
+- Step 7.5 computes CREDI developmental scores for all children under 4 years old (1,678 eligible, 884 scored). Generates 15 output scores (5 domains + 5 Z-scores + 5 standard errors) and stores in `ne25_credi_scores` table.
 
 ### Design Rationale
 

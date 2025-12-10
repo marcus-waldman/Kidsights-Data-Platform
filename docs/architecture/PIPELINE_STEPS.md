@@ -1,6 +1,6 @@
 # Pipeline Execution Steps
 
-**Last Updated:** October 2025
+**Last Updated:** December 2025
 
 This document provides step-by-step execution instructions for all four data pipelines. Each pipeline follows a similar pattern (Extract → Validate → Load) but with pipeline-specific tools and data sources.
 
@@ -189,6 +189,86 @@ DEBUG: Caching after person-fit joins...
 DEBUG: Cached person-fit data (4966 records)
 Person-fit joins completed in 0.9 seconds
 ```
+
+#### 7.5. CREDI Developmental Scoring
+
+**Executed by:** `pipelines/orchestration/ne25_pipeline.R` (Step 7.5) & `R/credi/score_credi.R`
+
+**Purpose:**
+- Compute CREDI (Caregiver Reported Early Development Instruments) developmental scores
+- Generate domain scores and Z-score metrics for early childhood development assessment
+- Automatically included in main NE25 pipeline for children under 4 years old
+
+**Eligibility Criteria:**
+- Children with `years_old < 4`
+- AND `meets_inclusion = TRUE` (eligible, not influential, sufficient responses)
+
+**What it does:**
+1. Loads CREDI Long Form (LF) item mappings from `codebook/data/codebook.json` (60 items)
+2. Filters to eligible children (1,678 eligible, 884 scored at 52.7%)
+3. Calls `credi::score()` from credi R package with min_items=5 threshold
+4. Generates 15 output scores for each child
+
+**Input:**
+- Source table: `ne25_transformed` (4,966 records total)
+- Filtered to: Children < 4 years old with meets_inclusion = TRUE (1,678 records)
+- Items: 60 CREDI Long Form items with lexicon mappings
+
+**Output Scores (15 columns):**
+
+1. **Domain Scores (5 columns)** - Standardized to mean=50, SD=10
+   - `COG` - Cognitive development
+   - `LANG` - Language development
+   - `MOT` - Motor development
+   - `SEM` - Social-Emotional development
+   - `OVERALL` - Combined developmental score
+
+2. **Age-Adjusted Z-Scores (5 columns)** - Standardized by age group
+   - `Z_COG`, `Z_LANG`, `Z_MOT`, `Z_SEM`, `Z_OVERALL`
+
+3. **Standard Errors (5 columns)** - Measurement precision
+   - `COG_SE`, `LANG_SE`, `MOT_SE`, `SEM_SE`, `OVERALL_SE`
+
+**Database Output:**
+- Table: `ne25_credi_scores`
+- Columns: `pid`, `record_id`, + 15 CREDI scores
+- Records: 1,678 (all assessed children, 884 with complete scores)
+- Indexes: pid, record_id for efficient lookups
+
+**Execution Time:** ~2.5 seconds
+
+**Technical Implementation:**
+- Module: `R/credi/score_credi.R` with two functions:
+  - `score_credi()` - Main scoring orchestration
+  - `save_credi_scores_to_db()` - Database persistence with indexes
+- Graceful error handling: Pipeline continues if CREDI scoring fails
+- Automatic codebook parsing for item-to-CREDI mappings
+- Uses credi package: `credi::score(reverse_code = FALSE, interactive = FALSE)`
+
+**Expected Output:**
+```
+--- Step 7.5: CREDI Developmental Scoring ---
+Computing CREDI developmental scores for children under 4 years old...
+[INFO] Loaded 60 CREDI LF item mappings
+[INFO] 1678 records remain after filters (years_old < 4, meets_inclusion = TRUE)
+[INFO] 60/60 CREDI variables found in data
+[INFO] Running CREDI scoring (min_items = 5)...
+Scoring  884  observations:
+[...]
+[INFO] CREDI scoring complete: 884/1678 records scored (52.7%)
+[INFO] Merging CREDI scores with original pid/record_id...
+[INFO] Final dataset: 1678 rows x 17 columns
+CREDI scoring complete. Saving 1678 records to database...
+[INFO] Saving CREDI scores to database table: ne25_credi_scores
+[INFO] Creating indexes...
+[INFO] Saved 1678 records to ne25_credi_scores
+CREDI scoring completed in 2.49 seconds
+```
+
+**Troubleshooting:**
+- **No CREDI scores generated:** Check that children have years_old < 4 AND meets_inclusion = TRUE
+- **Scores are all NA:** Verify CREDI items exist in ne25_transformed and have binary (0/1) values
+- **Missing items:** Confirm codebook.json has CREDI mappings (60 LF items)
 
 #### 11. NE25 Calibration Table Creation
 **Executed by:** `scripts/irt_scoring/create_ne25_calibration_table.R`
