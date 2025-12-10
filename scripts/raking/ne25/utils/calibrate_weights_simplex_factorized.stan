@@ -27,6 +27,11 @@ data {
   real<lower=0> concentration;                    // Dirichlet concentration (1.0 = uniform)
   real<lower=0> min_weight_multiplier;            // Min weight = min_weight_multiplier (e.g., 0.1)
   real<lower=0> max_weight_multiplier;            // Max weight = max_weight_multiplier (e.g., 10.0)
+
+  // Standardization factors from raking targets (pass from R)
+  vector[K] scale_mean;                           // Mean of each calibration variable
+  vector[K] scale_sd;                             // SD of each calibration variable
+  int<lower=0, upper=1> use_standardization;     // Flag: 1 = use standardization, 0 = raw scale
 }
 
 transformed data {
@@ -41,6 +46,55 @@ transformed data {
         n_observed_cov += 1;
       }
     }
+  }
+
+  // ========================================================================
+  // STANDARDIZATION (Optional, applied if use_standardization = 1)
+  // ========================================================================
+  // Transform design matrix and targets to standardized scale
+  // This improves optimizer efficiency without changing final weights
+
+  matrix[N, K] X_work;                            // Working copy of design matrix
+  vector[K] target_mean_work;                     // Working copy of target mean
+  matrix[K, K] target_cov_work;                   // Working copy of target covariance
+
+  if (use_standardization == 1) {
+    // Standardize design matrix: X_std = (X - mean) / sd
+    for (n in 1:N) {
+      for (k in 1:K) {
+        if (scale_sd[k] > 1e-10) {
+          X_work[n, k] = (X[n, k] - scale_mean[k]) / scale_sd[k];
+        } else {
+          X_work[n, k] = X[n, k] - scale_mean[k];  // If no variation, just center
+        }
+      }
+    }
+
+    // Standardize target mean: target_mean_std = (target_mean - mean) / sd
+    for (k in 1:K) {
+      if (scale_sd[k] > 1e-10) {
+        target_mean_work[k] = (target_mean[k] - scale_mean[k]) / scale_sd[k];
+      } else {
+        target_mean_work[k] = target_mean[k] - scale_mean[k];
+      }
+    }
+
+    // Standardize target covariance: cov_std = cov / (sd_i * sd_j)
+    for (i in 1:K) {
+      for (j in 1:K) {
+        real sd_product = scale_sd[i] * scale_sd[j];
+        if (sd_product > 1e-10) {
+          target_cov_work[i, j] = target_cov[i, j] / sd_product;
+        } else {
+          target_cov_work[i, j] = target_cov[i, j];  // If no variation, use original
+        }
+      }
+    }
+  } else {
+    // If not standardizing, use raw data
+    X_work = X;
+    target_mean_work = target_mean;
+    target_cov_work = target_cov;
   }
 }
 
@@ -75,32 +129,33 @@ model {
 
   // Compute achieved mean and covariance from weighted sample
   // Note: wgt sums to 1, so weight_sum = 1.0
+  // Uses standardized data if use_standardization = 1
   vector[K] achieved_mean;
   for (k in 1:K) {
-    achieved_mean[k] = sum(wgt .* X[, k]);
+    achieved_mean[k] = sum(wgt .* X_work[, k]);
   }
 
   // Achieved covariance matrix (weighted)
   matrix[K, K] achieved_cov;
   for (i in 1:K) {
     for (j in 1:K) {
-      vector[N] dev_i = X[, i] - achieved_mean[i];
-      vector[N] dev_j = X[, j] - achieved_mean[j];
+      vector[N] dev_i = X_work[, i] - achieved_mean[i];
+      vector[N] dev_j = X_work[, j] - achieved_mean[j];
       achieved_cov[i, j] = sum(wgt .* dev_i .* dev_j);
     }
   }
 
   // ========================================================================
-  // MASKED KL DIVERGENCE
+  // MASKED KL DIVERGENCE (on standardized scale if use_standardization = 1)
   // ========================================================================
 
-  vector[K] mean_diff = achieved_mean - target_mean;
+  vector[K] mean_diff = achieved_mean - target_mean_work;
 
   // Mean matching term (diagonal approximation to avoid singular matrix inversion)
   real mahalanobis = 0.0;
   for (k in 1:K) {
-    if (target_cov[k, k] > 1e-10) {
-      real normalized_diff = mean_diff[k] / sqrt(target_cov[k, k]);
+    if (target_cov_work[k, k] > 1e-10) {
+      real normalized_diff = mean_diff[k] / sqrt(target_cov_work[k, k]);
       mahalanobis += normalized_diff * normalized_diff;
     }
   }
@@ -110,9 +165,9 @@ model {
   for (i in 1:K) {
     for (j in 1:K) {
       if (cov_mask[i, j] > 0.5) {  // Only observed elements
-        real target_val = target_cov[i, j];
+        real target_val = target_cov_work[i, j];
         real achieved_val = achieved_cov[i, j];
-        real target_sd = sqrt(target_cov[i, i] * target_cov[j, j]);
+        real target_sd = sqrt(target_cov_work[i, i] * target_cov_work[j, j]);
 
         if (target_sd > 1e-10) {
           real normalized_diff = (achieved_val - target_val) / target_sd;
@@ -132,28 +187,28 @@ model {
 generated quantities {
   
 
-  // Achieved mean and covariance (using simplex weights)
+  // Achieved mean and covariance (using simplex weights, on standardized scale)
   vector[K] achieved_mean_final;
   for (k in 1:K) {
-    achieved_mean_final[k] = sum(wgt .* X[, k]);
+    achieved_mean_final[k] = sum(wgt .* X_work[, k]);
   }
 
   matrix[K, K] achieved_cov_final;
   for (i in 1:K) {
     for (j in 1:K) {
-      vector[N] dev_i = X[, i] - achieved_mean_final[i];
-      vector[N] dev_j = X[, j] - achieved_mean_final[j];
+      vector[N] dev_i = X_work[, i] - achieved_mean_final[i];
+      vector[N] dev_j = X_work[, j] - achieved_mean_final[j];
       achieved_cov_final[i, j] = sum(wgt .* dev_i .* dev_j);
     }
   }
 
-  // Final loss (masked)
-  vector[K] mean_diff_final = achieved_mean_final - target_mean;
+  // Final loss (masked, on standardized scale)
+  vector[K] mean_diff_final = achieved_mean_final - target_mean_work;
 
   real mahalanobis_final = 0.0;
   for (k in 1:K) {
-    if (target_cov[k, k] > 1e-10) {
-      real normalized_diff = mean_diff_final[k] / sqrt(target_cov[k, k]);
+    if (target_cov_work[k, k] > 1e-10) {
+      real normalized_diff = mean_diff_final[k] / sqrt(target_cov_work[k, k]);
       mahalanobis_final += normalized_diff * normalized_diff;
     }
   }
@@ -162,9 +217,9 @@ generated quantities {
   for (i in 1:K) {
     for (j in 1:K) {
       if (cov_mask[i, j] > 0.5) {
-        real target_val = target_cov[i, j];
+        real target_val = target_cov_work[i, j];
         real achieved_val = achieved_cov_final[i, j];
-        real target_sd = sqrt(target_cov[i, i] * target_cov[j, j]);
+        real target_sd = sqrt(target_cov_work[i, i] * target_cov_work[j, j]);
 
         if (target_sd > 1e-10) {
           real normalized_diff = (achieved_val - target_val) / target_sd;

@@ -815,6 +815,32 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("    To generate weights, run scripts 25-33 in the raking pipeline.")
     }
 
+    # STEP 6.10: BANDAID FIX - Mark out-of-state records (meets_inclusion=T but no weight)
+    message("\n--- Step 6.10: Marking Out-of-State Records ---")
+
+    # If meets_inclusion=T but calibrated_weight is NA, set out_of_state=T and meets_inclusion=F
+    final_data <- final_data %>%
+      dplyr::mutate(
+        out_of_state = dplyr::case_when(
+          meets_inclusion == TRUE & is.na(calibrated_weight) ~ TRUE,
+          TRUE ~ FALSE
+        ),
+        meets_inclusion = dplyr::case_when(
+          out_of_state == TRUE ~ FALSE,
+          TRUE ~ meets_inclusion
+        )
+      )
+
+    n_out_of_state <- sum(final_data$out_of_state, na.rm = TRUE)
+    if (n_out_of_state > 0) {
+      message(sprintf("  - Marked %d records as out-of-state (meets_inclusion=T but no weight)", n_out_of_state))
+      n_meets_inclusion_updated <- sum(final_data$meets_inclusion, na.rm = TRUE)
+      message(sprintf("  - Updated meets_inclusion: %d records (%.1f%%)",
+                     n_meets_inclusion_updated, 100 * n_meets_inclusion_updated / nrow(final_data)))
+    } else {
+      message("  - No out-of-state records detected")
+    }
+
     # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS (AND WEIGHTS IF AVAILABLE)
     message("\n--- Step 7: Storing Transformed Data ---")
     message("Storing transformed data with eligibility flags and calibrated weights...")
