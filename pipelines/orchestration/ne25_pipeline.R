@@ -1223,6 +1223,14 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("  - Loading overall HRTL from database...")
       hrtl_overall <- DBI::dbGetQuery(hrtl_con, "SELECT pid, record_id, n_on_track, n_needs_support, hrtl FROM ne25_hrtl_overall")
 
+      # Rename overall HRTL columns with hrtl_ prefix
+      hrtl_overall <- hrtl_overall %>%
+        dplyr::rename(
+          hrtl_n_on_track = n_on_track,
+          hrtl_n_needs_support = n_needs_support,
+          hrtl_overall = hrtl
+        )
+
       duckdb::dbDisconnect(hrtl_con, shutdown = TRUE)
 
       # Pivot domain scores to wide format (one row per child, columns per domain)
@@ -1235,8 +1243,10 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           names_glue = "{tolower(gsub(' ', '_', domain))}_{.value}"
         )
 
-      # Rename columns to be more readable
-      names(hrtl_wide) <- tolower(gsub("_classification", "", gsub("_avg_code", "_score", names(hrtl_wide))))
+      # Rename columns: add hrtl_ prefix and replace hyphens with underscores
+      names(hrtl_wide) <- gsub("_classification", "", gsub("_avg_code", "_score", names(hrtl_wide)))
+      names(hrtl_wide) <- gsub("^(?!pid|record_id)", "hrtl_", names(hrtl_wide), perl = TRUE)
+      names(hrtl_wide) <- tolower(gsub("-", "_", names(hrtl_wide)))
 
       # Join domain scores to final_data
       message("  - Joining HRTL domain scores to final_data...")
@@ -1254,8 +1264,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           by_vars = c("pid", "record_id")
         )
 
-      message(sprintf("  - HRTL columns added: %d children with scores",
-                     sum(!is.na(final_data$hrtl), na.rm = TRUE)))
+      message(sprintf("  - HRTL columns added: %d children with overall scores",
+                     sum(!is.na(final_data$hrtl_overall), na.rm = TRUE)))
 
     }, error = function(e) {
       warning(paste("Failed to join HRTL scores:", e$message))
