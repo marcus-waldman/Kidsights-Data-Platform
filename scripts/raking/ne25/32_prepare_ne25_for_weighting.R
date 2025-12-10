@@ -171,7 +171,7 @@ imputed_data$study_id <- "ne25"
 imputed_data$authenticity_weight <- 1.0  # Placeholder
 
 # Report missing data after imputation (CBSA may still have NAs)
-cat("\n[3.1] Missing data summary (after imputation):\n")
+cat("\n[3.1] Missing data summary (after MICE imputation):\n")
 missing_after <- colSums(is.na(imputed_data))
 if (sum(missing_after) == 0) {
   cat("      ✓ No missing values remaining\n")
@@ -181,6 +181,39 @@ if (sum(missing_after) == 0) {
     pct <- round(missing_after[var] / nrow(imputed_data) * 100, 1)
     cat(sprintf("        %s: %d (%.1f%%)\n", var, missing_after[var], pct))
   }
+}
+
+# ==============================================================================
+# [3.2] Fill Remaining Missing PUMA Values (MICE may not impute all)
+# ==============================================================================
+
+cat("\n[3.2] Checking PUMA completeness after MICE...\n")
+
+n_puma_missing <- sum(is.na(imputed_data$puma_clean))
+
+if (n_puma_missing > 0) {
+  cat(sprintf("      Note: %d records still have missing PUMA after MICE\n", n_puma_missing))
+  cat("            Using probabilistic allocation based on observed PUMA distribution...\n")
+
+  # Get distribution of non-missing PUMA values
+  puma_dist <- table(imputed_data$puma_clean[!is.na(imputed_data$puma_clean)])
+  puma_probs <- puma_dist / sum(puma_dist)
+  puma_codes <- as.numeric(names(puma_probs))
+
+  # Set seed for reproducibility
+  set.seed(20251209)
+
+  # Fill missing PUMA with random draw from observed distribution
+  missing_indices <- which(is.na(imputed_data$puma_clean))
+  imputed_data$puma_clean[missing_indices] <- sample(puma_codes,
+                                                       size = length(missing_indices),
+                                                       prob = puma_probs,
+                                                       replace = TRUE)
+
+  n_filled <- sum(!is.na(imputed_data$puma_clean))
+  cat(sprintf("      ✓ Filled missing PUMA: now %d records with complete PUMA\n", n_filled))
+} else {
+  cat("      ✓ All records have complete PUMA\n")
 }
 
 # ==============================================================================
