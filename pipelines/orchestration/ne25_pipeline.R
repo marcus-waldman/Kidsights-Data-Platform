@@ -82,6 +82,7 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   6.10. Mark out-of-state records
 #'   7. Store transformed data (with weights if available)
 #'   7.5. CREDI developmental scoring (children under 4 years old)
+#'   7.6. GSED D-score calculation (all eligible ages)
 #'   8. Generate variable metadata
 #'   9. Generate data dictionary
 #'   10. Generate interactive dictionary
@@ -921,6 +922,57 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     credi_time <- as.numeric(difftime(credi_end, credi_start, units = "secs"))
     metrics$credi_scoring_duration <- credi_time
     message(paste("CREDI scoring completed in", round(credi_time, 2), "seconds"))
+
+    # ===========================================================================
+    # STEP 7.6: GSED D-SCORE CALCULATION (ALL ELIGIBLE AGES)
+    # ===========================================================================
+    message("\n--- Step 7.6: GSED D-score Calculation ---")
+    dscore_start <- Sys.time()
+
+    # Source GSED D-score function
+    tryCatch({
+      source("R/dscore/score_dscore.R")
+
+      # Run GSED D-score calculation
+      message("Computing GSED D-scores for all eligible children...")
+      dscore_scores <- score_dscore(
+        data = final_data,
+        codebook_path = "codebook/data/codebook.json",
+        key = "gsed2406",
+        verbose = TRUE
+      )
+
+      # Save to database
+      if (nrow(dscore_scores) > 0) {
+        message(sprintf("GSED D-score calculation complete. Saving %d records to database...", nrow(dscore_scores)))
+
+        save_dscore_scores_to_db(
+          scores = dscore_scores,
+          db_path = "data/duckdb/kidsights_local.duckdb",
+          table_name = "ne25_dscore_scores",
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        metrics$dscore_records_scored <- sum(!is.na(dscore_scores$d))
+        metrics$dscore_records_attempted <- nrow(dscore_scores)
+      } else {
+        message("No records eligible for GSED D-score calculation")
+        metrics$dscore_records_scored <- 0
+        metrics$dscore_records_attempted <- 0
+      }
+
+    }, error = function(e) {
+      warning(paste("GSED D-score calculation failed:", e$message))
+      warning("Continuing pipeline without GSED D-scores")
+      metrics$dscore_records_scored <- 0
+      metrics$dscore_records_attempted <- 0
+    })
+
+    dscore_end <- Sys.time()
+    dscore_time <- as.numeric(difftime(dscore_end, dscore_start, units = "secs"))
+    metrics$dscore_scoring_duration <- dscore_time
+    message(paste("GSED D-score calculation completed in", round(dscore_time, 2), "seconds"))
 
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")

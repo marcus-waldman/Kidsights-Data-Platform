@@ -472,9 +472,22 @@ pip install pyreadstat
   - **Items Mapped:** 60 CREDI Long Form (LF) items from codebook.json
   - **Output Scores (15 columns):** 5 domain scores (COG, LANG, MOT, SEM, OVERALL) + 5 Z-scores + 5 standard errors
   - **Database Table:** `ne25_credi_scores` with pid, record_id, and 15 score columns
-  - **Execution Time:** ~2.5 seconds
+  - **Execution Time:** ~3 seconds
   - **Implementation:** R/credi/score_credi.R with graceful error handling
   - **Documentation:** See [CREDI Integration Guide](docs/CREDI_SCORING.md)
+- **GSED D-score Calculation (Step 7.6):** Automated GSED D-score calculation for all eligible children (December 2025)
+  - **Eligibility:** Children with meets_inclusion = TRUE (all ages)
+  - **Eligible Sample:** 2,645 children
+  - **Scored Sample:** 2,639 children (99.8% with sufficient item responses)
+  - **Items Mapped:** 132 GSED items from codebook.json (via gsed lexicon)
+  - **Output Scores (6 columns):** D-score (d), Development-for-Age Z-score (daz), standard error (sem), age in years (a), number of items (n), proportion passed (p)
+  - **Database Table:** `ne25_dscore_scores` with pid, record_id, and 6 score columns
+  - **Execution Time:** ~1.5 seconds
+  - **Key Parameters:** key="gsed2406" (most recent GSED 2024 key), xname="age_in_days", xunit="days"
+  - **Implementation:** R/dscore/score_dscore.R with automatic codebook parsing and database indexing
+  - **D-score Scale:** Linear scale (range: [12.25, 87.14] for NE25, typically 0-100 range)
+  - **DAZ Interpretation:** Age-adjusted Z-score relative to reference population (mean=0.41, SD=1.39 for NE25)
+  - **Quality Metrics:** Mean items used per child: 11.4, Mean SEM: 3.47 (measurement precision)
 
 ### ✅ ACS Pipeline - Complete
 - **API Integration:** Direct IPUMS USA API extraction via ipumspy

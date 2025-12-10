@@ -93,6 +93,13 @@ if (pipeline_result$success) {
       cat(paste("  • Scoring time:", round(metrics$credi_scoring_duration, 1), "seconds"), "\n")
     }
 
+    if (!is.null(metrics$dscore_records_scored)) {
+      cat("\n📊 GSED D-SCORE METRICS:\n")
+      cat(paste("  • Records attempted:", metrics$dscore_records_attempted), "\n")
+      cat(paste("  • Records scored:", metrics$dscore_records_scored), "\n")
+      cat(paste("  • Scoring time:", round(metrics$dscore_scoring_duration, 1), "seconds"), "\n")
+    }
+
     cat("\n⏱️ TOTAL EXECUTION TIME:", round(metrics$total_duration, 1), "seconds\n")
   }
 
