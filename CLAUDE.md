@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** December 2025 | **Version:** 3.6.0
+**Last Updated:** December 2025 | **Version:** 3.7.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -603,34 +603,40 @@ pip install pyreadstat
 - **Documentation:** See [Manual 2023 Scale Calibration](docs/irt_scoring/MANUAL_2023_SCALE_CALIBRATION.md)
 
 ### ✅ HRTL Scoring - Production Ready (December 2025)
-- **Status:** **PRODUCTION READY** - Integrated into NE25 pipeline as Step 7.7 (December 2025)
+- **Status:** **PRODUCTION READY** - Full pipeline integrated into NE25 as Step 7.7 (December 2025)
 - **Framework:** Healthy & Ready to Learn (HRTL) for ages 3-5 school readiness assessment
-- **Eligibility:** Children with `3 ≤ years_old < 6` AND `meets_inclusion = TRUE` (1,435 eligible)
-- **Domains:** 4 domains scored (23 items total, Motor Development excluded)
-  - Early Learning Skills (9 items)
-  - Health (5 items)
-  - Self-Regulation (3 items)
-  - Social-Emotional Development (6 items)
-- **Scoring Algorithm:** Item-level CAHMI thresholds
-  1. Apply age-specific thresholds (SC_AGE_YEARS 3, 4, 5) to each item
-  2. Code responses: 1=Needs Support, 2=Emerging, 3=On-Track
-  3. Average codes across domain items
-  4. Classify domain: ≥2.5=On-Track, ≥1.5=Emerging, <1.5=Needs Support
-- **Imputation:** `mirt::imputeMissing()` on full dataset (all ages) before age filtering
-- **Domain Results (N=1,435):**
-  - Early Learning Skills: 806/1435 on-track (56.1%)
-  - Social-Emotional Development: 1079/1435 on-track (75.2%)
-  - Self-Regulation: 931/1435 on-track (64.8%)
-  - Health: 1181/1435 on-track (82.3%)
-- **Overall HRTL:** Marked as NA (incomplete - requires Motor Development)
-- **Motor Development Exclusion (Issue #15):** Excluded due to 93% missing data (DrawFace, DrawPerson, BounceBall items age-routed in NE25)
+- **Pipeline:** Extract domain data → Fit Rasch models → Impute missing values → Score with CAHMI thresholds
+- **Eligibility:** Children with `3 ≤ years_old < 6` AND `meets_inclusion = TRUE` (1,412 eligible)
+- **Domains:** 4 domains scored, 1 masked (28 items total)
+  - Early Learning Skills (9 items): 1,005/1,413 on-track (71.1%)
+  - Health (3 items + derived): 1,266/1,425 on-track (88.8%)
+  - Self-Regulation (5 items): 933/1,411 on-track (66.1%)
+  - Social-Emotional Development (6 items): 1,222/1,425 on-track (85.8%)
+  - Motor Development (4 items): **MASKED** - 93% missing (Issue #15)
+- **Scoring Algorithm:**
+  1. Rasch IRT model: 1PL graded response model with equal slopes per domain
+  2. EAP theta estimation for each child
+  3. Bayesian imputation: `mirt::imputeMissing(model, Theta=theta_eap)` fills 0% missing
+  4. Item-level CAHMI thresholds applied (age-specific: 3, 4, 5 years)
+  5. Response coding: 1=Needs Support, 2=Emerging, 3=On-Track
+  6. Domain average & classification: ≥2.5=On-Track, ≥1.5=Emerging, <1.5=Needs Support
+- **DailyAct_22 Derivation:** Computed from cqr014x (HCABILITY) + nom044 (HCEXTENT) for Health domain
+- **Data Quality Masking (Issue #15):**
+  - Motor Development: All classification values masked to NA (age-routed items DrawFace/DrawPerson/BounceBall = 93% missing)
+  - Overall HRTL: Marked as NA (incomplete without Motor domain)
+  - Masking applied in pipeline with explicit GitHub issue reference
 - **Database Tables:**
-  - `ne25_hrtl_domain_scores` (5,740 records: 4 domains × 1,435 children)
-  - `ne25_hrtl_overall` (1,435 records: domain summary with hrtl=NA)
-- **Execution Time:** ~2-3 seconds
-- **Pipeline Location:** Step 7.7 in `pipelines/orchestration/ne25_pipeline.R`
-- **Implementation:** `R/hrtl/score_hrtl.R` (wrapper) & `R/hrtl/score_hrtl_itemlevel.R` (core logic)
-- **Documentation:** [PIPELINE_STEPS.md - Step 7.7](docs/architecture/PIPELINE_STEPS.md#77-hrtl-scoring-item-level-thresholds)
+  - `ne25_hrtl_domain_scores` (5,652 records: 4 scored domains × 1,412 + masked Motor)
+  - `ne25_hrtl_overall` (1,412 records: hrtl=NA for all due to Motor exclusion)
+- **Execution Time:** ~13.4 seconds (extraction + Rasch fitting + imputation + scoring)
+- **Pipeline Location:** Step 7.7 (4 sub-steps) in `pipelines/orchestration/ne25_pipeline.R`
+- **Scripts:**
+  - `scripts/hrtl/01_extract_domain_datasets.R` - Domain data extraction + DailyAct_22 derivation
+  - `scripts/hrtl/02_fit_rasch_models.R` - Rasch 1PL graded models (5 domains)
+  - `scripts/hrtl/03_impute_missing_values.R` - Bayesian imputation via EAP scores
+  - `scripts/hrtl/04_score_hrtl.R` - CAHMI threshold scoring & domain classification
+  - `R/hrtl/score_hrtl_itemlevel.R` - Legacy production wrapper (not used - validation issues)
+- **Validation:** `scripts/hrtl/validate_hrtl_results.R` - Verifies domain percentages within tolerance
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
@@ -644,5 +650,5 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: December 2025 | Version: 3.6.0*
+*Updated: December 2025 | Version: 3.7.0*
 - pid does not uniquely identify an individual in the nebraska 2025 (ne25) data. It is the pid + record_id combination.

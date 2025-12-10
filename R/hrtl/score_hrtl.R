@@ -13,8 +13,7 @@
 #' (93% missing DrawFace/DrawPerson/BounceBall items in NE25).
 #' See: https://github.com/anthropics/kidsights/issues/15
 #'
-#' @param data Data frame with child records (must include pid, record_id, years_old)
-#' @param imputed_data_path Path to RDS file with imputed item data (all ages)
+#' @param data Data frame with child records (must include pid, record_id, years_old, and all CAHMI items)
 #' @param thresholds_path Path to RDS file with CAHMI item-level thresholds
 #' @param domain_datasets_path Path to RDS file with domain item mappings
 #' @param verbose Logical, if TRUE print progress messages
@@ -36,20 +35,20 @@
 #'
 #' @export
 score_hrtl <- function(data,
-                       imputed_data_path = "scripts/temp/hrtl_data_imputed_allages.rds",
-                       thresholds_path = "scripts/temp/hrtl_conversion_tables.rds",
-                       domain_datasets_path = "scripts/temp/hrtl_domain_datasets.rds",
+                       imputed_data_path = "scripts/hrtl/hrtl_data_imputed_allages.rds",
+                       thresholds_path = "scripts/hrtl/hrtl_conversion_tables.rds",
+                       domain_datasets_path = "scripts/hrtl/hrtl_domain_datasets.rds",
                        verbose = TRUE) {
 
   if (verbose) {
-    message("=== HRTL Scoring - Step 7.7 (Item-Level Thresholds) ===\n")
+    message("=== HRTL Scoring - Step 7.7 (Item-Level Thresholds with Rasch Imputation) ===\n")
   }
 
   # ==============================================================================
-  # 1. LOAD IMPUTED DATA AND THRESHOLDS
+  # 1. LOAD IMPUTED DATA, THRESHOLDS, AND DOMAIN MAPPINGS
   # ==============================================================================
   if (verbose) {
-    message("1. Loading imputed data and reference files...\n")
+    message("1. Loading Rasch-imputed data and CAHMI item-level thresholds...\n")
   }
 
   tryCatch({
@@ -91,7 +90,7 @@ score_hrtl <- function(data,
     # Source the item-level scoring function
     source("R/hrtl/score_hrtl_itemlevel.R")
 
-    # Score children
+    # Score children using Rasch-imputed data and CAHMI thresholds
     results <- score_hrtl_itemlevel(
       data = data,
       imputed_data_list = imputed_data_list,
