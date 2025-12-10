@@ -1,208 +1,163 @@
-#' Score HRTL "Ready for Learning" Classification
+################################################################################
+# HRTL Item-Level Threshold Scoring (Production)
+################################################################################
+
+#' Score HRTL for NE25 Pipeline (Step 7.7)
 #'
 #' @description
-#' Applies the complete HRTL (Healthy & Ready to Learn) scoring framework:
-#' 1. Aggregates 27 items into 5 domain scores
-#' 2. Classifies each domain (On-Track/Emerging/Needs-Support)
-#' 3. Determines overall "Ready for Learning" status
+#' Complete HRTL scoring workflow for pipeline integration.
+#' Loads imputed item data and CAHMI item-level thresholds, scores children on
+#' HRTL domains, and returns domain and overall classifications.
 #'
-#' **HRTL Classification Logic:**
-#' A child is "Ready for Learning" if:
-#' - At least 4 out of 5 domains are "On-Track" AND
-#' - Zero domains are "Needs-Support"
+#' WARNING: Motor Development domain excluded due to data quality issues
+#' (93% missing DrawFace/DrawPerson/BounceBall items in NE25).
+#' See: https://github.com/anthropics/kidsights/issues/15
 #'
-#' @param dat Data frame containing HRTL item responses
-#' @param age_var Character. Name of age variable (numeric, ages 3-5). Default: "years"
-#' @param lexicon Character. Which lexicon to use for variable names. Default: "equate"
-#' @param codebook_path Character. Path to codebook.json. Default: "codebook/data/codebook.json"
-#' @param verbose Logical. Print diagnostic messages? Default: TRUE
+#' @param data Data frame with child records (must include pid, record_id, years_old)
+#' @param imputed_data_path Path to RDS file with imputed item data (all ages)
+#' @param thresholds_path Path to RDS file with CAHMI item-level thresholds
+#' @param domain_datasets_path Path to RDS file with domain item mappings
+#' @param verbose Logical, if TRUE print progress messages
 #'
-#' @return Data frame with original data plus:
-#'   - All domain score columns from aggregate_domains()
-#'   - hrtl_n_on_track: Number of domains classified as On-Track (0-5)
-#'   - hrtl_n_emerging: Number of domains classified as Emerging (0-5)
-#'   - hrtl_n_needs_support: Number of domains classified as Needs-Support (0-5)
-#'   - hrtl_ready_for_learning: Logical. TRUE if child meets HRTL criteria
-#'   - hrtl_classification: Character. "Ready", "Not Ready", or "Insufficient Data"
+#' @return List with:
+#'   - domain_scores: Tibble with domain-level classifications (4 domains, Motor excluded)
+#'   - hrtl_overall: Tibble with overall HRTL classification (marked as NA - incomplete)
 #'
 #' @details
-#' **Classification Categories:**
-#' - **"Ready"**: ≥4 domains On-Track AND 0 domains Needs-Support
-#' - **"Not Ready"**: Does not meet Ready criteria but has valid domain scores
-#' - **"Insufficient Data"**: <3 domains with valid scores
-#'
-#' **Known Limitations (GitHub Issue #9):**
-#' - Motor Development: Only 1/4 items available for ages 3-5
-#' - Early Learning: 6/9 items available for ages 3-5
-#' - Social-Emotional: 4/6 items available for ages 3-5
-#'
-#' Due to age-based routing in NE25, some domains may have reduced reliability.
-#' Results should be interpreted cautiously, especially for Motor Development.
-#'
-#' **Interim Approach:**
-#' This implementation uses simple averaging with `na.rm=TRUE` to handle
-#' missing items. Future versions may incorporate IRT-based scoring or
-#' NE25-specific norms.
-#'
-#' @examples
-#' \dontrun{
-#' # Load data
-#' library(DBI)
-#' library(duckdb)
-#' con <- dbConnect(duckdb(), "data/duckdb/kidsights_local.duckdb")
-#' dat <- dbGetQuery(con, "SELECT * FROM ne25_calibration WHERE years BETWEEN 3 AND 5")
-#' dbDisconnect(con)
-#'
-#' # Score HRTL
-#' dat_hrtl <- score_hrtl(dat, age_var = "years", lexicon = "equate")
-#'
-#' # Check results
-#' table(dat_hrtl$hrtl_classification, useNA = "ifany")
-#' table(dat_hrtl$hrtl_ready_for_learning, useNA = "ifany")
-#'
-#' # Summary by age
-#' library(dplyr)
-#' dat_hrtl %>%
-#'   group_by(floor(years)) %>%
-#'   summarise(
-#'     n = n(),
-#'     pct_ready = 100 * mean(hrtl_ready_for_learning, na.rm = TRUE)
-#'   )
-#' }
+#' Scoring algorithm:
+#' 1. Filter to ages 3-5 years (HRTL target age range)
+#' 2. For each domain (Early Learning, Social-Emotional, Self-Regulation, Health):
+#'    a. Apply age-specific item-level thresholds
+#'    b. Code responses: 1=Needs Support, 2=Emerging, 3=On-Track
+#'    c. Average codes within domain
+#'    d. Classify domain: >=2.5=On-Track, >=1.5=Emerging, <1.5=Needs Support
+#' 3. Determine overall HRTL: Would require >=4 domains On-Track + 0 domains Needs Support
+#'    (Not computed due to Motor Development exclusion)
 #'
 #' @export
-score_hrtl <- function(dat,
-                       age_var = "years",
-                       lexicon = "equate",
-                       codebook_path = "codebook/data/codebook.json",
+score_hrtl <- function(data,
+                       imputed_data_path = "scripts/temp/hrtl_data_imputed_allages.rds",
+                       thresholds_path = "scripts/temp/hrtl_conversion_tables.rds",
+                       domain_datasets_path = "scripts/temp/hrtl_domain_datasets.rds",
                        verbose = TRUE) {
 
   if (verbose) {
-    cat("\n")
-    cat(stringr::str_dup("=", 80), "\n")
-    cat("HRTL (HEALTHY & READY TO LEARN) SCORING\n")
-    cat(stringr::str_dup("=", 80), "\n\n")
+    message("=== HRTL Scoring - Step 7.7 (Item-Level Thresholds) ===\n")
   }
 
-  # Step 1: Aggregate domains
+  # ==============================================================================
+  # 1. LOAD IMPUTED DATA AND THRESHOLDS
+  # ==============================================================================
   if (verbose) {
-    cat("Step 1: Aggregating items into domain scores...\n")
+    message("1. Loading imputed data and reference files...\n")
   }
 
-  source("R/hrtl/aggregate_domains.R")
-  dat_scored <- aggregate_domains(
-    dat = dat,
-    lexicon = lexicon,
-    codebook_path = codebook_path,
-    verbose = verbose
+  tryCatch({
+    imputed_data_list <- readRDS(imputed_data_path)
+    conversion_tables <- readRDS(thresholds_path)
+    domain_datasets <- readRDS(domain_datasets_path)
+
+    if (verbose) {
+      message(sprintf("  [OK] Loaded imputed data (%d domains)\n", length(imputed_data_list)))
+      message(sprintf("  [OK] Loaded conversion tables (%d domains)\n", length(conversion_tables)))
+      message(sprintf("  [OK] Loaded domain datasets (%d domains)\n", length(domain_datasets)))
+    }
+
+  }, error = function(e) {
+    stop(sprintf("Failed to load HRTL reference data: %s", e$message))
+  })
+
+  # ==============================================================================
+  # 2. CREATE DOMAIN-TO-ITEMS MAPPING (Motor Development EXCLUDED)
+  # ==============================================================================
+  domain_item_map <- list(
+    "Early Learning Skills" = domain_datasets[["Early Learning Skills"]]$variables,
+    "Social-Emotional Development" = domain_datasets[["Social-Emotional Development"]]$variables,
+    "Self-Regulation" = domain_datasets[["Self-Regulation"]]$variables,
+    "Health" = domain_datasets[["Health"]]$variables
   )
 
-  # Step 2: Count domain classifications
+  # Extract thresholds from conversion tables
+  thresholds_list <- lapply(conversion_tables, function(ct) ct$cahmi_thresholds)
+
+  # ==============================================================================
+  # 3. SCORE CHILDREN USING ITEM-LEVEL THRESHOLDS
+  # ==============================================================================
   if (verbose) {
-    cat("\n")
-    cat(stringr::str_dup("-", 80), "\n")
-    cat("Step 2: Applying HRTL classification logic...\n\n")
+    message("2. Running HRTL item-level threshold scoring...\n")
   }
 
-  domain_class_cols <- c(
-    "hrtl_early_learning_class",
-    "hrtl_health_class",
-    "hrtl_motor_class",
-    "hrtl_self_regulation_class",
-    "hrtl_social_emotional_class"
-  )
+  tryCatch({
+    # Source the item-level scoring function
+    source("R/hrtl/score_hrtl_itemlevel.R")
 
-  # Count On-Track domains
-  dat_scored$hrtl_n_on_track <- rowSums(
-    dat_scored[, domain_class_cols, drop = FALSE] == "On-Track",
-    na.rm = TRUE
-  )
-
-  # Count Emerging domains
-  dat_scored$hrtl_n_emerging <- rowSums(
-    dat_scored[, domain_class_cols, drop = FALSE] == "Emerging",
-    na.rm = TRUE
-  )
-
-  # Count Needs-Support domains
-  dat_scored$hrtl_n_needs_support <- rowSums(
-    dat_scored[, domain_class_cols, drop = FALSE] == "Needs-Support",
-    na.rm = TRUE
-  )
-
-  # Step 3: Apply HRTL classification logic
-  # Ready for Learning: (n_on_track >= 4) AND (n_needs_support == 0)
-  dat_scored$hrtl_ready_for_learning <- (
-    dat_scored$hrtl_n_on_track >= 4 &
-    dat_scored$hrtl_n_needs_support == 0
-  )
-
-  # Create categorical classification
-  # Insufficient data: fewer than 3 valid domains
-  n_valid_domains <- (
-    dat_scored$hrtl_n_on_track +
-    dat_scored$hrtl_n_emerging +
-    dat_scored$hrtl_n_needs_support
-  )
-
-  dat_scored$hrtl_classification <- ifelse(
-    n_valid_domains < 3,
-    "Insufficient Data",
-    ifelse(
-      dat_scored$hrtl_ready_for_learning,
-      "Ready",
-      "Not Ready"
+    # Score children
+    results <- score_hrtl_itemlevel(
+      data = data,
+      imputed_data_list = imputed_data_list,
+      thresholds_list = thresholds_list,
+      domain_datasets = domain_datasets,
+      domain_item_map = domain_item_map,
+      verbose = verbose
     )
-  )
 
-  # Handle NA cases
-  dat_scored$hrtl_classification[is.na(dat_scored$hrtl_ready_for_learning)] <- "Insufficient Data"
+    return(results)
 
-  # Step 4: Summary statistics
-  if (verbose) {
-    cat("HRTL Classification Results:\n")
-    cat(stringr::str_dup("-", 80), "\n\n")
+  }, error = function(e) {
+    stop(sprintf("HRTL scoring failed: %s", e$message))
+  })
+}
 
-    # Overall classification
-    class_table <- table(dat_scored$hrtl_classification, useNA = "ifany")
-    cat("Overall Classifications:\n")
-    for (i in seq_along(class_table)) {
-      class_name <- names(class_table)[i]
-      count <- as.numeric(class_table[i])
-      pct <- 100 * count / nrow(dat_scored)
-      cat(sprintf("  %-20s: %5d (%.1f%%)\n", class_name, count, pct))
+
+#' Save HRTL Scores to Database
+#'
+#' @export
+save_hrtl_scores_to_db <- function(domain_scores, hrtl_overall,
+                                  db_path, table_prefix = "ne25_hrtl",
+                                  overwrite = TRUE, verbose = TRUE) {
+
+  con <- duckdb::dbConnect(duckdb::duckdb(), dbdir = db_path, read_only = FALSE)
+
+  tryCatch({
+    # Save domain scores
+    table_name <- sprintf("%s_domain_scores", table_prefix)
+    DBI::dbWriteTable(con, table_name, domain_scores,
+                     overwrite = overwrite, append = FALSE)
+
+    if (verbose) {
+      message(sprintf("[OK] Saved %d domain score records", nrow(domain_scores)))
     }
 
-    cat("\n")
+    # Create index
+    DBI::dbExecute(con, sprintf(
+      "CREATE INDEX IF NOT EXISTS idx_%s_domain_scores_pid
+       ON %s (pid, record_id, domain)",
+      table_prefix, table_name
+    ))
 
-    # Distribution of On-Track domains
-    cat("Distribution of On-Track Domains:\n")
-    on_track_table <- table(dat_scored$hrtl_n_on_track)
-    for (i in seq_along(on_track_table)) {
-      n_domains <- names(on_track_table)[i]
-      count <- as.numeric(on_track_table[i])
-      pct <- 100 * count / nrow(dat_scored)
-      cat(sprintf("  %s domains On-Track: %5d (%.1f%%)\n", n_domains, count, pct))
+    # Save overall HRTL
+    table_name <- sprintf("%s_overall", table_prefix)
+    DBI::dbWriteTable(con, table_name, hrtl_overall,
+                     overwrite = overwrite, append = FALSE)
+
+    if (verbose) {
+      message(sprintf("[OK] Saved %d overall HRTL records", nrow(hrtl_overall)))
     }
 
-    cat("\n")
+    # Create index
+    DBI::dbExecute(con, sprintf(
+      "CREATE UNIQUE INDEX IF NOT EXISTS idx_%s_overall_pid
+       ON %s (pid, record_id)",
+      table_prefix, table_name
+    ))
 
-    # Distribution of Needs-Support domains
-    cat("Distribution of Needs-Support Domains:\n")
-    needs_table <- table(dat_scored$hrtl_n_needs_support)
-    for (i in seq_along(needs_table)) {
-      n_domains <- names(needs_table)[i]
-      count <- as.numeric(needs_table[i])
-      pct <- 100 * count / nrow(dat_scored)
-      cat(sprintf("  %s domains Needs-Support: %5d (%.1f%%)\n", n_domains, count, pct))
-    }
+    invisible(TRUE)
 
-    cat("\n")
-    cat(stringr::str_dup("=", 80), "\n")
-    cat("[SUCCESS] HRTL scoring complete\n")
-    cat(sprintf("Added %d new columns to dataset\n", 5))  # 3 counts + ready + classification
-    cat(stringr::str_dup("=", 80), "\n\n")
-  }
+  }, error = function(e) {
+    warning(sprintf("Database write failed: %s", e$message))
+    invisible(FALSE)
 
-  return(dat_scored)
+  }, finally = {
+    duckdb::dbDisconnect(con, shutdown = TRUE)
+  })
 }

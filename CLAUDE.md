@@ -602,26 +602,35 @@ pip install pyreadstat
 - **Execution:** Manual workflow (run separately before NE25 pipeline)
 - **Documentation:** See [Manual 2023 Scale Calibration](docs/irt_scoring/MANUAL_2023_SCALE_CALIBRATION.md)
 
-### 🚧 HRTL Scoring - In Development (November 2025)
-- **Status:** **IN DEVELOPMENT** - Functional but pending validation (see GitHub Issue #9)
+### ✅ HRTL Scoring - Production Ready (December 2025)
+- **Status:** **PRODUCTION READY** - Integrated into NE25 pipeline as Step 7.7 (December 2025)
 - **Framework:** Healthy & Ready to Learn (HRTL) for ages 3-5 school readiness assessment
-- **Components:** 27 items across 5 domains (Early Learning, Health, Motor, Self-Regulation, Social-Emotional)
-- **Functions Created:**
-  - `load_hrtl_codebook()`: Extracts 27 items with age-specific thresholds from codebook.json
-  - `classify_items()`: Applies age-specific thresholds (3, 4, 5 years) to classify item responses
-  - `aggregate_domains()`: Computes domain means using simple averaging with `na.rm=TRUE`
-  - `score_hrtl()`: Overall "Ready for Learning" classification using HRTL logic
-- **Classification Logic:** Child is "Ready" if `(≥4 domains On-Track) AND (0 domains Needs-Support)`
-- **Known Limitations (Issue #9):**
-  - Age-based routing excludes 8/27 items from ages 3-5 (developmentally appropriate)
-  - Motor Development: Only 1/4 items available (DD207)
-  - Early Learning: 6/9 items available
-  - Social-Emotional: 4/6 items available
-- **Interim Approach:** Simple averaging handles missing items; NE25-specific validation needed
-- **Test Results (N=978):** 1.5% Ready, 96.1% Not Ready, 2.4% Insufficient Data
-- **Location:** `R/hrtl/` directory with 4 core functions
-- **Documentation:** `docs/hrtl/hrtl_item_age_contingency.csv` (27 items × 6 ages with stems/lexicons)
-- **Next Steps:** Validate against external criteria, develop NE25-specific norms, integrate into pipeline
+- **Eligibility:** Children with `3 ≤ years_old < 6` AND `meets_inclusion = TRUE` (1,435 eligible)
+- **Domains:** 4 domains scored (23 items total, Motor Development excluded)
+  - Early Learning Skills (9 items)
+  - Health (5 items)
+  - Self-Regulation (3 items)
+  - Social-Emotional Development (6 items)
+- **Scoring Algorithm:** Item-level CAHMI thresholds
+  1. Apply age-specific thresholds (SC_AGE_YEARS 3, 4, 5) to each item
+  2. Code responses: 1=Needs Support, 2=Emerging, 3=On-Track
+  3. Average codes across domain items
+  4. Classify domain: ≥2.5=On-Track, ≥1.5=Emerging, <1.5=Needs Support
+- **Imputation:** `mirt::imputeMissing()` on full dataset (all ages) before age filtering
+- **Domain Results (N=1,435):**
+  - Early Learning Skills: 806/1435 on-track (56.1%)
+  - Social-Emotional Development: 1079/1435 on-track (75.2%)
+  - Self-Regulation: 931/1435 on-track (64.8%)
+  - Health: 1181/1435 on-track (82.3%)
+- **Overall HRTL:** Marked as NA (incomplete - requires Motor Development)
+- **Motor Development Exclusion (Issue #15):** Excluded due to 93% missing data (DrawFace, DrawPerson, BounceBall items age-routed in NE25)
+- **Database Tables:**
+  - `ne25_hrtl_domain_scores` (5,740 records: 4 domains × 1,435 children)
+  - `ne25_hrtl_overall` (1,435 records: domain summary with hrtl=NA)
+- **Execution Time:** ~2-3 seconds
+- **Pipeline Location:** Step 7.7 in `pipelines/orchestration/ne25_pipeline.R`
+- **Implementation:** `R/hrtl/score_hrtl.R` (wrapper) & `R/hrtl/score_hrtl_itemlevel.R` (core logic)
+- **Documentation:** [PIPELINE_STEPS.md - Step 7.7](docs/architecture/PIPELINE_STEPS.md#77-hrtl-scoring-item-level-thresholds)
 
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations

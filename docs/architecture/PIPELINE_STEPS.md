@@ -270,6 +270,191 @@ CREDI scoring completed in 2.49 seconds
 - **Scores are all NA:** Verify CREDI items exist in ne25_transformed and have binary (0/1) values
 - **Missing items:** Confirm codebook.json has CREDI mappings (60 LF items)
 
+#### 7.6. GSED D-Score Calculation
+
+**Executed by:** `pipelines/orchestration/ne25_pipeline.R` (Step 7.6) & `R/dscore/score_dscore.R`
+
+**Purpose:**
+- Compute GSED D-scores (developmental quotient) for all eligible children
+- Provides age-adjusted developmental quotient using item response patterns
+- Automatically included in main NE25 pipeline for all ages
+
+**Eligibility Criteria:**
+- All children with `meets_inclusion = TRUE` (eligible, not influential, sufficient responses)
+
+**What it does:**
+1. Loads GSED item lexicon (132 items) from `codebook/data/codebook.json`
+2. Filters to eligible children (2,645 records)
+3. Calls `gsed::dscore()` with key "gsed2406" (GSED 2024.06 standard key)
+4. Generates 6 output scores for each child
+
+**Input:**
+- Source table: `ne25_transformed` (4,966 records total)
+- Filtered to: All children with meets_inclusion = TRUE (2,645 records)
+- Items: 132 GSED lexicon items
+
+**Output Scores (6 columns):**
+1. **D-score (d)** - Linear developmental scale (typical range: 0-100)
+2. **Development-for-Age Z-score (daz)** - Age-adjusted standardized score (mean=0, SD=1)
+3. **Standard Error (sem)** - Measurement precision of D-score
+4. **Age in Years (a)** - Child age at assessment
+5. **Number of Items (n)** - Items used for scoring
+6. **Proportion Passed (p)** - Proportion of items passed
+
+**Database Output:**
+- Table: `ne25_dscore_scores`
+- Columns: `pid`, `record_id`, + 6 D-score metrics
+- Records: 2,645 assessed children (99.8% successfully scored)
+- Indexes: pid, record_id for efficient lookups
+
+**Execution Time:** ~1.5 seconds
+
+**Technical Implementation:**
+- Module: `R/dscore/score_dscore.R` with two functions:
+  - `score_dscore()` - Main D-score calculation
+  - `save_dscore_scores_to_db()` - Database persistence with indexes
+- Uses gsed package with GSED 2024.06 item bank
+- Graceful error handling: Pipeline continues if D-score calculation fails
+
+**Expected Output:**
+```
+--- Step 7.6: GSED D-score Calculation ---
+Computing GSED D-scores for all eligible children...
+[OK] Loaded 132 GSED items
+[OK] 2645 records eligible for D-score calculation
+[OK] D-score calculation complete: 2639/2645 records scored (99.8%)
+GSED D-score calculation complete. Saving 2639 records to database...
+[OK] Saved 2639 records to ne25_dscore_scores
+GSED D-score calculation completed in 1.23 seconds
+```
+
+**Troubleshooting:**
+- **No D-scores generated:** Check that children have meets_inclusion = TRUE
+- **Scores are all NA:** Verify GSED items exist in ne25_transformed
+- **Missing items:** Confirm codebook.json has GSED lexicon mappings (132 items)
+
+#### 7.7. HRTL Scoring (Item-Level Thresholds)
+
+**Executed by:** `pipelines/orchestration/ne25_pipeline.R` (Step 7.7) & `R/hrtl/score_hrtl_itemlevel.R`
+
+**Purpose:**
+- Compute HRTL (Healthy & Ready to Learn) domain classifications for ages 3-5
+- Applies age-specific item-level CAHMI thresholds to determine school readiness domains
+- Automatically included in main NE25 pipeline for children ages 3-5
+
+**Eligibility Criteria:**
+- Children with `3 ≤ years_old < 6` (ages 3, 4, 5 years)
+- AND `meets_inclusion = TRUE` (eligible, not influential, sufficient responses)
+
+**What it does:**
+1. Loads pre-imputed item data from `scripts/temp/hrtl_data_imputed_allages.rds`
+2. Loads CAHMI age-specific thresholds from `scripts/temp/hrtl_conversion_tables.rds`
+3. Filters to eligible children ages 3-5 (1,435 records from 2,645 total)
+4. For each domain (Early Learning, Health, Self-Regulation, Social-Emotional):
+   - Apply age-specific thresholds to each item
+   - Code responses: 1=Needs Support, 2=Emerging, 3=On-Track
+   - Average codes across domain items
+   - Classify domain: ≥2.5=On-Track, ≥1.5=Emerging, <1.5=Needs Support
+5. Mark overall HRTL classification as NA (incomplete due to Motor Development exclusion)
+
+**Input:**
+- Source table: `ne25_transformed` (4,966 records total)
+- Filtered to: Children ages 3-5 with meets_inclusion = TRUE (1,435 records)
+- Items: 23 HRTL items across 4 domains (Motor Development excluded)
+- Imputed data: `scripts/temp/hrtl_data_imputed_allages.rds` (all ages, all domains)
+
+**Output Scores (domain_scores table):**
+- Table: `ne25_hrtl_domain_scores`
+- Columns: pid, record_id, domain, n_items, n_responses, avg_code, classification, years_old
+- 4 domains × ~1,435 children = ~5,740 records
+- Indexes: pid, record_id, domain for efficient querying
+
+**Output Summary (hrtl_overall table):**
+- Table: `ne25_hrtl_overall`
+- Columns: pid, record_id, n_on_track, n_emerging, n_needs_support, n_unable, hrtl=NA
+- ~1,435 records (one per child)
+- Indexes: pid, record_id for unique child identification
+
+**Domain Coverage:**
+1. **Early Learning Skills** - 9 items (literacy, numeracy, vocabulary)
+2. **Health** - 5 items (physical health, development)
+3. **Self-Regulation** - 3 items (behavior, emotional control)
+4. **Social-Emotional Development** - 6 items (social skills, relationships)
+5. **Motor Development** - EXCLUDED (93% missing for 3/4 items in NE25)
+
+**Execution Time:** ~2-3 seconds
+
+**Technical Implementation:**
+- Module: `R/hrtl/score_hrtl_itemlevel.R` with specialized functions:
+  - `score_hrtl_itemlevel()` - Main domain scoring using item-level thresholds
+  - `save_hrtl_scores_to_db()` - Database persistence with indexes
+- Imputation: `mirt::imputeMissing()` on full dataset (all ages) before age filtering
+- Threshold matching: Case-insensitive with underscore normalization
+- Graceful error handling: Pipeline continues if HRTL scoring fails
+
+**Known Limitations:**
+- **Motor Development Excluded:** NE25 has 93% missing data for DrawFace, DrawPerson, BounceBall items (3 of 4 Motor items). Age-routing design only administered these to select age groups.
+- **Overall HRTL Marked as NA:** Cannot compute overall HRTL classification without complete Motor Development domain (requires ≥4 domains on-track AND 0 domains needs-support)
+- **Issue Reference:** GitHub Issue #15 - Motor Development data quality limitations
+
+**Expected Output:**
+```
+--- Step 7.7: HRTL Scoring (Item-Level Thresholds) ---
+=== HRTL Scoring - Step 7.7 (Item-Level Thresholds) ===
+
+1. Loading imputed data and reference files...
+  [OK] Loaded imputed data (5 domains)
+  [OK] Loaded conversion tables (5 domains)
+  [OK] Loaded domain datasets (5 domains)
+
+2. Running HRTL item-level threshold scoring...
+Total input records: 2645
+HRTL-eligible (ages 3-5): 1435
+
+Scoring Early Learning Skills...
+  [OK] Scored 1435 children
+
+Scoring Social-Emotional Development...
+  [OK] Scored 1435 children
+
+Scoring Self-Regulation...
+  [OK] Scored 1435 children
+
+Scoring Health...
+  [OK] Scored 1435 children
+
+[WARNING] Overall HRTL classification marked as NA (missing)
+Reason: Motor Development domain excluded due to data quality issues
+        (93% of NE25 records missing DrawFace, DrawPerson, BounceBall items)
+
+Domain scores available for:
+  Early Learning Skills: 1435 children scored
+  Social-Emotional Development: 1435 children scored
+  Self-Regulation: 1435 children scored
+  Health: 1435 children scored
+
+HRTL Domain Classification Summary:
+  Early Learning Skills: 806/1435 on-track (56.1%)
+  Social-Emotional Development: 1079/1435 on-track (75.2%)
+  Self-Regulation: 931/1435 on-track (64.8%)
+  Health: 1181/1435 on-track (82.3%)
+
+HRTL scoring complete. Saving 5740 domain score records to database...
+[OK] Saved 5740 domain score records
+[OK] Saved 1435 overall HRTL records
+HRTL scoring completed in 2.34 seconds
+```
+
+**Troubleshooting:**
+- **No HRTL scores generated:** Check that children have `3 ≤ years_old < 6` AND `meets_inclusion = TRUE`
+- **"Unable to score" classifications:** Indicates insufficient imputed item responses for domain
+- **Missing thresholds error:** Verify `hrtl_conversion_tables.rds` exists in scripts/temp/
+- **Imputation file not found:** Run `scripts/temp/hrtl_imputeMissing_allages.R` to generate imputed data
+
+**References:**
+- GitHub Issue #15: Motor Development data quality (93% missing in NE25)
+- Implementation: [GitHub Issue #9](https://github.com/anthropics/kidsights/issues/9) - HRTL integration design
+
 #### 11. NE25 Calibration Table Creation
 **Executed by:** `scripts/irt_scoring/create_ne25_calibration_table.R`
 **What it does:**

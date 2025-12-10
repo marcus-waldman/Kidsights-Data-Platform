@@ -974,6 +974,73 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     metrics$dscore_scoring_duration <- dscore_time
     message(paste("GSED D-score calculation completed in", round(dscore_time, 2), "seconds"))
 
+    # ===========================================================================
+    # STEP 7.7: HRTL SCORING (ITEM-LEVEL THRESHOLDS, AGES 3-5)
+    # ===========================================================================
+    message("\n--- Step 7.7: HRTL Scoring (Item-Level Thresholds) ---")
+    hrtl_start <- Sys.time()
+
+    # Source HRTL scoring function
+    tryCatch({
+      source("R/hrtl/score_hrtl.R")
+
+      # Run HRTL scoring
+      message("Computing HRTL scores for children ages 3-5...")
+      hrtl_results <- score_hrtl(
+        data = final_data,
+        imputed_data_path = "scripts/temp/hrtl_data_imputed_allages.rds",
+        thresholds_path = "scripts/temp/hrtl_conversion_tables.rds",
+        domain_datasets_path = "scripts/temp/hrtl_domain_datasets.rds",
+        verbose = TRUE
+      )
+
+      # Save domain scores to database
+      if (nrow(hrtl_results$domain_scores) > 0) {
+        message(sprintf("HRTL scoring complete. Saving %d domain score records to database...", nrow(hrtl_results$domain_scores)))
+
+        save_hrtl_scores_to_db(
+          domain_scores = hrtl_results$domain_scores,
+          hrtl_overall = hrtl_results$hrtl_overall,
+          db_path = "data/duckdb/kidsights_local.duckdb",
+          table_prefix = "ne25_hrtl",
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        # Calculate metrics
+        metrics$hrtl_records_scored <- sum(!is.na(hrtl_results$domain_scores$avg_code))
+        metrics$hrtl_records_attempted <- nrow(hrtl_results$domain_scores) / 4  # 4 domains
+
+        # Calculate domain-level summaries
+        domain_summary <- hrtl_results$domain_scores %>%
+          dplyr::group_by(domain, classification) %>%
+          dplyr::summarise(n = dplyr::n(), .groups = "drop")
+
+        message(sprintf("\nHRTL Domain Classification Summary:"))
+        for (domain in unique(hrtl_results$domain_scores$domain)) {
+          on_track <- sum(hrtl_results$domain_scores$classification[hrtl_results$domain_scores$domain == domain] == "On-Track", na.rm = TRUE)
+          n_domain <- length(unique(hrtl_results$domain_scores$pid[hrtl_results$domain_scores$domain == domain]))
+          pct <- 100 * on_track / n_domain
+          message(sprintf("  %s: %d/%d on-track (%.1f%%)", domain, on_track, n_domain, pct))
+        }
+      } else {
+        message("No records eligible for HRTL scoring (no children ages 3-5)")
+        metrics$hrtl_records_scored <- 0
+        metrics$hrtl_records_attempted <- 0
+      }
+
+    }, error = function(e) {
+      warning(paste("HRTL scoring failed:", e$message))
+      warning("Continuing pipeline without HRTL scores")
+      metrics$hrtl_records_scored <- 0
+      metrics$hrtl_records_attempted <- 0
+    })
+
+    hrtl_end <- Sys.time()
+    hrtl_time <- as.numeric(difftime(hrtl_end, hrtl_start, units = "secs"))
+    metrics$hrtl_scoring_duration <- hrtl_time
+    message(paste("HRTL scoring completed in", round(hrtl_time, 2), "seconds"))
+
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
     metadata_start <- Sys.time()

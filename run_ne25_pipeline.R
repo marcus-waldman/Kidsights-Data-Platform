@@ -100,6 +100,15 @@ if (pipeline_result$success) {
       cat(paste("  • Scoring time:", round(metrics$dscore_scoring_duration, 1), "seconds"), "\n")
     }
 
+    if (!is.null(metrics$hrtl_records_scored)) {
+      cat("\n📊 HRTL SCORING METRICS:\n")
+      cat(paste("  • Records attempted:", metrics$hrtl_records_attempted), "\n")
+      cat(paste("  • Records scored:", metrics$hrtl_records_scored), "\n")
+      cat(paste("  • Scoring time:", round(metrics$hrtl_scoring_duration, 1), "seconds"), "\n")
+      cat("  • Note: Motor Development excluded (93% missing data in NE25)\n")
+      cat("  • Overall HRTL marked as NA (incomplete without Motor domain)\n")
+    }
+
     cat("\n⏱️ TOTAL EXECUTION TIME:", round(metrics$total_duration, 1), "seconds\n")
   }
 
