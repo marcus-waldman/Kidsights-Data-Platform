@@ -86,6 +86,13 @@ if (pipeline_result$success) {
     }
     cat(paste("  • Processing time:", round(metrics$processing_duration, 1), "seconds"), "\n")
 
+    if (!is.null(metrics$credi_records_scored)) {
+      cat("\n📊 CREDI SCORING METRICS:\n")
+      cat(paste("  • Records attempted:", metrics$credi_records_attempted), "\n")
+      cat(paste("  • Records scored:", metrics$credi_records_scored), "\n")
+      cat(paste("  • Scoring time:", round(metrics$credi_scoring_duration, 1), "seconds"), "\n")
+    }
+
     cat("\n⏱️ TOTAL EXECUTION TIME:", round(metrics$total_duration, 1), "seconds\n")
   }
 

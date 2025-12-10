@@ -79,9 +79,12 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   6.7. Join GSED person-fit scores (if available)
 #'   6.8. Create meets_inclusion filter column
 #'   6.9. Join calibrated KL divergence weights (if available)
+#'   6.10. Mark out-of-state records
 #'   7. Store transformed data (with weights if available)
+#'   7.5. CREDI developmental scoring (children under 4 years old)
 #'   8. Generate variable metadata
 #'   9. Generate data dictionary
+#'   10. Generate interactive dictionary
 #'
 #' @param config_path Path to NE25 configuration file
 #' @param pipeline_type Type of pipeline run ("full", "incremental", "test")
@@ -866,6 +869,58 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message("Transformed data stored successfully")
     }
     metrics$records_transformed <- nrow(final_data)
+
+    # ===========================================================================
+    # STEP 7.5: CREDI SCORING (FOR CHILDREN UNDER 4 YEARS OLD)
+    # ===========================================================================
+    message("\n--- Step 7.5: CREDI Developmental Scoring ---")
+    credi_start <- Sys.time()
+
+    # Source CREDI scoring function
+    tryCatch({
+      source("R/credi/score_credi.R")
+
+      # Run CREDI scoring
+      message("Computing CREDI developmental scores for children under 4 years old...")
+      credi_scores <- score_credi(
+        data = final_data,
+        codebook_path = "codebook/data/codebook.json",
+        min_items = 5,
+        age_cutoff = 4,
+        verbose = TRUE
+      )
+
+      # Save to database
+      if (nrow(credi_scores) > 0) {
+        message(sprintf("CREDI scoring complete. Saving %d records to database...", nrow(credi_scores)))
+
+        save_credi_scores_to_db(
+          scores = credi_scores,
+          db_path = "data/duckdb/kidsights_local.duckdb",
+          table_name = "ne25_credi_scores",
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        metrics$credi_records_scored <- sum(!is.na(credi_scores$OVERALL))
+        metrics$credi_records_attempted <- nrow(credi_scores)
+      } else {
+        message("No records eligible for CREDI scoring (no children under 4 years old)")
+        metrics$credi_records_scored <- 0
+        metrics$credi_records_attempted <- 0
+      }
+
+    }, error = function(e) {
+      warning(paste("CREDI scoring failed:", e$message))
+      warning("Continuing pipeline without CREDI scores")
+      metrics$credi_records_scored <- 0
+      metrics$credi_records_attempted <- 0
+    })
+
+    credi_end <- Sys.time()
+    credi_time <- as.numeric(difftime(credi_end, credi_start, units = "secs"))
+    metrics$credi_scoring_duration <- credi_time
+    message(paste("CREDI scoring completed in", round(credi_time, 2), "seconds"))
 
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
