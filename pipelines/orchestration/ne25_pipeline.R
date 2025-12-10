@@ -76,8 +76,10 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   5.5. Data validation (detect unexpected data loss)
 #'   6. Eligibility validation
 #'   6.5. Join manual influential observations (if available)
-#'   7. Store transformed data
-#'   7.5. Join calibrated KL divergence weights (if available)
+#'   6.7. Join GSED person-fit scores (if available)
+#'   6.8. Create meets_inclusion filter column
+#'   6.9. Join calibrated KL divergence weights (if available)
+#'   7. Store transformed data (with weights if available)
 #'   8. Generate variable metadata
 #'   9. Generate data dictionary
 #'
@@ -96,9 +98,10 @@ convert_dictionary_to_df <- function(dict_list) {
 #'   3. Re-run pipeline to incorporate influential flags
 #'
 #' @section Calibrated Weights:
-#' Step 7.5 optionally joins KL divergence calibrated weights from
+#' Step 6.9 optionally joins KL divergence calibrated weights from
 #' `data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather` if the file exists.
 #' If weights are not available, the pipeline continues normally without them.
+#' Weights are joined BEFORE database storage (Step 7) to ensure they are persisted.
 #'
 #' To generate calibrated weights:
 #'   1. Run raking targets pipeline (scripts 25-30b)
@@ -765,34 +768,9 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     metrics$inclusion_duration <- inclusion_time
     message(paste("meets_inclusion column created in", round(inclusion_time, 2), "seconds"))
 
-    # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS
-    message("\n--- Step 7: Storing Transformed Data ---")
-    message("Storing transformed data with eligibility flags...")
-    transformed_feather <- file.path(temp_dir, "ne25_transformed.feather")
-    arrow::write_feather(final_data, transformed_feather)
-
-    transformed_result <- system2(
-      python_path,
-      args = c(
-        "pipelines/python/insert_raw_data.py",
-        "--data-file", transformed_feather,
-        "--table-name", "ne25_transformed",
-        "--data-type", "raw",
-        "--config", config_path
-      ),
-      stdout = TRUE,
-      stderr = TRUE
-    )
-
-    if (attr(transformed_result, "status") != 0 && !is.null(attr(transformed_result, "status"))) {
-      warning(paste("Transformed data insertion had issues:", paste(transformed_result, collapse = "\n")))
-    } else {
-      message("Transformed data stored successfully")
-    }
-    metrics$records_transformed <- nrow(final_data)
-
-    # STEP 7.5: OPTIONAL - JOIN CALIBRATED WEIGHTS IF AVAILABLE
-    message("\n--- Step 7.5: Checking for Calibrated Weights ---")
+    # STEP 6.9: OPTIONAL - JOIN CALIBRATED WEIGHTS IF AVAILABLE
+    # NOTE: Must be done BEFORE Step 7 (database storage) so weights are included in database
+    message("\n--- Step 6.9: Checking for Calibrated Weights ---")
     weights_file <- "data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather"
 
     if (file.exists(weights_file)) {
@@ -836,6 +814,32 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
       message(sprintf("    Expected location: %s", weights_file))
       message("    To generate weights, run scripts 25-33 in the raking pipeline.")
     }
+
+    # STEP 7: STORE TRANSFORMED DATA WITH ELIGIBILITY FLAGS (AND WEIGHTS IF AVAILABLE)
+    message("\n--- Step 7: Storing Transformed Data ---")
+    message("Storing transformed data with eligibility flags and calibrated weights...")
+    transformed_feather <- file.path(temp_dir, "ne25_transformed.feather")
+    arrow::write_feather(final_data, transformed_feather)
+
+    transformed_result <- system2(
+      python_path,
+      args = c(
+        "pipelines/python/insert_raw_data.py",
+        "--data-file", transformed_feather,
+        "--table-name", "ne25_transformed",
+        "--data-type", "raw",
+        "--config", config_path
+      ),
+      stdout = TRUE,
+      stderr = TRUE
+    )
+
+    if (attr(transformed_result, "status") != 0 && !is.null(attr(transformed_result, "status"))) {
+      warning(paste("Transformed data insertion had issues:", paste(transformed_result, collapse = "\n")))
+    } else {
+      message("Transformed data stored successfully")
+    }
+    metrics$records_transformed <- nrow(final_data)
 
     # STEP 8: METADATA GENERATION USING PYTHON
     message("\n--- Step 8: Generating Variable Metadata ---")
