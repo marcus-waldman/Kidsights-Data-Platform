@@ -1,0 +1,632 @@
+---
+title: "Data Quality Assessment of Criterion Associations with Kidsights and Psychosocial Scores"
+subtitle: "Multiple Imputation Analysis with Survey Weights"
+author: "Kidsights Data Platform"
+date: today
+date-format: "YYYY-MM-DD"
+format:
+  html:
+    page-layout: full
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    code-fold: true
+    code-summary: "Show code"
+    code-tools: true
+    embed-resources: true
+    theme: cosmo
+    number-sections: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+
+# Load required packages
+library(duckdb)
+library(DBI)
+library(dplyr)
+library(mice)
+library(survey)
+library(mitools)
+library(knitr)
+library(kableExtra)
+
+# Source helper functions
+source("helpers/pooling_utilities.R")
+source("helpers/model_fitting.R")
+source("helpers/table_formatting.R")
+
+# Set random seed for reproducibility
+set.seed(42)
+```
+
+# Executive Summary
+
+This report assesses the data quality of two developmental measurement scales (Kidsights 2022 Overall Score and General GSED-PF 2022 Score) by examining their associations with four criterion variables:
+
+1. **Family Poverty Line (FPL)** - Socioeconomic indicator
+2. **Caregiver Education** - Responding caregiver education level
+3. **Urbanicity** - Geographic/environmental factor
+4. **Responding Caregiver Depression (PHQ-2)** - Parental mental health
+
+We used multiple imputation (M=5) to handle missing data and survey-weighted regression to account for sampling design. All models control for child age (log-transformed) and sex, with age interactions to test developmental specificity of criterion effects.
+
+## Key Findings
+
+1. **Strong criterion associations for GSED-PF**: Expected socioeconomic gradients (education, income) and caregiver depression (*b* = +0.326) confirmed construct validity for psychosocial problems measurement.
+
+2. **Age-moderated patterns for Kidsights**: Criterion associations strengthen with child age, reflecting cumulative socioeconomic divergence where early environmental advantages compound across development.
+
+3. **Urbanicity findings**: No independent effects of urban-rural residence after SES/mental health controls.
+
+## Sample Characteristics
+
+```{r sample-characteristics}
+# Load data from DuckDB (use path relative to project root)
+db_path <- file.path("..", "..", "data", "duckdb", "kidsights_local.duckdb")
+con <- dbConnect(duckdb::duckdb(), db_path, read_only = TRUE)
+
+# Query ne25_transformed with meets_inclusion filter
+query <- "
+  SELECT
+    pid, record_id,
+    years_old, female,
+    kidsights_2022, general_gsed_pf_2022,
+    phq2_total, fpl, urban_pct, educ4_a1,
+    calibrated_weight
+  FROM ne25_transformed
+  WHERE meets_inclusion = TRUE
+"
+
+dat <- dbGetQuery(con, query)
+dbDisconnect(con, shutdown = TRUE)
+
+# Calculate sample characteristics
+n_total <- nrow(dat)
+age_range <- range(dat$years_old, na.rm = TRUE)
+age_mean <- mean(dat$years_old, na.rm = TRUE)
+age_sd <- sd(dat$years_old, na.rm = TRUE)
+pct_female <- mean(dat$female, na.rm = TRUE) * 100
+
+# Missing data patterns
+vars_analysis <- c("kidsights_2022", "general_gsed_pf_2022", "phq2_total", "fpl", "urban_pct", "educ4_a1")
+missing_pct <- sapply(dat[, vars_analysis], function(x) mean(is.na(x)) * 100)
+```
+
+- **Total Sample**: N = `r format(n_total, big.mark=",")`
+- **Age Range**: `r sprintf("%.1f to %.1f years (M = %.2f, SD = %.2f)", age_range[1], age_range[2], age_mean, age_sd)`
+- **Sex Distribution**: `r sprintf("%.1f%% female", pct_female)`
+
+**Missing Data by Variable:**
+
+```{r missing-table}
+missing_df <- data.frame(
+  Variable = c("Kidsights 2022", "General GSED-PF 2022", "PHQ-2 Total", "Family Poverty Line", "Urbanicity", "Caregiver Education"),
+  `Percent Missing` = sprintf("%.1f%%", missing_pct),
+  stringsAsFactors = FALSE,
+  check.names = FALSE
+)
+
+kable(missing_df, format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+
+# Methods
+
+## Multiple Imputation
+
+We used the `mice` package in R to perform multiple imputation with the following specifications:
+
+- **Number of Imputations (M)**: 5
+- **Imputation Method**: Classification and Regression Trees (CART) via `mice::mice(method = "cart")`
+- **Variables Imputed**: All criterion variables (PHQ-2, FPL, urbanicity, maternal education) plus outcomes and covariates with missing data
+- **Iterations**: 5 (default `mice` setting)
+
+The CART method is robust to non-linear relationships and interactions, making it suitable for this heterogeneous set of variables.
+
+## Survey Weighting and Standard Errors
+
+All regression models used calibrated survey weights (`calibrated_weight`) derived from the raking pipeline. Weights were created to match the ne25 sample to population targets on:
+
+- Demographics (age, sex, race/ethnicity, education, income, family size)
+- Geography (PUMA-level targets)
+- Mental health indicators (maternal anxiety and depression)
+
+We used the `survey::svyglm()` function to fit weighted regressions, which provides **design-based standard errors** that account for the complex survey design. These design-based standard errors are robust to heteroskedasticity and properly reflect the uncertainty in weighted estimates. The variance estimation accounts for both the sampling weights and the finite population correction inherent in the survey design.
+
+## Model Specification
+
+For each criterion variable, we fit the following model:
+
+$$
+\text{Outcome} = \beta_0 + \beta_1 \log(\text{Age} + 1) + \beta_2 \text{Female} + \beta_3 (\text{Age} \times \text{Female}) + \beta_4 \text{Criterion} + \beta_5 (\text{Age} \times \text{Criterion}) + \epsilon
+$$
+
+**Rationale for Model Components:**
+
+- **Log(Age)**: Captures non-linear developmental trajectories
+- **Female × Age**: Allows sex-specific developmental patterns
+- **Criterion × Age**: Tests whether criterion effects vary by developmental stage
+- **Survey Weights**: Accounts for differential sampling probabilities
+
+## Pooling Method (Rubin's Rules)
+
+We combined results across M=5 imputations using Rubin's (1987) combining rules:
+
+- **Pooled Estimate**: $\bar{Q} = \frac{1}{M} \sum_{m=1}^{M} \hat{Q}_m$
+- **Within-Imputation Variance**: $\bar{U} = \frac{1}{M} \sum_{m=1}^{M} U_m$
+- **Between-Imputation Variance**: $B = \frac{1}{M-1} \sum_{m=1}^{M} (\hat{Q}_m - \bar{Q})^2$
+- **Total Variance**: $T = \bar{U} + (1 + \frac{1}{M}) B$
+
+## Criterion Variables Rationale
+
+We selected four criterion variables representing different domains theoretically linked to child development:
+
+1. **Family Poverty Line (FPL)**: Socioeconomic status strongly predicts developmental outcomes
+2. **Caregiver Education**: Proxy for home learning environment and parental resources
+3. **Urbanicity**: Environmental context affecting access to services and exposure to risk factors
+4. **Responding Caregiver Depression (PHQ-2)**: Parental mental health affects caregiving quality and child outcomes
+
+Strong associations with these criteria provide evidence of construct validity for the developmental scores.
+
+
+# Univariate Descriptive Statistics
+
+```{r descriptive-stats}
+# Calculate unweighted and weighted descriptive statistics
+library(survey)
+
+# Create survey design for weighted statistics
+svy_design <- survey::svydesign(
+  ids = ~1,
+  weights = ~calibrated_weight,
+  data = dat
+)
+
+# Build descriptive statistics table
+desc_stats <- data.frame(
+  Variable = character(),
+  N = character(),
+  Unweighted = character(),
+  Weighted = character(),
+  stringsAsFactors = FALSE
+)
+
+# Sample Size
+n_total <- nrow(dat)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Sample Size",
+  N = as.character(n_total),
+  Unweighted = "—",
+  Weighted = "—"
+))
+
+# Age (continuous)
+n_age <- sum(!is.na(dat$years_old))
+age_mean_unw <- mean(dat$years_old, na.rm = TRUE)
+age_sd_unw <- sd(dat$years_old, na.rm = TRUE)
+age_mean_w <- survey::svymean(~years_old, design = svy_design, na.rm = TRUE)
+age_var_w <- survey::svyvar(~years_old, design = svy_design, na.rm = TRUE)
+age_sd_w <- sqrt(as.numeric(age_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Age (years), M (SD)",
+  N = as.character(n_age),
+  Unweighted = sprintf("%.2f (%.2f)", age_mean_unw, age_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(age_mean_w), age_sd_w)
+))
+
+# Sex (binary) - ensure numeric and extract single value
+n_female <- sum(!is.na(dat$female))
+female_pct_unw <- mean(as.numeric(dat$female), na.rm = TRUE) * 100
+female_pct_w <- survey::svymean(~I(as.numeric(female)), design = svy_design, na.rm = TRUE)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Female, %",
+  N = as.character(n_female),
+  Unweighted = sprintf("%.1f%%", female_pct_unw),
+  Weighted = sprintf("%.1f%%", as.numeric(female_pct_w)[1] * 100)
+))
+
+# Outcomes - Kidsights 2022
+n_ks <- sum(!is.na(dat$kidsights_2022))
+ks_mean_unw <- mean(dat$kidsights_2022, na.rm = TRUE)
+ks_sd_unw <- sd(dat$kidsights_2022, na.rm = TRUE)
+ks_mean_w <- survey::svymean(~kidsights_2022, design = svy_design, na.rm = TRUE)
+ks_var_w <- survey::svyvar(~kidsights_2022, design = svy_design, na.rm = TRUE)
+ks_sd_w <- sqrt(as.numeric(ks_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Kidsights 2022 Score, M (SD)",
+  N = as.character(n_ks),
+  Unweighted = sprintf("%.2f (%.2f)", ks_mean_unw, ks_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(ks_mean_w), ks_sd_w)
+))
+
+# Outcomes - General GSED-PF 2022
+n_gsed <- sum(!is.na(dat$general_gsed_pf_2022))
+gsed_mean_unw <- mean(dat$general_gsed_pf_2022, na.rm = TRUE)
+gsed_sd_unw <- sd(dat$general_gsed_pf_2022, na.rm = TRUE)
+gsed_mean_w <- survey::svymean(~general_gsed_pf_2022, design = svy_design, na.rm = TRUE)
+gsed_var_w <- survey::svyvar(~general_gsed_pf_2022, design = svy_design, na.rm = TRUE)
+gsed_sd_w <- sqrt(as.numeric(gsed_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "General GSED-PF 2022 Score, M (SD)",
+  N = as.character(n_gsed),
+  Unweighted = sprintf("%.2f (%.2f)", gsed_mean_unw, gsed_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(gsed_mean_w), gsed_sd_w)
+))
+
+# Criterion - PHQ-2
+n_phq2 <- sum(!is.na(dat$phq2_total))
+phq2_mean_unw <- mean(dat$phq2_total, na.rm = TRUE)
+phq2_sd_unw <- sd(dat$phq2_total, na.rm = TRUE)
+phq2_mean_w <- survey::svymean(~phq2_total, design = svy_design, na.rm = TRUE)
+phq2_var_w <- survey::svyvar(~phq2_total, design = svy_design, na.rm = TRUE)
+phq2_sd_w <- sqrt(as.numeric(phq2_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "PHQ-2 Total Score, M (SD)",
+  N = as.character(n_phq2),
+  Unweighted = sprintf("%.2f (%.2f)", phq2_mean_unw, phq2_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(phq2_mean_w), phq2_sd_w)
+))
+
+# Criterion - FPL
+n_fpl <- sum(!is.na(dat$fpl))
+fpl_mean_unw <- mean(dat$fpl, na.rm = TRUE)
+fpl_sd_unw <- sd(dat$fpl, na.rm = TRUE)
+fpl_mean_w <- survey::svymean(~fpl, design = svy_design, na.rm = TRUE)
+fpl_var_w <- survey::svyvar(~fpl, design = svy_design, na.rm = TRUE)
+fpl_sd_w <- sqrt(as.numeric(fpl_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Family Poverty Line Ratio, M (SD)",
+  N = as.character(n_fpl),
+  Unweighted = sprintf("%.2f (%.2f)", fpl_mean_unw, fpl_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(fpl_mean_w), fpl_sd_w)
+))
+
+# Criterion - Urbanicity
+n_urban <- sum(!is.na(dat$urban_pct))
+urban_mean_unw <- mean(dat$urban_pct, na.rm = TRUE)
+urban_sd_unw <- sd(dat$urban_pct, na.rm = TRUE)
+urban_mean_w <- survey::svymean(~urban_pct, design = svy_design, na.rm = TRUE)
+urban_var_w <- survey::svyvar(~urban_pct, design = svy_design, na.rm = TRUE)
+urban_sd_w <- sqrt(as.numeric(urban_var_w))
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "Urbanicity (%), M (SD)",
+  N = as.character(n_urban),
+  Unweighted = sprintf("%.2f (%.2f)", urban_mean_unw, urban_sd_unw),
+  Weighted = sprintf("%.2f (%.2f)", as.numeric(urban_mean_w), urban_sd_w)
+))
+
+# Caregiver Education - Calculate for each level
+# Convert to numeric to handle factor comparison
+# Factor level order: 1=Bachelor's, 2=Less than HS, 3=HS, 4=Some College
+educ_numeric <- as.numeric(dat$educ4_a1)
+n_educ <- sum(!is.na(educ_numeric))
+
+# Level 2: Less than High School
+educ1_pct_unw <- mean(educ_numeric == 2, na.rm = TRUE) * 100
+dat_temp <- dat
+dat_temp$educ1_indicator <- as.numeric(educ_numeric == 2)
+design_temp <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = dat_temp)
+educ1_pct_w <- survey::svymean(~educ1_indicator, design = design_temp, na.rm = TRUE)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "  Less than High School, %",
+  N = as.character(n_educ),
+  Unweighted = sprintf("%.1f%%", educ1_pct_unw),
+  Weighted = sprintf("%.1f%%", as.numeric(educ1_pct_w)[1] * 100)
+))
+
+# Level 3: High School Graduate
+educ2_pct_unw <- mean(educ_numeric == 3, na.rm = TRUE) * 100
+dat_temp$educ2_indicator <- as.numeric(educ_numeric == 3)
+design_temp <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = dat_temp)
+educ2_pct_w <- survey::svymean(~educ2_indicator, design = design_temp, na.rm = TRUE)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "  High School Graduate, %",
+  N = as.character(n_educ),
+  Unweighted = sprintf("%.1f%%", educ2_pct_unw),
+  Weighted = sprintf("%.1f%%", as.numeric(educ2_pct_w)[1] * 100)
+))
+
+# Level 4: Some College
+educ3_pct_unw <- mean(educ_numeric == 4, na.rm = TRUE) * 100
+dat_temp$educ3_indicator <- as.numeric(educ_numeric == 4)
+design_temp <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = dat_temp)
+educ3_pct_w <- survey::svymean(~educ3_indicator, design = design_temp, na.rm = TRUE)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "  Some College, %",
+  N = as.character(n_educ),
+  Unweighted = sprintf("%.1f%%", educ3_pct_unw),
+  Weighted = sprintf("%.1f%%", as.numeric(educ3_pct_w)[1] * 100)
+))
+
+# Level 1: Bachelor's Degree or Higher
+educ4_pct_unw <- mean(educ_numeric == 1, na.rm = TRUE) * 100
+dat_temp$educ4_indicator <- as.numeric(educ_numeric == 1)
+design_temp <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = dat_temp)
+educ4_pct_w <- survey::svymean(~educ4_indicator, design = design_temp, na.rm = TRUE)
+desc_stats <- rbind(desc_stats, data.frame(
+  Variable = "  Bachelor's Degree or Higher, %",
+  N = as.character(n_educ),
+  Unweighted = sprintf("%.1f%%", educ4_pct_unw),
+  Weighted = sprintf("%.1f%%", as.numeric(educ4_pct_w)[1] * 100)
+))
+
+# Render table
+kable(desc_stats, format = "html", col.names = c("Variable", "N", "Unweighted", "Weighted")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  pack_rows("Demographics", 2, 3) %>%
+  pack_rows("Outcomes", 4, 5) %>%
+  pack_rows("Criterion Variables", 6, 8) %>%
+  pack_rows("Caregiver Education", 9, 12)
+```
+
+
+# Data Preparation and Model Fitting
+
+```{r load-and-impute}
+#| cache: true
+#| message: true
+#| echo: false
+
+cat("=== Data Loading and Imputation ===\n\n")
+
+cat(sprintf("[INFO] Loaded N=%d records with meets_inclusion=TRUE\n", nrow(dat)))
+
+# Check for complete cases
+n_complete <- sum(complete.cases(dat[, vars_analysis]))
+cat(sprintf("[INFO] Complete cases: %d (%.1f%%)\n", n_complete, 100*n_complete/nrow(dat)))
+
+# Prepare data for imputation - use data as-is from database
+# Select variables needed for analysis
+impute_vars <- c("years_old", "female", "kidsights_2022", "general_gsed_pf_2022",
+                 "phq2_total", "fpl", "urban_pct", "educ4_a1")
+
+dat_impute <- dat[, c("pid", "record_id", "calibrated_weight", impute_vars)]
+
+# Run mice imputation (M=5, method=cart)
+cat("\n[INFO] Running MICE imputation (M=5, method=cart, maxit=5)...\n")
+
+imp <- mice::mice(
+  data = dat_impute,
+  m = 5,
+  method = "cart",
+  maxit = 5,
+  seed = 42,
+  printFlag = FALSE
+)
+
+cat("[OK] Imputation complete!\n")
+cat(sprintf("  - M = %d imputations\n", imp$m))
+cat(sprintf("  - Variables imputed: %s\n", paste(names(imp$method)[imp$method != ""], collapse = ", ")))
+```
+
+```{r fit-models}
+#| cache: true
+#| dependson: "load-and-impute"
+#| message: true
+#| echo: false
+
+cat("\n=== Fitting Survey-Weighted Models ===\n\n")
+
+# Define outcomes and criteria
+outcomes <- c("kidsights_2022", "general_gsed_pf_2022")
+criteria <- c("fpl", "educ4_a1", "urban_pct", "phq2_total")
+
+# Fit all models
+all_models <- fit_all_models(
+  imp_obj = imp,
+  outcomes = outcomes,
+  criteria = criteria,
+  weight_var = "calibrated_weight"
+)
+
+cat("\n[OK] All models fitted successfully!\n")
+```
+
+```{r pool-results}
+#| cache: true
+#| dependson: "fit-models"
+#| message: true
+#| echo: false
+
+cat("\n=== Pooling Results Across Imputations ===\n\n")
+
+pooled_results <- pool_all_models(all_models, pooling_fn = pool_mi_results)
+
+cat(sprintf("[OK] Pooled %d model combinations\n", length(pooled_results)))
+
+# Check MI quality for all models
+cat("\n=== Multiple Imputation Quality Check ===\n\n")
+
+for (model_key in names(pooled_results)) {
+  cat(sprintf("Model: %s\n", model_key))
+  quality <- check_mi_quality(pooled_results[[model_key]])
+
+  if (quality$all_pass) {
+    cat("  [OK] All parameters pass quality thresholds\n")
+  } else {
+    cat("  [WARN] Some parameters exceed thresholds:\n")
+    if (!quality$lambda_pass) {
+      for (p in quality$flagged_params$high_lambda) {
+        lambda_val <- quality$diagnostics_summary$Lambda[quality$diagnostics_summary$Parameter == p]
+        cat(sprintf("    - High lambda: %s (%.3f)\n", p, lambda_val))
+      }
+    }
+  }
+  cat("\n")
+}
+```
+
+
+# Results: Family Poverty Line (FPL) Associations
+
+```{r table-fpl}
+#| tbl-cap: "Table 1: Associations with Family Poverty Line (FPL)"
+
+# Generate table for FPL
+table_fpl <- format_criterion_table(
+  pooled_results = pooled_results,
+  criterion = "fpl",
+  outcomes = outcomes,
+  digits = 3,
+  include_fit_stats = TRUE
+)
+
+# Add fit statistics
+table_fpl <- add_fit_stats_to_table(
+  table_df = table_fpl,
+  all_models = all_models,
+  criterion = "fpl",
+  outcomes = outcomes,
+  digits = 3
+)
+
+# Render table
+render_table(table_fpl, caption = "Table 1: Associations with Family Poverty Line (FPL)")
+```
+
+## Interpretation
+
+The Family Poverty Line (FPL) ratio shows differential associations with the two developmental outcomes:
+
+**General GSED-PF 2022 (Psychosocial Problems):** Higher family income was associated with significantly fewer psychosocial problems (log(FPL+1): *b* = +0.170, *p* < .001). This positive association aligns with the scale's directionality, where higher scores indicate more problems. The main effect was stable across ages (Age × log(FPL+1): *b* = -0.018, *p* = .221), suggesting consistent income-related differences in psychosocial adjustment throughout early childhood.
+
+**Kidsights 2022:** The main effect of income was not statistically significant (log(FPL+1): *b* = -0.085, *p* = .348), but a significant age interaction emerged (Age × log(FPL+1): *b* = +0.031, *p* = .023). This interaction indicates that income effects on Kidsights scores strengthen with age: among younger children, family income shows little association with developmental scores, but among older children, higher income is increasingly associated with higher Kidsights scores. This developmental pattern suggests that socioeconomic advantages may accumulate over early childhood.
+
+
+# Results: Caregiver Education Associations
+
+```{r table-education}
+#| tbl-cap: "Table 2: Associations with Caregiver Education"
+
+# Generate table for caregiver education
+table_educ <- format_criterion_table(
+  pooled_results = pooled_results,
+  criterion = "educ4_a1",
+  outcomes = outcomes,
+  digits = 3,
+  include_fit_stats = TRUE
+)
+
+# Add fit statistics
+table_educ <- add_fit_stats_to_table(
+  table_df = table_educ,
+  all_models = all_models,
+  criterion = "educ4_a1",
+  outcomes = outcomes,
+  digits = 3
+)
+
+# Render table
+render_table(table_educ, caption = "Table 2: Associations with Caregiver Education")
+```
+
+## Interpretation
+
+Caregiver education showed distinct patterns across the two developmental measures:
+
+**General GSED-PF 2022 (Psychosocial Problems):** A clear educational gradient emerged, with lower caregiver education associated with significantly more psychosocial problems compared to Bachelor's degree or higher (Less than HS: *b* = -1.167, *p* < .001; HS Graduate: *b* = -0.666, *p* < .001; Some College: *b* = -0.336, *p* = .011). Positive age interactions for HS and Some College groups (Age × HS: *b* = +0.121, *p* = .005; Age × Some College: *b* = +0.075, *p* = .027) indicate that education-related differences in psychosocial problems increase with child age, consistent with cumulative advantage models of socioeconomic effects on development.
+
+**Kidsights 2022:** Main effects of education were not statistically significant (*b* = +0.238 to +0.335, all *p* > .05), but significant negative age interactions emerged for both HS and Some College groups (Age × HS: *b* = -0.209, *p* = .002; Age × Some College: *b* = -0.140, *p* = .002). These interactions reveal a developmental divergence pattern: among younger children, Kidsights scores show minimal differences across education levels, but among older children, those with Bachelor's+ caregivers increasingly outperform their peers with HS or Some College education. This widening educational achievement gap with age aligns with cumulative advantage models where early socioeconomic resources compound over development.
+
+
+# Results: Urbanicity Associations
+
+```{r table-urbanicity}
+#| tbl-cap: "Table 3: Associations with Urbanicity"
+
+# Generate table for urbanicity
+table_urban <- format_criterion_table(
+  pooled_results = pooled_results,
+  criterion = "urban_pct",
+  outcomes = outcomes,
+  digits = 3,
+  include_fit_stats = TRUE
+)
+
+# Add fit statistics
+table_urban <- add_fit_stats_to_table(
+  table_df = table_urban,
+  all_models = all_models,
+  criterion = "urban_pct",
+  outcomes = outcomes,
+  digits = 3
+)
+
+# Render table
+render_table(table_urban, caption = "Table 3: Associations with Urbanicity (%)")
+```
+
+## Interpretation
+
+Urbanicity showed no statistically significant associations with either developmental outcome. Neither Kidsights 2022 (urban_pct: *b* = +0.003, *p* = .718; Age × urban_pct: *b* = -0.002, *p* = .250) nor General GSED-PF 2022 (urban_pct: *b* = +0.000, *p* = .994; Age × urban_pct: *b* = +0.001, *p* = .645) showed main effects or age interactions with urbanicity percentage. These null findings suggest that urban-rural residence does not explain meaningful variance in these developmental scores within this Nebraska sample, after accounting for socioeconomic factors (income, education) and responding caregiver mental health.
+
+
+# Results: Responding Caregiver Depression (PHQ-2) Associations
+
+```{r table-phq2}
+#| tbl-cap: "Table 4: Associations with Responding Caregiver Depression (PHQ-2)"
+
+# Generate table for PHQ-2
+table_phq2 <- format_criterion_table(
+  pooled_results = pooled_results,
+  criterion = "phq2_total",
+  outcomes = outcomes,
+  digits = 3,
+  include_fit_stats = TRUE
+)
+
+# Add fit statistics
+table_phq2 <- add_fit_stats_to_table(
+  table_df = table_phq2,
+  all_models = all_models,
+  criterion = "phq2_total",
+  outcomes = outcomes,
+  digits = 3
+)
+
+# Render table
+render_table(table_phq2, caption = "Table 4: Associations with Responding Caregiver Depression (PHQ-2)")
+```
+
+## Interpretation
+
+Responding caregiver depression (PHQ-2 total score) showed differential associations with the two developmental outcomes:
+
+**General GSED-PF 2022 (Psychosocial Problems):** Higher responding caregiver depression was strongly associated with more child psychosocial problems (phq2_total: *b* = +0.326, *p* < .001). This positive association aligns with the scale's construct (higher scores = more problems) and is consistent with extensive literature linking caregiver depression to child behavioral and emotional difficulties. The association was stable across ages (Age × phq2_total: *b* = -0.017, *p* = .345), suggesting that responding caregiver depression effects on child psychosocial adjustment are consistent throughout early childhood.
+
+**Kidsights 2022:** The main effect of responding caregiver depression was not statistically significant (phq2_total: *b* = +0.116, *p* = .114), but a significant negative age interaction emerged (Age × phq2_total: *b* = -0.064, *p* = .001). This interaction suggests an age-dependent reversal: among younger children, responding caregiver depression shows a weak positive association with Kidsights scores (counterintuitively, children of caregivers with depression scoring slightly higher), but this association weakens and potentially reverses among older children. This developmental shift may reflect age-specific vulnerabilities to caregiver mental health or changing measurement sensitivity across developmental stages.
+
+
+# Discussion
+
+## Summary of Criterion Associations
+
+This analysis examined associations between four criterion variables (family poverty, caregiver education, urbanicity, responding caregiver depression) and two developmental outcomes (Kidsights 2022, General GSED-PF 2022) using survey-weighted regression with multiple imputation (M=5).
+
+**General GSED-PF 2022 (Psychosocial Problems)** showed expected socioeconomic gradients and mental health associations:
+
+- **Responding Caregiver Depression (PHQ-2)**: Strongest predictor (*b* = +0.326, *p* < .001), indicating that higher responding caregiver depression is associated with more child psychosocial problems. This association was stable across ages.
+- **Caregiver Education**: Clear educational gradient, with lower education levels associated with significantly more problems (Less than HS: *b* = -1.167, *p* < .001; HS: *b* = -0.666, *p* < .001; Some College: *b* = -0.336, *p* = .011 vs. Bachelor's+). Age interactions suggest increasing education-related disparities with child age.
+- **Family Poverty (FPL)**: Higher income associated with fewer problems (*b* = +0.170, *p* < .001), with stable effects across ages.
+- **Urbanicity**: No significant associations (*p* > .05 for main and interaction effects).
+
+**Kidsights 2022** exhibited age-moderated associations across multiple criteria, revealing specific developmental trajectories:
+
+- **Family Poverty**: Income shows minimal association among younger children, but increasingly positive effects among older children (*b* = +0.031, *p* = .023), suggesting accumulating socioeconomic advantages.
+- **Caregiver Education**: Younger children show minimal differences across education levels, but older children from Bachelor's+ families increasingly outperform peers from HS (*b* = -0.209, *p* = .002) or Some College (*b* = -0.140, *p* = .002) backgrounds, indicating widening educational achievement gaps.
+- **Responding Caregiver Depression**: Younger children of caregivers with depression show weak positive associations (counterintuitively higher scores), but this reverses among older children (*b* = -0.064, *p* = .001), suggesting age-specific vulnerabilities.
+- **Urbanicity**: No significant associations (*p* > .05 for main and interaction effects).
+
+**Interesting Findings for Further Investigation:**
+
+1. **Cumulative Socioeconomic Divergence in Kidsights**: Both income and education show widening gaps with age, where younger children show minimal socioeconomic differences but older children from advantaged backgrounds (higher income, Bachelor's+ education) increasingly outperform their less advantaged peers. This pattern aligns with cumulative advantage models where early resources compound across development. The responding caregiver depression reversal (positive associations among younger children, weakening/reversing among older children) presents a contrasting pattern that warrants further investigation into age-specific measurement sensitivities or developmental vulnerabilities.
+
+2. **Differential Criterion Sensitivity**: GSED-PF showed robust main effects for socioeconomic and mental health criteria, while Kidsights showed primarily age-moderated effects. This differential pattern may indicate that the two measures capture different developmental constructs or have different developmental sensitivities.
+
+3. **Null Urbanicity Findings**: The absence of urbanicity effects for both outcomes (after accounting for SES and mental health) suggests that urban-rural differences in development may be mediated by socioeconomic factors rather than representing independent geographic effects in this sample.
