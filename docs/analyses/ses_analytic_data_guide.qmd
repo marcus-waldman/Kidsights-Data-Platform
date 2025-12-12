@@ -1,0 +1,1058 @@
+---
+title: "SES Analytic Dataset - Data Guide"
+subtitle: "Nebraska 2025 Study"
+author: "Kidsights Data Platform"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    code-fold: true
+    theme: cosmo
+    embed-resources: true
+    fig-width: 8
+    fig-height: 6
+  pdf:
+    toc: true
+    toc-depth: 2
+    fig-width: 7
+    fig-height: 5
+execute:
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+
+# Load the analytic dataset
+analytic_data <- readRDS("../../data/analyses/ses_analytic_dataset.rds")
+
+# Load codebook
+codebook <- read.csv("../../data/analyses/ses_analytic_codebook.csv")
+
+# Set knitr options
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+# Overview
+
+## Dataset Description
+
+This data guide provides comprehensive documentation for the **SES Analytic Dataset** created from the Nebraska 2025 (NE25) study. The dataset was designed to support research questions related to socioeconomic status, material hardship, home learning environment, and child development outcomes.
+
+**Dataset Files:**
+- `ses_analytic_dataset.csv` - CSV format
+- `ses_analytic_dataset.rds` - R format
+- `ses_analytic_dataset.sav` - SPSS format
+- `ses_analytic_codebook.csv` - Variable metadata
+
+**Created:** `r Sys.Date()`
+
+## Dataset Characteristics
+
+```{r dataset-overview}
+tibble::tibble(
+  Characteristic = c(
+    "Total Variables",
+    "Total Participants",
+    "Eligible Participants",
+    "Age Range",
+    "Data Collection Period"
+  ),
+  Value = c(
+    ncol(analytic_data),
+    nrow(analytic_data),
+    sum(analytic_data$meets_inclusion, na.rm = TRUE)),$
+    sprintf("%.1f - %.1f years", min(analytic_data$years_old, na.rm = TRUE)),$
+            max(analytic_data$years_old, na.rm = TRUE)),
+    "2024-2025"
+  )
+) %>%
+  kable(caption = "Dataset Overview") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## Variable Organization
+
+The dataset contains **114 variables** organized into 17 logical groups:
+
+1. **Core Identifiers** (2) - `pid`, `record_id`
+2. **Survey Weights** (1) - `calibrated_weight`
+3. **Geography** (5) - County, PUMA, urban/rural classification
+4. **Neighborhood/Community** (4) - Social cohesion and support
+5. **Demographics** (7) - Age, sex, race/ethnicity, education
+6. **Inclusion/Eligibility** (3) - Sample inclusion criteria
+7. **Socioeconomic Status** (4) - Income, FPL, family size
+8. **Government Services** (7) - Program enrollment
+9. **Material Hardship & Food Security** (10) - Food insecurity scale
+10. **Caregiver Mental Health & ACEs** (10) - PHQ-2, GAD-2, ACE scores
+11. **Caregiver Health** (2) - Physical and mental health
+12. **Parenting Support & Confidence** (2) - Parenting resources
+13. **Family Resilience** (4) - Family coping and strengths
+14. **Home Learning Environment** (26) - FCI scale (books, toys, activities)
+15. **Child Positive Characteristics** (4) - Temperament traits
+16. **Child ACEs** (2) - Adverse childhood experiences
+17. **Child Development Outcomes** (20) - Kidsights, D-scores, CREDI, HRTL
+
+---
+
+# Sample Composition
+
+## Inclusion Criteria
+
+```{r inclusion-criteria}
+inclusion_table <- analytic_data %>%
+  summarise(
+    `Total Records` = n(),
+    `Meets Inclusion` = sum(meets_inclusion, na.rm = TRUE)),$
+    `Eligible` = sum(eligible, na.rm = TRUE)),$
+    `Not Influential` = sum(!influential, na.rm = TRUE)),$
+    `Excluded` = sum(!meets_inclusion, na.rm = TRUE)
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Criterion", values_to = "N") %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (N / nrow(analytic_data)) * 100)
+  )
+
+kable(inclusion_table, caption = "Sample Inclusion Summary") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+**Inclusion Definition:** `meets_inclusion = TRUE` requires:
+- `eligible = TRUE` (meets study criteria)
+- `influential = FALSE` (not flagged as high-leverage observation)
+
+## Age Distribution
+
+```{r age-distribution}
+age_summary <- analytic_data %>%
+  filter(meets_inclusion) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  group_by(age_floor) %>%
+  summarise(
+    N = n(),
+    Percentage = sprintf("%.1f%%", (n() / sum(!is.na(analytic_data$years_old[analytic_data$meets_inclusion]))) * 100),
+    `Mean Age (years)` = sprintf("%.2f", mean(years_old, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(years_old, na.rm = TRUE))
+  ) %>%
+  rename(`Age (years)` = age_floor)
+
+kable(age_summary, caption = "Age Distribution of Included Participants") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r age-histogram, fig.cap="Age Distribution Histogram"}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  ggplot(aes(x = years_old)) +
+  geom_histogram(binwidth = 0.5, fill = "steelblue", color = "white") +
+  labs(
+    title = "Age Distribution of Included Participants",
+    x = "Age (years)",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+## Demographics Summary
+
+### Sex
+
+```{r sex-distribution}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(female) %>%
+  mutate(
+    Sex = case_when(
+      female == TRUE ~ "Female",
+      female == FALSE ~ "Male",
+      TRUE ~ "Missing"
+    ),
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  select(Sex, N = n, Percentage) %>%
+  kable(caption = "Sex Distribution") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Race/Ethnicity
+
+```{r race-distribution}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(raceG) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  arrange(desc(n)) %>%
+  rename(`Race/Ethnicity` = raceG, N = n) %>%
+  kable(caption = "Race/Ethnicity Distribution") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Maternal Education
+
+```{r maternal-education}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(educ_mom) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  arrange(desc(n)) %>%
+  rename(`Maternal Education` = educ_mom, N = n) %>%
+  kable(caption = "Maternal Education Distribution") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+# Variable Profiles by Domain
+
+## 1. Geography & Neighborhood (9 variables)
+
+### Geography
+
+```{r geography-vars}
+geo_vars <- c("county", "county_name", "puma", "urban_rural", "urban_pct")
+
+geo_summary <- codebook %>%
+  filter(variable_name %in% geo_vars) %>%
+  select(Variable = variable_name, Label = variable_label, Type = data_type,
+         `Missing %` = missing_percentage)
+
+kable(geo_summary, caption = "Geography Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+#### Urban/Rural Distribution
+
+```{r urban-rural}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(urban_rural) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  rename(`Urban/Rural` = urban_rural, N = n) %>%
+  kable(caption = "Urban/Rural Classification") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Neighborhood/Community
+
+```{r neighborhood-vars}
+neighborhood_vars <- c("cqfb009_neighborhood_help", "cqfb010_neighborhood_watch",
+                       "cqfb011_neighborhood_safe", "cqfb012_community_support")
+
+neighborhood_summary <- codebook %>%
+  filter(variable_name %in% neighborhood_vars) %>%
+  select(Variable = variable_name, Label = variable_label, `Missing %` = missing_percentage)
+
+kable(neighborhood_summary, caption = "Neighborhood/Community Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  column_spec(2, width = "30em")
+```
+
+---
+
+## 2. Socioeconomic Status (4 variables)
+
+```{r ses-descriptives}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  summarise(
+    `Income: Mean` = sprintf("$%.0f", mean(income, na.rm = TRUE)),
+    `Income: SD` = sprintf("$%.0f", sd(income, na.rm = TRUE)),
+    `Income: Missing N` = as.character(sum(is.na(income))),
+    `FPL: Mean` = sprintf("%.0f%%", mean(fpl, na.rm = TRUE)),
+    `FPL: SD` = sprintf("%.0f%%", sd(fpl, na.rm = TRUE)),
+    `FPL: Missing N` = as.character(sum(is.na(fpl))),
+    `Family Size: Mean` = sprintf("%.1f", mean(family_size, na.rm = TRUE)),
+    `Family Size: SD` = sprintf("%.1f", sd(family_size, na.rm = TRUE)),
+    `Family Size: Missing N` = as.character(sum(is.na(family_size)))
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  kable(caption = "SES Variables - Descriptive Statistics") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Federal Poverty Level Categories
+
+```{r fpl-categories}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(fplcat) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  arrange(desc(n)) %>%
+  rename(`FPL Category` = fplcat, N = n) %>%
+  kable(caption = "Federal Poverty Level Distribution") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+## 3. Government Services (7 variables)
+
+**Question:** "Is your family enrolled in any of the following programs or services?"
+
+```{r government-services}
+gov_services <- c(
+  "cqr007_medicaid" = "Medicaid",
+  "cqr007_childcare_subsidy" = "Child care subsidies (Title XX)",
+  "cqr007_cash_assistance" = "Cash assistance (welfare)",
+  "cqr007_free_reduced_meals" = "Free/reduced-cost school meals",
+  "cqr007_snap" = "Food Stamps/SNAP",
+  "cqr007_head_start" = "Early Head Start/Head Start",
+  "cqr007_wic" = "WIC Program"
+)
+
+gov_summary <- purrr::map_df(names(gov_services), function(var) {
+  analytic_data %>%
+    filter(meets_inclusion) %>%
+    summarise(
+      Service = gov_services[[var]],
+      Variable = var,
+      Enrolled = sum(.data[[var]] == 1, na.rm = TRUE)),$
+      `Not Enrolled` = sum(.data[[var]] == 0, na.rm = TRUE)),$
+      Missing = sum(is.na(.data[[var]])),
+      `Enrollment %` = sprintf("%.1f%%",
+        (sum(.data[[var]] == 1, na.rm = TRUE) /
+          (sum(.data[[var]] == 1, na.rm = TRUE) + sum(.data[[var]] == 0, na.rm = TRUE))) * 100)
+    )
+})
+
+kable(gov_summary, caption = "Government Services Enrollment") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+## 4. Material Hardship & Food Security (10 variables)
+
+### Material Hardship
+
+**Question:** "Since your child was born, how often has it been very hard to cover the basics, like food and housing, on your family's income?"
+
+```{r hardship-basics}
+if ("cqfa005_hardship_basics" %in% names(analytic_data)) {
+  analytic_data %>%
+    filter(meets_inclusion) %>%
+    count(cqfa005_hardship_basics) %>%
+    mutate(
+      Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+    ) %>%
+    rename(`Response` = cqfa005_hardship_basics, N = n) %>%
+    kable(caption = "Hardship Covering Basics") %>%
+    kable_styling(bootstrap_options = c("striped", "hover"))
+}
+```
+
+### Food Insecurity Scale (FIES)
+
+```{r food-insecurity}
+food_vars <- c(
+  "cqfa006_food_afford" = "Ability to afford food needed",
+  "mmifs009_food_worry" = "Worried would not have enough food",
+  "mmifs010_food_unhealthy" = "Unable to eat healthy/nutritious food",
+  "mmifs011_food_limited_variety" = "Ate only a few kinds of food",
+  "mmifs012_food_skip_meal" = "Had to skip a meal",
+  "mmifs013_food_ate_less" = "Ate less than should",
+  "mmifs014_food_ran_out" = "Household ran out of food",
+  "mmifs015_food_hungry" = "Hungry but did not eat",
+  "mmifs016_food_whole_day_without" = "Went without eating for whole day"
+)
+
+food_summary <- codebook %>%
+  filter(variable_name %in% names(food_vars)) %>%
+  mutate(Item = food_vars[match(variable_name, names(food_vars))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(food_summary, caption = "Food Insecurity Scale Items") %>%
+  kable_styling(bootstrap_options = c("striped", "hover")) %>%
+  column_spec(1, width = "20em")
+```
+
+---
+
+## 5. Caregiver Mental Health & ACEs (10 variables)
+
+### Depression Screening (PHQ-2)
+
+**Items:** "Over the last 2 weeks, how often have you been bothered by..."
+
+```{r phq2-summary}
+phq2_vars <- c(
+  "phq2_interest" = "Little interest or pleasure in doing things",
+  "phq2_depressed" = "Feeling down, depressed, or hopeless"
+)
+
+cat("**PHQ-2 Total Score Range:** 0-6\n")
+cat("**Clinical Cutoff:** ≥3 indicates likely depression\n\n")
+
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  summarise(
+    `Mean` = sprintf("%.2f", mean(phq2_total, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(phq2_total, na.rm = TRUE)),
+    `Range` = sprintf("%.0f - %.0f", min(phq2_total, na.rm = TRUE)),$
+                      max(phq2_total, na.rm = TRUE)),
+    `Positive Screen N` = as.character(sum(phq2_positive == 1, na.rm = TRUE)),$
+    `Positive Screen %` = sprintf("%.1f%%",
+      (sum(phq2_positive == 1, na.rm = TRUE) /
+        sum(!is.na(phq2_positive))) * 100),
+    `Missing N` = as.character(sum(is.na(phq2_total)))
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  kable(caption = "PHQ-2 Depression Screening") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Anxiety Screening (GAD-2)
+
+**Items:** "Over the last 2 weeks, how often have you been bothered by..."
+
+```{r gad2-summary}
+gad2_vars <- c(
+  "gad2_nervous" = "Feeling nervous, anxious, or on edge",
+  "gad2_worry" = "Not being able to stop or control worrying"
+)
+
+cat("**GAD-2 Total Score Range:** 0-6\n")
+cat("**Clinical Cutoff:** ≥3 indicates likely anxiety\n\n")
+
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  summarise(
+    `Mean` = sprintf("%.2f", mean(gad2_total, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(gad2_total, na.rm = TRUE)),
+    `Range` = sprintf("%.0f - %.0f", min(gad2_total, na.rm = TRUE)),$
+                      max(gad2_total, na.rm = TRUE)),
+    `Positive Screen N` = as.character(sum(gad2_positive == 1, na.rm = TRUE)),$
+    `Positive Screen %` = sprintf("%.1f%%",
+      (sum(gad2_positive == 1, na.rm = TRUE) /
+        sum(!is.na(gad2_positive))) * 100),
+    `Missing N` = as.character(sum(is.na(gad2_total)))
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  kable(caption = "GAD-2 Anxiety Screening") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Caregiver ACEs (Childhood)
+
+```{r caregiver-aces}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  summarise(
+    `Mean ACE Score` = sprintf("%.2f", mean(a1_ace_total, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(a1_ace_total, na.rm = TRUE)),
+    `Range` = sprintf("%.0f - %.0f", min(a1_ace_total, na.rm = TRUE)),$
+                      max(a1_ace_total, na.rm = TRUE)),
+    `Missing N` = as.character(sum(is.na(a1_ace_total)))
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  kable(caption = "Caregiver Childhood ACE Scores") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r caregiver-ace-categories}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(a1_ace_risk_cat) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  arrange(desc(n)) %>%
+  rename(`ACE Risk Category` = a1_ace_risk_cat, N = n) %>%
+  kable(caption = "Caregiver ACE Risk Categories") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+## 6. Home Learning Environment (26 variables)
+
+The Family Care Indicators (FCI) scale measures the home learning environment across 4 sections:
+
+### Section A: Reading Materials in Home (3 variables)
+
+```{r fci-section-a}
+fci_a_vars <- c(
+  "fci_a_1_books_home" = "Adult books in home",
+  "fci_a_2_magazines_newspapers" = "Magazines/newspapers in household",
+  "fci_a_3_see_adults_reading" = "Times per week child sees adults reading"
+)
+
+fci_a_summary <- codebook %>%
+  filter(variable_name %in% names(fci_a_vars)) %>%
+  mutate(Item = fci_a_vars[match(variable_name, names(fci_a_vars))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(fci_a_summary, caption = "FCI Section A: Reading Materials") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Section B: Children's Books (2 variables)
+
+```{r fci-section-b}
+fci_b_vars <- c(
+  "fci_b_1_has_childrens_books" = "Has children's books or picture books",
+  "fci_b_2_num_childrens_books" = "Number of children's books at home"
+)
+
+fci_b_summary <- codebook %>%
+  filter(variable_name %in% names(fci_b_vars)) %>%
+  mutate(Item = fci_b_vars[match(variable_name, names(fci_b_vars))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(fci_b_summary, caption = "FCI Section B: Children's Books") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Section C: Play Materials/Toys (11 variables)
+
+**Question:** "Does your child have..."
+
+```{r fci-section-c}
+fci_c_labels <- c(
+  "fci_c_1_toys_homemade" = "Home-made toys",
+  "fci_c_2_toys_store_bought" = "Store-bought/manufactured toys",
+  "fci_c_3_toys_household_objects" = "Household objects or outdoor objects",
+  "fci_c_4_toys_music" = "Things that make or play music",
+  "fci_c_5_toys_drawing_writing" = "Things for drawing or writing",
+  "fci_c_6_toys_picture_books" = "Picture books (not schoolbooks)",
+  "fci_c_7_toys_building" = "Things for stacking/constructing/building",
+  "fci_c_8_toys_movement" = "Things encouraging movement",
+  "fci_c_9_toys_learning" = "Toys for learning colors or shapes",
+  "fci_c_10_toys_pretend" = "Things for pretending",
+  "fci_c_11_electronic_devices" = "Electronic devices (not radio/TV)"
+)
+
+fci_c_summary <- codebook %>%
+  filter(variable_name %in% names(fci_c_labels)) %>%
+  mutate(Item = fci_c_labels[match(variable_name, names(fci_c_labels))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(fci_c_summary, caption = "FCI Section C: Play Materials/Toys") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Section D: Caregiver-Child Activities (11 variables)
+
+**Question:** "In the past week, did you or another family member..."
+
+```{r fci-section-d}
+fci_d_labels <- c(
+  "fci_d_1_read_books" = "Read books or look at picture books",
+  "fci_d_2_tell_stories" = "Tell stories",
+  "fci_d_3_sing_songs" = "Sing songs or say rhymes",
+  "fci_d_4_go_outside" = "Take child outside home/yard",
+  "fci_d_5_play_together" = "Play with child",
+  "fci_d_6_count_things" = "Count things with child",
+  "fci_d_7_draw_paint" = "Draw or paint things",
+  "fci_d_8_build_construct" = "Construct things",
+  "fci_d_9_chores_together" = "Do household chores together",
+  "fci_d_10_physical_activity" = "Do physical activities",
+  "fci_d_11_toy_storage_space" = "Child has place to keep toys/treasures"
+)
+
+fci_d_summary <- codebook %>%
+  filter(variable_name %in% names(fci_d_labels)) %>%
+  mutate(Item = fci_d_labels[match(variable_name, names(fci_d_labels))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(fci_d_summary, caption = "FCI Section D: Caregiver-Child Activities") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+## 7. Child Characteristics (6 variables)
+
+### Positive Characteristics
+
+**Question:** "How often is this child..."
+
+```{r child-positive-chars}
+child_chars <- c(
+  "mmi110_child_affectionate" = "Affectionate and tender",
+  "mmi111_child_resilient" = "Bounces back quickly when things don't go their way",
+  "mmi112_child_curious" = "Shows interest and curiosity in learning new things",
+  "mmi113_child_happy" = "Smiles and laughs"
+)
+
+child_char_summary <- codebook %>%
+  filter(variable_name %in% names(child_chars)) %>%
+  mutate(Item = child_chars[match(variable_name, names(child_chars))]) %>%
+  select(Item, Variable = variable_name, `Missing %` = missing_percentage)
+
+kable(child_char_summary, caption = "Child Positive Characteristics") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Child ACEs
+
+```{r child-aces}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  summarise(
+    `Mean ACE Score` = sprintf("%.2f", mean(child_ace_total, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(child_ace_total, na.rm = TRUE)),
+    `Range` = sprintf("%.0f - %.0f", min(child_ace_total, na.rm = TRUE)),$
+                      max(child_ace_total, na.rm = TRUE)),
+    `Missing N` = as.character(sum(is.na(child_ace_total)))
+  ) %>%
+  tidyr::pivot_longer(everything(), names_to = "Statistic", values_to = "Value") %>%
+  kable(caption = "Child ACE Scores") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r child-ace-categories}
+analytic_data %>%
+  filter(meets_inclusion) %>%
+  count(child_ace_risk_cat) %>%
+  mutate(
+    Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+  ) %>%
+  arrange(desc(n)) %>%
+  rename(`ACE Risk Category` = child_ace_risk_cat, N = n) %>%
+  kable(caption = "Child ACE Risk Categories") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+# Child Development Outcomes (Age-Stratified)
+
+This section presents child development outcomes **stratified by age** (floor of `years_old`).
+
+**Important Notes:**
+- **D-scores are masked for children ≥42 months** (3.5 years) as D-scores are not calibrated for older ages
+- **CREDI scores** are designed for children 0-3 years
+- **HRTL classifications** are designed for children 3-5 years
+
+## Overall Sample by Age
+
+```{r outcomes-sample-by-age}
+outcomes_sample <- analytic_data %>%
+  filter(meets_inclusion) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  group_by(age_floor) %>%
+  summarise(
+    N = n(),
+    `% of Sample` = sprintf("%.1f%%", (n() / nrow(analytic_data[analytic_data$meets_inclusion, ])) * 100)
+  ) %>%
+  rename(`Age (years)` = age_floor)
+
+kable(outcomes_sample, caption = "Sample Size by Age Group") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## Kidsights Person-Fit Scores (Ages 0-5)
+
+Kidsights person-fit scores from the 2022 GSED scale calibration.
+
+```{r kidsights-by-age}
+kidsights_vars <- c("kidsights_2022", "general_pf", "feeding_pf", "externalizing_pf",
+                    "internalizing_pf", "sleeping_pf", "social_competency_pf")
+
+kidsights_by_age <- analytic_data %>%
+  filter(meets_inclusion) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  group_by(age_floor) %>%
+  summarise(
+    across(all_of(kidsights_vars),
+           list(
+             n = ~sum(!is.na(.)),
+             mean = ~mean(., na.rm = TRUE)),$
+             sd = ~sd(., na.rm = TRUE)),$
+             min = ~min(., na.rm = TRUE)),$
+             max = ~max(., na.rm = TRUE)
+           ),
+           .names = "{.col}_{.fn}")
+  )
+
+# Overall Kidsights 2022
+kidsights_overall <- kidsights_by_age %>%
+  select(age_floor, starts_with("kidsights_2022")) %>%
+  rename(
+    Age = age_floor,
+    N = kidsights_2022_n,
+    Mean = kidsights_2022_mean,
+    SD = kidsights_2022_sd,
+    Min = kidsights_2022_min,
+    Max = kidsights_2022_max
+  ) %>%
+  mutate(across(c(Mean, SD), ~sprintf("%.2f", .)))
+
+kable(kidsights_overall, caption = "Overall Kidsights Score by Age") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### Kidsights Domain Scores by Age
+
+```{r kidsights-domains-by-age}
+domain_vars <- c("general_pf", "feeding_pf", "externalizing_pf",
+                 "internalizing_pf", "sleeping_pf", "social_competency_pf")
+
+for (domain in domain_vars) {
+  domain_label <- gsub("_pf", "", domain)
+  domain_label <- gsub("_", " ", domain_label)
+  domain_label <- tools::toTitleCase(domain_label)
+
+  domain_table <- kidsights_by_age %>%
+    select(age_floor, starts_with(domain)) %>%
+    rename(
+      Age = age_floor,
+      N = !!paste0(domain, "_n"),
+      Mean = !!paste0(domain, "_mean"),
+      SD = !!paste0(domain, "_sd"),
+      Min = !!paste0(domain, "_min"),
+      Max = !!paste0(domain, "_max")
+    ) %>%
+    mutate(across(c(Mean, SD), ~sprintf("%.2f", .)))
+
+  print(kable(domain_table, caption = paste(domain_label, "by Age")) %>%
+    kable_styling(bootstrap_options = c("striped", "hover")))
+  cat("\n\n")
+}
+```
+
+## D-Scores (Ages 0-3.5 years)
+
+**Note:** D-scores are masked (set to NA) for children ≥42 months (3.5 years).
+
+```{r dscore-by-age}
+dscore_by_age <- analytic_data %>%
+  filter(meets_inclusion) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  group_by(age_floor) %>%
+  summarise(
+    N = sum(!is.na(dscore_d)),
+    `Mean D-score` = sprintf("%.2f", mean(dscore_d, na.rm = TRUE)),
+    `SD` = sprintf("%.2f", sd(dscore_d, na.rm = TRUE)),
+    `Min` = sprintf("%.2f", min(dscore_d, na.rm = TRUE)),
+    `Max` = sprintf("%.2f", max(dscore_d, na.rm = TRUE)),
+    `Mean Items (n)` = sprintf("%.1f", mean(dscore_n, na.rm = TRUE)),
+    `Missing N` = as.character(sum(is.na(dscore_d)))
+  ) %>%
+  rename(Age = age_floor)
+
+kable(dscore_by_age, caption = "D-Scores by Age") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+## CREDI Scores (Ages 0-3 years)
+
+CREDI (Caregiver-Reported Early Development Instruments) scores for children under 4 years.
+
+```{r credi-by-age}
+credi_vars <- c("credi_cog", "credi_lang", "credi_mot", "credi_sem", "credi_overall")
+
+credi_by_age <- analytic_data %>%
+  filter(meets_inclusion, years_old < 4) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  group_by(age_floor) %>%
+  summarise(
+    across(all_of(credi_vars),
+           list(
+             n = ~sum(!is.na(.)),
+             mean = ~mean(., na.rm = TRUE)),$
+             sd = ~sd(., na.rm = TRUE)
+           ),
+           .names = "{.col}_{.fn}")
+  )
+
+# Overall CREDI
+credi_overall_age <- credi_by_age %>%
+  select(age_floor, starts_with("credi_overall")) %>%
+  rename(
+    Age = age_floor,
+    N = credi_overall_n,
+    Mean = credi_overall_mean,
+    SD = credi_overall_sd
+  ) %>%
+  mutate(across(c(Mean, SD), ~sprintf("%.2f", .)))
+
+kable(credi_overall_age, caption = "Overall CREDI Score by Age (0-3 years)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+### CREDI Domain Scores by Age
+
+```{r credi-domains-by-age}
+credi_domains <- c("credi_cog", "credi_lang", "credi_mot", "credi_sem")
+domain_labels <- c("Cognitive", "Language", "Motor", "Social-Emotional")
+
+for (i in seq_along(credi_domains)) {
+  domain <- credi_domains[i]
+  label <- domain_labels[i]
+
+  domain_table <- credi_by_age %>%
+    select(age_floor, starts_with(domain)) %>%
+    rename(
+      Age = age_floor,
+      N = !!paste0(domain, "_n"),
+      Mean = !!paste0(domain, "_mean"),
+      SD = !!paste0(domain, "_sd")
+    ) %>%
+    mutate(across(c(Mean, SD), ~sprintf("%.2f", .)))
+
+  print(kable(domain_table, caption = paste("CREDI", label, "by Age (0-3 years)")) %>%
+    kable_styling(bootstrap_options = c("striped", "hover")))
+  cat("\n\n")
+}
+```
+
+## HRTL Classifications (Ages 3-5 years)
+
+Healthy & Ready to Learn (HRTL) school readiness classifications for children 3-5 years.
+
+**Categories:** On-Track, Emerging, Needs Support
+
+**Note:** Motor Development domain is masked due to high missingness (93%).
+
+```{r hrtl-sample-by-age}
+hrtl_sample <- analytic_data %>%
+  filter(meets_inclusion, years_old >= 3, years_old < 6) %>%
+  mutate(age_floor = floor(years_old)) %>%
+  count(age_floor) %>%
+  rename(Age = age_floor, N = n)
+
+kable(hrtl_sample, caption = "HRTL Sample by Age (3-5 years)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+```{r hrtl-by-age}
+hrtl_vars <- c("hrtl_early_learning_skills", "hrtl_health", "hrtl_self_regulation",
+               "hrtl_social_emotional")
+hrtl_labels <- c("Early Learning Skills", "Health", "Self-Regulation", "Social-Emotional")
+
+for (i in seq_along(hrtl_vars)) {
+  var <- hrtl_vars[i]
+  label <- hrtl_labels[i]
+
+  hrtl_table <- analytic_data %>%
+    filter(meets_inclusion, years_old >= 3, years_old < 6) %>%
+    mutate(age_floor = floor(years_old)) %>%
+    group_by(age_floor, !!sym(var)) %>%
+    summarise(n = n(), .groups = "drop") %>%
+    group_by(age_floor) %>%
+    mutate(
+      Percentage = sprintf("%.1f%%", (n / sum(n)) * 100)
+    ) %>%
+    ungroup() %>%
+    rename(Age = age_floor, Classification = !!sym(var), N = n)
+
+  print(kable(hrtl_table, caption = paste("HRTL", label, "by Age (3-5 years)")) %>%
+    kable_styling(bootstrap_options = c("striped", "hover")))
+  cat("\n\n")
+}
+```
+
+---
+
+# Cross-Reference Tables
+
+## Variable Renaming Map
+
+This table shows the mapping from original database variable names to renamed analytic variable names (where applicable).
+
+```{r variable-renaming}
+# Variables that were renamed
+renamed_vars <- tibble::tribble(
+  ~`Original Variable`, ~`Analytic Variable`, ~`Transformation`,
+  # Psychosocial scores
+  "general_gsed_pf_2022", "general_pf", "Shortened suffix",
+  "feeding_gsed_pf_2022", "feeding_pf", "Shortened suffix",
+  "externalizing_gsed_pf_2022", "externalizing_pf", "Shortened suffix",
+  "internalizing_gsed_pf_2022", "internalizing_pf", "Shortened suffix",
+  "sleeping_gsed_pf_2022", "sleeping_pf", "Shortened suffix",
+  "social_competency_gsed_pf_2022", "social_competency_pf", "Shortened suffix",
+
+  # Food insecurity
+  "cqfa005", "cqfa005_hardship_basics", "Added descriptive suffix",
+  "cqfa006", "cqfa006_food_afford", "Added descriptive suffix",
+  "mmifs009", "mmifs009_food_worry", "Added descriptive suffix",
+  "mmifs010", "mmifs010_food_unhealthy", "Added descriptive suffix",
+  "mmifs011", "mmifs011_food_limited_variety", "Added descriptive suffix",
+  "mmifs012", "mmifs012_food_skip_meal", "Added descriptive suffix",
+  "mmifs013", "mmifs013_food_ate_less", "Added descriptive suffix",
+  "mmifs014", "mmifs014_food_ran_out", "Added descriptive suffix",
+  "mmifs015", "mmifs015_food_hungry", "Added descriptive suffix",
+  "mmifs016", "mmifs016_food_whole_day_without", "Added descriptive suffix",
+
+  # Government services
+  "cqr007___1", "cqr007_medicaid", "Descriptive suffix",
+  "cqr007___2", "cqr007_childcare_subsidy", "Descriptive suffix",
+  "cqr007___3", "cqr007_cash_assistance", "Descriptive suffix",
+  "cqr007___4", "cqr007_free_reduced_meals", "Descriptive suffix",
+  "cqr007___5", "cqr007_snap", "Descriptive suffix",
+  "cqr007___6", "cqr007_head_start", "Descriptive suffix",
+  "cqr007___7", "cqr007_wic", "Descriptive suffix",
+
+  # Flourishing Index - Caregiver
+  "cfqb001", "cfqb001_caregiver_phys_health", "Added descriptive suffix",
+  "cqfb002", "cqfb002_caregiver_mental_health", "Added descriptive suffix",
+
+  # Flourishing Index - Child
+  "mmi110", "mmi110_child_affectionate", "Added descriptive suffix",
+  "mmi111", "mmi111_child_resilient", "Added descriptive suffix",
+  "mmi112", "mmi112_child_curious", "Added descriptive suffix",
+  "mmi113", "mmi113_child_happy", "Added descriptive suffix",
+
+  # Flourishing Index - Family
+  "mmi120", "mmi120_family_communication", "Added descriptive suffix",
+  "mmi121", "mmi121_family_problem_solving", "Added descriptive suffix",
+  "mmi122", "mmi122_family_strengths", "Added descriptive suffix",
+  "mmi123", "mmi123_family_hope", "Added descriptive suffix",
+
+  # Neighborhood/Community
+  "cqfb009", "cqfb009_neighborhood_help", "Added descriptive suffix",
+  "cqfb010", "cqfb010_neighborhood_watch", "Added descriptive suffix (shortened)",
+  "cqfb011", "cqfb011_neighborhood_safe", "Added descriptive suffix",
+  "cqfb012", "cqfb012_community_support", "Added descriptive suffix",
+
+  # Parenting
+  "cqfa010", "cqfa010_parenting_support", "Added descriptive suffix (shortened)",
+  "q1502", "q1502_parenting_confidence", "Added descriptive suffix",
+
+  # HRTL
+  "hrtl_social_emotional_development", "hrtl_social_emotional", "Shortened name"
+)
+
+kable(renamed_vars, caption = "Variable Renaming Map (Selected Variables)") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+# Transformation Log
+
+## Composite Score Formulas
+
+### Mental Health Scores
+
+**PHQ-2 Total (Depression):**
+```
+phq2_total = phq2_interest + phq2_depressed
+Range: 0-6
+Positive screen: phq2_total >= 3
+```
+
+**GAD-2 Total (Anxiety):**
+```
+gad2_total = gad2_nervous + gad2_worry
+Range: 0-6
+Positive screen: gad2_total >= 3
+```
+
+### ACE Scores
+
+**Caregiver ACE Total (a1_ace_total):**
+- Sum of 10 caregiver childhood ACE items
+- Range: 0-10
+- Missing if any item is missing (na.rm = FALSE)
+
+**Child ACE Total (child_ace_total):**
+- Sum of 8 child current ACE items
+- Range: 0-8
+- Missing if any item is missing (na.rm = FALSE)
+
+**ACE Risk Categories:**
+- No ACEs: 0
+- 1 ACE: 1
+- 2-3 ACEs: 2-3
+- 4+ ACEs: >=4 (High Risk)
+
+## Missing Data Handling
+
+### Recoding Rules
+
+**Sentinel Values Recoded to NA:**
+- 99 = "Prefer not to answer" → NA
+- 98 = "Don't know" → NA (where applicable)
+
+**All composite scores use conservative approach:**
+- `na.rm = FALSE` - If any component is missing, total score is NA
+- Prevents misleading partial scores
+
+### Masking Rules
+
+**D-scores:**
+- Masked (set to NA) for children with `age_in_days >= 1278.375` (42 months)
+- Rationale: D-scores not calibrated for children ≥3.5 years
+
+**HRTL Motor Development:**
+- Masked (set to NA) for all participants
+- Rationale: 93% missingness due to age-routed items
+- Overall HRTL also masked (incomplete without motor domain)
+
+## Data Quality Notes
+
+1. **Individual ACE Items Removed:** Only composite ACE scores included to reduce dataset size
+2. **Variable Name Length:** All variables ≤32 characters for SPSS compatibility
+3. **Logical Ordering:** Variables organized into 17 conceptual groups
+4. **Descriptive Naming:** All cryptic codes replaced with interpretable suffixes
+
+---
+
+# Technical Appendix
+
+## Survey Weights
+
+**Variable:** `calibrated_weight`
+
+**Method:** KL divergence minimization with masked factorized covariance structure
+
+**Sample:** 2,645 in-state Nebraska participants (100% of eligible)
+
+**Weight Quality:**
+- Effective N (Kish): 1,518.9 (57.4% efficiency)
+- Weight ratio (max/min): 33.55
+
+**Calibration Variables:** 24 variables
+- 7 demographics
+- 14 PUMA geography
+- 2 mental health
+- 1 child outcome
+
+**Use:** Apply `calibrated_weight` for population-representative inference
+
+## Data Sources
+
+**Nebraska 2025 Study:** REDCap data collection (2024-2025)
+
+**Derived Scores:**
+- Kidsights person-fit scores: 2022 GSED scale calibration
+- D-scores: dscore package (key = "gsed2406")
+- CREDI scores: CREDI Long Form scoring
+- HRTL classifications: CAHMI age-specific thresholds
+
+## File Versions
+
+- **Dataset created:** `r Sys.Date()`
+- **Data guide generated:** `r Sys.Date()`
+- **Platform version:** 3.7.0
+
+---
+
+# Contact & Citation
+
+**Project:** Kidsights Data Platform
+**Study:** Nebraska 2025 (NE25)
+**Documentation:** [GitHub Repository](https://github.com/kidsights-data-platform)
+
+**For questions about this dataset, contact the Kidsights team.**
+
+---
+
+*This data guide was automatically generated using Quarto.*
