@@ -1,10 +1,16 @@
-# NE25 Data Transformation Functions
-# Ported from Kidsights Dashboard utils-etl.R
+# MN26 Data Transformation Functions
+# Adapted from NE25 transforms (R/transform/ne25_transforms.R)
+# Based on reconciliation audit: scripts/mn26/reconciliation_audit.R
 #
-# Shared utilities (study-agnostic) are sourced from R/utils/:
-#   - recode_missing() from R/utils/recode_utils.R
-#   - cpi_ratio_1999() from R/utils/cpi_utils.R
-#   - get_poverty_threshold() from R/utils/poverty_utils.R
+# Key changes from NE25:
+#   - Race: cqr010b (6 categories) replaces cqr010 (15 categories)
+#   - Race: sq002b (6 categories) replaces sq002 (15 categories)
+#   - Caregiver: mn2 replaces cqr002 (adds Non-binary=97)
+#   - Age: age_in_days_n replaces age_in_days
+#   - Income: consent_date_n_n replaces consent_date_n
+#   - Sex, education, mental health, childcare, geographic: IDENTICAL
+#
+# Shared utilities (study-agnostic) sourced from R/utils/:
 source("R/utils/recode_utils.R")
 source("R/utils/cpi_utils.R")
 source("R/utils/poverty_utils.R")
@@ -70,7 +76,7 @@ install_transformation_packages <- function() {
 transformation_packages <- install_transformation_packages()
 
 # Helper function to get value labels from REDCap dictionary
-value_labels <- function(lex, dict, varname = "lex_ne25") {
+value_labels <- function(lex, dict, varname = "lex_mn26") {
   cat("=== VALUE_LABELS TRANSFORM DEBUG ===\n")
   cat("Lex:", lex, "\n")
   cat("Varname:", varname, "\n")
@@ -90,7 +96,7 @@ value_labels <- function(lex, dict, varname = "lex_ne25") {
   if (is.null(dict) || is.null(dict[[lex]]) || is.null(dict[[lex]]$select_choices_or_calculations)) {
     warning(paste("Dictionary entry not found for field:", lex, "- returning empty labels"))
     return(data.frame(
-      lex_ne25 = character(0),
+      lex_mn26 = character(0),
       value = character(0),
       label = character(0)
     ))
@@ -105,7 +111,7 @@ value_labels <- function(lex, dict, varname = "lex_ne25") {
   if (is.na(choices_str) || all(choices_str == "")) {
     warning(paste("Empty choices for field:", lex, "- returning empty labels"))
     return(data.frame(
-      lex_ne25 = character(0),
+      lex_mn26 = character(0),
       value = character(0),
       label = character(0)
     ))
@@ -308,88 +314,82 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
   recodes_df <- NULL
 
   if(what %in% c("include")) {
+    # MN26: Eligibility handled by R/harmonize/mn26_eligibility.R
+    # The "include" transform is a no-op here — eligibility is applied separately
+    # in the pipeline orchestrator after transforms complete
     recodes_df <- dat %>%
-      dplyr::select(pid, record_id, eligibility, authenticity) %>%
+      dplyr::select(pid, record_id) %>%
       dplyr::mutate(
-        eligible = (eligibility == "Pass"),
-        authentic = (authenticity == "Pass"),
-        include = (eligible & authentic)
-      ) %>%
-      dplyr::select(-eligibility, -authenticity)
+        eligible = NA,  # Populated by check_mn26_eligibility()
+        meets_inclusion = NA  # Populated by apply_mn26_inclusion()
+      )
 
     if(add_labels && requireNamespace("labelled", quietly = TRUE)) {
-      labelled::var_label(recodes_df$eligible) <- "Meets study inclusion criteria"
-      labelled::var_label(recodes_df$authentic) <- "Passes authenticity screening"
-      labelled::var_label(recodes_df$include) <- "Meets inclusion criteria (inclusion + authenticity)"
+      labelled::var_label(recodes_df$eligible) <- "Meets MN26 eligibility criteria (4 criteria)"
+      labelled::var_label(recodes_df$meets_inclusion) <- "Meets inclusion criteria for analysis"
     }
   }
 
   if(what %in% c("race", "ethnicity")) {
     #---------------------------------------------------------------------------
-    # Child Race
+    # Child Race — MN26: cqr010b with 6 pre-collapsed categories (100-105)
+    # No need for Asian/PI collapse like NE25 — already collapsed in REDCap
     #---------------------------------------------------------------------------
+    # MN26 race codes: 100=AIAN, 101=Asian, 102=Black, 103=NHPI, 104=White, 105=Other
+    c1_race_cols <- grep("^cqr010b___", names(dat), value = TRUE)
+
     raceth_df <- dat %>%
-      dplyr::select(pid, record_id, dplyr::starts_with("cqr011"), dplyr::starts_with("cqr010_")) %>%
-      tidyr::pivot_longer(dplyr::starts_with("cqr010"), names_to = "var", values_to = "response") %>%
-      safe_left_join(
-        value_labels("cqr010", dict = dict) %>%
-          dplyr::mutate(var = paste(lex_ne25, value, sep = "___")) %>%
-          dplyr::select(var, label),
-        by_vars = "var"
-      ) %>%
+      dplyr::select(pid, record_id, cqr011, dplyr::all_of(c1_race_cols)) %>%
       dplyr::mutate(
-        label = ifelse(label %in% c("Asian Indian", "Chinese", "Filipino", "Japanese", "Korean", "Vietnamese", "Native Hawaiian", "Guamanian or Chamorro", "Samoan", "Other Pacific Islander"), "Asian or Pacific Islander", label),
-        label = ifelse(label %in% c("Middle Eastern", "Some other race"), "Some Other Race", label)
+        race_count = rowSums(dplyr::across(dplyr::all_of(c1_race_cols)), na.rm = TRUE),
+        hisp = ifelse(cqr011 == 1, "Hispanic", "non-Hisp."),
+        race = dplyr::case_when(
+          race_count > 1 ~ "Two or More",
+          cqr010b___104 == 1 ~ "White",
+          cqr010b___102 == 1 ~ "Black or African American",
+          cqr010b___100 == 1 ~ "American Indian or Alaska Native",
+          cqr010b___101 == 1 ~ "Asian",
+          cqr010b___103 == 1 ~ "Native Hawaiian or Other Pacific Islander",
+          cqr010b___105 == 1 ~ "Other",
+          .default = NA_character_
+        ),
+        raceG = ifelse(hisp == "Hispanic", "Hispanic", paste0(race, ", non-Hisp."))
       ) %>%
-      dplyr::filter(response == 1) %>%
-      dplyr::group_by(pid, record_id, label) %>%
-      dplyr::reframe(hisp = ifelse(cqr011[1] == 1, "Hispanic", "non-Hisp.")) %>%
-      dplyr::ungroup() %>%
-      dplyr::group_by(pid, record_id) %>%
-      dplyr::reframe(hisp = hisp[1], race = ifelse(n() > 1, "Two or More", label[1])) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(raceG = ifelse(hisp == "Hispanic", "Hispanic", paste0(race, ", non-Hisp."))) %>%
-      dplyr::mutate(raceG = ifelse(raceG == "Other Asian, non-Hisp.", "Asian or Pacific Islander, non-Hisp.", raceG)) %>%
-      dplyr::mutate(across(where(is.character), as.factor)) %>%
-      dplyr::select(pid:record_id, hisp, race, raceG)
+      dplyr::select(pid, record_id, hisp, race, raceG) %>%
+      dplyr::mutate(across(where(is.character), as.factor))
 
     if(relevel_it) {
-      # Set baseline categories
       raceth_df$hisp <- relevel(raceth_df$hisp, ref = "non-Hisp.")
       raceth_df$race <- relevel(raceth_df$race, ref = "White")
       raceth_df$raceG <- relevel(raceth_df$raceG, ref = "White, non-Hisp.")
     }
 
     #---------------------------------------------------------------------------
-    # Caregiver's Race
+    # Caregiver's Race — MN26: sq002b with 6 pre-collapsed categories (100-105)
     #---------------------------------------------------------------------------
+    a1_race_cols <- grep("^sq002b___", names(dat), value = TRUE)
+
     a1_raceth_df <- dat %>%
-      dplyr::select(pid, record_id, dplyr::starts_with("sq003"), dplyr::starts_with("sq002_")) %>%
-      tidyr::pivot_longer(dplyr::starts_with("sq002_"), names_to = "var", values_to = "response") %>%
-      safe_left_join(
-        value_labels("sq002", dict = dict) %>%
-          dplyr::mutate(var = paste(lex_ne25, value, sep = "___")) %>%
-          dplyr::select(var, label),
-        by_vars = "var"
-      ) %>%
+      dplyr::select(pid, record_id, sq003, dplyr::all_of(a1_race_cols)) %>%
       dplyr::mutate(
-        label = ifelse(label %in% c("Asian Indian", "Chinese", "Filipino", "Japanese", "Korean", "Vietnamese", "Native Hawaiian", "Guamanian or Chamorro", "Samoan", "Other Pacific Islander"), "Asian or Pacific Islander", label),
-        label = ifelse(label %in% c("Middle Eastern", "Some other race"), "Some Other Race", label)
+        a1_race_count = rowSums(dplyr::across(dplyr::all_of(a1_race_cols)), na.rm = TRUE),
+        a1_hisp = ifelse(sq003 == 1, "Hispanic", "non-Hisp."),
+        a1_race = dplyr::case_when(
+          a1_race_count > 1 ~ "Two or More",
+          sq002b___104 == 1 ~ "White",
+          sq002b___102 == 1 ~ "Black or African American",
+          sq002b___100 == 1 ~ "American Indian or Alaska Native",
+          sq002b___101 == 1 ~ "Asian",
+          sq002b___103 == 1 ~ "Native Hawaiian or Other Pacific Islander",
+          sq002b___105 == 1 ~ "Other",
+          .default = NA_character_
+        ),
+        a1_raceG = ifelse(a1_hisp == "Hispanic", "Hispanic", paste0(a1_race, ", non-Hisp."))
       ) %>%
-      dplyr::filter(response == 1) %>%
-      dplyr::group_by(pid, record_id, label) %>%
-      dplyr::reframe(a1_hisp = ifelse(sq003[1] == 1, "Hispanic", "non-Hisp.")) %>%
-      dplyr::ungroup() %>%
-      dplyr::group_by(pid, record_id) %>%
-      dplyr::reframe(a1_hisp = a1_hisp[1], a1_race = ifelse(n() > 1, "Two or More", label[1])) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(a1_raceG = ifelse(a1_hisp == "Hispanic", "Hispanic", paste0(a1_race, ", non-Hisp."))) %>%
-      dplyr::mutate(a1_raceG = ifelse(a1_raceG == "Other Asian, non-Hisp.", "Asian or Pacific Islander, non-Hisp.", a1_raceG)) %>%
-      dplyr::mutate(across(where(is.character), as.factor)) %>%
-      dplyr::select(pid:record_id, a1_hisp, a1_race, a1_raceG)
+      dplyr::select(pid, record_id, a1_hisp, a1_race, a1_raceG) %>%
+      dplyr::mutate(across(where(is.character), as.factor))
 
     if(relevel_it) {
-      # Set baseline categories
       a1_raceth_df$a1_hisp <- relevel(a1_raceth_df$a1_hisp, ref = "non-Hisp.")
       a1_raceth_df$a1_race <- relevel(a1_raceth_df$a1_race, ref = "White")
       a1_raceth_df$a1_raceG <- relevel(a1_raceth_df$a1_raceG, ref = "White, non-Hisp.")
@@ -428,7 +428,8 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
             as.character(nschj013)
           }
         }, error = function(e) { as.character(nschj013) }),
-        female_a1 = as.logical(cqr002 == 0),
+        # MN26: mn2 replaces cqr002. 0=Female, 1=Male, 97=Non-binary
+        female_a1 = as.logical(mn2 == 0),
         mom_a1 = tryCatch({
           labels <- value_labels(lex = "cqr008", dict = dict)
           if (nrow(labels) > 0) {
@@ -487,10 +488,10 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
   if(what == "age") {
     age_df <- dat %>%
-      dplyr::select(pid, record_id, age_in_days, cqr003) %>%
+      dplyr::select(pid, record_id, age_in_days_n, cqr003) %>%
       dplyr::mutate(
-        days_old = age_in_days,
-        years_old = age_in_days / 365.25,
+        days_old = age_in_days_n,
+        years_old = age_in_days_n / 365.25,
         months_old = years_old * 12,
         a1_years_old = cqr003
       )
@@ -503,15 +504,15 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       labelled::var_label(age_df$a1_years_old) <- "Primary caregiver age (years)"
     }
 
-    recodes_df <- age_df %>% dplyr::select(-cqr003, -age_in_days)
+    recodes_df <- age_df %>% dplyr::select(-cqr003, -age_in_days_n)
   }
 
   if(what == "income") {
     income_df <- dat %>%
-      dplyr::select(consent_date, pid, record_id, cqr006, fqlive1_1, fqlive1_2) %>%
+      dplyr::select(consent_date_n, pid, record_id, cqr006, fqlive1_1, fqlive1_2) %>%
       dplyr::rename(income = cqr006) %>%
       dplyr::mutate(
-        cpi99 = cpi_ratio_1999(consent_date),
+        cpi99 = cpi_ratio_1999(consent_date_n),
         inc99 = income * cpi99,
         family_size = dplyr::case_when(
           fqlive1_1 < 999 & fqlive1_2 < 999 ~ fqlive1_1 + fqlive1_2,
@@ -521,7 +522,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       )
 
     # Get poverty thresholds with derivation flags
-    poverty_results <- get_poverty_threshold(dates = income_df$consent_date,
+    poverty_results <- get_poverty_threshold(dates = income_df$consent_date_n,
                                              family_size = income_df$family_size,
                                              return_flag = TRUE)
 
@@ -548,7 +549,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       labelled::var_label(income_df$fplcat) <- "Household income as percentage of federal poverty level (categories)"
     }
 
-    recodes_df <- income_df %>% dplyr::select(-consent_date, -cpi99)
+    recodes_df <- income_df %>% dplyr::select(-consent_date_n, -cpi99)
   }
 
   if(what %in% c("education")) {
@@ -1364,12 +1365,12 @@ recode_it <- function(dat, dict, my_API = NULL, what = "all") {
   # Apply reverse coding to items marked in codebook BEFORE any transformations
   message("Applying reverse coding from codebook...")
   source("R/transform/reverse_code_items.R")
-  dat <- reverse_code_items(dat, lexicon_name = "ne25", verbose = TRUE)
+  dat <- reverse_code_items(dat, lexicon_name = "mn26", verbose = TRUE)
 
   # Validate item responses against codebook (set invalid values to NA)
   message("Validating item responses against codebook...")
   source("R/transform/validate_item_responses.R")
-  dat <- validate_item_responses(dat, lexicon_name = "ne25", verbose = TRUE)
+  dat <- validate_item_responses(dat, lexicon_name = "mn26", verbose = TRUE)
 
   recoded_dat <- dat
   for(v in vars) {
