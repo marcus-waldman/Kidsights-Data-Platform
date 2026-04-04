@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Development Guidelines
 
-**Last Updated:** December 2025 | **Version:** 3.7.0
+**Last Updated:** April 2026 | **Version:** 3.8.0
 
 This is a quick reference guide for AI assistants working with the Kidsights Data Platform. For detailed documentation, see the [Documentation Directory](#documentation-directory) below.
 
@@ -8,21 +8,30 @@ This is a quick reference guide for AI assistants working with the Kidsights Dat
 
 ## Quick Start
 
-The Kidsights Data Platform is a multi-source ETL system for childhood development research with **seven independent pipelines**:
+The Kidsights Data Platform is a multi-source ETL system for childhood development research with **eight independent pipelines**:
 
 1. **NE25 Pipeline** - REDCap survey data processing (Nebraska 2025 study)
-2. **ACS Pipeline** - IPUMS USA census data extraction
-3. **NHIS Pipeline** - IPUMS Health Surveys data extraction
-4. **NSCH Pipeline** - National Survey of Children's Health data integration
-5. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
-6. **Imputation Pipeline** - Multiple imputation for geographic, sociodemographic, childcare, and mental health uncertainty
-7. **IRT Calibration Pipeline** - Mplus calibration dataset creation for psychometric scale recalibration
+2. **MN26 Pipeline** - REDCap survey data processing (Minnesota 2026 study, multi-child households)
+3. **ACS Pipeline** - IPUMS USA census data extraction
+4. **NHIS Pipeline** - IPUMS Health Surveys data extraction
+5. **NSCH Pipeline** - National Survey of Children's Health data integration
+6. **Raking Targets Pipeline** - Population-representative targets for post-stratification weighting
+7. **Imputation Pipeline** - Multiple imputation for geographic, sociodemographic, childcare, and mental health uncertainty
+8. **IRT Calibration Pipeline** - Mplus calibration dataset creation for psychometric scale recalibration
 
 ### Running Pipelines
 
 **NE25 Pipeline:**
 ```bash
 "C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=run_ne25_pipeline.R
+```
+
+**MN26 Pipeline:**
+```bash
+"C:\Program Files\R\R-4.5.1\bin\R.exe" --slave --no-restore --file=run_mn26_pipeline.R
+
+# Skip database (test mode)
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" run_mn26_pipeline.R --skip-database
 ```
 
 **ACS Pipeline:**
@@ -535,6 +544,28 @@ pip install pyreadstat
   - Verified all 11 stages execute successfully with proper database insertions
   - Child ACEs stage validated: 2,585 total rows across 9 ACE tables with binary/valid range checks passing
 
+### 🚧 MN26 Pipeline - Core Complete (April 2026)
+- **Status:** Core pipeline runs end-to-end. Scoring, raking, and imputation deferred.
+- **Study:** Minnesota 2026 (NORC-administered REDCap survey)
+- **Multi-Child:** Up to 2 children per household, wide-to-long pivot (pid + record_id + child_num)
+- **Reconciliation Audit:** Three-way dictionary comparison (NE25 vs MN26 active vs MN26 full)
+  - 331 identical fields, 128 hidden-identical (@HIDDEN but still in data)
+  - 341 new child 2 fields, 3 renames, 2 structural (race checkbox reorganization), 3 recoded (sliders)
+  - Sex codes (cqr009) confirmed IDENTICAL — earlier "swap" claims were incorrect
+  - Education codes (cqr004) confirmed IDENTICAL (both 0-8)
+- **Key Variable Changes:** cqr002→mn2 (parent gender), age_in_days→age_in_days_n, eqstate→mn_eqstate, cqr010→cqr010b (race 15→6 categories), sq002→sq002b
+- **Eligibility:** 4 criteria (vs NE25's 9): parent age, child age ≤5yr, primary caregiver, MN residence
+- **Data:** 2,654 test records from NORC REDCap project, 976 columns
+- **Pipeline Steps:** Extract → Pivot → Store raw → Transform → Eligibility → Store transformed → Dictionary
+- **Execution Time:** ~1.3 seconds (skip-database mode)
+- **Entry Point:** `run_mn26_pipeline.R` (supports `--skip-database`, `--credentials` flags)
+- **Config:** `config/sources/mn26.yaml` (fully populated)
+- **Plan:** `todo/mn26_pipeline_plan.md`
+- **Audit Script:** `scripts/mn26/reconciliation_audit.R`
+- **Deferred:** Raking targets (needs MN ACS), imputation, IRT calibration/scoring, SES analytic dataset
+- **Shared Utils Extracted:** `R/utils/{recode_utils,cpi_utils,poverty_utils}.R` (used by both NE25 and MN26)
+- **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
+
 ### 🚧 IRT Calibration Pipeline - In Development (November 2025)
 - **Multi-Study Dataset:** 47,084 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
 - **Item Coverage:** 416 developmental/behavioral items with lexicon-based harmonization
@@ -650,5 +681,5 @@ pip install pyreadstat
 
 **For detailed information on any topic, see the [Documentation Directory](#documentation-directory) above.**
 
-*Updated: December 2025 | Version: 3.7.0*
+*Updated: April 2026 | Version: 3.8.0*
 - pid does not uniquely identify an individual in the nebraska 2025 (ne25) data. It is the pid + record_id combination.
