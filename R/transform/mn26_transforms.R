@@ -318,7 +318,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     # The "include" transform is a no-op here — eligibility is applied separately
     # in the pipeline orchestrator after transforms complete
     recodes_df <- dat %>%
-      dplyr::select(pid, record_id) %>%
+      dplyr::select(pid, record_id, child_num) %>%
       dplyr::mutate(
         eligible = NA,  # Populated by check_mn26_eligibility()
         meets_inclusion = NA  # Populated by apply_mn26_inclusion()
@@ -339,7 +339,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     c1_race_cols <- grep("^cqr010b___", names(dat), value = TRUE)
 
     raceth_df <- dat %>%
-      dplyr::select(pid, record_id, cqr011, dplyr::all_of(c1_race_cols)) %>%
+      dplyr::select(pid, record_id, child_num, cqr011, dplyr::all_of(c1_race_cols)) %>%
       dplyr::mutate(
         race_count = rowSums(dplyr::across(dplyr::all_of(c1_race_cols)), na.rm = TRUE),
         hisp = ifelse(cqr011 == 1, "Hispanic", "non-Hisp."),
@@ -355,7 +355,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         ),
         raceG = ifelse(hisp == "Hispanic", "Hispanic", paste0(race, ", non-Hisp."))
       ) %>%
-      dplyr::select(pid, record_id, hisp, race, raceG) %>%
+      dplyr::select(pid, record_id, child_num, hisp, race, raceG) %>%
       dplyr::mutate(across(where(is.character), as.factor))
 
     if(relevel_it) {
@@ -370,7 +370,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
     a1_race_cols <- grep("^sq002b___", names(dat), value = TRUE)
 
     a1_raceth_df <- dat %>%
-      dplyr::select(pid, record_id, sq003, dplyr::all_of(a1_race_cols)) %>%
+      dplyr::select(pid, record_id, child_num, sq003, dplyr::all_of(a1_race_cols)) %>%
       dplyr::mutate(
         a1_race_count = rowSums(dplyr::across(dplyr::all_of(a1_race_cols)), na.rm = TRUE),
         a1_hisp = ifelse(sq003 == 1, "Hispanic", "non-Hisp."),
@@ -386,7 +386,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         ),
         a1_raceG = ifelse(a1_hisp == "Hispanic", "Hispanic", paste0(a1_race, ", non-Hisp."))
       ) %>%
-      dplyr::select(pid, record_id, a1_hisp, a1_race, a1_raceG) %>%
+      dplyr::select(pid, record_id, child_num, a1_hisp, a1_race, a1_raceG) %>%
       dplyr::mutate(across(where(is.character), as.factor))
 
     if(relevel_it) {
@@ -395,7 +395,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       a1_raceth_df$a1_raceG <- relevel(a1_raceth_df$a1_raceG, ref = "White, non-Hisp.")
     }
 
-    recodes_df <- raceth_df %>% safe_left_join(a1_raceth_df, by_vars = c("pid", "record_id"))
+    recodes_df <- raceth_df %>% safe_left_join(a1_raceth_df, by_vars = c("pid", "record_id", "child_num"))
 
     # Add labels after creating variables
     if(add_labels && requireNamespace("labelled", quietly = TRUE)) {
@@ -439,7 +439,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
           }
         }, error = function(e) { as.logical(FALSE) })
       ) %>%
-      dplyr::select(pid, record_id, relation1:mom_a1) %>%
+      dplyr::select(pid, record_id, child_num, relation1:mom_a1) %>%
       dplyr::mutate(across(where(is.character), as.factor))
 
     if(relevel_it) {
@@ -459,7 +459,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
   if(what == "sex") {
     sex_df <- dat %>%
-      dplyr::select(pid, record_id, cqr009) %>%
+      dplyr::select(pid, record_id, child_num, cqr009) %>%
       dplyr::mutate(
         sex = tryCatch({
           labels <- value_labels(lex = "cqr009", dict = dict)
@@ -488,7 +488,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
   if(what == "age") {
     age_df <- dat %>%
-      dplyr::select(pid, record_id, age_in_days_n, cqr003) %>%
+      dplyr::select(pid, record_id, child_num, age_in_days_n, cqr003) %>%
       dplyr::mutate(
         days_old = age_in_days_n,
         years_old = age_in_days_n / 365.25,
@@ -509,7 +509,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
   if(what == "income") {
     income_df <- dat %>%
-      dplyr::select(consent_date_n, pid, record_id, cqr006, fqlive1_1, fqlive1_2) %>%
+      dplyr::select(consent_date_n, pid, record_id, child_num, cqr006, fqlive1_1, fqlive1_2) %>%
       dplyr::rename(income = cqr006) %>%
       dplyr::mutate(
         cpi99 = cpi_ratio_1999(consent_date_n),
@@ -611,7 +611,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
     educ_df <- dat %>%
       dplyr::select(-dplyr::any_of(c("relation1", "relation2", "mom_a1"))) %>%
-      safe_left_join(relate_vars, by_vars = c("pid", "record_id")) %>%
+      safe_left_join(relate_vars, by_vars = c("pid", "record_id", "child_num")) %>%
       dplyr::mutate(
         ## Maximum education of caregivers (8 categories)
         educ_max =
@@ -661,7 +661,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
           factor(levels = simple_educ_value$educ6, labels = simple_educ_label$educ6)
 
       ) %>%
-      dplyr::select(pid, record_id, educ_max:educ6_mom) %>%
+      dplyr::select(pid, record_id, child_num, educ_max:educ6_mom) %>%
       dplyr::mutate(across(where(is.character), as.factor))
 
 
@@ -895,7 +895,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
 
     # Join all geographic data to participant data using sq001 (ZIP code)
     geographic_df <- dat %>%
-      dplyr::select(pid, record_id, sq001) %>%
+      dplyr::select(pid, record_id, child_num, sq001) %>%
       dplyr::mutate(
         # Clean ZIP code: remove spaces, convert to 5-digit string
         zip_clean = stringr::str_trim(as.character(sq001)),
@@ -911,7 +911,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
       safe_left_join(zip_sldu_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
       safe_left_join(zip_congress_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
       safe_left_join(zip_aiannh_crosswalk, by_vars = c("zip_clean" = "zip")) %>%
-      dplyr::select(pid, record_id,
+      dplyr::select(pid, record_id, child_num,
                    puma, puma_afact,
                    county, county_name, county_afact,
                    tract, tract_afact,
@@ -986,7 +986,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
   #---------------------------------------------------------------------------
   if(what %in% c("mental health", "ace", "phq", "gad")) {
 
-    mental_health_df <- dat %>% dplyr::select(pid, record_id)
+    mental_health_df <- dat %>% dplyr::select(pid, record_id, child_num)
 
     # PHQ-2 Variables (Depression Screening)
     if(all(c("cqfb013", "cqfb014") %in% names(dat))) {
@@ -1173,7 +1173,7 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
   # Childcare Variables
   if(what %in% c("childcare", "child care", "cc")) {
 
-    childcare_df <- dat %>% dplyr::select(pid, record_id)
+    childcare_df <- dat %>% dplyr::select(pid, record_id, child_num)
 
     # Access and Difficulty Variables
     if("mmi013" %in% names(dat)) {
@@ -1380,7 +1380,7 @@ recode_it <- function(dat, dict, my_API = NULL, what = "all") {
       recode_result <- recode__(dat = dat, dict = dict, my_API = my_API, what = v)
       if(!is.null(recode_result)) {
         recoded_dat <- recoded_dat %>%
-          safe_left_join(recode_result, by_vars = c("pid", "record_id"))
+          safe_left_join(recode_result, by_vars = c("pid", "record_id", "child_num"))
       }
     }, error = function(e) {
       message(paste("Warning: Failed to process", v, ":", e$message))
