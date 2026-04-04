@@ -1,0 +1,489 @@
+---
+title: "MN26 Monitoring Report Function Guide"
+subtitle: "Input Requirements & Output Specifications for NORC"
+date: today
+format:
+  docx:
+    toc: true
+    number-sections: true
+    reference-doc: reference.docx
+---
+
+# Overview
+
+The `generate_monitoring_report()` function is a self-contained R function that pulls raw data from REDCap, transforms key demographic variables, and returns structured data frames for monitoring MN26 recruitment progress. This document specifies what NORC needs to provide (inputs) and what the function returns (outputs).
+
+**Current Status:** The script uses NE25 (Nebraska 2025) data as a template. Variable names will be updated once MN26 data collection begins.
+
+::: {.callout-important}
+## Multi-Child Households
+
+MN26 allows **up to 2 children per household**. The current script assumes 1 child per record (NE25 structure). Once the MN26 REDCap data dictionary is finalized, the child demographics and child age eligibility logic will need to be updated so that each child is tracked separately. The exact modification depends on how REDCap stores the second child's data (repeating instruments, separate fields, etc.).
+
+This affects:
+
+- **Child demographics** --- will return up to 2 rows per household instead of 1
+- **Eligibility** --- child age (0--5 years) will need to be checked per child
+:::
+
+{{< pagebreak >}}
+
+# What You Need (Inputs)
+
+## R Packages
+
+Install the following R packages before first use:
+
+```r
+install.packages(c("dplyr", "tidyr", "REDCapR", "httr"))
+```
+
+## API Credentials CSV File
+
+The function requires a single CSV file containing REDCap API credentials.
+
+**CSV columns:**
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| `project` | Descriptive project name | `mn26_main_survey` |
+| `pid` | REDCap project ID number | `7679` |
+| `api_code` | REDCap API token (32-character string) | `A1B2C3D4E5F6G7H8...` |
+
+**Example CSV file** (`mn26_redcap_api.csv`):
+
+```
+project,pid,api_code
+mn26_main_survey,7679,A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6
+mn26_follow_up,8014,Q7R8S9T0U1V2W3X4Y5Z6A7B8C9D0E1F2
+```
+
+Store this file in a secure location outside the repository (e.g., `C:/Users/YOUR_USERNAME/my-APIs/mn26_redcap_api.csv`). **Never commit this file to version control.**
+
+## REDCap API Variables Required
+
+The function needs access to the following 28 raw REDCap variables through the API. These are the minimum variables required for monitoring.
+
+### Identifiers (2 variables)
+
+| Variable | Description |
+|----------|-------------|
+| `pid` | Participant ID |
+| `record_id` | REDCap record ID |
+
+### Eligibility Screening (5 variables)
+
+| Variable | Description |
+|----------|-------------|
+| `eq001` | Informed consent |
+| `eq002` | Primary caregiver status |
+| `eq003` | Parent/caregiver age (19+ years) |
+| `eqstate` | State residence |
+| `age_in_days` | Child age in days (calculated from DOB) |
+
+### Survey Completion Status (7 variables)
+
+| Variable | Description |
+|----------|-------------|
+| `module_2_complete` | Module 2 completion status |
+| `module_3_complete` | Module 3 completion status |
+| `module_4_complete` | Module 4 completion status |
+| `module_5_complete` | Module 5 completion status |
+| `module_6_complete` | Module 6 completion status |
+| `module_7_complete` | Module 7 completion status |
+| `module_9_complete` | Module 9 completion status |
+
+### Child Demographics (2 variables)
+
+| Variable | Description |
+|----------|-------------|
+| `age_in_days` | Child age in days (overlap with eligibility) |
+| `cqr009` | Child sex |
+
+### Parent/Caregiver Demographics (19 variables)
+
+| Variable | Description |
+|----------|-------------|
+| `cqr002` | Respondent sex/gender |
+| `cqr003` | Respondent age in years |
+| `cqr004` | Respondent education level (8 categories) |
+| `sq002___1` through `sq002___15` | Respondent race (15 checkbox fields) |
+| `sq003` | Respondent Hispanic/Latino ethnicity |
+| `cqfa001` | Marital status |
+
+**Note:** Variable names may differ for MN26 depending on the final REDCap data dictionary.
+
+{{< pagebreak >}}
+
+# How to Run It
+
+## Basic Usage
+
+```r
+# Step 1: Load the script
+source("monitoring_report.R")
+
+# Step 2: Run the function (pass your CSV path)
+monitoring_data <- generate_monitoring_report(
+  csv_path = "C:/Users/YOUR_USERNAME/my-APIs/mn26_redcap_api.csv"
+)
+```
+
+## Optional: Custom REDCap URL
+
+If MN26 uses a different REDCap instance than the default:
+
+```r
+monitoring_data <- generate_monitoring_report(
+  csv_path = "C:/Users/YOUR_USERNAME/my-APIs/mn26_redcap_api.csv",
+  redcap_url = "https://redcap.umn.edu/api/"
+)
+```
+
+## Function Parameters
+
+| Parameter | Required | Default | Description |
+|-----------|----------|---------|-------------|
+| `csv_path` | Yes | -- | Path to API credentials CSV |
+| `redcap_url` | No | `https://unmcredcap.unmc.edu/redcap/api/` | REDCap API endpoint URL |
+
+{{< pagebreak >}}
+
+# What You Get Back (Outputs)
+
+The function returns a named list with **5 data frames**. Access each one using `$` notation (e.g., `monitoring_data$eligibility`).
+
+## 1. `$screener_status` --- Screener Completion
+
+Tracks whether eligibility has been determined for each participant.
+
+**Columns:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `screener_complete` | logical | `TRUE` if eligibility is known |
+| `screener_status` | character | `"Complete"` or `"Incomplete"` |
+
+**Hypothetical output** (`head(monitoring_data$screener_status)`):
+
+| pid | record_id | screener_complete | screener_status |
+|-----|-----------|-------------------|-----------------|
+| MN26-0001 | 1 | TRUE | Complete |
+| MN26-0002 | 2 | TRUE | Complete |
+| MN26-0003 | 3 | FALSE | Incomplete |
+| MN26-0004 | 4 | TRUE | Complete |
+| MN26-0005 | 5 | TRUE | Complete |
+| MN26-0006 | 6 | FALSE | Incomplete |
+
+**Example summary:**
+
+```r
+table(monitoring_data$screener_status$screener_status)
+#
+#   Complete Incomplete
+#      1,842        658
+```
+
+## 2. `$eligibility` --- Eligibility Determination
+
+Tracks the 4 eligibility criteria and overall eligibility for each participant.
+
+**Columns:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `parent_age_eligible` | logical | Parent age >= 19 |
+| `child_age_eligible` | logical | Child age 0--5 years |
+| `primary_caregiver_eligible` | logical | Respondent is primary caregiver |
+| `state_eligible` | logical | Participant lives in Minnesota |
+| `eligible` | logical | All 4 criteria met |
+
+**Hypothetical output** (`head(monitoring_data$eligibility)`):
+
+| pid | record_id | parent_age_eligible | child_age_eligible | primary_caregiver_eligible | state_eligible | eligible |
+|-----|-----------|-----|-----|-----|-----|-----|
+| MN26-0001 | 1 | TRUE | TRUE | TRUE | TRUE | TRUE |
+| MN26-0002 | 2 | TRUE | TRUE | TRUE | TRUE | TRUE |
+| MN26-0003 | 3 | NA | NA | NA | NA | NA |
+| MN26-0004 | 4 | TRUE | TRUE | TRUE | FALSE | FALSE |
+| MN26-0005 | 5 | TRUE | FALSE | TRUE | TRUE | FALSE |
+| MN26-0006 | 6 | NA | NA | NA | NA | NA |
+
+**Example summaries:**
+
+```r
+# Overall eligibility
+table(monitoring_data$eligibility$eligible, useNA = "ifany")
+#
+# FALSE  TRUE  <NA>
+#   394 1,448   658
+
+# Breakdown by criterion
+colMeans(monitoring_data$eligibility[, 3:6], na.rm = TRUE)
+#     parent_age_eligible      child_age_eligible
+#                   0.973                   0.921
+# primary_caregiver_eligible       state_eligible
+#                   0.988                   0.786
+```
+
+## 3. `$survey_completion` --- Survey Module Completion
+
+Tracks progress through the required survey modules (Modules 2, 3, 4, 5, 6, 7, and 9). Includes the number and percentage of modules completed, and which module was the last one finished.
+
+**Columns:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `modules_complete` | integer | Number of modules completed (0--7) |
+| `pct_complete` | numeric | Percentage of required modules completed (0--100) |
+| `last_module_complete` | character | Last completed module (e.g., `"Module 5"`) or `NA` |
+| `survey_complete` | logical | `TRUE` if all 7 modules complete |
+| `survey_status` | character | `"Complete"` or `"Incomplete"` |
+
+**Hypothetical output** (`head(monitoring_data$survey_completion)`):
+
+| pid | record_id | modules_complete | pct_complete | last_module_complete | survey_complete | survey_status |
+|-----|-----------|-----------------|-------------|---------------------|-----------------|---------------|
+| MN26-0001 | 1 | 7 | 100.0 | Module 9 | TRUE | Complete |
+| MN26-0002 | 2 | 7 | 100.0 | Module 9 | TRUE | Complete |
+| MN26-0003 | 3 | 3 | 42.9 | Module 4 | FALSE | Incomplete |
+| MN26-0004 | 4 | 5 | 71.4 | Module 6 | FALSE | Incomplete |
+| MN26-0005 | 5 | 7 | 100.0 | Module 9 | TRUE | Complete |
+| MN26-0006 | 6 | 0 | 0.0 | NA | FALSE | Incomplete |
+
+**Example summaries:**
+
+```r
+# Completion status
+table(monitoring_data$survey_completion$survey_status)
+#
+#   Complete Incomplete
+#      1,105      1,395
+
+# Percent complete distribution
+summary(monitoring_data$survey_completion$pct_complete)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+#    0.00   28.60   71.40   62.35  100.00  100.00
+
+# Where are incomplete participants dropping off?
+incomplete <- monitoring_data$survey_completion %>%
+  dplyr::filter(!survey_complete)
+table(incomplete$last_module_complete, useNA = "ifany")
+#
+#    Module 2  Module 3  Module 4  Module 5  Module 6  Module 7      <NA>
+#         312       198       287       243       156        87       112
+```
+
+## 4. `$child_demographics` --- Child Age and Sex
+
+Age and sex for each child participant. Currently returns 1 row per record (NE25 template). Once updated for MN26 multi-child households, this will return up to 2 rows per household with a `child_number` column.
+
+**Columns (current --- NE25 template):**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `age_years` | numeric | Child's age in years (0--5) |
+| `sex` | character | `"Female"` or `"Male"` |
+
+**Hypothetical output (current --- 1 child per record):**
+
+| pid | record_id | age_years | sex |
+|-----|-----------|-----------|-----|
+| MN26-0001 | 1 | 2.34 | Female |
+| MN26-0002 | 2 | 0.87 | Male |
+| MN26-0003 | 3 | 4.51 | Female |
+
+**Planned columns (MN26 --- up to 2 children per household):**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `child_number` | integer | Child 1 or 2 within household |
+| `age_years` | numeric | Child's age in years (0--5) |
+| `sex` | character | `"Female"` or `"Male"` |
+
+**Hypothetical output (planned --- multi-child):**
+
+| pid | record_id | child_number | age_years | sex |
+|-----|-----------|-------------|-----------|-----|
+| MN26-0001 | 1 | 1 | 2.34 | Female |
+| MN26-0001 | 1 | 2 | 0.87 | Male |
+| MN26-0002 | 2 | 1 | 4.51 | Female |
+| MN26-0003 | 3 | 1 | 1.12 | Male |
+| MN26-0003 | 3 | 2 | 3.78 | Female |
+| MN26-0004 | 4 | 1 | 0.45 | Male |
+
+Note: Not all households will have 2 children. Households with 1 child will have a single row with `child_number = 1`.
+
+**Example summaries:**
+
+```r
+summary(monitoring_data$child_demographics$age_years)
+#    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.
+#   0.030   1.220   2.510   2.480   3.740   4.990
+
+table(monitoring_data$child_demographics$sex)
+#
+# Female   Male
+#  1,215  1,285
+
+# Children per household (planned)
+table(table(monitoring_data$child_demographics$record_id))
+#
+#    1    2
+# 1,562  438
+```
+
+## 5. `$parent_demographics` --- Parent/Caregiver Demographics
+
+Demographics for the primary caregiver (respondent).
+
+**Columns:**
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `pid` | character | Participant ID |
+| `record_id` | integer | REDCap record ID |
+| `age_years` | numeric | Parent age in years |
+| `female` | logical | `TRUE` if female, `FALSE` if male |
+| `race_ethnicity` | character | Combined race/ethnicity category |
+| `education` | character | Education level (8 categories) |
+| `marital_status_label` | character | Marital status |
+
+**Hypothetical output** (`head(monitoring_data$parent_demographics)`):
+
+| pid | record_id | age_years | female | race_ethnicity | education | marital_status_label |
+|-----|-----------|-----------|--------|----------------|-----------|---------------------|
+| MN26-0001 | 1 | 31 | TRUE | White, non-Hisp. | Bachelor's degree | Married |
+| MN26-0002 | 2 | 28 | TRUE | Hispanic | Some college, no degree | Not married, but living with a partner |
+| MN26-0003 | 3 | 35 | FALSE | Black or African American, non-Hisp. | Graduate or professional degree | Married |
+| MN26-0004 | 4 | 24 | TRUE | White, non-Hisp. | High school graduate or GED | Never Married |
+| MN26-0005 | 5 | 42 | TRUE | Two or More, non-Hisp. | Associate degree | Divorced |
+| MN26-0006 | 6 | 29 | TRUE | White, non-Hisp. | Bachelor's degree | Married |
+
+**Race/ethnicity categories:**
+
+- `"White, non-Hisp."`
+- `"Black or African American, non-Hisp."`
+- `"Two or More, non-Hisp."`
+- `"Other, non-Hisp."`
+- `"Hispanic"` (any race)
+
+**Education categories** (8 levels):
+
+1. Less than 9th grade
+2. 9th-12th grade, no diploma
+3. High school graduate or GED
+4. Some college, no degree
+5. Associate degree
+6. Vocational/Technical/Trade
+7. Bachelor's degree
+8. Graduate or professional degree
+
+**Marital status categories** (6 levels):
+
+1. Married
+2. Not married, but living with a partner
+3. Never Married
+4. Divorced
+5. Separated
+6. Widowed
+
+**Example summaries:**
+
+```r
+# Race/ethnicity distribution
+table(monitoring_data$parent_demographics$race_ethnicity)
+#
+# Black or African American, non-Hisp.                              Hispanic
+#                                   184                                   298
+#                     Other, non-Hisp.                Two or More, non-Hisp.
+#                                    67                                   143
+#                     White, non-Hisp.
+#                                 1,308
+
+# Education distribution
+table(monitoring_data$parent_demographics$education)
+#
+#                Associate degree              Bachelor's degree
+#                             186                            524
+# Graduate or professional degree   High school graduate or GED
+#                             312                            298
+#            Less than 9th grade  9th-12th grade, no diploma
+#                              23                             45
+#      Some college, no degree  Vocational/Technical/Trade
+#                            387                             78
+
+# Marital status distribution
+table(monitoring_data$parent_demographics$marital_status_label)
+#
+#                                Divorced                                 Married
+#                                      87                                   1,124
+#                           Never Married Not married, but living with a partner
+#                                     298                                     312
+#                               Separated                                 Widowed
+#                                      24                                       8
+```
+
+{{< pagebreak >}}
+
+# Putting It All Together
+
+A typical monitoring session might look like this:
+
+```r
+# Load and run
+source("monitoring_report.R")
+monitoring_data <- generate_monitoring_report(
+  csv_path = "C:/Users/YOUR_USERNAME/my-APIs/mn26_redcap_api.csv"
+)
+
+# Quick recruitment snapshot
+cat("Total screened:", nrow(monitoring_data$screener_status), "\n")
+cat("Screener complete:",
+    sum(monitoring_data$screener_status$screener_complete), "\n")
+cat("Eligible:",
+    sum(monitoring_data$eligibility$eligible, na.rm = TRUE), "\n")
+cat("Survey complete:",
+    sum(monitoring_data$survey_completion$survey_complete, na.rm = TRUE), "\n")
+
+# Which eligibility criterion is failing most?
+elig <- monitoring_data$eligibility
+cat("\nEligibility pass rates:\n")
+cat("  Parent age 19+:",
+    mean(elig$parent_age_eligible, na.rm = TRUE) * 100, "%\n")
+cat("  Child age 0-5:",
+    mean(elig$child_age_eligible, na.rm = TRUE) * 100, "%\n")
+cat("  Primary caregiver:",
+    mean(elig$primary_caregiver_eligible, na.rm = TRUE) * 100, "%\n")
+cat("  Lives in Minnesota:",
+    mean(elig$state_eligible, na.rm = TRUE) * 100, "%\n")
+
+# Demographic balance check
+table(monitoring_data$child_demographics$sex)
+table(monitoring_data$parent_demographics$race_ethnicity)
+table(monitoring_data$parent_demographics$education)
+```
+
+{{< pagebreak >}}
+
+# Geography
+
+The monitoring function does not currently include geographic data. However, the **mailing address** where each participant's invitation was sent can be identified by linking `pid` + `record_id` to a separate address dataset (not included in the REDCap API pull).
+
+Future versions of this script may add geocoding capabilities to convert addresses to latitude/longitude and derive geographic classifications (county, census tract, PUMA, urban/rural) using the US Census Bureau geocoder. This would enable monitoring of geographic coverage across Minnesota during recruitment.
+
+{{< pagebreak >}}
+
+# Contact
+
+For questions about adapting this function for MN26 data, contact Marcus Waldman.

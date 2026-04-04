@@ -1,0 +1,194 @@
+# MN26 (Minnesota 2026) Study Configuration
+# REDCap data source configuration for Kidsights Minnesota study
+
+# REDCap connection settings
+redcap:
+  # [MN26 TODO] Update to Minnesota REDCap URL once available
+  # Current: Using Nebraska URL as template
+  url: "https://redcap.unmc.edu/api/"
+
+  # API credentials file location (NOT committed to git)
+  # This path can be overridden by setting REDCAP_API_CREDENTIALS_PATH_MN26 in .env file
+  # Priority: 1) REDCAP_API_CREDENTIALS_PATH_MN26 env var, 2) This YAML value
+  # For portability, copy .env.template to .env and set your local path
+  api_credentials_file: "C:/Users/YOUR_USERNAME/my-APIs/mn26_redcap_api.csv"
+
+  # Project configurations
+  # [MN26 TODO] Update project list once MN26 REDCap projects are created
+  # Current: Template structure from NE25
+  projects:
+    - name: "mn26_main_survey"
+      pid: 0000  # [MN26 TODO] Replace with actual project ID
+      description: "MN26 Main Survey"
+
+  timeout: 300  # seconds
+  rate_limit:
+    max_requests_per_hour: 1000
+    retry_attempts: 3
+    retry_delay: 5  # seconds
+
+# Survey forms/instruments to extract
+# [MN26 TODO] Update module list once MN26 questionnaire is finalized
+survey_modules:
+  core_modules:
+    - "demographics"           # eq* variables
+    - "child_demographics"     # cq* variables
+    - "screening_questions"    # sq* variables
+    - "household_information"  # fq* variables
+
+  assessment_modules:
+    - "child_development"
+    - "caregiver_wellbeing"
+    - "childcare_experiences"
+
+# MN26-specific field configuration
+fields:
+  # Core identifiers
+  identifiers:
+    - "record_id"
+    - "pid"
+    - "redcap_event_name"
+    - "redcap_survey_identifier"
+
+  # Age calculation fields
+  age_fields:
+    - "child_dob"
+    - "age_in_days"
+    - "caregiver_dob"
+
+  # Geographic validation
+  geographic:
+    - "sq001"      # ZIP code
+    - "fq001"      # County
+    - "eqstate"    # State residence (Minnesota)
+
+  # Eligibility screening
+  eligibility:
+    - "eq001"      # Informed consent
+    - "eq002"      # Primary caregiver status
+    - "eq003"      # Age 19+ verification
+
+# Data validation rules
+validation:
+  # Age restrictions
+  # [MN26 TODO] Verify child age cutoff (currently 5 years vs NE25's 6 years)
+  child_age_max_days: 1825  # 5 years
+  caregiver_min_age: 19
+
+  # Geographic validation
+  # [MN26 TODO] Update with Minnesota ZIP code prefixes
+  minnesota_zip_prefixes: ["550", "551", "553", "554", "555", "556", "557", "558", "559", "560", "561", "562", "563", "564", "565", "566", "567"]
+  validate_zip_county_match: true
+
+  # Survey completion requirements
+  required_modules:
+    - "demographics"
+    - "child_demographics"
+    - "screening_questions"
+  completion_status_required: 2  # REDCap complete status
+
+# Variable recoding specifications
+recoding:
+  # Race/ethnicity field mapping
+  race_ethnicity:
+    child_race_prefix: "cqr010_"
+    child_hispanic: "cqr011"
+    caregiver_race_prefix: "sq002_"
+    caregiver_hispanic: "sq003"
+
+  # Education categories
+  education:
+    create_4_category: true
+    create_6_category: true
+    create_8_category: true
+    maternal_education_only: true
+
+  # Income and poverty
+  income:
+    adjust_for_cpi: true
+    calculate_fpl: true
+    fpl_categories: [100, 200, 300, 400]  # Percentage thresholds
+
+# Eligibility criteria (adapted from NE25)
+# [MN26 TODO] Verify these match MN26 study requirements
+eligibility_criteria:
+  criterion_1:
+    name: "informed_consent"
+    description: "Participant provided informed consent"
+    field: "eq001"
+    required_value: 1
+
+  criterion_2:
+    name: "caregiver_status"
+    description: "Respondent is 19 years or older and a primary caregiver"
+    fields: ["eq002", "eq003"]
+    required_values: [1, 1]
+
+  criterion_3:
+    name: "child_age"
+    description: "Child is 0-5 years old (1825 days or younger)"
+    field: "age_in_days"
+    max_value: 1825
+
+  criterion_4:
+    name: "minnesota_residence"
+    description: "Currently lives in the state of Minnesota"
+    field: "eqstate"
+    required_value: 1  # [MN26 TODO] Verify Minnesota state code in REDCap
+
+# Processing options
+processing:
+  # Extraction settings
+  batch_size: 500
+  extract_all_records: false
+  incremental_field: "retrieved_date"
+
+  # Transformation settings
+  standardize_missing_values: true
+  create_derived_variables: true
+  apply_reverse_coding: true
+
+  # Quality control
+  flag_duplicates: true
+  duplicate_match_fields: ["pid", "child_dob"]
+  validate_geographic_consistency: true
+
+# Output configuration
+output:
+  # DuckDB database location (relative to project root)
+  # This path can be overridden by setting KIDSIGHTS_DB_PATH in .env file
+  database_path: "data/duckdb/kidsights_local.duckdb"
+
+  # Landing table (raw data)
+  landing_table: "mn26_raw"
+
+  # Staging tables (cleaned data)
+  staging_tables:
+    - "mn26_eligibility"
+    - "mn26_harmonized"
+    - "mn26_data_dictionary"
+
+  # Variable naming conventions
+  prefix_convention: "mn26_"
+  preserve_original_names: true
+
+  # Metadata preservation
+  store_data_dictionary: true
+  store_value_labels: true
+  include_extraction_metadata: true
+
+# Monitoring and logging
+monitoring:
+  # Extraction monitoring
+  track_record_counts: true
+  monitor_api_response_times: true
+  alert_on_missing_projects: true
+
+  # Data quality monitoring
+  track_eligibility_rates: true
+  monitor_completion_rates: true
+  flag_unusual_patterns: true
+
+  # Geographic coverage
+  track_county_representation: true
+  monitor_zip_code_coverage: true
