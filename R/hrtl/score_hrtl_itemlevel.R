@@ -52,7 +52,7 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
   }
 
   # NOTE: Motor Development excluded due to data quality issues
-  # See: https://github.com/anthropics/kidsights/issues/XXX
+  # See: https://github.com/anthropics/kidsights/issues/15
   # NE25 Motor items 93% missing for DrawFace/DrawPerson/BounceBall
   domains <- c("Early Learning Skills", "Social-Emotional Development",
                "Self-Regulation", "Health")
@@ -71,13 +71,12 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
 
     if (is.null(imputed_items) || is.null(thresholds)) {
       if (verbose) {
-        message(sprintf("  [SKIP] Missing imputed data or thresholds\n"))
+        message(sprintf("  [SKIP] Missing imputed data or thresholds for %s\n", domain))
       }
       next
     }
 
-    # Match imputed data to children in HRTL age range
-    # Get pid/record_id from domain_datasets (they were filtered to create imputed data)
+    # Get the original domain data to match HRTL-eligible children by pid/record_id
     domain_data_full <- domain_datasets[[domain]]$data
 
     if (is.null(domain_data_full)) {
@@ -90,30 +89,24 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
       dplyr::select(pid, record_id) %>%
       dplyr::mutate(row_in_domain_data = dplyr::row_number())
 
-    # Start with child identifiers
+    # Start with HRTL-eligible children
     domain_result <- data_hrtl %>%
       dplyr::select(pid, record_id, years_old, age_years)
 
-    # For each child in HRTL age range, find their row in the domain data
-    # Then extract imputed items from that row
+    # Match HRTL-eligible children to domain_data by pid/record_id
     domain_result <- domain_result %>%
       dplyr::left_join(
         domain_pids,
         by = c("pid", "record_id")
       )
 
-    # Extract imputed items using row positions in domain data
+    # Extract imputed items for matching children (using row positions)
     imputed_hrtl <- imputed_items[domain_result$row_in_domain_data, ]
-    # Reset row names for safety
     rownames(imputed_hrtl) <- NULL
 
     # Initialize item codes (will be 1=Needs Support, 2=Emerging, 3=On-Track)
     item_codes <- data.frame(matrix(NA, nrow = nrow(domain_result), ncol = length(domain_items)))
     colnames(item_codes) <- domain_items
-
-    # Create mapping from NE25 items to CAHMI codes
-    ne25_to_cahmi <- setNames(domain_datasets[[domain]]$cahmi_codes,
-                              domain_datasets[[domain]]$variables)
 
     # Code each item based on age-specific thresholds
     for (item in domain_items) {
@@ -126,23 +119,14 @@ score_hrtl_itemlevel <- function(data, imputed_data_list, thresholds_list,
 
       item_responses <- imputed_hrtl[[item]]
 
-      # Get CAHMI code for this item
-      cahmi_code <- ne25_to_cahmi[[item]]
-      if (is.na(cahmi_code)) {
-        if (verbose) {
-          message(sprintf("    [WARN] CAHMI code not found for item %s\n", item))
-        }
-        next
-      }
-
       # Get age-specific thresholds for this item
-      # Match by CAHMI code (case-insensitive, remove suffix and underscores)
+      # Match by CAHMI code from thresholds table
       item_thresholds <- thresholds %>%
-        dplyr::filter(tolower(gsub("_22$|_", "", var_cahmi)) == tolower(gsub("_", "", cahmi_code)))
+        dplyr::filter(tolower(gsub("_22$|_r$", "", var_cahmi)) == tolower(gsub("_22$|_r$", "", item)))
 
       if (nrow(item_thresholds) == 0) {
         if (verbose) {
-          message(sprintf("    [WARN] No thresholds found for item %s\n", item))
+          message(sprintf("    [WARN] No thresholds found for item %s (NE25), skipping\n", item))
         }
         next
       }
