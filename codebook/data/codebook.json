@@ -24,7 +24,8 @@
         "ne22": "C020",
         "ne20": "C20",
         "credi": "LF5",
-        "gsed": "crosec004"
+        "gsed": "crosec004",
+        "mn26": "C020"
       },
       "content": {
         "stems": {
@@ -126,7 +127,8 @@
         "ne22": "C023",
         "ne20": "C23",
         "credi": "LF3",
-        "gsed": "croclc006"
+        "gsed": "croclc006",
+        "mn26": "C023"
       },
       "content": {
         "stems": {
@@ -227,7 +229,8 @@
         "ne22": "C026",
         "ne20": "C26",
         "credi": "LF6",
-        "gsed": "cromoc006"
+        "gsed": "cromoc006",
+        "mn26": "C026"
       },
       "content": {
         "stems": {
@@ -329,7 +332,8 @@
         "ne22": "C033",
         "ne20": "C33",
         "credi": "LF8",
-        "gsed": "croclc014"
+        "gsed": "croclc014",
+        "mn26": "C033"
       },
       "content": {
         "stems": {
@@ -430,7 +434,8 @@
         "ne22": "C038",
         "ne20": "C38",
         "credi": "LF11",
-        "gsed": "cromoc010"
+        "gsed": "cromoc010",
+        "mn26": "C038"
       },
       "content": {
         "stems": {
@@ -532,7 +537,8 @@
         "ne22": "C042",
         "ne20": "C42",
         "credi": "LF18",
-        "gsed": "cromoc005"
+        "gsed": "cromoc005",
+        "mn26": "C042"
       },
       "content": {
         "stems": {
@@ -634,7 +640,8 @@
         "ne22": "C043",
         "ne20": "C43",
         "credi": "LF16",
-        "gsed": "cromoc009"
+        "gsed": "cromoc009",
+        "mn26": "C043"
       },
       "content": {
         "stems": {
@@ -736,7 +743,8 @@
         "ne22": "C047",
         "ne20": "C47",
         "credi": "LF19",
-        "gsed": "croclc007"
+        "gsed": "croclc007",
+        "mn26": "C047"
       },
       "content": {
         "stems": {
@@ -837,7 +845,8 @@
         "ne22": "C048",
         "ne20": "C48",
         "credi": "LF21",
-        "gsed": "croclc011"
+        "gsed": "croclc011",
+        "mn26": "C048"
       },
       "content": {
         "stems": {
@@ -939,7 +948,8 @@
         "ne22": "C049",
         "ne20": "C49",
         "credi": "LF20",
-        "gsed": "cromoc011"
+        "gsed": "cromoc011",
+        "mn26": "C049"
       },
       "content": {
         "stems": {
@@ -1041,7 +1051,8 @@
         "ne22": "C054",
         "ne20": "C54",
         "credi": "LF29",
-        "gsed": "cromoc015"
+        "gsed": "cromoc015",
+        "mn26": "C054"
       },
       "content": {
         "stems": {
@@ -1143,7 +1154,8 @@
         "ne22": "C060",
         "ne20": "C60",
         "credi": "LF34",
-        "gsed": "cromoc018"
+        "gsed": "cromoc018",
+        "mn26": "C060"
       },
       "content": {
         "stems": {
@@ -1245,7 +1257,8 @@
         "ne22": "C062",
         "ne20": "C62",
         "credi": "LF36",
-        "gsed": "cromoc017"
+        "gsed": "cromoc017",
+        "mn26": "C062"
       },
       "content": {
         "stems": {
@@ -1347,7 +1360,8 @@
         "ne22": "C065",
         "ne20": "C65",
         "credi": "LF44",
-        "gsed": "iyomoc022"
+        "gsed": "iyomoc022",
+        "mn26": "C065"
       },
       "content": {
         "stems": {
@@ -1449,7 +1463,8 @@
         "ne22": "C089",
         "ne20": "C89",
         "credi": "LF58",
-        "gsed": "mdtsed019"
+        "gsed": "mdtsed019",
+        "mn26": "C089"
       },
       "content": {
         "stems": {
@@ -1551,7 +1566,8 @@
         "ne22": "C093",
         "ne20": "C93",
         "credi": "LF62",
-        "gsed": "croclc025"
+        "gsed": "croclc025",
+        "mn26": "C093"
       },
       "content": {
         "stems": {
@@ -1653,7 +1669,8 @@
         "ne22": "C096",
         "ne20": "C96",
         "credi": "LF64",
-        "gsed": "croclc028"
+        "gsed": "croclc028",
+        "mn26": "C096"
       },
       "content": {
         "stems": {
@@ -1757,7 +1774,8 @@
         "ne20": "C97",
         "ecdi": "ECDI1",
         "credi": "LF60",
-        "gsed": "cromoc031"
+        "gsed": "cromoc031",
+        "mn26": "C097"
       },
       "content": {
         "stems": {
@@ -1865,7 +1883,8 @@
         "ne22": "C100",
         "ne20": "C100",
         "credi": "LF71",
-        "gsed": "croclc038"
+        "gsed": "croclc038",
+        "mn26": "C100"
       },
       "content": {
         "stems": {
@@ -1969,7 +1988,8 @@
         "ne20": "C101",
         "ecdi": "ECDI9",
         "credi": "LF72",
-        "gsed": "croclc034"
+        "gsed": "croclc034",
+        "mn26": "C101"
       },
       "content": {
         "stems": {
@@ -2077,7 +2097,8 @@
         "ne22": "C104",
         "ne20": "C104",
         "credi": "LF77",
-        "gsed": "cromoc035"
+        "gsed": "cromoc035",
+        "mn26": "C104"
       },
       "content": {
         "stems": {
@@ -2179,7 +2200,8 @@
         "ne22": "C110",
         "ne20": "C110",
         "credi": "LF86",
-        "gsed": "cromoc033"
+        "gsed": "cromoc033",
+        "mn26": "C110"
       },
       "content": {
         "stems": {
@@ -2283,7 +2305,8 @@
         "ne20": "C113",
         "ecdi": "ECDI8",
         "credi": "LF88",
-        "gsed": "croclc031"
+        "gsed": "croclc031",
+        "mn26": "C113"
       },
       "content": {
         "stems": {
@@ -2391,7 +2414,8 @@
         "ne22": "C116",
         "ne20": "C116",
         "credi": "LF89",
-        "gsed": "croclc046"
+        "gsed": "croclc046",
+        "mn26": "C116"
       },
       "content": {
         "stems": {
@@ -2493,7 +2517,8 @@
         "ne22": "C119",
         "ne20": "C119",
         "credi": "LF97",
-        "gsed": "croclc039"
+        "gsed": "croclc039",
+        "mn26": "C119"
       },
       "content": {
         "stems": {
@@ -2595,7 +2620,8 @@
         "ne22": "C121",
         "ne20": "C121",
         "credi": "LF95",
-        "gsed": "croclc050"
+        "gsed": "croclc050",
+        "mn26": "C121"
       },
       "content": {
         "stems": {
@@ -2699,7 +2725,8 @@
         "ne20": "C132",
         "ecdi": "ECDI4",
         "credi": "LF105",
-        "gsed": "cromoc039"
+        "gsed": "cromoc039",
+        "mn26": "C132"
       },
       "content": {
         "stems": {
@@ -2807,7 +2834,8 @@
         "ne22": "C136",
         "ne20": "C136",
         "credi": "LF104",
-        "gsed": "crosec051"
+        "gsed": "crosec051",
+        "mn26": "C136"
       },
       "content": {
         "stems": {
@@ -2909,7 +2937,8 @@
         "ne22": "C139",
         "ne20": "C139",
         "credi": "LF106",
-        "gsed": "croclc048"
+        "gsed": "croclc048",
+        "mn26": "C139"
       },
       "content": {
         "stems": {
@@ -3007,7 +3036,8 @@
         "kidsight": "AA50",
         "ne25": "CREDI001",
         "ne22": "CREDI01",
-        "credi": "LF4"
+        "credi": "LF4",
+        "mn26": "CREDI001"
       },
       "content": {
         "stems": {
@@ -3091,7 +3121,8 @@
         "kidsight": "AA54",
         "ne25": "CREDI017",
         "ne22": "CREDI17",
-        "credi": "LF13"
+        "credi": "LF13",
+        "mn26": "CREDI017"
       },
       "content": {
         "stems": {
@@ -3176,7 +3207,8 @@
         "kidsight": "AA55",
         "ne25": "CREDI019",
         "ne22": "CREDI19",
-        "credi": "LF75"
+        "credi": "LF75",
+        "mn26": "CREDI019"
       },
       "content": {
         "stems": {
@@ -3260,7 +3292,8 @@
         "kidsight": "AA56",
         "ne25": "CREDI020",
         "ne22": "CREDI20",
-        "credi": "LF39"
+        "credi": "LF39",
+        "mn26": "CREDI020"
       },
       "content": {
         "stems": {
@@ -3350,7 +3383,8 @@
         "kidsight": "AA57",
         "ne25": "CREDI021",
         "ne22": "CREDI21",
-        "credi": "LF61"
+        "credi": "LF61",
+        "mn26": "CREDI021"
       },
       "content": {
         "stems": {
@@ -3435,7 +3469,8 @@
         "kidsight": "AA60",
         "ne25": "CREDI025",
         "ne22": "CREDI25",
-        "credi": "LF55"
+        "credi": "LF55",
+        "mn26": "CREDI025"
       },
       "content": {
         "stems": {
@@ -3520,7 +3555,8 @@
         "kidsight": "AA65",
         "ne25": "CREDI041",
         "ne22": "CREDI41",
-        "credi": "LF78"
+        "credi": "LF78",
+        "mn26": "CREDI041"
       },
       "content": {
         "stems": {
@@ -3604,7 +3640,8 @@
         "kidsight": "AA68",
         "ne25": "CREDI045",
         "ne22": "CREDI45",
-        "credi": "LF59"
+        "credi": "LF59",
+        "mn26": "CREDI045"
       },
       "content": {
         "stems": {
@@ -3689,7 +3726,8 @@
         "kidsight": "AA69",
         "ne25": "CREDI046",
         "ne22": "CREDI46",
-        "credi": "LF85"
+        "credi": "LF85",
+        "mn26": "CREDI046"
       },
       "content": {
         "stems": {
@@ -3774,7 +3812,8 @@
         "kidsight": "AA71",
         "ne25": "CREDI052",
         "ne22": "CREDI52",
-        "credi": "LF103"
+        "credi": "LF103",
+        "mn26": "CREDI052"
       },
       "content": {
         "stems": {
@@ -3858,7 +3897,8 @@
         "kidsight": "AA72",
         "ne25": "CREDI058",
         "ne22": "CREDI58",
-        "credi": "LF91"
+        "credi": "LF91",
+        "mn26": "CREDI058"
       },
       "content": {
         "stems": {
@@ -3940,7 +3980,8 @@
         "equate": "AA102",
         "kidsight": "AA102",
         "ne25": "CREDI005",
-        "ne22": "CREDI05"
+        "ne22": "CREDI05",
+        "mn26": "CREDI005"
       },
       "content": {
         "stems": {
@@ -4017,7 +4058,8 @@
         "equate": "AA104",
         "kidsight": "AA104",
         "ne25": "CREDI028",
-        "ne22": "CREDI28"
+        "ne22": "CREDI28",
+        "mn26": "CREDI028"
       },
       "content": {
         "stems": {
@@ -4090,7 +4132,8 @@
       "lexicons": {
         "equate": "AA201",
         "kidsight": "AA201",
-        "ne25": "SF018"
+        "ne25": "SF018",
+        "mn26": "SF018"
       },
       "content": {
         "stems": {
@@ -4147,7 +4190,8 @@
       "lexicons": {
         "equate": "AA202",
         "kidsight": "AA202",
-        "ne25": "SF019"
+        "ne25": "SF019",
+        "mn26": "SF019"
       },
       "content": {
         "stems": {
@@ -4210,7 +4254,8 @@
       "lexicons": {
         "equate": "AA203",
         "kidsight": "AA203",
-        "ne25": "SF021"
+        "ne25": "SF021",
+        "mn26": "SF021"
       },
       "content": {
         "stems": {
@@ -4271,7 +4316,8 @@
       "lexicons": {
         "equate": "AA205",
         "kidsight": "AA205",
-        "ne25": "SF093"
+        "ne25": "SF093",
+        "mn26": "SF093"
       },
       "content": {
         "stems": {
@@ -4345,7 +4391,8 @@
         "ne25": "ECDI016",
         "ne22": "ECD043",
         "ne20": "ECD43",
-        "ecdi": "ECDI16"
+        "ecdi": "ECDI16",
+        "mn26": "ECDI016"
       },
       "content": {
         "stems": {
@@ -4438,7 +4485,8 @@
         "ne25": "ECDI017",
         "ne22": "ECD044",
         "ne20": "ECD44",
-        "ecdi": "ECDI17"
+        "ecdi": "ECDI17",
+        "mn26": "ECDI017"
       },
       "content": {
         "stems": {
@@ -4524,7 +4572,8 @@
       "lexicons": {
         "equate": "BB201",
         "kidsight": "BB201",
-        "ne25": "ECDI009X"
+        "ne25": "ECDI009X",
+        "mn26": "ECDI009X"
       },
       "content": {
         "stems": {
@@ -4599,7 +4648,8 @@
         "ne25": "C004",
         "ne22": "C004",
         "ne20": "C4",
-        "gsed": "mdtsed001"
+        "gsed": "mdtsed001",
+        "mn26": "C004"
       },
       "content": {
         "stems": {
@@ -4692,7 +4742,8 @@
         "ne25": "C005",
         "ne22": "C005",
         "ne20": "C5",
-        "gsed": "iyomoc001"
+        "gsed": "iyomoc001",
+        "mn26": "C005"
       },
       "content": {
         "stems": {
@@ -4786,7 +4837,8 @@
         "ne25": "C007",
         "ne22": "C007",
         "ne20": "C7",
-        "gsed": "croclc001"
+        "gsed": "croclc001",
+        "mn26": "C007"
       },
       "content": {
         "stems": {
@@ -4879,7 +4931,8 @@
         "ne25": "C010",
         "ne22": "C010",
         "ne20": "C10",
-        "gsed": "iyosec004"
+        "gsed": "iyosec004",
+        "mn26": "C010"
       },
       "content": {
         "stems": {
@@ -4972,7 +5025,8 @@
         "ne25": "C012",
         "ne22": "C012",
         "ne20": "C12",
-        "gsed": "iyolgc002"
+        "gsed": "iyolgc002",
+        "mn26": "C012"
       },
       "content": {
         "stems": {
@@ -5066,7 +5120,8 @@
         "ne25": "C013",
         "ne22": "C013",
         "ne20": "C13",
-        "gsed": "gsdgmc005"
+        "gsed": "gsdgmc005",
+        "mn26": "C013"
       },
       "content": {
         "stems": {
@@ -5160,7 +5215,8 @@
         "ne25": "C014",
         "ne22": "C014",
         "ne20": "C14",
-        "gsed": "iyosec002"
+        "gsed": "iyosec002",
+        "mn26": "C014"
       },
       "content": {
         "stems": {
@@ -5253,7 +5309,8 @@
         "ne25": "C015",
         "ne22": "C015",
         "ne20": "C15",
-        "gsed": "crosec002"
+        "gsed": "crosec002",
+        "mn26": "C015"
       },
       "content": {
         "stems": {
@@ -5347,7 +5404,8 @@
         "ne25": "C016",
         "ne22": "C016",
         "ne20": "C16",
-        "gsed": "iyosec001"
+        "gsed": "iyosec001",
+        "mn26": "C016"
       },
       "content": {
         "stems": {
@@ -5441,7 +5499,8 @@
         "ne25": "C017",
         "ne22": "C017",
         "ne20": "C17",
-        "gsed": "iyomoc002"
+        "gsed": "iyomoc002",
+        "mn26": "C017"
       },
       "content": {
         "stems": {
@@ -5535,7 +5594,8 @@
         "ne25": "C018",
         "ne22": "C018",
         "ne20": "C18",
-        "gsed": "gsdgmc006"
+        "gsed": "gsdgmc006",
+        "mn26": "C018"
       },
       "content": {
         "stems": {
@@ -5629,7 +5689,8 @@
         "ne25": "C019",
         "ne22": "C019",
         "ne20": "C19",
-        "gsed": "iyolgc005"
+        "gsed": "iyolgc005",
+        "mn26": "C019"
       },
       "content": {
         "stems": {
@@ -5723,7 +5784,8 @@
         "ne25": "C021",
         "ne22": "C021",
         "ne20": "C21",
-        "gsed": "iyolgc001"
+        "gsed": "iyolgc001",
+        "mn26": "C021"
       },
       "content": {
         "stems": {
@@ -5816,7 +5878,8 @@
         "ne25": "C022",
         "ne22": "C022",
         "ne20": "C22",
-        "gsed": "iyolgc003"
+        "gsed": "iyolgc003",
+        "mn26": "C022"
       },
       "content": {
         "stems": {
@@ -5909,7 +5972,8 @@
         "ne25": "C024",
         "ne22": "C024",
         "ne20": "C24",
-        "gsed": "iyomoc004"
+        "gsed": "iyomoc004",
+        "mn26": "C024"
       },
       "content": {
         "stems": {
@@ -6003,7 +6067,8 @@
         "ne25": "C025",
         "ne22": "C025",
         "ne20": "C25",
-        "gsed": "iyosec005"
+        "gsed": "iyosec005",
+        "mn26": "C025"
       },
       "content": {
         "stems": {
@@ -6096,7 +6161,8 @@
         "ne25": "C027",
         "ne22": "C027",
         "ne20": "C27",
-        "gsed": "iyolgc004"
+        "gsed": "iyolgc004",
+        "mn26": "C027"
       },
       "content": {
         "stems": {
@@ -6190,7 +6256,8 @@
         "ne25": "C031",
         "ne22": "C031",
         "ne20": "C31",
-        "gsed": "iyosec003"
+        "gsed": "iyosec003",
+        "mn26": "C031"
       },
       "content": {
         "stems": {
@@ -6283,7 +6350,8 @@
         "ne25": "C032",
         "ne22": "C032",
         "ne20": "C32",
-        "gsed": "crosec003"
+        "gsed": "crosec003",
+        "mn26": "C032"
       },
       "content": {
         "stems": {
@@ -6376,7 +6444,8 @@
         "ne25": "C035",
         "ne22": "C035",
         "ne20": "C35",
-        "gsed": "iyomoc007"
+        "gsed": "iyomoc007",
+        "mn26": "C035"
       },
       "content": {
         "stems": {
@@ -6470,7 +6539,8 @@
         "ne25": "C036",
         "ne22": "C036",
         "ne20": "C36",
-        "gsed": "aqigmc012"
+        "gsed": "aqigmc012",
+        "mn26": "C036"
       },
       "content": {
         "stems": {
@@ -6564,7 +6634,8 @@
         "ne25": "C037",
         "ne22": "C037",
         "ne20": "C37",
-        "gsed": "cromoc002"
+        "gsed": "cromoc002",
+        "mn26": "C037"
       },
       "content": {
         "stems": {
@@ -6658,7 +6729,8 @@
         "ne25": "C039",
         "ne22": "C039",
         "ne20": "C39",
-        "gsed": "mdtsed006"
+        "gsed": "mdtsed006",
+        "mn26": "C039"
       },
       "content": {
         "stems": {
@@ -6752,7 +6824,8 @@
         "ne25": "C041",
         "ne22": "C041",
         "ne20": "C41",
-        "gsed": "iyomoc009"
+        "gsed": "iyomoc009",
+        "mn26": "C041"
       },
       "content": {
         "stems": {
@@ -6846,7 +6919,8 @@
         "ne25": "C044",
         "ne22": "C044",
         "ne20": "C44",
-        "gsed": "iyomoc008"
+        "gsed": "iyomoc008",
+        "mn26": "C044"
       },
       "content": {
         "stems": {
@@ -6940,7 +7014,8 @@
         "ne25": "C045",
         "ne22": "C045",
         "ne20": "C45",
-        "gsed": "iyosec006"
+        "gsed": "iyosec006",
+        "mn26": "C045"
       },
       "content": {
         "stems": {
@@ -7034,7 +7109,8 @@
         "ne25": "C046",
         "ne22": "C046",
         "ne20": "C46",
-        "gsed": "croclc008"
+        "gsed": "croclc008",
+        "mn26": "C046"
       },
       "content": {
         "stems": {
@@ -7128,7 +7204,8 @@
         "ne25": "C050",
         "ne22": "C050",
         "ne20": "C50",
-        "gsed": "iyomoc011"
+        "gsed": "iyomoc011",
+        "mn26": "C050"
       },
       "content": {
         "stems": {
@@ -7221,7 +7298,8 @@
         "ne25": "C051",
         "ne22": "C051",
         "ne20": "C51",
-        "gsed": "iyolgc006"
+        "gsed": "iyolgc006",
+        "mn26": "C051"
       },
       "content": {
         "stems": {
@@ -7315,7 +7393,8 @@
         "ne25": "C052",
         "ne22": "C052",
         "ne20": "C52",
-        "gsed": "iyomoc012"
+        "gsed": "iyomoc012",
+        "mn26": "C052"
       },
       "content": {
         "stems": {
@@ -7409,7 +7488,8 @@
         "ne25": "C056",
         "ne22": "C056",
         "ne20": "C56",
-        "gsed": "iyomoc016"
+        "gsed": "iyomoc016",
+        "mn26": "C056"
       },
       "content": {
         "stems": {
@@ -7503,7 +7583,8 @@
         "ne25": "C057",
         "ne22": "C057",
         "ne20": "C57",
-        "gsed": "aqigmc020"
+        "gsed": "aqigmc020",
+        "mn26": "C057"
       },
       "content": {
         "stems": {
@@ -7597,7 +7678,8 @@
         "ne25": "C059",
         "ne22": "C059",
         "ne20": "C59",
-        "gsed": "mdtlgd008"
+        "gsed": "mdtlgd008",
+        "mn26": "C059"
       },
       "content": {
         "stems": {
@@ -7690,7 +7772,8 @@
         "ne25": "C061",
         "ne22": "C061",
         "ne20": "C61",
-        "gsed": "iyomoc020"
+        "gsed": "iyomoc020",
+        "mn26": "C061"
       },
       "content": {
         "stems": {
@@ -7784,7 +7867,8 @@
         "ne25": "C063",
         "ne22": "C063",
         "ne20": "C63",
-        "gsed": "iyomoc021"
+        "gsed": "iyomoc021",
+        "mn26": "C063"
       },
       "content": {
         "stems": {
@@ -7878,7 +7962,8 @@
         "ne25": "C066",
         "ne22": "C066",
         "ne20": "C66",
-        "gsed": "iyomoc024"
+        "gsed": "iyomoc024",
+        "mn26": "C066"
       },
       "content": {
         "stems": {
@@ -7972,7 +8057,8 @@
         "ne25": "C067",
         "ne22": "C067",
         "ne20": "C67",
-        "gsed": "aqigmc027"
+        "gsed": "aqigmc027",
+        "mn26": "C067"
       },
       "content": {
         "stems": {
@@ -8066,7 +8152,8 @@
         "ne25": "C069",
         "ne22": "C069",
         "ne20": "C69",
-        "gsed": "aqigmc026"
+        "gsed": "aqigmc026",
+        "mn26": "C069"
       },
       "content": {
         "stems": {
@@ -8160,7 +8247,8 @@
         "ne25": "C071",
         "ne22": "C071",
         "ne20": "C71",
-        "gsed": "iyomoc025"
+        "gsed": "iyomoc025",
+        "mn26": "C071"
       },
       "content": {
         "stems": {
@@ -8254,7 +8342,8 @@
         "ne25": "C072",
         "ne22": "C072",
         "ne20": "C72",
-        "gsed": "iyolgc013"
+        "gsed": "iyolgc013",
+        "mn26": "C072"
       },
       "content": {
         "stems": {
@@ -8348,7 +8437,8 @@
         "ne25": "C073",
         "ne22": "C073",
         "ne20": "C73",
-        "gsed": "vinxxc006"
+        "gsed": "vinxxc006",
+        "mn26": "C073"
       },
       "content": {
         "stems": {
@@ -8442,7 +8532,8 @@
         "ne25": "C074",
         "ne22": "C074",
         "ne20": "C74",
-        "gsed": "vinxxc007"
+        "gsed": "vinxxc007",
+        "mn26": "C074"
       },
       "content": {
         "stems": {
@@ -8536,7 +8627,8 @@
         "ne25": "C075",
         "ne22": "C075",
         "ne20": "C75",
-        "gsed": "mdtsed013"
+        "gsed": "mdtsed013",
+        "mn26": "C075"
       },
       "content": {
         "stems": {
@@ -8629,7 +8721,8 @@
         "ne25": "C077",
         "ne22": "C077",
         "ne20": "C77",
-        "gsed": "iyomoc027"
+        "gsed": "iyomoc027",
+        "mn26": "C077"
       },
       "content": {
         "stems": {
@@ -8723,7 +8816,8 @@
         "ne25": "C082",
         "ne22": "C082",
         "ne20": "C82",
-        "gsed": "mdtsed016"
+        "gsed": "mdtsed016",
+        "mn26": "C082"
       },
       "content": {
         "stems": {
@@ -8817,7 +8911,8 @@
         "ne25": "C084",
         "ne22": "C084",
         "ne20": "C84",
-        "gsed": "iyomoc032"
+        "gsed": "iyomoc032",
+        "mn26": "C084"
       },
       "content": {
         "stems": {
@@ -8911,7 +9006,8 @@
         "ne25": "C085",
         "ne22": "C085",
         "ne20": "C85",
-        "gsed": "mdtsed017"
+        "gsed": "mdtsed017",
+        "mn26": "C085"
       },
       "content": {
         "stems": {
@@ -9004,7 +9100,8 @@
         "ne25": "C087",
         "ne22": "C087",
         "ne20": "C87",
-        "gsed": "vinxxc021"
+        "gsed": "vinxxc021",
+        "mn26": "C087"
       },
       "content": {
         "stems": {
@@ -9098,7 +9195,8 @@
         "ne25": "C088",
         "ne22": "C088",
         "ne20": "C88",
-        "gsed": "croclc023"
+        "gsed": "croclc023",
+        "mn26": "C088"
       },
       "content": {
         "stems": {
@@ -9191,7 +9289,8 @@
         "ne25": "C090",
         "ne22": "C090",
         "ne20": "C90",
-        "gsed": "aqicmc033"
+        "gsed": "aqicmc033",
+        "mn26": "C090"
       },
       "content": {
         "stems": {
@@ -9285,7 +9384,8 @@
         "ne25": "C092",
         "ne22": "C092",
         "ne20": "C92",
-        "gsed": "vinxxc048"
+        "gsed": "vinxxc048",
+        "mn26": "C092"
       },
       "content": {
         "stems": {
@@ -9378,7 +9478,8 @@
         "ne25": "C094",
         "ne22": "C094",
         "ne20": "C94",
-        "gsed": "mdtsed021"
+        "gsed": "mdtsed021",
+        "mn26": "C094"
       },
       "content": {
         "stems": {
@@ -9472,7 +9573,8 @@
         "ne25": "C095",
         "ne22": "C095",
         "ne20": "C95",
-        "gsed": "mdtsed023"
+        "gsed": "mdtsed023",
+        "mn26": "C095"
       },
       "content": {
         "stems": {
@@ -9565,7 +9667,8 @@
         "ne25": "C099",
         "ne22": "C099",
         "ne20": "C99",
-        "gsed": "iyolgc022"
+        "gsed": "iyolgc022",
+        "mn26": "C099"
       },
       "content": {
         "stems": {
@@ -9659,7 +9762,8 @@
         "ne25": "C102",
         "ne22": "C102",
         "ne20": "C102",
-        "gsed": "iyolgc023"
+        "gsed": "iyolgc023",
+        "mn26": "C102"
       },
       "content": {
         "stems": {
@@ -9755,7 +9859,8 @@
         "ne25": "C105",
         "ne22": "C105",
         "ne20": "C105",
-        "gsed": "croclc027"
+        "gsed": "croclc027",
+        "mn26": "C105"
       },
       "content": {
         "stems": {
@@ -9849,7 +9954,8 @@
         "ne25": "C108",
         "ne22": "C108",
         "ne20": "C108",
-        "gsed": "croclc032"
+        "gsed": "croclc032",
+        "mn26": "C108"
       },
       "content": {
         "stems": {
@@ -9943,7 +10049,8 @@
         "ne25": "C109",
         "ne22": "C109",
         "ne20": "C109",
-        "gsed": "mdtsed026"
+        "gsed": "mdtsed026",
+        "mn26": "C109"
       },
       "content": {
         "stems": {
@@ -10037,7 +10144,8 @@
         "ne25": "C114",
         "ne22": "C114",
         "ne20": "C114",
-        "gsed": "crosec042"
+        "gsed": "crosec042",
+        "mn26": "C114"
       },
       "content": {
         "stems": {
@@ -10128,7 +10236,8 @@
         "kidsight": "DD9",
         "ne25": "NOM009",
         "ne22": "NOM009",
-        "ne20": "NOM09"
+        "ne20": "NOM09",
+        "mn26": "NOM009"
       },
       "content": {
         "stems": {
@@ -10216,7 +10325,8 @@
         "ne25": "C123",
         "ne22": "C123",
         "ne20": "C123",
-        "gsed": "mdtsed028"
+        "gsed": "mdtsed028",
+        "mn26": "C123"
       },
       "content": {
         "stems": {
@@ -10310,7 +10420,8 @@
         "ne25": "C128",
         "ne22": "C128",
         "ne20": "C128",
-        "gsed": "crosec059"
+        "gsed": "crosec059",
+        "mn26": "C128"
       },
       "content": {
         "stems": {
@@ -10404,7 +10515,8 @@
         "ne25": "C129",
         "ne22": "C129",
         "ne20": "C129",
-        "gsed": "iyomoc040"
+        "gsed": "iyomoc040",
+        "mn26": "C129"
       },
       "content": {
         "stems": {
@@ -10497,7 +10609,8 @@
         "ne25": "C130",
         "ne22": "C130",
         "ne20": "C130",
-        "gsed": "mdtsed029"
+        "gsed": "mdtsed029",
+        "mn26": "C130"
       },
       "content": {
         "stems": {
@@ -10591,7 +10704,8 @@
         "ne25": "C134",
         "ne22": "C134",
         "ne20": "C134",
-        "gsed": "mdtsed033"
+        "gsed": "mdtsed033",
+        "mn26": "C134"
       },
       "content": {
         "stems": {
@@ -10684,7 +10798,8 @@
         "ne25": "C137",
         "ne22": "C137",
         "ne20": "C137",
-        "gsed": "mdtsed032"
+        "gsed": "mdtsed032",
+        "mn26": "C137"
       },
       "content": {
         "stems": {
@@ -10774,7 +10889,8 @@
         "equate": "CQFA002",
         "kidsight": "CQFA002",
         "ne25": "CQFA002",
-        "cahmi22": "K2Q01"
+        "cahmi22": "K2Q01",
+        "mn26": "CQFA002"
       },
       "content": {
         "stems": {
@@ -10861,7 +10977,8 @@
         "equate": "CQR014X",
         "kidsight": "CQR014X",
         "ne25": "CQR014X",
-        "cahmi22": "HCABILITY"
+        "cahmi22": "HCABILITY",
+        "mn26": "CQR014X"
       },
       "content": {
         "stems": {
@@ -11015,7 +11132,8 @@
         "kidsight": "DD15",
         "ne25": "NOM015",
         "ne22": "NOM015",
-        "ne20": "NOM15"
+        "ne20": "NOM15",
+        "mn26": "NOM015"
       },
       "content": {
         "stems": {
@@ -11182,7 +11300,8 @@
         "kidsight": "DD19",
         "ne25": "NOM019",
         "ne22": "NOM019",
-        "ne20": "NOM19"
+        "ne20": "NOM19",
+        "mn26": "NOM019"
       },
       "content": {
         "stems": {
@@ -11760,7 +11879,8 @@
         "equate": "DD103",
         "kidsight": "DD103",
         "ne25": "NOM103",
-        "cahmi21": "SIMPLEINST"
+        "cahmi21": "SIMPLEINST",
+        "mn26": "NOM103"
       },
       "content": {
         "stems": {
@@ -12034,7 +12154,8 @@
         "equate": "DD205",
         "kidsight": "DD205",
         "ne25": "NOM2205",
-        "cahmi22": "GROUPOFOBJECTS"
+        "cahmi22": "GROUPOFOBJECTS",
+        "mn26": "NOM2205"
       },
       "content": {
         "stems": {
@@ -12138,7 +12259,8 @@
         "cahmi22": [
           "BOUNCEBALL",
           "BOUNCEABALL"
-        ]
+        ],
+        "mn26": "NOM042X"
       },
       "content": {
         "stems": {
@@ -12235,7 +12357,8 @@
         "equate": "DD221",
         "kidsight": "DD221",
         "ne25": "NOM048X",
-        "cahmi21": "MAKEFRIEND"
+        "cahmi21": "MAKEFRIEND",
+        "mn26": "NOM048X"
       },
       "content": {
         "stems": {
@@ -12319,7 +12442,8 @@
         "kidsight": "DD299",
         "ne25": "NOM054X",
         "cahmi22": "DISTRACTED",
-        "cahmi21": "DISTRACTED"
+        "cahmi21": "DISTRACTED",
+        "mn26": "NOM054X"
       },
       "content": {
         "stems": {
@@ -12434,7 +12558,8 @@
         "ne22": "C079",
         "ne20": "C79",
         "credi": "LF47",
-        "gsed": "cromoc025"
+        "gsed": "cromoc025",
+        "mn26": "C079"
       },
       "content": {
         "stems": {
@@ -12535,7 +12660,8 @@
         "ne25": "C080",
         "ne22": "C080",
         "ne20": "C80",
-        "gsed": "iyomoc031"
+        "gsed": "iyomoc031",
+        "mn26": "C080"
       },
       "content": {
         "stems": {
@@ -12635,7 +12761,8 @@
         "ne22": "C091",
         "ne20": "C91",
         "credi": "LF73",
-        "gsed": "croclc024"
+        "gsed": "croclc024",
+        "mn26": "C091"
       },
       "content": {
         "stems": {
@@ -12838,7 +12965,8 @@
         "ne20": "C112",
         "ecdi": "ECDI6",
         "credi": "LF83",
-        "gsed": "croclc029"
+        "gsed": "croclc029",
+        "mn26": "C112"
       },
       "content": {
         "stems": {
@@ -13046,7 +13174,8 @@
         "ne22": "C115",
         "ne20": "C115",
         "credi": "LF87",
-        "gsed": "croclc042"
+        "gsed": "croclc042",
+        "mn26": "C115"
       },
       "content": {
         "stems": {
@@ -13379,7 +13508,8 @@
         "ne22": "C124",
         "ne20": "C124",
         "credi": "LF99",
-        "gsed": "croclc051"
+        "gsed": "croclc051",
+        "mn26": "C124"
       },
       "content": {
         "stems": {
@@ -13479,7 +13609,8 @@
         "equate": "EG5a",
         "kidsight": "DD202",
         "ne25": "NOM2202",
-        "cahmi22": "FOCUSON"
+        "cahmi22": "FOCUSON",
+        "mn26": "NOM2202"
       },
       "content": {
         "stems": {
@@ -13583,7 +13714,8 @@
         "kidsight": "AA63",
         "ne25": "CREDI036",
         "ne22": "CREDI36",
-        "credi": "LF70"
+        "credi": "LF70",
+        "mn26": "CREDI036"
       },
       "content": {
         "stems": {
@@ -13674,7 +13806,8 @@
         "ne25": "ECDI015",
         "ne22": "ECD028",
         "ne20": "ECD28",
-        "ecdi": "ECDI15"
+        "ecdi": "ECDI15",
+        "mn26": "ECDI015"
       },
       "content": {
         "stems": {
@@ -13761,7 +13894,8 @@
       "lexicons": {
         "equate": "EG6_2",
         "kidsight": "BB202",
-        "ne25": "ECDI015X"
+        "ne25": "ECDI015X",
+        "mn26": "ECDI015X"
       },
       "content": {
         "stems": {
@@ -13840,7 +13974,8 @@
         "ne25": "C029",
         "ne22": "C029",
         "ne20": "C29",
-        "gsed": "iyomoc005"
+        "gsed": "iyomoc005",
+        "mn26": "C029"
       },
       "content": {
         "stems": {
@@ -13927,7 +14062,8 @@
       "lexicons": {
         "equate": "EG7_2",
         "kidsight": "CC23x",
-        "ne25": "C029X"
+        "ne25": "C029X",
+        "mn26": "C029X"
       },
       "content": {
         "stems": {
@@ -14006,7 +14142,8 @@
         "ne25": "C030",
         "ne22": "C030",
         "ne20": "C30",
-        "gsed": "gsdgmc007"
+        "gsed": "gsdgmc007",
+        "mn26": "C030"
       },
       "content": {
         "stems": {
@@ -14093,7 +14230,8 @@
       "lexicons": {
         "equate": "EG8_2",
         "kidsight": "CC24x",
-        "ne25": "C030X"
+        "ne25": "C030X",
+        "mn26": "C030X"
       },
       "content": {
         "stems": {
@@ -14172,7 +14310,8 @@
         "ne25": "C068",
         "ne22": "C068",
         "ne20": "C68",
-        "gsed": "mdtlgd009"
+        "gsed": "mdtlgd009",
+        "mn26": "C068"
       },
       "content": {
         "stems": {
@@ -14365,7 +14504,8 @@
         "ne25": "C076",
         "ne22": "C076",
         "ne20": "C76",
-        "gsed": "iyomoc028"
+        "gsed": "iyomoc028",
+        "mn26": "C076"
       },
       "content": {
         "stems": {
@@ -14543,7 +14683,8 @@
         "ne25": "C081",
         "ne22": "C081",
         "ne20": "C81",
-        "gsed": "iyolgc017"
+        "gsed": "iyolgc017",
+        "mn26": "C081"
       },
       "content": {
         "stems": {
@@ -14735,7 +14876,8 @@
         "ne25": "C122",
         "ne22": "C122",
         "ne20": "C122",
-        "gsed": "croclc044"
+        "gsed": "croclc044",
+        "mn26": "C122"
       },
       "content": {
         "stems": {
@@ -14907,7 +15049,8 @@
         "ne25": "C127",
         "ne22": "C127",
         "ne20": "C127",
-        "gsed": "iyolgc030"
+        "gsed": "iyolgc030",
+        "mn26": "C127"
       },
       "content": {
         "stems": {
@@ -15099,7 +15242,8 @@
         "ne25": "C131",
         "ne22": "C131",
         "ne20": "C131",
-        "gsed": "iyolgc029"
+        "gsed": "iyolgc029",
+        "mn26": "C131"
       },
       "content": {
         "stems": {
@@ -15192,7 +15336,8 @@
         "kidsight": "DD12",
         "ne25": "NOM012",
         "ne22": "NOM012",
-        "ne20": "NOM12"
+        "ne20": "NOM12",
+        "mn26": "NOM012"
       },
       "content": {
         "stems": {
@@ -15282,7 +15427,8 @@
         "kidsight": "DD2",
         "ne25": "NOM002",
         "ne22": "NOM002",
-        "ne20": "NOM02"
+        "ne20": "NOM02",
+        "mn26": "NOM002"
       },
       "content": {
         "stems": {
@@ -15372,7 +15518,8 @@
         "kidsight": "DD219",
         "ne25": "NOM002X",
         "cahmi22": "RECOGBEGIN",
-        "cahmi21": "RECOGBEGIN"
+        "cahmi21": "RECOGBEGIN",
+        "mn26": "NOM002X"
       },
       "content": {
         "stems": {
@@ -15487,7 +15634,8 @@
         "kidsight": "DD101x",
         "ne25": "NOM049X",
         "cahmi22": "PLAYWELL",
-        "cahmi21": "PLAYWELL"
+        "cahmi21": "PLAYWELL",
+        "mn26": "NOM049X"
       },
       "content": {
         "stems": {
@@ -15599,7 +15747,8 @@
         "kidsight": "DD101",
         "ne25": "NOM049",
         "ne22": "NOM049",
-        "ne20": "NOM49"
+        "ne20": "NOM49",
+        "mn26": "NOM049"
       },
       "content": {
         "stems": {
@@ -15697,7 +15846,8 @@
         "ne25": "ECDI018",
         "ne22": "ECD041",
         "ne20": "ECD41",
-        "ecdi": "ECDI18"
+        "ecdi": "ECDI18",
+        "mn26": "ECDI018"
       },
       "content": {
         "stems": {
@@ -15793,7 +15943,8 @@
         "kidsight": "AA61",
         "ne25": "CREDI030",
         "ne22": "CREDI30",
-        "credi": "LF63"
+        "credi": "LF63",
+        "mn26": "CREDI030"
       },
       "content": {
         "stems": {
@@ -15880,7 +16031,8 @@
         "equate": "EG17a",
         "kidsight": "DD102",
         "ne25": "NOM102",
-        "cahmi21": "WORKTOFIN"
+        "cahmi21": "WORKTOFIN",
+        "mn26": "NOM102"
       },
       "content": {
         "stems": {
@@ -15967,7 +16119,8 @@
         "kidsight": "AA64",
         "ne25": "CREDI038",
         "ne22": "CREDI38",
-        "credi": "LF79"
+        "credi": "LF79",
+        "mn26": "CREDI038"
       },
       "content": {
         "stems": {
@@ -16054,7 +16207,8 @@
         "equate": "EG18a",
         "kidsight": "DD104",
         "ne25": "NOM104",
-        "cahmi21": "SITSTILL"
+        "cahmi21": "SITSTILL",
+        "mn26": "NOM104"
       },
       "content": {
         "stems": {
@@ -16141,7 +16295,8 @@
         "kidsight": "AA105",
         "ne25": "CREDI029",
         "ne22": "CREDI29",
-        "credi": "LMH6"
+        "credi": "LMH6",
+        "mn26": "CREDI029"
       },
       "content": {
         "stems": {
@@ -16399,7 +16554,8 @@
         "ne22": "C117",
         "ne20": "C117",
         "credi": "LF92",
-        "gsed": "croclc035"
+        "gsed": "croclc035",
+        "mn26": "C117"
       },
       "content": {
         "stems": {
@@ -16503,7 +16659,8 @@
         "ne25": "C111",
         "ne22": "C111",
         "ne20": "C111",
-        "gsed": "iyolgc026"
+        "gsed": "iyolgc026",
+        "mn26": "C111"
       },
       "content": {
         "stems": {
@@ -16593,7 +16750,8 @@
       "lexicons": {
         "equate": "EG19a_4",
         "kidsight": "AA206",
-        "ne25": "SF122"
+        "ne25": "SF122",
+        "mn26": "SF122"
       },
       "content": {
         "stems": {
@@ -16668,7 +16826,8 @@
         "equate": "EG20a",
         "kidsight": "DD14x",
         "ne25": "NOM014X",
-        "cahmi22": "COUNTTO_R"
+        "cahmi22": "COUNTTO_R",
+        "mn26": "NOM014X"
       },
       "content": {
         "stems": {
@@ -16769,7 +16928,8 @@
         "kidsight": "DD14",
         "ne25": "NOM014",
         "ne22": "NOM014",
-        "ne20": "NOM14"
+        "ne20": "NOM14",
+        "mn26": "NOM014"
       },
       "content": {
         "stems": {
@@ -16961,7 +17121,8 @@
         "ne25": "ECDI014",
         "ne22": "ECD004",
         "ne20": "ECD4",
-        "ecdi": "ECDI14"
+        "ecdi": "ECDI14",
+        "mn26": "ECDI014"
       },
       "content": {
         "stems": {
@@ -17061,7 +17222,8 @@
         "ne22": "C118",
         "ne20": "C118",
         "credi": "LF90",
-        "gsed": "croclc041"
+        "gsed": "croclc041",
+        "mn26": "C118"
       },
       "content": {
         "stems": {
@@ -17169,7 +17331,8 @@
         "ne20": "C126",
         "ecdi": "ECDI13",
         "credi": "LF100",
-        "gsed": "croclc043"
+        "gsed": "croclc043",
+        "mn26": "C126"
       },
       "content": {
         "stems": {
@@ -17271,7 +17434,8 @@
       "lexicons": {
         "equate": "EG20e_2",
         "kidsight": "AA207",
-        "ne25": "SF127"
+        "ne25": "SF127",
+        "mn26": "SF127"
       },
       "content": {
         "stems": {
@@ -17346,7 +17510,8 @@
         "equate": "EG21a",
         "kidsight": "DD17x",
         "ne25": "NOM017X",
-        "cahmi22": "READONEDIGIT"
+        "cahmi22": "READONEDIGIT",
+        "mn26": "NOM017X"
       },
       "content": {
         "stems": {
@@ -17450,7 +17615,8 @@
         "kidsight": "DD17",
         "ne25": "NOM017",
         "ne22": "NOM017",
-        "ne20": "NOM17"
+        "ne20": "NOM17",
+        "mn26": "NOM017"
       },
       "content": {
         "stems": {
@@ -17540,7 +17706,8 @@
         "kidsight": "DD18",
         "ne25": "NOM018",
         "ne22": "NOM018",
-        "ne20": "NOM18"
+        "ne20": "NOM18",
+        "mn26": "NOM018"
       },
       "content": {
         "stems": {
@@ -17628,7 +17795,8 @@
         "equate": "EG22_2",
         "kidsight": "DD18x",
         "ne25": "NOM018X",
-        "cahmi22": "SIMPLEADDITION"
+        "cahmi22": "SIMPLEADDITION",
+        "mn26": "NOM018X"
       },
       "content": {
         "stems": {
@@ -17733,7 +17901,8 @@
         "equate": "EG23a",
         "kidsight": "DD208",
         "ne25": "NOM2208",
-        "cahmi22": "SHARETOYS"
+        "cahmi22": "SHARETOYS",
+        "mn26": "NOM2208"
       },
       "content": {
         "stems": {
@@ -17839,7 +18008,8 @@
         "ne25": "C086",
         "ne22": "C086",
         "ne20": "C86",
-        "gsed": "mdtsed018"
+        "gsed": "mdtsed018",
+        "mn26": "C086"
       },
       "content": {
         "stems": {
@@ -18014,7 +18184,8 @@
         "cahmi22": [
           "TEMPERR",
           "TEMPER_R"
-        ]
+        ],
+        "mn26": "NOM052Y"
       },
       "content": {
         "stems": {
@@ -18124,7 +18295,8 @@
         "cahmi21": [
           "CALMDOWNR",
           "CALMDOWN"
-        ]
+        ],
+        "mn26": "NOM060Y"
       },
       "content": {
         "stems": {
@@ -18234,7 +18406,8 @@
         "equate": "EG25b",
         "kidsight": "AA106",
         "ne25": "CREDI031",
-        "ne22": "CREDI31"
+        "ne22": "CREDI31",
+        "mn26": "CREDI031"
       },
       "content": {
         "stems": {
@@ -18393,7 +18566,8 @@
         "equate": "EG26b",
         "kidsight": "DD217",
         "ne25": "NOM062Y",
-        "cahmi22": "STARTNEWACT"
+        "cahmi22": "STARTNEWACT",
+        "mn26": "NOM062Y"
       },
       "content": {
         "stems": {
@@ -18498,7 +18672,8 @@
         "equate": "EG27a",
         "kidsight": "DD22x",
         "ne25": "NOM022X",
-        "cahmi21": "RECSHAPES"
+        "cahmi21": "RECSHAPES",
+        "mn26": "NOM022X"
       },
       "content": {
         "stems": {
@@ -18585,7 +18760,8 @@
         "kidsight": "DD22",
         "ne25": "NOM022",
         "ne22": "NOM022",
-        "ne20": "NOM22"
+        "ne20": "NOM22",
+        "mn26": "NOM022"
       },
       "content": {
         "stems": {
@@ -18841,7 +19017,8 @@
         "kidsight": "DD24x",
         "ne25": "NOM024X",
         "cahmi22": "WRITENAME",
-        "cahmi21": "WRITENAME"
+        "cahmi21": "WRITENAME",
+        "mn26": "NOM024X"
       },
       "content": {
         "stems": {
@@ -18953,7 +19130,8 @@
         "kidsight": "DD24",
         "ne25": "NOM024",
         "ne22": "NOM024",
-        "ne20": "NOM24"
+        "ne20": "NOM24",
+        "mn26": "NOM024"
       },
       "content": {
         "stems": {
@@ -19045,7 +19223,8 @@
         "ne25": "ECDI011",
         "ne22": "ECD012",
         "ne20": "ECD12",
-        "ecdi": "ECDI11"
+        "ecdi": "ECDI11",
+        "mn26": "ECDI011"
       },
       "content": {
         "stems": {
@@ -19144,7 +19323,8 @@
           "RECOGLETTER",
           "RECOGABC"
         ],
-        "cahmi21": "RECOGABC"
+        "cahmi21": "RECOGABC",
+        "mn26": "NOM026X"
       },
       "content": {
         "stems": {
@@ -19256,7 +19436,8 @@
         "kidsight": "DD26",
         "ne25": "NOM026",
         "ne22": "NOM026",
-        "ne20": "NOM26"
+        "ne20": "NOM26",
+        "mn26": "NOM026"
       },
       "content": {
         "stems": {
@@ -19350,7 +19531,8 @@
         "ne25": "ECDI010",
         "ne22": "ECD007",
         "ne20": "ECD7",
-        "ecdi": "ECDI10"
+        "ecdi": "ECDI10",
+        "mn26": "ECDI010"
       },
       "content": {
         "stems": {
@@ -19447,7 +19629,8 @@
         "cahmi22": [
           "DRAWCIRCLE",
           "DRAWACIRCLE"
-        ]
+        ],
+        "mn26": "NOM029X"
       },
       "content": {
         "stems": {
@@ -19635,7 +19818,8 @@
         "ne25": "C133",
         "ne22": "C133",
         "ne20": "C133",
-        "gsed": "iyomoc038"
+        "gsed": "iyomoc038",
+        "mn26": "C133"
       },
       "content": {
         "stems": {
@@ -19731,7 +19915,8 @@
         "kidsight": "DD28",
         "ne25": "NOM028",
         "ne22": "NOM028",
-        "ne20": "NOM28"
+        "ne20": "NOM28",
+        "mn26": "NOM028"
       },
       "content": {
         "stems": {
@@ -19826,7 +20011,8 @@
         "kidsight": "DD29",
         "ne25": "NOM029",
         "ne22": "NOM029",
-        "ne20": "NOM29"
+        "ne20": "NOM29",
+        "mn26": "NOM029"
       },
       "content": {
         "stems": {
@@ -19923,7 +20109,8 @@
         "ne25": "C103",
         "ne22": "C103",
         "ne20": "C103",
-        "gsed": "iyomoc037"
+        "gsed": "iyomoc037",
+        "mn26": "C103"
       },
       "content": {
         "stems": {
@@ -20019,7 +20206,8 @@
         "kidsight": "DD31",
         "ne25": "NOM031",
         "ne22": "NOM031",
-        "ne20": "NOM31"
+        "ne20": "NOM31",
+        "mn26": "NOM031"
       },
       "content": {
         "stems": {
@@ -20110,7 +20298,8 @@
         "ne22": "C083",
         "ne20": "C83",
         "credi": "LF54",
-        "gsed": "cromoc029"
+        "gsed": "cromoc029",
+        "mn26": "C083"
       },
       "content": {
         "stems": {
@@ -20214,7 +20403,8 @@
         "ne25": "C078",
         "ne22": "C078",
         "ne20": "C78",
-        "gsed": "iyomoc030"
+        "gsed": "iyomoc030",
+        "mn26": "C078"
       },
       "content": {
         "stems": {
@@ -20311,7 +20501,8 @@
         "cahmi22": [
           "DRAWFACE",
           "DRAWAFACE"
-        ]
+        ],
+        "mn26": "NOM033X"
       },
       "content": {
         "stems": {
@@ -20411,7 +20602,8 @@
         "kidsight": "DD33",
         "ne25": "NOM033",
         "ne22": "NOM033",
-        "ne20": "NOM33"
+        "ne20": "NOM33",
+        "mn26": "NOM033"
       },
       "content": {
         "stems": {
@@ -20502,7 +20694,8 @@
         "cahmi22": [
           "DRAWPERSON",
           "DRAWAPERSON"
-        ]
+        ],
+        "mn26": "NOM034X"
       },
       "content": {
         "stems": {
@@ -20602,7 +20795,8 @@
         "kidsight": "DD34",
         "ne25": "NOM034",
         "ne22": "NOM034",
-        "ne20": "NOM34"
+        "ne20": "NOM34",
+        "mn26": "NOM034"
       },
       "content": {
         "stems": {
@@ -20690,7 +20884,8 @@
         "equate": "EG34a",
         "kidsight": "DD35x",
         "ne25": "NOM035X",
-        "cahmi21": "USEPENCIL"
+        "cahmi21": "USEPENCIL",
+        "mn26": "NOM035X"
       },
       "content": {
         "stems": {
@@ -20775,7 +20970,8 @@
         "kidsight": "DD35",
         "ne25": "NOM035",
         "ne22": "NOM035",
-        "ne20": "NOM35"
+        "ne20": "NOM35",
+        "mn26": "NOM035"
       },
       "content": {
         "stems": {
@@ -20953,7 +21149,8 @@
         "ne20": "C106",
         "ecdi": "ECDI2",
         "credi": "LF82",
-        "gsed": "cromoc034"
+        "gsed": "cromoc034",
+        "mn26": "C106"
       },
       "content": {
         "stems": {
@@ -21145,7 +21342,8 @@
         "ne25": "C135",
         "ne22": "C135",
         "ne20": "C135",
-        "gsed": "iyomoc039"
+        "gsed": "iyomoc039",
+        "mn26": "C135"
       },
       "content": {
         "stems": {
@@ -21243,7 +21441,8 @@
         "ne25": "NOM059",
         "ne22": "NOM047",
         "ne20": "NOM47",
-        "cahmi22": "HURTSAD"
+        "cahmi22": "HURTSAD",
+        "mn26": "NOM059"
       },
       "content": {
         "stems": {
@@ -21359,7 +21558,8 @@
         "equate": "EG37_2",
         "kidsight": "DD047",
         "ne25": "NOM047X",
-        "cahmi21": "HURTSAD"
+        "cahmi21": "HURTSAD",
+        "mn26": "NOM047X"
       },
       "content": {
         "stems": {
@@ -21447,7 +21647,8 @@
         "equate": "EG38a",
         "kidsight": "DD43x",
         "ne25": "NOM053X",
-        "cahmi22": "NAMEEMOTIONS"
+        "cahmi22": "NAMEEMOTIONS",
+        "mn26": "NOM053X"
       },
       "content": {
         "stems": {
@@ -21551,7 +21752,8 @@
         "kidsight": "DD43",
         "ne25": "NOM053",
         "ne22": "NOM053",
-        "ne20": "NOM53"
+        "ne20": "NOM53",
+        "mn26": "NOM053"
       },
       "content": {
         "stems": {
@@ -21643,7 +21845,8 @@
         "ne25": "C125",
         "ne22": "C125",
         "ne20": "C125",
-        "gsed": "crosec049"
+        "gsed": "crosec049",
+        "mn26": "C125"
       },
       "content": {
         "stems": {
@@ -21737,7 +21940,8 @@
         "equate": "EG39a",
         "kidsight": "DD211",
         "ne25": "NOM056X",
-        "cahmi22": "WAITFORTURN"
+        "cahmi22": "WAITFORTURN",
+        "mn26": "NOM056X"
       },
       "content": {
         "stems": {
@@ -21846,7 +22050,8 @@
         "kidsight": "DD45",
         "ne25": "NOM057",
         "ne22": "NOM057",
-        "ne20": "NOM57"
+        "ne20": "NOM57",
+        "mn26": "NOM057"
       },
       "content": {
         "stems": {
@@ -21937,7 +22142,8 @@
         "equate": "EG40_1",
         "kidsight": "DD212",
         "ne25": "NOM059X",
-        "cahmi22": "HARDWORK"
+        "cahmi22": "HARDWORK",
+        "mn26": "NOM059X"
       },
       "content": {
         "stems": {
@@ -22110,7 +22316,8 @@
         "kidsight": "DD215",
         "ne25": "NOM061X",
         "cahmi22": "K6Q73_R",
-        "cahmi21": "K6Q73_R"
+        "cahmi21": "K6Q73_R",
+        "mn26": "NOM061X"
       },
       "content": {
         "stems": {
@@ -22204,7 +22411,8 @@
         "kidsight": "DD48",
         "ne25": "NOM061",
         "ne22": "NOM061",
-        "ne20": "NOM61"
+        "ne20": "NOM61",
+        "mn26": "NOM061"
       },
       "content": {
         "stems": {
@@ -22303,7 +22511,8 @@
         "cahmi22": [
           "RHYMEWORDR",
           "RHYMEWORD_R"
-        ]
+        ],
+        "mn26": "NOM005X"
       },
       "content": {
         "stems": {
@@ -22488,7 +22697,8 @@
         "kidsight": "DD5",
         "ne25": "NOM005",
         "ne22": "NOM005",
-        "ne20": "NOM05"
+        "ne20": "NOM05",
+        "mn26": "NOM005"
       },
       "content": {
         "stems": {
@@ -22579,7 +22789,8 @@
         "equate": "EG43a_1",
         "kidsight": "DD218",
         "ne25": "NOM006X",
-        "cahmi22": "CLEAREXP"
+        "cahmi22": "CLEAREXP",
+        "mn26": "NOM006X"
       },
       "content": {
         "stems": {
@@ -22683,7 +22894,8 @@
         "kidsight": "DD6",
         "ne25": "NOM006",
         "ne22": "NOM006",
-        "ne20": "NOM06"
+        "ne20": "NOM06",
+        "mn26": "NOM006"
       },
       "content": {
         "stems": {
@@ -22780,7 +22992,8 @@
         "ne22": "C138",
         "ne20": "C138",
         "credi": "LF107",
-        "gsed": "croclc045"
+        "gsed": "croclc045",
+        "mn26": "C138"
       },
       "content": {
         "stems": {
@@ -22886,7 +23099,8 @@
         "ne22": "NOM001",
         "ne20": "NOM01",
         "cahmi22": "UNDERSTAND2",
-        "cahmi21": "UNDERSTAND2"
+        "cahmi21": "UNDERSTAND2",
+        "mn26": "NOM001"
       },
       "content": {
         "stems": {
@@ -22995,7 +23209,8 @@
         "ne22": "C120",
         "ne20": "C120",
         "credi": "LF96",
-        "gsed": "croclc049"
+        "gsed": "croclc049",
+        "mn26": "C120"
       },
       "content": {
         "stems": {
@@ -23099,7 +23314,8 @@
         "equate": "EG45_1",
         "kidsight": "DD209",
         "ne25": "NOM003X",
-        "cahmi22": "SAMESOUND"
+        "cahmi22": "SAMESOUND",
+        "mn26": "NOM003X"
       },
       "content": {
         "stems": {
@@ -23203,7 +23419,8 @@
         "kidsight": "DD3",
         "ne25": "NOM003",
         "ne22": "NOM003",
-        "ne20": "NOM03"
+        "ne20": "NOM03",
+        "mn26": "NOM003"
       },
       "content": {
         "stems": {
@@ -23290,7 +23507,8 @@
       "lexicons": {
         "equate": "EG46a_1",
         "kidsight": "AA204",
-        "ne25": "SF054"
+        "ne25": "SF054",
+        "mn26": "SF054"
       },
       "content": {
         "stems": {
@@ -23368,7 +23586,8 @@
         "ne22": "C058",
         "ne20": "C58",
         "credi": "LF32",
-        "gsed": "cromoc022"
+        "gsed": "cromoc022",
+        "mn26": "C058"
       },
       "content": {
         "stems": {
@@ -23474,7 +23693,8 @@
         "ne22": "C040",
         "ne20": "C40",
         "credi": "LF14",
-        "gsed": "cromoc012"
+        "gsed": "cromoc012",
+        "mn26": "C040"
       },
       "content": {
         "stems": {
@@ -23580,7 +23800,8 @@
         "ne22": "C053",
         "ne20": "C53",
         "credi": "LF31",
-        "gsed": "cromoc019"
+        "gsed": "cromoc019",
+        "mn26": "C053"
       },
       "content": {
         "stems": {
@@ -23684,7 +23905,8 @@
         "ne25": "C064",
         "ne22": "C064",
         "ne20": "C64",
-        "gsed": "mdtsed012"
+        "gsed": "mdtsed012",
+        "mn26": "C064"
       },
       "content": {
         "stems": {
@@ -23782,7 +24004,8 @@
         "ne25": "C070",
         "ne22": "C070",
         "ne20": "C70",
-        "gsed": "iyomoc023"
+        "gsed": "iyomoc023",
+        "mn26": "C070"
       },
       "content": {
         "stems": {
@@ -23877,7 +24100,8 @@
         "ne25": "C055",
         "ne22": "C055",
         "ne20": "C55",
-        "gsed": "aqigmc021"
+        "gsed": "aqigmc021",
+        "mn26": "C055"
       },
       "content": {
         "stems": {
@@ -24059,7 +24283,8 @@
         "ne22": "C107",
         "ne20": "C107",
         "credi": "LF81",
-        "gsed": "croclc037"
+        "gsed": "croclc037",
+        "mn26": "C107"
       },
       "content": {
         "stems": {
@@ -24163,7 +24388,8 @@
         "ne22": "C034",
         "ne20": "C34",
         "credi": "LF10",
-        "gsed": "croclc004"
+        "gsed": "croclc004",
+        "mn26": "C034"
       },
       "content": {
         "stems": {
@@ -24264,7 +24490,8 @@
         "ne25": "C028",
         "ne22": "C028",
         "ne20": "C28",
-        "gsed": "iyomoc006"
+        "gsed": "iyomoc006",
+        "mn26": "C028"
       },
       "content": {
         "stems": {
@@ -24459,7 +24686,8 @@
         "ne25": "C098",
         "ne22": "C098",
         "ne20": "C98",
-        "gsed": "iyolgc021"
+        "gsed": "iyolgc021",
+        "mn26": "C098"
       },
       "content": {
         "stems": {
@@ -24553,7 +24781,8 @@
         "equate": "NOM044",
         "kidsight": "NOM044",
         "ne25": "NOM044",
-        "cahmi22": "HCEXTENT"
+        "cahmi22": "HCEXTENT",
+        "mn26": "NOM044"
       },
       "content": {
         "stems": {
@@ -24621,7 +24850,8 @@
         "equate": "NOM046X",
         "kidsight": "NOM046X",
         "ne25": "NOM046X",
-        "cahmi22": "K2Q01_D"
+        "cahmi22": "K2Q01_D",
+        "mn26": "NOM046X"
       },
       "content": {
         "stems": {
@@ -24702,7 +24932,8 @@
       ],
       "lexicons": {
         "equate": "PS001",
-        "ne25": "PS001"
+        "ne25": "PS001",
+        "mn26": "PS001"
       },
       "age_range": {
         "min_months": 0,
@@ -24751,7 +24982,8 @@
       ],
       "lexicons": {
         "equate": "PS002",
-        "ne25": "PS002"
+        "ne25": "PS002",
+        "mn26": "PS002"
       },
       "domains": {
         "kidsights": {
@@ -24808,7 +25040,8 @@
       ],
       "lexicons": {
         "equate": "PS003",
-        "ne25": "PS003"
+        "ne25": "PS003",
+        "mn26": "PS003"
       },
       "domains": {
         "kidsights": {
@@ -24865,7 +25098,8 @@
       ],
       "lexicons": {
         "equate": "PS004",
-        "ne25": "PS004"
+        "ne25": "PS004",
+        "mn26": "PS004"
       },
       "domains": {
         "kidsights": {
@@ -24922,7 +25156,8 @@
       ],
       "lexicons": {
         "equate": "PS005",
-        "ne25": "PS005"
+        "ne25": "PS005",
+        "mn26": "PS005"
       },
       "domains": {
         "kidsights": {
@@ -24979,7 +25214,8 @@
       ],
       "lexicons": {
         "equate": "PS006",
-        "ne25": "PS006"
+        "ne25": "PS006",
+        "mn26": "PS006"
       },
       "domains": {
         "kidsights": {
@@ -25036,7 +25272,8 @@
       ],
       "lexicons": {
         "equate": "PS007",
-        "ne25": "PS007"
+        "ne25": "PS007",
+        "mn26": "PS007"
       },
       "domains": {
         "kidsights": {
@@ -25093,7 +25330,8 @@
       ],
       "lexicons": {
         "equate": "PS008",
-        "ne25": "PS008"
+        "ne25": "PS008",
+        "mn26": "PS008"
       },
       "domains": {
         "kidsights": {
@@ -25150,7 +25388,8 @@
       ],
       "lexicons": {
         "equate": "PS009",
-        "ne25": "PS009"
+        "ne25": "PS009",
+        "mn26": "PS009"
       },
       "domains": {
         "kidsights": {
@@ -25207,7 +25446,8 @@
       ],
       "lexicons": {
         "equate": "PS010",
-        "ne25": "PS010"
+        "ne25": "PS010",
+        "mn26": "PS010"
       },
       "domains": {
         "kidsights": {
@@ -25264,7 +25504,8 @@
       ],
       "lexicons": {
         "equate": "PS011",
-        "ne25": "PS011"
+        "ne25": "PS011",
+        "mn26": "PS011"
       },
       "domains": {
         "kidsights": {
@@ -25321,7 +25562,8 @@
       ],
       "lexicons": {
         "equate": "PS013",
-        "ne25": "PS013"
+        "ne25": "PS013",
+        "mn26": "PS013"
       },
       "domains": {
         "kidsights": {
@@ -25378,7 +25620,8 @@
       ],
       "lexicons": {
         "equate": "PS014",
-        "ne25": "PS014"
+        "ne25": "PS014",
+        "mn26": "PS014"
       },
       "domains": {
         "kidsights": {
@@ -25435,7 +25678,8 @@
       ],
       "lexicons": {
         "equate": "PS015",
-        "ne25": "PS015"
+        "ne25": "PS015",
+        "mn26": "PS015"
       },
       "domains": {
         "kidsights": {
@@ -25492,7 +25736,8 @@
       ],
       "lexicons": {
         "equate": "PS016",
-        "ne25": "PS016"
+        "ne25": "PS016",
+        "mn26": "PS016"
       },
       "domains": {
         "kidsights": {
@@ -25549,7 +25794,8 @@
       ],
       "lexicons": {
         "equate": "PS017",
-        "ne25": "PS017"
+        "ne25": "PS017",
+        "mn26": "PS017"
       },
       "domains": {
         "kidsights": {
@@ -25606,7 +25852,8 @@
       ],
       "lexicons": {
         "equate": "PS018",
-        "ne25": "PS018"
+        "ne25": "PS018",
+        "mn26": "PS018"
       },
       "domains": {
         "kidsights": {
@@ -25663,7 +25910,8 @@
       ],
       "lexicons": {
         "equate": "PS019",
-        "ne25": "PS019"
+        "ne25": "PS019",
+        "mn26": "PS019"
       },
       "domains": {
         "kidsights": {
@@ -25720,7 +25968,8 @@
       ],
       "lexicons": {
         "equate": "PS020",
-        "ne25": "PS020"
+        "ne25": "PS020",
+        "mn26": "PS020"
       },
       "domains": {
         "kidsights": {
@@ -25777,7 +26026,8 @@
       ],
       "lexicons": {
         "equate": "PS022",
-        "ne25": "PS022"
+        "ne25": "PS022",
+        "mn26": "PS022"
       },
       "domains": {
         "kidsights": {
@@ -25834,7 +26084,8 @@
       ],
       "lexicons": {
         "equate": "PS023",
-        "ne25": "PS023"
+        "ne25": "PS023",
+        "mn26": "PS023"
       },
       "domains": {
         "kidsights": {
@@ -25891,7 +26142,8 @@
       ],
       "lexicons": {
         "equate": "PS024",
-        "ne25": "PS024"
+        "ne25": "PS024",
+        "mn26": "PS024"
       },
       "domains": {
         "kidsights": {
@@ -25948,7 +26200,8 @@
       ],
       "lexicons": {
         "equate": "PS025",
-        "ne25": "PS025"
+        "ne25": "PS025",
+        "mn26": "PS025"
       },
       "domains": {
         "kidsights": {
@@ -26005,7 +26258,8 @@
       ],
       "lexicons": {
         "equate": "PS026",
-        "ne25": "PS026"
+        "ne25": "PS026",
+        "mn26": "PS026"
       },
       "domains": {
         "kidsights": {
@@ -26062,7 +26316,8 @@
       ],
       "lexicons": {
         "equate": "PS027",
-        "ne25": "PS027"
+        "ne25": "PS027",
+        "mn26": "PS027"
       },
       "domains": {
         "kidsights": {
@@ -26119,7 +26374,8 @@
       ],
       "lexicons": {
         "equate": "PS028",
-        "ne25": "PS028"
+        "ne25": "PS028",
+        "mn26": "PS028"
       },
       "domains": {
         "kidsights": {
@@ -26176,7 +26432,8 @@
       ],
       "lexicons": {
         "equate": "PS029",
-        "ne25": "PS029"
+        "ne25": "PS029",
+        "mn26": "PS029"
       },
       "domains": {
         "kidsights": {
@@ -26233,7 +26490,8 @@
       ],
       "lexicons": {
         "equate": "PS030",
-        "ne25": "PS030"
+        "ne25": "PS030",
+        "mn26": "PS030"
       },
       "domains": {
         "kidsights": {
@@ -26290,7 +26548,8 @@
       ],
       "lexicons": {
         "equate": "PS031",
-        "ne25": "PS031"
+        "ne25": "PS031",
+        "mn26": "PS031"
       },
       "domains": {
         "kidsights": {
@@ -26347,7 +26606,8 @@
       ],
       "lexicons": {
         "equate": "PS032",
-        "ne25": "PS032"
+        "ne25": "PS032",
+        "mn26": "PS032"
       },
       "domains": {
         "kidsights": {
@@ -26404,7 +26664,8 @@
       ],
       "lexicons": {
         "equate": "PS034",
-        "ne25": "PS034"
+        "ne25": "PS034",
+        "mn26": "PS034"
       },
       "domains": {
         "kidsights": {
@@ -26461,7 +26722,8 @@
       ],
       "lexicons": {
         "equate": "PS035",
-        "ne25": "PS035"
+        "ne25": "PS035",
+        "mn26": "PS035"
       },
       "domains": {
         "kidsights": {
@@ -26518,7 +26780,8 @@
       ],
       "lexicons": {
         "equate": "PS036",
-        "ne25": "PS036"
+        "ne25": "PS036",
+        "mn26": "PS036"
       },
       "domains": {
         "kidsights": {
@@ -26575,7 +26838,8 @@
       ],
       "lexicons": {
         "equate": "PS037",
-        "ne25": "PS037"
+        "ne25": "PS037",
+        "mn26": "PS037"
       },
       "domains": {
         "kidsights": {
@@ -26632,7 +26896,8 @@
       ],
       "lexicons": {
         "equate": "PS038",
-        "ne25": "PS038"
+        "ne25": "PS038",
+        "mn26": "PS038"
       },
       "domains": {
         "kidsights": {
@@ -26689,7 +26954,8 @@
       ],
       "lexicons": {
         "equate": "PS039",
-        "ne25": "PS039"
+        "ne25": "PS039",
+        "mn26": "PS039"
       },
       "domains": {
         "kidsights": {
@@ -26746,7 +27012,8 @@
       ],
       "lexicons": {
         "equate": "PS040",
-        "ne25": "PS040"
+        "ne25": "PS040",
+        "mn26": "PS040"
       },
       "domains": {
         "kidsights": {
@@ -26803,7 +27070,8 @@
       ],
       "lexicons": {
         "equate": "PS041",
-        "ne25": "PS041"
+        "ne25": "PS041",
+        "mn26": "PS041"
       },
       "domains": {
         "kidsights": {
@@ -26860,7 +27128,8 @@
       ],
       "lexicons": {
         "equate": "PS042",
-        "ne25": "PS042"
+        "ne25": "PS042",
+        "mn26": "PS042"
       },
       "domains": {
         "kidsights": {
@@ -26917,7 +27186,8 @@
       ],
       "lexicons": {
         "equate": "PS043",
-        "ne25": "PS043"
+        "ne25": "PS043",
+        "mn26": "PS043"
       },
       "domains": {
         "kidsights": {
@@ -26974,7 +27244,8 @@
       ],
       "lexicons": {
         "equate": "PS044",
-        "ne25": "PS044"
+        "ne25": "PS044",
+        "mn26": "PS044"
       },
       "domains": {
         "kidsights": {
@@ -27031,7 +27302,8 @@
       ],
       "lexicons": {
         "equate": "PS045",
-        "ne25": "PS045"
+        "ne25": "PS045",
+        "mn26": "PS045"
       },
       "domains": {
         "kidsights": {
@@ -27088,7 +27360,8 @@
       ],
       "lexicons": {
         "equate": "PS046",
-        "ne25": "PS046"
+        "ne25": "PS046",
+        "mn26": "PS046"
       },
       "domains": {
         "kidsights": {
@@ -27145,7 +27418,8 @@
       ],
       "lexicons": {
         "equate": "PS047",
-        "ne25": "PS047"
+        "ne25": "PS047",
+        "mn26": "PS047"
       },
       "domains": {
         "kidsights": {
@@ -27202,7 +27476,8 @@
       ],
       "lexicons": {
         "equate": "PS048",
-        "ne25": "PS048"
+        "ne25": "PS048",
+        "mn26": "PS048"
       },
       "domains": {
         "kidsights": {
@@ -27259,7 +27534,8 @@
       ],
       "lexicons": {
         "equate": "PS049",
-        "ne25": "PS049"
+        "ne25": "PS049",
+        "mn26": "PS049"
       },
       "domains": {
         "kidsights": {
