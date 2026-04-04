@@ -1066,20 +1066,20 @@ recode__ <- function(dat, dict, my_API = NULL, what = NULL, relevel_it = TRUE, a
         }
       }
 
-      # ACE Total Score (0-10)
+      # A1 ACE Total Score (0-10) - A1 = responding caregiver's childhood ACEs
       ace_cols <- ace_mapping[ace_vars_present]
       if(length(ace_cols) > 0) {
-        mental_health_df$ace_total <- rowSums(
+        mental_health_df$a1_ace_total <- rowSums(
           mental_health_df[ace_cols],
           na.rm = FALSE
         )
 
-        # ACE Risk Category
-        mental_health_df$ace_risk_cat <- dplyr::case_when(
-          mental_health_df$ace_total == 0 ~ "No ACEs",
-          mental_health_df$ace_total == 1 ~ "1 ACE",
-          mental_health_df$ace_total %in% 2:3 ~ "2-3 ACEs",
-          mental_health_df$ace_total >= 4 ~ "4+ ACEs",
+        # A1 ACE Risk Category
+        mental_health_df$a1_ace_risk_cat <- dplyr::case_when(
+          mental_health_df$a1_ace_total == 0 ~ "No ACEs",
+          mental_health_df$a1_ace_total == 1 ~ "1 ACE",
+          mental_health_df$a1_ace_total %in% 2:3 ~ "2-3 ACEs",
+          mental_health_df$a1_ace_total >= 4 ~ "4+ ACEs",
           TRUE ~ NA_character_
         )
       }

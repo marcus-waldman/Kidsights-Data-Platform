@@ -171,8 +171,8 @@ all_derived_variables:
   - ace_physical_abuse
   - ace_emotional_neglect
   - ace_sexual_abuse
-  - ace_total
-  - ace_risk_cat
+  - a1_ace_total
+  - a1_ace_risk_cat
 
   # Child ACE Variables (child's adverse experiences as reported by caregiver)
   - child_ace_parent_divorce
@@ -299,8 +299,8 @@ variable_labels:
   ace_physical_abuse: "ACE - Experienced physical abuse from parent/adult"
   ace_emotional_neglect: "ACE - Felt unloved or not special in family"
   ace_sexual_abuse: "ACE - Experienced unwanted sexual contact"
-  ace_total: "ACE Total Score (0-10) - Total count of adverse childhood experiences"
-  ace_risk_cat: "ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)"
+  a1_ace_total: "A1 ACE Total Score (0-10) - Caregiver's total childhood adverse experiences"
+  a1_ace_risk_cat: "A1 ACE Risk Category - No ACEs (0), 1 ACE, 2-3 ACEs, 4+ ACEs (High Risk)"
 
   # Adverse Childhood Experiences (ACE) - Child (reported by caregiver)
   child_ace_parent_divorce: "Child ACE - Child experienced parent/guardian divorce or separation"
@@ -395,7 +395,7 @@ composite_variables:
     category: "Mental Health Screening"
     sample_size_impact: "3,100 non-missing (63.3%), 1,800 missing (36.7%)"
 
-  ace_total:
+  a1_ace_total:
     is_composite: true
     components: ["ace_neglect", "ace_parent_loss", "ace_mental_illness", "ace_substance_use", "ace_domestic_violence", "ace_incarceration", "ace_verbal_abuse", "ace_physical_abuse", "ace_emotional_neglect", "ace_sexual_abuse"]
     valid_range: [0, 10]

@@ -246,7 +246,9 @@ class DataDictionaryGenerator:
 
                     # Clean up text for markdown table
                     variable = str(row['variable_name']).replace('|', '\\|')
-                    label = str(row['variable_label']).replace('|', '\\|')
+                    label = str(row['variable_label']).replace('\n', ' ').replace('\r', ' ').replace('|', '\\|')
+                    # Remove extra whitespace from multi-line labels
+                    label = ' '.join(label.split())
                     missing_pct = f"{row['missing_percentage']:.1f}%" if pd.notna(row['missing_percentage']) else "N/A"
                     details = str(details).replace('|', '\\|')
 
