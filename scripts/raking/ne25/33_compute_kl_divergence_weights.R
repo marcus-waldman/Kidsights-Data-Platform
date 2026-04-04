@@ -196,9 +196,9 @@ calibration_result <- calibrate_weights_simplex_factorized_stan(
   max_weight = 100,        # Maximum weight per observation
   concentration = 1,      # Dirichlet prior (1.0 = uniform)
   verbose = TRUE, 
-  history_size = 500, 
+  history_size = 5, 
   refresh = 20, 
-  iter = 100
+  iter = 1000
 )
 
 # ============================================================================
@@ -224,31 +224,6 @@ arrow::write_feather(output_data, output_file)
 cat(sprintf("    Saved: %s\n", output_file))
 cat(sprintf("      - %d records × %d columns\n", nrow(output_data), ncol(output_data)))
 cat(sprintf("      - New column: calibrated_weight\n\n"))
-
-# CORRELATION IMPROVEMENT ANALYSIS
-# ==========================================================================
-# The Stan loss function minimizes a MASKED KL DIVERGENCE that approximates
-# correlation matching (not true mean-matching). This analysis validates that
-# the weights are achieving their primary objective: improving the correlation
-# structure to match population targets.
-#
-# Mathematical basis:
-#   L = 0.5 × [Σ(μ_diff)²/σ² + Σ_mask(ρ_diff)²]
-#   where ρ = Cov / (σ[i] × σ[j]) normalizes covariance to correlation
-#
-# Interpretation:
-#   - Unweighted RMSE: RMSE of sample correlations vs targets (before weighting)
-#   - Weighted RMSE: RMSE of weighted sample correlations vs targets (after weighting)
-#   - % Improvement: (unweighted - weighted) / unweighted × 100
-#
-# For M=1: 71.9% improvement means the weights brought the correlation
-# structure from 0.0381 RMSE down to 0.0107 RMSE. This indicates the weights
-# are successfully matching the target correlation structure, which is the
-# primary goal of the optimization.
-#
-# Note: Mean-matching may not be tight (iteration limit 100 hit for M=1),
-# but the correlation matching is well-achieved and acceptable.
-# ==========================================================================
 
 # Save diagnostics
 diagnostics <- list(
