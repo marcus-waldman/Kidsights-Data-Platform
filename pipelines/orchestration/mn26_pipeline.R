@@ -13,9 +13,8 @@
 #'   6. Eligibility validation (4 criteria)
 #'   7. Create meets_inclusion filter
 #'   8. Kidsights developmental scoring (KidsightsPublic package)
-#'   9. Psychosocial domain scoring (KidsightsPublic package)
-#'   10. Store transformed data in DuckDB
-#'   11. Store data dictionary
+#'   9. Store transformed data in DuckDB
+#'   10. Store data dictionary
 
 # Load required libraries
 library(dplyr)
@@ -237,44 +236,14 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
 
     metrics$step_durations$kidsights_scoring <- as.numeric(Sys.time() - step_start)
 
-    # ==================================================================
-    # STEP 9: PSYCHOSOCIAL DOMAIN SCORING
-    # ==================================================================
-    message("\n--- Step 9: Psychosocial Domain Scoring ---")
-    step_start <- Sys.time()
-
-    tryCatch({
-      psychosocial_scores <- KidsightsPublic::score_psychosocial(
-        transformed_data,
-        id_cols = c("pid", "record_id", "child_num"),
-        min_responses = 5
-      )
-
-      # Join 6 domain scores back to transformed data
-      transformed_data <- transformed_data %>%
-        safe_left_join(
-          psychosocial_scores,
-          by_vars = c("pid", "record_id", "child_num")
-        )
-
-      n_scored_ps <- sum(!is.na(transformed_data$theta_gen))
-      message(sprintf("  Scored: %d of %d children (6 domains)", n_scored_ps, nrow(transformed_data)))
-      metrics$n_psychosocial_scored <- n_scored_ps
-    }, error = function(e) {
-      message("  [WARN] Psychosocial scoring failed: ", e$message)
-      for (col in c("theta_gen", "theta_eat", "theta_ext", "theta_int", "theta_sle", "theta_soc")) {
-        transformed_data[[col]] <<- NA_real_
-      }
-      metrics$n_psychosocial_scored <<- 0
-    })
-
-    metrics$step_durations$psychosocial_scoring <- as.numeric(Sys.time() - step_start)
+    # NOTE: Psychosocial domain scoring (score_psychosocial) is NOT included
+    # for MN26 — psychosocial items are NE25-specific.
 
     # ==================================================================
-    # STEP 10: STORE TRANSFORMED DATA IN DUCKDB
+    # STEP 9: STORE TRANSFORMED DATA IN DUCKDB
     # ==================================================================
     if (!skip_database) {
-      message("\n--- Step 10: Storing Transformed Data ---")
+      message("\n--- Step 9: Storing Transformed Data ---")
       step_start <- Sys.time()
 
       transformed_feather <- file.path(temp_dir, "mn26_transformed.feather")
@@ -291,14 +260,14 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
 
       metrics$step_durations$store_transformed <- as.numeric(Sys.time() - step_start)
     } else {
-      message("\n--- Step 10: SKIPPED (skip_database=TRUE) ---")
+      message("\n--- Step 9: SKIPPED (skip_database=TRUE) ---")
     }
 
     # ==================================================================
-    # STEP 11: STORE DATA DICTIONARY
+    # STEP 10: STORE DATA DICTIONARY
     # ==================================================================
     if (!skip_database) {
-      message("\n--- Step 11: Storing Data Dictionary ---")
+      message("\n--- Step 10: Storing Data Dictionary ---")
 
       dict_df <- dictionary_to_dataframe(dictionary_full)
       dict_feather <- file.path(temp_dir, "mn26_data_dictionary.feather")
@@ -333,7 +302,6 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
   message(sprintf("  Eligible:             %d", metrics$n_eligible))
   message(sprintf("  Meets inclusion:      %d", metrics$n_meets_inclusion))
   message(sprintf("  Kidsights scored:     %d", if (is.null(metrics$n_kidsights_scored)) 0 else metrics$n_kidsights_scored))
-  message(sprintf("  Psychosocial scored:  %d", if (is.null(metrics$n_psychosocial_scored)) 0 else metrics$n_psychosocial_scored))
   message(sprintf("  Total duration:       %.1f seconds", metrics$total_duration))
   message("========================================\n")
 
