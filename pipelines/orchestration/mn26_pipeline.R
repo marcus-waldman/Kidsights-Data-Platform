@@ -38,7 +38,8 @@ source("R/utils/safe_joins.R")
 #' @return List with execution results and metrics
 run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
                               credentials_path = NULL,
-                              skip_database = FALSE) {
+                              skip_database = FALSE,
+                              data = NULL) {
 
   execution_id <- paste0("mn26_", format(Sys.time(), "%Y%m%d_%H%M%S"))
   pipeline_start <- Sys.time()
@@ -68,35 +69,46 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
 
   tryCatch({
 
-    # ==================================================================
-    # STEP 1: LOAD API CREDENTIALS
-    # ==================================================================
-    message("\n--- Step 1: Loading API Credentials ---")
-    step_start <- Sys.time()
+    if (is.null(data)) {
+      # ==================================================================
+      # STEP 1: LOAD API CREDENTIALS
+      # ==================================================================
+      message("\n--- Step 1: Loading API Credentials ---")
+      step_start <- Sys.time()
 
-    creds <- load_mn26_credentials(csv_path = credentials_path, config = config)
+      creds <- load_mn26_credentials(csv_path = credentials_path, config = config)
 
-    metrics$step_durations$credentials <- as.numeric(Sys.time() - step_start)
+      metrics$step_durations$credentials <- as.numeric(Sys.time() - step_start)
 
-    # ==================================================================
-    # STEP 2: EXTRACT DATA + DICTIONARY FROM REDCAP
-    # ==================================================================
-    message("\n--- Step 2: Extracting REDCap Data ---")
-    step_start <- Sys.time()
+      # ==================================================================
+      # STEP 2: EXTRACT DATA + DICTIONARY FROM REDCAP
+      # ==================================================================
+      message("\n--- Step 2: Extracting REDCap Data ---")
+      step_start <- Sys.time()
 
-    extraction <- extract_mn26_data(
-      credentials = creds,
-      redcap_url = config$redcap$url,
-      timeout = config$redcap$timeout
-    )
+      extraction <- extract_mn26_data(
+        credentials = creds,
+        redcap_url = config$redcap$url,
+        timeout = config$redcap$timeout
+      )
 
-    raw_wide <- extraction$data
-    dictionary <- extraction$dictionary
-    dictionary_full <- extraction$dictionary_full
+      raw_wide <- extraction$data
+      dictionary <- extraction$dictionary
+      dictionary_full <- extraction$dictionary_full
 
-    metrics$n_extracted <- nrow(raw_wide)
-    metrics$step_durations$extraction <- as.numeric(Sys.time() - step_start)
-    message(sprintf("  Extracted: %d records, %d columns", nrow(raw_wide), ncol(raw_wide)))
+      metrics$n_extracted <- nrow(raw_wide)
+      metrics$step_durations$extraction <- as.numeric(Sys.time() - step_start)
+      message(sprintf("  Extracted: %d records, %d columns", nrow(raw_wide), ncol(raw_wide)))
+
+    } else {
+      # Pre-loaded data (e.g., synthetic test) — skip extraction
+      message("\n--- Steps 1-2: SKIPPED (pre-loaded data) ---")
+      raw_wide <- data
+      dictionary <- list()
+      dictionary_full <- list()
+      metrics$n_extracted <- nrow(raw_wide)
+      message(sprintf("  Pre-loaded: %d records, %d columns", nrow(raw_wide), ncol(raw_wide)))
+    }
 
     # Ensure sq001 (ZIP) is character
     if ("sq001" %in% names(raw_wide)) {
