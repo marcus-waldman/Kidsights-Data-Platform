@@ -202,7 +202,9 @@ Steps:
 7. Eligibility validation (4 criteria)
 8. Create `meets_inclusion` filter
 9. Store transformed data
-10. Scoring (CREDI, GSED, HRTL — TBD at checkpoint)
+10. Kidsights developmental scoring via KidsightsPublic (Step 8, integrated April 2026)
+    - Psychosocial scoring NOT included (NE25-specific items)
+    - CREDI, GSED D-score, HRTL: deferred (separate instruments)
 11. Generate metadata
 
 ---

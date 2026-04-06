@@ -545,7 +545,7 @@ pip install pyreadstat
   - Child ACEs stage validated: 2,585 total rows across 9 ACE tables with binary/valid range checks passing
 
 ### 🚧 MN26 Pipeline - Core Complete (April 2026)
-- **Status:** Core pipeline runs end-to-end. Scoring, raking, and imputation deferred.
+- **Status:** Core pipeline runs end-to-end. Kidsights scoring integrated. Raking and imputation deferred.
 - **Study:** Minnesota 2026 (NORC-administered REDCap survey)
 - **Multi-Child:** Up to 2 children per household, wide-to-long pivot (pid + record_id + child_num)
 - **Reconciliation Audit:** Three-way dictionary comparison (NE25 vs MN26 active vs MN26 full)
@@ -556,13 +556,17 @@ pip install pyreadstat
 - **Key Variable Changes:** cqr002→mn2 (parent gender), age_in_days→age_in_days_n, eqstate→mn_eqstate, cqr010→cqr010b (race 15→6 categories), sq002→sq002b
 - **Eligibility:** 4 criteria (vs NE25's 9): parent age, child age ≤5yr, primary caregiver, MN residence
 - **Data:** 2,654 test records from NORC REDCap project, 976 columns
-- **Pipeline Steps:** Extract → Pivot → Store raw → Transform → Eligibility → Store transformed → Dictionary
-- **Execution Time:** ~1.3 seconds (skip-database mode)
+- **Pipeline Steps:** Extract → Pivot → Store raw → Transform → Eligibility → Kidsights scoring → Store transformed → Dictionary
+- **Kidsights Scoring (Step 8):** Automated via `KidsightsPublic` R package (CmdStan MAP with fixed item parameters)
+  - 220 developmental items scored (GRM, age-informed prior with ln(age+1) and age basis)
+  - Psychosocial scoring NOT included for MN26 (NE25-specific items)
+  - Graceful failure: pipeline continues with NA scores if CmdStan unavailable
+- **Execution Time:** ~1.3 seconds (skip-database mode, scoring adds ~2-15s with real data)
 - **Entry Point:** `run_mn26_pipeline.R` (supports `--skip-database`, `--credentials` flags)
 - **Config:** `config/sources/mn26.yaml` (fully populated)
 - **Plan:** `todo/mn26_pipeline_plan.md`
 - **Audit Script:** `scripts/mn26/reconciliation_audit.R`
-- **Deferred:** Raking targets (needs MN ACS), imputation, IRT calibration/scoring, SES analytic dataset
+- **Deferred:** Raking targets (needs MN ACS), imputation, SES analytic dataset
 - **Shared Utils Extracted:** `R/utils/{recode_utils,cpi_utils,poverty_utils}.R` (used by both NE25 and MN26)
 - **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
 
