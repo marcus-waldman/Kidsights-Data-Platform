@@ -21,9 +21,11 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
                                                       min_weight = 0.1,
                                                       max_weight = 10.0,
                                                       concentration = 1.0,
-                                                      verbose = TRUE, 
-                                                      history_size = 100, 
-                                                      refresh = 1, 
+                                                      dirichlet_alpha = NULL,
+                                                      init = 0,
+                                                      verbose = TRUE,
+                                                      history_size = 100,
+                                                      refresh = 1,
                                                       iter = 1000) {
 
   cat("\n========================================\n")
@@ -32,7 +34,12 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   cat("========================================\n\n")
 
   cat(sprintf("Weight constraints: %.1f <= wgt[i] <= %.1f\n", min_weight, max_weight))
-  cat(sprintf("Concentration parameter: %.2f\n\n", concentration))
+  if (is.null(dirichlet_alpha)) {
+    cat(sprintf("Dirichlet prior: flat (concentration = %.2f for all N)\n\n", concentration))
+  } else {
+    cat(sprintf("Dirichlet prior: per-observation vector (min=%.3f, max=%.3f, mean=%.3f)\n\n",
+                min(dirichlet_alpha), max(dirichlet_alpha), mean(dirichlet_alpha)))
+  }
 
   # Validate inputs
   if (!all(calibration_vars %in% names(data))) {
@@ -56,6 +63,23 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   # Extract dimensions
   N <- nrow(data)
   K <- length(calibration_vars)
+
+  # Resolve dirichlet_alpha (per-observation Dirichlet prior concentration).
+  # If not supplied, default to rep(concentration, N) — this exactly reproduces
+  # the flat-prior behavior from before this parameter was added.
+  if (is.null(dirichlet_alpha)) {
+    dirichlet_alpha <- rep(concentration, N)
+  } else {
+    if (length(dirichlet_alpha) != N) {
+      stop(sprintf(
+        "dirichlet_alpha length (%d) must equal N (%d)",
+        length(dirichlet_alpha), N
+      ))
+    }
+    if (any(dirichlet_alpha <= 0)) {
+      stop("all dirichlet_alpha values must be strictly positive")
+    }
+  }
 
   cat("[1] Data Summary:\n")
   cat(sprintf("    N (observations): %d\n", N))
@@ -149,7 +173,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     target_mean = as.vector(target_mean),
     target_cov = target_cov,
     cov_mask = cov_mask,
-    concentration = concentration,
+    dirichlet_alpha = as.vector(dirichlet_alpha),
     min_weight_multiplier = min_weight,
     max_weight_multiplier = max_weight,
     # NEW: Standardization factors for improved optimizer efficiency
@@ -192,7 +216,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     fit <- mod$optimize(
       data = stan_data,
       seed = 12345,
-      init = 0,
+      init = init,
       algorithm = "lbfgs",
       tol_rel_grad = 1e-10,
       tol_grad = 1e-10,
@@ -426,6 +450,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     min_weight = min_weight,
     max_weight = max_weight,
     concentration = concentration,
+    dirichlet_alpha = dirichlet_alpha,
     # Standardization factors (for documentation)
     scale_mean = scale_mean,
     scale_sd = scale_sd,

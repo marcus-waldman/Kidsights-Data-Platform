@@ -3,7 +3,10 @@
 // Method: Minimize masked KL divergence using N-dimensional simplex for weights
 //
 // Mathematical form:
-//   wgt[i] ~ Dirichlet(concentration)
+//   wgt_raw ~ Dirichlet(dirichlet_alpha)  — per-observation concentration vector
+//                                            (use rep_vector(1, N) for a flat prior;
+//                                             use a Bayesian-bootstrap draw for
+//                                             Bucket 3's sample-variance estimator)
 //   wgt sums to 1, final_wgt[i] = N * wgt[i]
 //   Weights constrained: min_weight <= final_wgt[i] <= max_weight
 //
@@ -24,7 +27,9 @@ data {
   // Covariance mask (1 = observed, 0 = unobserved)
   matrix<lower=0, upper=1>[K, K] cov_mask;
 
-  real<lower=0> concentration;                    // Dirichlet concentration (1.0 = uniform)
+  vector<lower=0>[N] dirichlet_alpha;             // per-obs Dirichlet concentration
+                                                  // (flat prior: rep_vector(1.0, N);
+                                                  //  Bayesian bootstrap: Dirichlet(1,...,1) draw)
   real<lower=0> min_weight_multiplier;            // Min weight = min_weight_multiplier (e.g., 0.1)
   real<lower=0> max_weight_multiplier;            // Max weight = max_weight_multiplier (e.g., 10.0)
 
@@ -124,7 +129,7 @@ transformed parameters {
 
 model {
   // Dirichlet prior on raw simplex weights
-  wgt_raw ~ dirichlet(rep_vector(concentration, N));
+  wgt_raw ~ dirichlet(dirichlet_alpha);
   efficiency_pct~normal(100,75);
 
   // Compute achieved mean and covariance from weighted sample
