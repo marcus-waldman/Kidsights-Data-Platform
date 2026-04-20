@@ -2,20 +2,25 @@
 # Script 33: Compute KL Divergence Raking Weights (24 Variables)
 # ============================================================================
 #
-# Purpose: Calculate survey weights that match population targets via KL divergence minimization
+# Purpose: Produce M calibrated weight sets (one per imputation) by running
+#          masked KL-divergence / moment-matching optimization in Stan for
+#          each of the M harmonized datasets emitted by script 32.
 #
-# Inputs:
-#   - data/raking/ne25/ne25_harmonized/ne25_harmonized_m1.feather (2,785 × 27)
-#   - data/raking/ne25/unified_moments.rds (24-variable targets: μ, Σ, n_eff)
+# Inputs (per imputation m):
+#   - data/raking/ne25/ne25_harmonized/ne25_harmonized_m{m}.feather
+#   - data/raking/ne25/unified_moments.rds  (shared across imputations)
+#
+# Outputs (per imputation m):
+#   - data/raking/ne25/ne25_weights/ne25_calibrated_weights_m{m}.feather
+#   - data/raking/ne25/ne25_weights/calibration_diagnostics_m{m}.rds
 #
 # Method:
-#   - Stan optimization: minimize KL(target || achieved)
-#   - Linear model: log(wgt[i]) = α + X[i,] β
-#   - Matches 24 means + factorized 24×24 covariance structure
-#
-# Outputs:
-#   - data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather
-#   - data/raking/ne25/ne25_weights/calibration_diagnostics_m1.rds
+#   - Simplex-N Stan parameterization (one weight per observation).
+#   - Dirichlet(1) prior (flat over simplex).
+#   - Masked moment-matching loss: all 24 means + 488 observed cells of the
+#     24x24 target covariance (see WEIGHT_CONSTRUCTION.qmd section 3.3).
+#   - cmdstanr compiles the Stan model once and caches it at ~/.cmdstanr/,
+#     so iterations 2..M skip compilation.
 #
 # Block Structure (24 variables):
 #   Block 1: Demographics + PUMA (21 variables)
@@ -24,16 +29,10 @@
 #   Block 2: Mental Health (2 variables, NHIS-only)
 #   Block 3: Child Outcome (1 variable, NSCH-only)
 #
-# Factorized Covariance:
-#   - Observed blocks: Demographics×Demographics, PUMA×PUMA, Demographics×PUMA,
-#                      Demographics×MentalHealth, Demographics×ChildOutcome
-#   - Unobserved blocks (set to 0): PUMA×MentalHealth, PUMA×ChildOutcome,
-#                                    MentalHealth×ChildOutcome
+# Typical timing: ~3 min per imputation; ~15 min total for M=5.
 #
-# Execution time: ~2-5 minutes (Stan optimization with K=24)
-#
-# Author: Generated via Claude Code
-# Date: December 2025
+# Part of NE25 Bucket 2 (multi-imputation integration). See
+# todo/ne25_weights_roadmap.md and WEIGHT_CONSTRUCTION.qmd section 5.1.
 # ============================================================================
 
 suppressPackageStartupMessages({
@@ -41,32 +40,41 @@ suppressPackageStartupMessages({
   library(dplyr)
 })
 
-# Source the simplex Stan wrapper (handles incomplete covariance structure)
-# NOTE: Using simplex parameterization for flexibility with 24 variables
 source("scripts/raking/ne25/utils/calibrate_weights_simplex_factorized_cmdstan.R")
+source("R/imputation/config.R")  # for get_n_imputations()
 
 # ============================================================================
-# [1] Load NE25 Harmonized Data
+# [0] Shared Setup (once; independent of m)
 # ============================================================================
 
 cat("\n========================================\n")
-cat("SCRIPT 33: KL DIVERGENCE RAKING WEIGHTS\n")
+cat("SCRIPT 33: KL DIVERGENCE RAKING WEIGHTS (M imputations)\n")
 cat("========================================\n\n")
 
-cat("[1] Loading NE25 harmonized data (imputation m=1)...\n\n")
+M <- get_n_imputations()
+cat(sprintf("Number of imputations (from config): M = %d\n\n", M))
 
-harmonized_file <- "data/raking/ne25/ne25_harmonized/ne25_harmonized_m1.feather"
+# Unified moments are imputation-invariant — load once
+moments_file <- "data/raking/ne25/unified_moments.rds"
+if (!file.exists(moments_file)) {
+  stop(sprintf("Unified moments not found: %s\nRun script 30b first.", moments_file))
+}
+unified <- readRDS(moments_file)
 
-if (!file.exists(harmonized_file)) {
-  stop(sprintf("Harmonized data not found: %s\nRun script 32 first.", harmonized_file))
+if (length(unified$mu) != 24) {
+  stop(sprintf("Expected 24-element mean vector, got %d", length(unified$mu)))
+}
+if (!all(dim(unified$Sigma) == c(24, 24))) {
+  stop(sprintf("Expected 24x24 covariance matrix, got %d x %d",
+               nrow(unified$Sigma), ncol(unified$Sigma)))
 }
 
-ne25 <- arrow::read_feather(harmonized_file)
+calibration_vars <- unified$variable_names
+cat(sprintf("Unified moments loaded: %d variables, n_eff blocks = (%.0f, %.0f, %.0f)\n",
+            length(calibration_vars),
+            unified$n_eff$block1, unified$n_eff$block2, unified$n_eff$block3))
 
-cat(sprintf("    Loaded: %d records × %d columns\n", nrow(ne25), ncol(ne25)))
-cat(sprintf("    Expected: 3 identifiers + 24 variables = 27 columns\n\n"))
-
-# Validate structure
+# Validate expected columns (same check for every m)
 expected_cols <- c("pid", "record_id", "study_id",
                    "male", "age", "white_nh", "black", "hispanic",
                    "educ_years", "poverty_ratio",
@@ -74,259 +82,172 @@ expected_cols <- c("pid", "record_id", "study_id",
                                         801, 802, 901, 902, 903, 904)),
                    "phq2_total", "gad2_total", "excellent_health")
 
-missing_cols <- setdiff(expected_cols, names(ne25))
-if (length(missing_cols) > 0) {
-  stop(sprintf("Missing expected columns: %s", paste(missing_cols, collapse = ", ")))
-}
-
-# ============================================================================
-# [2] Load Unified Moments (24-variable targets)
-# ============================================================================
-
-cat("[2] Loading unified moments (24-variable targets)...\n\n")
-
-moments_file <- "data/raking/ne25/unified_moments.rds"
-
-if (!file.exists(moments_file)) {
-  stop(sprintf("Unified moments not found: %s\nRun script 30b first.", moments_file))
-}
-
-unified <- readRDS(moments_file)
-
-cat("    Loaded unified moments structure:\n")
-cat(sprintf("      - Target mean vector (μ): %d elements\n", length(unified$mu)))
-cat(sprintf("      - Target covariance matrix (Σ): %d × %d\n",
-            nrow(unified$Sigma), ncol(unified$Sigma)))
-cat(sprintf("      - Variable names: %d variables\n", length(unified$variable_names)))
-cat(sprintf("      - Effective sample sizes: Block 1=%.1f, Block 2=%.1f, Block 3=%.1f\n\n",
-            unified$n_eff$block1, unified$n_eff$block2, unified$n_eff$block3))
-
-# Validate dimensions
-if (length(unified$mu) != 24) {
-  stop(sprintf("Expected 24-element mean vector, got %d", length(unified$mu)))
-}
-
-if (!all(dim(unified$Sigma) == c(24, 24))) {
-  stop(sprintf("Expected 24×24 covariance matrix, got %d × %d",
-               nrow(unified$Sigma), ncol(unified$Sigma)))
-}
-
-# ============================================================================
-# [3] Prepare Calibration Variables
-# ============================================================================
-
-cat("[3] Preparing calibration variables for Stan...\n\n")
-
-# Define 24 calibration variables (ordered to match unified moments)
-calibration_vars <- unified$variable_names
-
-cat("    Calibration variables (24 total):\n\n")
-cat("      Block 1 - Demographics (7):\n")
-cat(sprintf("        %s\n", paste(calibration_vars[1:7], collapse = ", ")))
-cat("\n      Block 1 - PUMA (14):\n")
-cat(sprintf("        %s\n", paste(calibration_vars[8:21], collapse = ", ")))
-cat("\n      Block 2 - Mental Health (2):\n")
-cat(sprintf("        %s\n", paste(calibration_vars[22:23], collapse = ", ")))
-cat("\n      Block 3 - Child Outcome (1):\n")
-cat(sprintf("        %s\n\n", calibration_vars[24]))
-
-# Check for missing values in calibration variables
-missing_check <- ne25 %>%
-  dplyr::select(dplyr::all_of(calibration_vars)) %>%
-  dplyr::summarise(dplyr::across(dplyr::everything(), ~sum(is.na(.))))
-
-n_missing_total <- sum(as.numeric(missing_check[1, ]))
-
-cat("    Missing values check:\n")
-if (n_missing_total > 0) {
-  cat("[WARNING] Missing values detected in calibration variables:\n")
-  for (var in names(missing_check)) {
-    n_miss <- as.numeric(missing_check[1, var])
-    if (n_miss > 0) {
-      cat(sprintf("      %s: %d / %d (%.1f%%)\n",
-                  var, n_miss, nrow(ne25), n_miss / nrow(ne25) * 100))
-    }
-  }
-  cat("\n      Strategy: Listwise deletion for calibration (observations with ANY missing values excluded)\n")
-  cat("                This maintains consistency with unified moments computation.\n\n")
-
-  # Filter to complete cases
-  ne25_complete <- ne25 %>%
-    dplyr::filter(!dplyr::if_any(dplyr::all_of(calibration_vars), is.na))
-
-  cat(sprintf("      Complete cases: %d / %d (%.1f%%)\n\n",
-              nrow(ne25_complete), nrow(ne25), nrow(ne25_complete) / nrow(ne25) * 100))
-} else {
-  cat("      [OK] All calibration variables complete - no missing data\n\n")
-  ne25_complete <- ne25
-}
-
-# ============================================================================
-# [4] Run Stan Optimization
-# ============================================================================
-
-cat("[4] Running Stan KL divergence optimization...\n\n")
-
-cat("    Model: Simplex calibration (N-dimensional simplex parameterization)\n")
-cat(sprintf("      - Simplex weights (wgt_raw): %d parameters (one per observation)\n",
-            nrow(ne25_complete)))
-cat(sprintf("      - Dirichlet prior concentration: 1.0 (uniform, flat over simplex)\n"))
-cat(sprintf("      - Final weights scaled by N and constrained to [min_weight, max_weight]\n\n"))
-
-cat("    Objective: Minimize masked moment-matching loss (see WEIGHT_CONSTRUCTION.qmd §3.3)\n")
-cat("      - Mean-matching: all 24 target means (diagonal Z-score weighting)\n")
-cat("      - Covariance-matching: 488 observed cells of 24x24 target covariance\n")
-cat("      - Masking: 88 cells structurally unidentified (PUMA*MH, PUMA*outcome, MH*outcome) -> excluded\n\n")
-
-cat("    Stan optimization settings:\n")
-cat("      - Algorithm: BFGS (full Hessian)\n")
-cat("      - Convergence tolerances: 1e-10 gradient, 1e-6 objective\n")
-cat("      - Max iterations: 10,000 (set in R wrapper; current production run converges earlier)\n\n")
-
-cat("    NOTE: This may take 2-5 minutes for K=24 variables...\n\n")
-
-# Call simplex Stan optimization wrapper
-calibration_result <- calibrate_weights_simplex_factorized_stan(
-  data = ne25_complete,
-  target_mean = unified$mu,
-  target_cov = unified$Sigma,
-  cov_mask = unified$cov_mask,
-  calibration_vars = calibration_vars,
-  min_weight = 1E-2,         # Minimum weight per observation
-  max_weight = 100,        # Maximum weight per observation
-  concentration = 1,      # Dirichlet prior (1.0 = uniform)
-  verbose = TRUE,
-  history_size = 50,     # raised from 5 for cleaner L-BFGS Hessian approximation
-  refresh = 20,
-  iter = 1000            # 5000 empirically gives no improvement over 1000 with hist=50
-)
-
-# ============================================================================
-# [5] Save Calibrated Weights
-# ============================================================================
-
-cat("[5] Saving calibrated weights...\n\n")
-
-# Create output directory
 output_dir <- "data/raking/ne25/ne25_weights"
-if (!dir.exists(output_dir)) {
-  dir.create(output_dir, recursive = TRUE)
-  cat(sprintf("    Created directory: %s\n", output_dir))
-}
-
-# Prepare output: complete cases with weights
-output_data <- ne25_complete %>%
-  dplyr::mutate(calibrated_weight = calibration_result$calibrated_weight)
-
-output_file <- file.path(output_dir, "ne25_calibrated_weights_m1.feather")
-arrow::write_feather(output_data, output_file)
-
-cat(sprintf("    Saved: %s\n", output_file))
-cat(sprintf("      - %d records × %d columns\n", nrow(output_data), ncol(output_data)))
-cat(sprintf("      - New column: calibrated_weight\n\n"))
-
-# Save diagnostics
-# Two distinct convergence concepts (see WEIGHT_CONSTRUCTION.qmd discussion):
-#   stan_terminated_normally: did Stan's optimizer finish cleanly?
-#   marginals_within_1pct: are all 24 marginal means within 1% of target?
-# Keep legacy $converged field populated for backward compatibility with existing
-# consumers; it now aliases marginals_within_1pct.
-diagnostics <- list(
-  stan_terminated_normally = calibration_result$stan_terminated_normally,
-  stan_return_code = calibration_result$stan_return_code,
-  marginals_within_1pct = calibration_result$marginals_within_1pct,
-  converged = calibration_result$marginals_within_1pct,  # deprecated alias
-  final_marginals = calibration_result$final_marginals,
-  effective_n = calibration_result$effective_n,
-  efficiency_pct = calibration_result$efficiency_pct,
-  weight_ratio = calibration_result$weight_ratio,
-  log_prob = calibration_result$log_prob,
-  # Correlation diagnostics
-  unweighted_rmse_corr = calibration_result$unweighted_rmse_corr,
-  weighted_rmse_corr = calibration_result$weighted_rmse_corr,
-  correlation_improvement_pct = calibration_result$correlation_improvement_pct,
-  unweighted_correlations = calibration_result$unweighted_correlations,
-  target_correlations = calibration_result$target_correlations,
-  weighted_correlations = calibration_result$weighted_correlations,
-  correlation_improvements_by_pair = calibration_result$correlation_improvements,
-  # Sample info
-  n_complete_cases = nrow(ne25_complete),
-  n_total_cases = nrow(ne25),
-  completion_rate = nrow(ne25_complete) / nrow(ne25) * 100,
-  # Target moments
-  target_mean = unified$mu,
-  target_cov = unified$Sigma,
-  variable_names = unified$variable_names,
-  n_eff_blocks = unified$n_eff,
-  pooling_weights = unified$pooling_weights
-)
-
-diagnostics_file <- file.path(output_dir, "calibration_diagnostics_m1.rds")
-saveRDS(diagnostics, diagnostics_file)
-
-cat(sprintf("    Saved: %s\n\n", diagnostics_file))
+if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 # ============================================================================
-# [6] Summary Report
+# [1] Per-Imputation Calibration Loop
+# ============================================================================
+
+all_diagnostics <- vector("list", M)
+
+for (m in seq_len(M)) {
+  cat(sprintf("\n----------------------------------------\n"))
+  cat(sprintf("  Calibrating imputation m = %d of %d\n", m, M))
+  cat(sprintf("----------------------------------------\n"))
+
+  harmonized_file <- sprintf(
+    "data/raking/ne25/ne25_harmonized/ne25_harmonized_m%d.feather", m
+  )
+  if (!file.exists(harmonized_file)) {
+    stop(sprintf("Harmonized file not found: %s\nRun script 32 first.",
+                 harmonized_file))
+  }
+
+  ne25 <- arrow::read_feather(harmonized_file)
+  cat(sprintf("[1a] Loaded: %d records x %d columns (from %s)\n",
+              nrow(ne25), ncol(ne25), basename(harmonized_file)))
+
+  missing_cols <- setdiff(expected_cols, names(ne25))
+  if (length(missing_cols) > 0) {
+    stop(sprintf("Missing expected columns in m=%d: %s",
+                 m, paste(missing_cols, collapse = ", ")))
+  }
+
+  # Listwise-delete any residual NAs in calibration vars (should be zero per
+  # script 32's fallback mice step; kept as a safety net)
+  missing_counts <- colSums(is.na(ne25[, calibration_vars]))
+  if (any(missing_counts > 0)) {
+    cat("[1b] [WARN] Residual NAs in calibration vars after script 32:\n")
+    for (v in names(missing_counts)[missing_counts > 0]) {
+      cat(sprintf("      %s: %d\n", v, missing_counts[v]))
+    }
+    ne25_complete <- ne25 %>%
+      dplyr::filter(!dplyr::if_any(dplyr::all_of(calibration_vars), is.na))
+    cat(sprintf("      Complete cases retained: %d / %d\n",
+                nrow(ne25_complete), nrow(ne25)))
+  } else {
+    ne25_complete <- ne25
+    cat(sprintf("[1b] All %d calibration inputs complete (no NAs)\n",
+                nrow(ne25_complete)))
+  }
+
+  # --------------------------------------------------------------------------
+  # [1c] Run Stan optimization (cmdstanr caches the compiled model)
+  # --------------------------------------------------------------------------
+  cat(sprintf("[1c] Running Stan (simplex-N, history_size=50, iter=1000)...\n"))
+
+  calibration_result <- calibrate_weights_simplex_factorized_stan(
+    data = ne25_complete,
+    target_mean = unified$mu,
+    target_cov = unified$Sigma,
+    cov_mask = unified$cov_mask,
+    calibration_vars = calibration_vars,
+    min_weight = 1E-2,
+    max_weight = 100,
+    concentration = 1,
+    verbose = TRUE,
+    history_size = 50,
+    refresh = 20,
+    iter = 1000
+  )
+
+  # --------------------------------------------------------------------------
+  # [1d] Save weights feather
+  # --------------------------------------------------------------------------
+  output_data <- ne25_complete %>%
+    dplyr::mutate(calibrated_weight = calibration_result$calibrated_weight)
+
+  output_file <- file.path(
+    output_dir, sprintf("ne25_calibrated_weights_m%d.feather", m)
+  )
+  arrow::write_feather(output_data, output_file)
+  cat(sprintf("[1d] Saved: %s (%d records)\n",
+              output_file, nrow(output_data)))
+
+  # --------------------------------------------------------------------------
+  # [1e] Save diagnostics RDS
+  # --------------------------------------------------------------------------
+  diagnostics <- list(
+    imputation_m = m,
+    stan_terminated_normally = calibration_result$stan_terminated_normally,
+    stan_return_code = calibration_result$stan_return_code,
+    marginals_within_1pct = calibration_result$marginals_within_1pct,
+    converged = calibration_result$marginals_within_1pct,  # deprecated alias
+    final_marginals = calibration_result$final_marginals,
+    effective_n = calibration_result$effective_n,
+    efficiency_pct = calibration_result$efficiency_pct,
+    weight_ratio = calibration_result$weight_ratio,
+    log_prob = calibration_result$log_prob,
+    unweighted_rmse_corr = calibration_result$unweighted_rmse_corr,
+    weighted_rmse_corr = calibration_result$weighted_rmse_corr,
+    correlation_improvement_pct = calibration_result$correlation_improvement_pct,
+    unweighted_correlations = calibration_result$unweighted_correlations,
+    target_correlations = calibration_result$target_correlations,
+    weighted_correlations = calibration_result$weighted_correlations,
+    correlation_improvements_by_pair = calibration_result$correlation_improvements,
+    n_complete_cases = nrow(ne25_complete),
+    n_total_cases = nrow(ne25),
+    completion_rate = nrow(ne25_complete) / nrow(ne25) * 100,
+    target_mean = unified$mu,
+    target_cov = unified$Sigma,
+    variable_names = unified$variable_names,
+    n_eff_blocks = unified$n_eff,
+    pooling_weights = unified$pooling_weights
+  )
+  diagnostics_file <- file.path(
+    output_dir, sprintf("calibration_diagnostics_m%d.rds", m)
+  )
+  saveRDS(diagnostics, diagnostics_file)
+  cat(sprintf("[1e] Saved: %s\n", diagnostics_file))
+
+  # --------------------------------------------------------------------------
+  # [1f] Per-imputation summary
+  # --------------------------------------------------------------------------
+  max_pct_diff <- max(calibration_result$final_marginals$Pct_Diff)
+  cat(sprintf("[1f] m=%d: Kish N=%.1f, efficiency=%.1f%%, ratio=%.2f, max|Pct_Diff|=%.2f%%\n",
+              m,
+              calibration_result$effective_n,
+              calibration_result$efficiency_pct,
+              calibration_result$weight_ratio,
+              max_pct_diff))
+
+  all_diagnostics[[m]] <- diagnostics
+}
+
+# ============================================================================
+# [2] Cross-Imputation Summary
 # ============================================================================
 
 cat("\n========================================\n")
-cat("CALIBRATION SUMMARY\n")
+cat("CROSS-IMPUTATION SUMMARY\n")
 cat("========================================\n\n")
 
-cat("Input Data:\n")
-cat(sprintf("  - Total NE25 records: %d\n", nrow(ne25)))
-cat(sprintf("  - Complete cases: %d (%.1f%%)\n",
-            nrow(ne25_complete), nrow(ne25_complete) / nrow(ne25) * 100))
-cat(sprintf("  - Calibration variables: %d\n\n", length(calibration_vars)))
+summary_tbl <- data.frame(
+  m                  = seq_len(M),
+  n                  = vapply(all_diagnostics, function(d) d$n_complete_cases, integer(1)),
+  stan_ok            = vapply(all_diagnostics, function(d) d$stan_terminated_normally, logical(1)),
+  within_1pct        = vapply(all_diagnostics, function(d) d$marginals_within_1pct, logical(1)),
+  kish_n             = vapply(all_diagnostics, function(d) d$effective_n, numeric(1)),
+  efficiency_pct     = vapply(all_diagnostics, function(d) d$efficiency_pct, numeric(1)),
+  weight_ratio       = vapply(all_diagnostics, function(d) d$weight_ratio, numeric(1)),
+  corr_rmse_weighted = vapply(all_diagnostics, function(d) d$weighted_rmse_corr, numeric(1))
+)
 
-cat("Target Moments:\n")
-cat(sprintf("  - Block 1 effective N: %.1f (%.1f%% ACS, %.1f%% NHIS, %.1f%% NSCH)\n",
-            unified$n_eff$block1,
-            unified$pooling_weights$acs * 100,
-            unified$pooling_weights$nhis * 100,
-            unified$pooling_weights$nsch * 100))
-cat(sprintf("  - Block 2 effective N: %.1f (NHIS)\n", unified$n_eff$block2))
-cat(sprintf("  - Block 3 effective N: %.1f (NSCH)\n\n", unified$n_eff$block3))
+print(summary_tbl, row.names = FALSE, digits = 4)
 
-cat("Calibration Results:\n")
-cat(sprintf("  - Stan optimizer: %s\n",
-            ifelse(calibration_result$stan_terminated_normally,
-                   "[OK] Terminated normally",
-                   sprintf("[WARNING] Return code %s",
-                           paste(calibration_result$stan_return_code, collapse=",")))))
-cat(sprintf("  - All marginals <1%%: %s\n",
-            ifelse(calibration_result$marginals_within_1pct, "[OK]", "[INFO] No — see below")))
-cat(sprintf("  - Effective N (Kish): %.1f\n", calibration_result$effective_n))
-cat(sprintf("  - Efficiency: %.1f%%\n", calibration_result$efficiency_pct))
-cat(sprintf("  - Weight ratio (max/min): %.2f\n\n", calibration_result$weight_ratio))
+kish_cv <- stats::sd(summary_tbl$kish_n) / mean(summary_tbl$kish_n)
+rmse_range <- diff(range(summary_tbl$corr_rmse_weighted))
 
-cat("Marginal Accuracy:\n")
-max_pct_diff <- max(calibration_result$final_marginals$Pct_Diff)
-cat(sprintf("  - Max percent difference: %.2f%%\n", max_pct_diff))
-
-# Show variables with >1% difference
-large_diff <- calibration_result$final_marginals %>%
-  dplyr::filter(Pct_Diff > 1.0) %>%
-  dplyr::arrange(dplyr::desc(Pct_Diff))
-
-if (nrow(large_diff) > 0) {
-  cat("\n  Variables with >1%% difference from targets:\n")
-  for (i in 1:nrow(large_diff)) {
-    cat(sprintf("    %s: %.2f%% (target: %.4f, achieved: %.4f)\n",
-                large_diff$Variable[i], large_diff$Pct_Diff[i],
-                large_diff$Target[i], large_diff$Achieved[i]))
-  }
-} else {
-  cat("  [OK] All variables within 1%% of targets\n")
-}
+cat(sprintf("\nAcceptance checks:\n"))
+cat(sprintf("  Kish N coefficient of variation: %.3f (target < 0.05)\n", kish_cv))
+cat(sprintf("  Correlation RMSE range:          %.5f (target < 0.005)\n", rmse_range))
+cat(sprintf("  Stan terminated normally in all: %s\n",
+            ifelse(all(summary_tbl$stan_ok), "YES", "NO")))
 
 cat("\n========================================\n")
 cat("SCRIPT 33 COMPLETE\n")
 cat("========================================\n\n")
 
-cat("Next Steps:\n")
-cat("  1. Review calibration diagnostics in calibration_diagnostics_m1.rds\n")
-cat("  2. Validate weight distributions and effective sample size\n")
-cat("  3. Use ne25_calibrated_weights_m1.feather for weighted analyses\n")
-cat("  4. Apply weights to all M=5 imputations (repeat for m2-m5)\n\n")
+cat("Next step: run scripts/raking/ne25/34_store_raked_weights_long.R\n")
+cat("to insert the M weight sets into the ne25_raked_weights DuckDB table.\n")
