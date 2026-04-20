@@ -330,16 +330,27 @@ This section is the de facto tracker for raking work. Items are prioritized P0 (
 **Dependencies.** Script 32 needs to run for `m ∈ 2..5`; the stub `33_compute_kl_weights_ne25.R` is the intended orchestration wrapper and should be completed or replaced.
 :::
 
-## P1 — `gad2_total` marginal residual {#p1-gad2_total-marginal-residual}
+## P1 — Mental-health marginal residuals (`gad2_total`, `phq2_total`) {#p1-mental-health-residuals}
 
 ::: {.callout-note icon=false}
-**Effort:** S · **Status:** known issue
+**Effort:** M · **Status:** diagnosed, awaiting modeling decision
 
-**Problem.** At M = 1, the weighted mean of `gad2_total` is 19.8% off its target. Correlation matching was the primary objective and was achieved (RMSE 0.0107), but this marginal residual is a blemish.
+**Problem.** At M = 1, the two NHIS-only mental-health variables both sit at ~19% marginal residual (`gad2_total`: 19.92%, `phq2_total`: 19.01%). Correlation matching is fully achieved (RMSE 0.0107), but these two mean-matching gaps are distinctive.
 
-**Approach.** Raise the L-BFGS `max_iter` from 100 to 200–500 and refit. If marginal residual does not improve, the issue is tension between mean-matching and correlation-matching constraints — in that case, rebalance the two loss terms (currently both weighted 0.5) or relax weight bounds.
+**Diagnosis (confirmed empirically).** This was initially assumed to be a convergence issue — the hypothesis was that raising L-BFGS `iter` beyond 100 would close the gap. Direct empirical test: refitting at `iter = 5000` with `history_size = 50` (up from `5`) produced numerically tighter optimization (gradient norm dropped from ~5e-6 to ~4e-7) but **identical** residuals to the original run. Both mental-health items are stuck at exactly 19%; all other items unchanged. The plateau is structural, not numerical.
 
-**Acceptance criteria:** `gad2_total` marginal residual < 5%, with no degradation of correlation RMSE beyond 0.015.
+The structural explanation is visible in the factorization (§[3.3](#factorized-target-structure)). Mental-health items (Block C) have identified cross-covariances with demographics (A × C from NHIS) but **zero** identified cross-covariances with PUMA (B × C is masked). They receive less "leverage" in the loss than variables that participate in more cross-block constraints. The `efficiency_pct ~ Normal(100, 75)` soft prior in the Stan model (see §[3.3.6](#regularization-and-parameterization)) further resists the weight concentration that would be required to pull these means down.
+
+**Approach (proposed, not yet attempted).** Two candidate levers, mutually compatible:
+
+1. **Widen the efficiency prior.** Raise σ from 75 to 200, or remove the `efficiency_pct ~ Normal(...)` statement entirely. Current Kish efficiency (57.75%) would likely drop; mental-health residuals would likely shrink.
+2. **Reweight the loss.** Change `total_loss = 0.5 * (mahalanobis + cov_loss)` to `total_loss = w_mean * mahalanobis + w_cov * cov_loss` with `w_mean > w_cov` (e.g., 2.0 and 0.5). This biases the optimizer toward mean-matching at the cost of correlation fidelity.
+
+Both are *modeling* changes, not convergence tuning. Either will degrade something else (efficiency or correlation RMSE) to fix the mental-health residuals — there is no free lunch.
+
+**Acceptance criteria:** mental-health marginal residuals < 5%, with no degradation of correlation RMSE beyond 0.015 AND Kish effective N no lower than 1,200 (vs current 1,527).
+
+**Empirical baseline set by cleanup refit (April 2026):** `history_size = 50` is the current production value (raised from `5`, no downside but slightly cleaner numerics); `iter = 1000` is the current production setting (raising to 5000 confirmed to give no improvement).
 :::
 
 ## P1 — Deprecated script cleanup {#p1-deprecated-script-cleanup}

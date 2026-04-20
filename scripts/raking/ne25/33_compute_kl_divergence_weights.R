@@ -195,10 +195,10 @@ calibration_result <- calibrate_weights_simplex_factorized_stan(
   min_weight = 1E-2,         # Minimum weight per observation
   max_weight = 100,        # Maximum weight per observation
   concentration = 1,      # Dirichlet prior (1.0 = uniform)
-  verbose = TRUE, 
-  history_size = 5, 
-  refresh = 20, 
-  iter = 1000
+  verbose = TRUE,
+  history_size = 50,     # raised from 5 for cleaner L-BFGS Hessian approximation
+  refresh = 20,
+  iter = 1000            # 5000 empirically gives no improvement over 1000 with hist=50
 )
 
 # ============================================================================

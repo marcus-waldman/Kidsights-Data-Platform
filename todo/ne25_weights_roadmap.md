@@ -27,12 +27,17 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
   - Consider whether to also reframe "Bandaid Fix" language at `RAKING_INTEGRATION.md` §"Step 6.10" and the `# STEP 6.10: BANDAID FIX` comment in `pipelines/orchestration/ne25_pipeline.R` — per recent correction, Step 6.10 is the correct final treatment, not a workaround.
 - **Acceptance:** grep over active paths for `apply_propensity`, `_rake_nhis`, `_rake_nsch`, `compute_kl_weights_ne25.R`, `rake_to_targets`, and `Linear calibration (K+1` returns no hits outside `archive/`.
 
-### 2. `gad2_total` marginal residual refit (`WEIGHT_CONSTRUCTION.qmd §5.2`)
+### 2. Mental-health marginal residuals — diagnosed, now medium-effort (`WEIGHT_CONSTRUCTION.qmd §5.2`)
 
-- **Effort:** S (~0.5 day including validation)
-- **Dependencies:** none
-- **What:** Raise BFGS `max_iter` from 100 to 500 in `33_compute_kl_divergence_weights.R`; refit; compare `calibration_diagnostics_m1.rds` before/after. If the 19.8% residual does not close, one follow-up iteration of rebalancing the mean-vs-covariance loss weights.
-- **Acceptance:** `gad2_total` marginal residual < 5% with no degradation of correlation RMSE beyond 0.015.
+- **Effort:** M (was S) · **Status:** diagnosis complete (April 2026); modeling decision pending
+- **Dependencies:** none for the fix itself; modeling-decision input from Marcus needed before next refit.
+- **What (completed):** Hypothesized that raising `iter` and `history_size` would close the `gad2_total` 19.92% / `phq2_total` 19.01% residuals. Empirically refuted: `history_size = 50` + `iter = 5000` produces numerically tighter optimization (gradient ~4e-7 vs ~5e-6) but **identical** residuals. Plateau is structural — the `efficiency_pct ~ Normal(100, 75)` soft prior plus the factorization (mental health has no PUMA cross-covariance constraints) prevents the weight concentration that would close the gap.
+- **What (next):** Two candidate modeling changes:
+  1. Widen/drop the efficiency prior (σ: 75 → 200 or remove).
+  2. Reweight the loss terms (currently `0.5 * (mahalanobis + cov_loss)`; bias toward mean matching).
+  Either will degrade something (efficiency or correlation RMSE) to fix the mental-health residuals. Needs Marcus's sign-off before implementation.
+- **Acceptance:** mental-health marginal residuals < 5% with correlation RMSE not worse than 0.015 and Kish effective N ≥ 1,200.
+- **Baseline (shipped in April 2026 cleanup):** `history_size = 50`, `iter = 1000`. Marginally better numerics than previous `hist=5`; no practical difference in achieved weights.
 
 ### 3. Publication-ready diagnostics report (`WEIGHT_CONSTRUCTION.qmd §5.5`)
 
