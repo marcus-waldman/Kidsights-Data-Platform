@@ -1,0 +1,305 @@
+---
+title: "NE25 Calibration Diagnostics"
+subtitle: "Weight calibration quality for imputation `r params$imputation`"
+author: "Kidsights Data Platform"
+date: today
+date-format: "YYYY-MM-DD HH:mm"
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    code-fold: true
+    code-summary: "Show code"
+    fig-width: 9
+    fig-height: 5
+    fig-cap-location: bottom
+    embed-resources: true
+    smooth-scroll: true
+execute:
+  echo: false
+  warning: false
+  message: false
+params:
+  imputation: 1
+---
+
+```{r setup}
+library(arrow)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(tibble)
+
+m <- params$imputation
+# Paths are relative to this .qmd's location (Quarto default execute-dir = file)
+data_root <- "../../../data/raking/ne25/ne25_weights"
+diagnostics_file <- sprintf("%s/calibration_diagnostics_m%d.rds", data_root, m)
+weights_file <- sprintf("%s/ne25_calibrated_weights_m%d.feather", data_root, m)
+
+if (!file.exists(diagnostics_file)) {
+  stop(sprintf("Diagnostics file not found: %s\nRun script 33 first.", diagnostics_file))
+}
+if (!file.exists(weights_file)) {
+  stop(sprintf("Weights file not found: %s", weights_file))
+}
+
+diag <- readRDS(diagnostics_file)
+weights_df <- arrow::read_feather(weights_file)
+
+# Helper for formatting
+fmt_pct <- function(x, digits = 2) sprintf("%.*f%%", digits, x)
+fmt_num <- function(x, digits = 4) formatC(x, digits = digits, format = "f")
+```
+
+# Executive Summary
+
+This report summarizes the quality of the calibrated raking weights produced by `scripts/raking/ne25/33_compute_kl_divergence_weights.R` for imputation **m = `r m`** of the NE25 analytic dataset. For the underlying method, see [`WEIGHT_CONSTRUCTION.qmd`](../../docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd); for operator detail, see [`RAKING_INTEGRATION.md`](../../docs/raking/RAKING_INTEGRATION.md).
+
+## Headline metrics
+
+```{r headline, results='asis'}
+headline <- tibble::tibble(
+  Metric = c(
+    "Records calibrated (complete cases)",
+    "Optimizer converged",
+    "Correlation RMSE — unweighted",
+    "Correlation RMSE — weighted",
+    "Correlation RMSE improvement",
+    "Kish effective N",
+    "Weight efficiency",
+    "Weight ratio (max / min)"
+  ),
+  Value = c(
+    formatC(diag$n_complete_cases, big.mark = ","),
+    as.character(diag$converged),
+    fmt_num(diag$unweighted_rmse_corr),
+    fmt_num(diag$weighted_rmse_corr),
+    fmt_pct(diag$correlation_improvement_pct, 1),
+    formatC(round(diag$effective_n, 1), big.mark = ","),
+    fmt_pct(diag$efficiency_pct, 1),
+    fmt_num(diag$weight_ratio, 2)
+  )
+)
+knitr::kable(headline, align = c("l", "r"))
+```
+
+::: {.callout-note}
+**Convergence status:** `r diag$converged`. The primary calibration objective is correlation matching (see WEIGHT_CONSTRUCTION.qmd §3.3); convergence = FALSE typically reflects the optimizer hitting the iteration cap at a plateau rather than a failure to find useful weights.
+:::
+
+# Weight Distribution
+
+```{r weight-histogram, fig.cap = "Distribution of calibrated weights. Target = 1 (uniform); spread reflects how hard the optimizer had to push on individual records to match calibration targets."}
+w <- weights_df$calibrated_weight
+
+ggplot(tibble::tibble(w = w), aes(x = w)) +
+  geom_histogram(bins = 60, fill = "#4c72b0", color = "white", alpha = 0.9) +
+  geom_vline(xintercept = 1, linetype = "dashed", color = "red", linewidth = 0.6) +
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 8)) +
+  labs(
+    x = "Calibrated weight",
+    y = "Count",
+    caption = sprintf(
+      "N = %s · mean = %s · median = %s · max/min ratio = %s",
+      formatC(length(w), big.mark = ","),
+      fmt_num(mean(w), 3),
+      fmt_num(median(w), 3),
+      fmt_num(max(w) / min(w), 2)
+    )
+  ) +
+  theme_minimal(base_size = 11)
+```
+
+```{r weight-quantiles, results='asis'}
+q <- quantile(w, probs = c(0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99))
+qtbl <- tibble::tibble(
+  Quantile = c("1%", "5%", "25%", "50% (median)", "75%", "95%", "99%"),
+  Weight = fmt_num(q, 3)
+)
+cat("## Weight quantiles\n\n")
+knitr::kable(qtbl, align = c("l", "r"))
+```
+
+# Marginal Residuals
+
+For each of the 24 calibration variables, the weighted sample mean should match the target mean. Residuals are shown in absolute terms and as a percentage of the target.
+
+```{r marginal-residuals-table}
+m_tbl <- diag$final_marginals %>%
+  dplyr::mutate(
+    Target = fmt_num(Target, 4),
+    Achieved = fmt_num(Achieved, 4),
+    Difference = fmt_num(Difference, 4),
+    `Pct Diff` = fmt_pct(Pct_Diff, 2)
+  ) %>%
+  dplyr::select(Variable, Target, Achieved, Difference, `Pct Diff`, Pct_Diff) %>%
+  dplyr::arrange(dplyr::desc(abs(Pct_Diff))) %>%
+  dplyr::select(-Pct_Diff)
+
+knitr::kable(m_tbl, align = c("l", "r", "r", "r", "r"))
+```
+
+```{r marginal-residual-plot, fig.cap = "Marginal residuals sorted by magnitude. Dashed lines mark 5% and 10% thresholds. Variables above 10% are structural flags warranting investigation."}
+plt_df <- diag$final_marginals %>%
+  dplyr::arrange(abs(Pct_Diff)) %>%
+  dplyr::mutate(Variable = factor(Variable, levels = Variable))
+
+ggplot(plt_df, aes(x = Variable, y = abs(Pct_Diff))) +
+  geom_col(fill = "#55a868", alpha = 0.85) +
+  geom_hline(yintercept = 5, linetype = "dashed", color = "#b07028", linewidth = 0.4) +
+  geom_hline(yintercept = 10, linetype = "dashed", color = "red", linewidth = 0.4) +
+  coord_flip() +
+  labs(x = NULL, y = "|Pct Diff| (%)") +
+  theme_minimal(base_size = 10)
+```
+
+# Correlation Matching
+
+The primary calibration objective is matching the 488 observed cells of the 24 × 24 target covariance (correlation-scale loss). See [`WEIGHT_CONSTRUCTION.qmd §3.3`](../../docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd#the-objective-function) for the formal loss.
+
+## Summary
+
+```{r corr-summary}
+corr_tbl <- tibble::tibble(
+  Metric = c(
+    "Unweighted RMSE vs target correlation",
+    "Weighted RMSE vs target correlation",
+    "Absolute RMSE reduction",
+    "Relative improvement"
+  ),
+  Value = c(
+    fmt_num(diag$unweighted_rmse_corr),
+    fmt_num(diag$weighted_rmse_corr),
+    fmt_num(diag$unweighted_rmse_corr - diag$weighted_rmse_corr),
+    fmt_pct(diag$correlation_improvement_pct, 2)
+  )
+)
+knitr::kable(corr_tbl, align = c("l", "r"))
+```
+
+## Top correlation pairs by improvement
+
+The 10 variable pairs where the weighted correlation moved closest to the target (largest error reduction).
+
+```{r corr-top-improvements}
+if (!is.null(diag$correlation_improvements_by_pair) && nrow(diag$correlation_improvements_by_pair) > 0) {
+  imp_df <- diag$correlation_improvements_by_pair
+  # Try common column names
+  err_reduced_col <- intersect(c("error_reduced", "improvement", "error_reduction"), names(imp_df))
+  if (length(err_reduced_col) > 0) {
+    imp_df <- imp_df %>%
+      dplyr::arrange(dplyr::desc(.data[[err_reduced_col[1]]])) %>%
+      utils::head(10)
+  }
+  # Format numeric columns
+  imp_df <- imp_df %>%
+    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), ~fmt_num(.x, 4)))
+  knitr::kable(imp_df, align = c("l", "l", rep("r", ncol(imp_df) - 2)))
+} else {
+  cat("*(Correlation improvement detail not available in this diagnostics file.)*\n")
+}
+```
+
+## Correlation matrix heatmaps
+
+```{r corr-heatmaps, fig.width = 11, fig.height = 4.5, fig.cap = "Three 24×24 correlation matrices side by side. Top row labels correspond to calibration variables in the order they appear in the target moments structure."}
+vars <- diag$variable_names
+
+mats <- list(
+  Unweighted = diag$unweighted_correlations,
+  Target = diag$target_correlations,
+  Weighted = diag$weighted_correlations
+)
+
+long_df <- purrr::map_dfr(names(mats), function(nm) {
+  M <- mats[[nm]]
+  dimnames(M) <- list(vars, vars)
+  df <- as.data.frame(as.table(M))
+  names(df) <- c("Var1", "Var2", "Correlation")
+  df$Panel <- nm
+  df
+})
+
+long_df$Panel <- factor(long_df$Panel, levels = c("Unweighted", "Target", "Weighted"))
+long_df$Var1 <- factor(long_df$Var1, levels = vars)
+long_df$Var2 <- factor(long_df$Var2, levels = rev(vars))
+
+ggplot(long_df, aes(x = Var1, y = Var2, fill = Correlation)) +
+  geom_tile() +
+  scale_fill_gradient2(
+    low = "#3b5998", mid = "white", high = "#b23a48",
+    midpoint = 0, limits = c(-1, 1)
+  ) +
+  facet_wrap(~Panel, nrow = 1) +
+  coord_equal() +
+  labs(x = NULL, y = NULL) +
+  theme_minimal(base_size = 8) +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1, size = 6),
+    axis.text.y = element_text(size = 6),
+    strip.text = element_text(face = "bold"),
+    panel.grid = element_blank()
+  )
+```
+
+# Factorization & Block Structure
+
+Reminder of the target covariance factorization (full detail in [`WEIGHT_CONSTRUCTION.qmd §3.3`](../../docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd#factorized-target-structure)):
+
+```{r block-table}
+block_tbl <- tibble::tibble(
+  Block = c("A — demographics", "B — PUMA", "C — mental health", "D — child outcome"),
+  Vars = c(7, 14, 2, 1),
+  `Identified from` = c(
+    "Pooled ACS / NHIS / NSCH",
+    "ACS only",
+    "NHIS only",
+    "NSCH only"
+  ),
+  `Effective n (per docs)` = c(
+    "~2,000 (Block 1)",
+    "~2,000 (Block 1)",
+    "~1,500 (Block 2)",
+    "~500 (Block 3)"
+  )
+)
+knitr::kable(block_tbl, align = c("l", "r", "l", "l"))
+```
+
+The 88 structurally unidentified covariance cells (B × C = 28, B × D = 14, C × D = 2, doubled for both triangles) are masked out of the loss. See `cov_mask` in the unified moments for the exact pattern.
+
+```{r pooling-weights, results='asis'}
+if (!is.null(diag$pooling_weights)) {
+  pw <- unlist(diag$pooling_weights)
+  cat("## Pooling weights used for demographic targets\n\n")
+  cat(sprintf(
+    "- ACS: %s\n- NHIS: %s\n- NSCH: %s\n",
+    fmt_pct(pw["acs"] * 100, 1),
+    fmt_pct(pw["nhis"] * 100, 1),
+    fmt_pct(pw["nsch"] * 100, 1)
+  ))
+}
+```
+
+# Reproducibility
+
+- **Diagnostics RDS:** `r diagnostics_file`
+- **Weights feather:** `r weights_file`
+- **Rendered:** `r format(Sys.time(), "%Y-%m-%d %H:%M")`
+- **R version:** `r R.version$version.string`
+
+To regenerate:
+
+```bash
+# Refit weights for imputation m
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" \
+  scripts/raking/ne25/33_compute_kl_divergence_weights.R
+
+# Re-render this report for imputation m
+"C:/Program Files/RStudio/resources/app/bin/quarto/bin/quarto.exe" \
+  render scripts/raking/ne25/calibration_diagnostics_report.qmd \
+  -P imputation:1
+```
