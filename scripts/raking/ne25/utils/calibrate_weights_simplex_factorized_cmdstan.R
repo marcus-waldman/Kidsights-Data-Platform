@@ -212,11 +212,21 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   cat("        → Parameter tolerance: 1e-10\n")
   cat("      - Max iterations: ", iter, "\n\n")
 
+  # cmdstanr's optimize() expects `init` as either a numeric (uniform bound on
+  # unconstrained scale) or a list-of-lists (one inner list per chain, with
+  # parameter values on the constrained scale). Callers of this wrapper may
+  # more naturally pass a single flat list like list(wgt_raw = ...); coerce it
+  # into list-of-lists form transparently.
+  init_to_pass <- init
+  if (is.list(init) && length(init) > 0 && !is.list(init[[1]])) {
+    init_to_pass <- list(init)
+  }
+
   tryCatch({
     fit <- mod$optimize(
       data = stan_data,
       seed = 12345,
-      init = init,
+      init = init_to_pass,
       algorithm = "lbfgs",
       tol_rel_grad = 1e-10,
       tol_grad = 1e-10,
@@ -245,6 +255,18 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     cat(sprintf("    Extracted %d weights from Stan output\n", length(final_weights)))
   } else {
     stop("Could not extract wgt_final from Stan optimization result")
+  }
+
+  # Also extract wgt_raw on the simplex scale -- needed as a warm-start
+  # init value for Bucket 3's Bayesian-bootstrap fits. wgt_raw sums to 1
+  # and is the parameter Stan actually samples; passing it as init avoids
+  # having to invert the min/max mapping analytically.
+  wgt_raw_cols <- grep("^wgt_raw\\[", names(fit$draws(format = "df")), value = TRUE)
+  if (length(wgt_raw_cols) > 0) {
+    wgt_raw_df      <- fit$draws(variables = "wgt_raw", format = "df")
+    wgt_raw_estimate <- as.numeric(wgt_raw_df[1, wgt_raw_cols])
+  } else {
+    wgt_raw_estimate <- NULL
   }
 
   cat(sprintf("    Min weight: %.4f\n", min(final_weights)))
@@ -437,6 +459,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   list(
     data = data %>% dplyr::mutate(calibrated_weight = final_weights),
     calibrated_weight = final_weights,
+    wgt_raw_estimate = wgt_raw_estimate,
     stan_terminated_normally = stan_terminated_normally,
     stan_return_code = stan_return_code,
     marginals_within_1pct = marginals_within_1pct,
