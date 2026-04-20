@@ -370,13 +370,29 @@ Both are *modeling* changes, not convergence tuning. Either will degrade somethi
 ## P2 — Bootstrap variance for raked weights {#p2-bootstrap-variance}
 
 ::: {.callout-note icon=false}
-**Effort:** L · **Status:** design only
+**Effort:** L · **Status:** design locked (MIB framework); implementation pending
 
-**Problem.** Bootstrap replicates exist for the ACS *targets* (4096 per estimand, via [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)) but the downstream *weights* are currently treated as fixed quantities. A fully rigorous uncertainty propagation would refit weights against each bootstrap draw of the targets.
+**Problem.** Bootstrap replicates exist for the ACS *targets* (4,096 per estimand, via [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)) but the downstream *weights* are currently treated as fixed quantities. Pairing this with the M = 5 multiple imputation from §[5.1](#p0-multi-imputation) requires a commitment to a variance-combination framework.
 
-**Approach.** Distill the 4096 ACS replicates into ~200 representative draws, refit weights per draw, and store a `calibrated_weight_boot_{1..200}` matrix alongside the point-estimate weights. Downstream `survey::svyglm` users can then ignore the bootstrap matrix or use it for variance estimation per Rubin's rules.
+**Framework decision (April 2026): Multiple Imputation then Bootstrap (MIB).** For each of M = 5 imputations, refit weights against B = 200 distilled bootstrap-target draws. Total refits: **M × B = 1,000**. Rubin's rules pool variance across imputations; bootstrap provides within-imputation variance.
 
-**Acceptance criteria:** per-observation bootstrap weight matrix available; at least one analysis demonstrates variance inflation vs. fixed-weight approach.
+Two alternatives considered and rejected:
+
+- **Fixed imputation + bootstrap targets (~200 refits):** silently drops imputation variance from the uncertainty budget. Cheap but misleading.
+- **Bootstrap-then-Impute with random pairing (~200 refits):** asymptotically valid but harder to decompose analytically; doesn't separate within-imputation and between-imputation variance components.
+
+MIB is the most rigorous option and the most transparent for downstream analysts familiar with Rubin's-rules workflows.
+
+**Approach.**
+
+1. **Target distillation (one-time):** subsample 200 representative draws from the 4,096 ACS bootstrap replicates, shared across all imputations.
+2. **Refit loop:** for `(m, b) ∈ {1..5} × {1..200}`, refit Stan with the `m`-th imputation's harmonized data against the `b`-th target draw. Stan model compilation cached; each refit ~3 minutes.
+3. **Storage:** per-imputation bootstrap matrix `ne25_calibrated_weights_m{m}_boot.feather` (N × 200 doubles ≈ 4 MB × 5 ≈ 21 MB total). Point-estimate weights stay in their existing `ne25_calibrated_weights_m{1..5}.feather` files.
+4. **Compute:** ~50 hours serial or ~3 hours on 16 parallel workers.
+
+**Acceptance criteria:** five per-imputation bootstrap weight matrices available; Rubin's-rules pooling demonstrated for at least one target quantity; variance inflation vs. fixed-weight baseline documented.
+
+**Dependency:** §[5.1](#p0-multi-imputation) (multi-imputation integration) must complete first so the five harmonized `ne25_harmonized_m{1..5}.feather` files exist.
 :::
 
 ## P2 — Publication-ready diagnostics report {#p2-publication-diagnostics}

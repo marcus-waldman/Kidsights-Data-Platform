@@ -1,6 +1,6 @@
 # NE25 Weight Construction — Execution Roadmap
 
-**Created:** 2026-04-20 | **Updated:** 2026-04-20 | **Status:** Not started | **Repository:** Kidsights-Data-Platform
+**Created:** 2026-04-20 | **Updated:** 2026-04-20 | **Status:** Bucket 1 complete; Bucket 2 pending plan-mode session | **Repository:** Kidsights-Data-Platform
 
 ---
 
@@ -67,13 +67,19 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
 
 ## Bucket 3 — Deferred
 
-### 5. Bootstrap variance for raked weights (`WEIGHT_CONSTRUCTION.qmd §5.4`)
+### 5. Bootstrap variance for raked weights — MIB framework (`WEIGHT_CONSTRUCTION.qmd §5.4`)
 
-- **Effort:** L (~1–2 weeks part-time, incl. ~10+ hours of Stan compute)
+- **Effort:** L (~1–2 weeks engineering; ~3 h compute on 16 parallel workers, ~50 h serial)
 - **Priority:** P2
 - **Plan mode:** yes, but **not yet**.
-- **Blocking dependency:** Bucket 2 (§5.1) must settle multi-imputation join patterns first — otherwise the bootstrap weight matrix will have to be refactored once the imputation structure lands.
-- **What (sketch):** Distill 4,096 ACS target replicates to ~200 representative draws; refit weights per draw; store per-observation bootstrap weight matrix; integrate with downstream `survey` workflow.
+- **Framework (decided April 2026):** **Multiple Imputation then Bootstrap (MIB).** For each of M = 5 imputations, refit weights against B = 200 distilled bootstrap-target draws → **1,000 total Stan refits**. Rubin's rules pool variance across imputations; bootstrap provides within-imputation variance.
+- **Blocking dependency:** Bucket 2 (§5.1) must complete first — MIB needs the five harmonized datasets `ne25_harmonized_m{1..5}.feather` to exist.
+- **What (sketch):**
+  1. Distill 4,096 ACS target replicates → 200 representative draws, shared across all M.
+  2. Refit loop over `(m, b) ∈ {1..5} × {1..200}` with cached Stan compilation.
+  3. Store as `ne25_calibrated_weights_m{m}_boot.feather` (per-imputation N × 200 matrix; ~21 MB total).
+  4. Document variance pooling via Rubin's rules on at least one analysis target.
+- **Why MIB over alternatives:** fixed-imputation bootstrap silently drops imputation variance; random-pairing BtI is cheaper but harder to decompose. MIB is the rigorous option and transparent to downstream `survey`-package analysts.
 - **Revisit:** after Bucket 2 is complete and stable for at least one analysis cycle.
 
 ---
