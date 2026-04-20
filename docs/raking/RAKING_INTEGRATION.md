@@ -168,8 +168,8 @@ if (file.exists("data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feathe
 
 **Result:** 2,645 records have `calibrated_weight` column
 
-### Step 6.10: Out-of-State Handling (Bandaid Fix)
-Identifies records with no weight and marks as out-of-state:
+### Step 6.10: Out-of-State Exclusion
+Identifies records whose zipcodes have no match in the Nebraska ZCTA→PUMA crosswalk and excludes them from the analytic set. These records are genuinely out-of-state (or have invalid zipcodes); this is the correct final treatment, not a workaround.
 
 ```r
 final_data <- final_data %>%
@@ -201,17 +201,24 @@ final_data <- final_data %>%
 
 ### Model Structure
 
-**Linear calibration model:**
+**Simplex-N calibration model:**
 ```stan
-log(weight[i]) = α + X_std[i,] β
+simplex[N] wgt_raw;                            // one weight per observation
+wgt_raw ~ dirichlet(rep_vector(concentration, N));  // flat Dirichlet(1) prior
+
+// Final weights: scale to [min_weight, max_weight] and renormalize
+vector[N] wgt_scaled = min_wgt + (max_wgt - min_wgt) * wgt_raw;
+simplex[N] wgt = wgt_scaled / sum(wgt_scaled);
+vector[N] wgt_final = N * wgt;
 ```
 
 Where:
-- **α:** Intercept (1 parameter)
-- **β:** Slope vector (K=24 parameters)
-- **X_std:** Standardized design matrix (Z-score normalized)
+- **N:** Number of observations (2,645 complete cases for M=1)
+- **K:** Number of calibration variables (24)
+- **concentration:** Dirichlet prior concentration (1.0 = uniform, no entropy regularization)
+- **X_std:** Design matrix is Z-score standardized inside `transformed data` for numerical stability; the final weights are invariant to this standardization
 
-**Total parameters:** 25 (1 intercept + 24 slopes)
+**Total parameters:** N (one simplex weight per observation). Earlier versions of this doc described a log-linear `log(w) = α + Xβ` form with K+1=25 parameters; that parameterization was **considered and rejected** as insufficiently expressive for matching K=24 means plus 488 masked covariance cells. See [WEIGHT_CONSTRUCTION.qmd §2.3](ne25/WEIGHT_CONSTRUCTION.qmd) for the full alternatives discussion and §3.3 for the loss specification.
 
 ### Standardization In-Model
 

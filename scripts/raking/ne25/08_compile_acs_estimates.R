@@ -172,12 +172,12 @@ acs_metadata <- list(
   age_range = c(min(acs_estimates$age), max(acs_estimates$age)),
   estimate_range = c(min(acs_estimates$estimate), max(acs_estimates$estimate)),
   sources = list(
-    sex = "02_estimate_sex_final.R",
-    race_ethnicity = "03_estimate_race_ethnicity.R",
-    fpl = "04_estimate_fpl.R",
-    puma = "05_estimate_puma.R",
-    mother_education = "06_estimate_mother_education.R",
-    mother_marital_status = "07_estimate_mother_marital_status.R"
+    sex = "02_estimate_sex_glm2.R",
+    race_ethnicity = "03_estimate_race_ethnicity_glm2.R",
+    fpl = "04_estimate_fpl_glm2.R",
+    puma = "05_estimate_puma_glm2.R",
+    mother_education = "06_estimate_mother_education_glm2.R",
+    mother_marital_status = "07_estimate_mother_marital_status_glm2.R"
   ),
   created_date = Sys.time()
 )

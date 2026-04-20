@@ -1,6 +1,6 @@
 # Phase 3, Task 3.1a: Create Shared NHIS Bootstrap Design
 # Generate ONE bootstrap design for NHIS PHQ-2 estimand
-# This design will be used by 13_estimate_phq2.R
+# This design will be used by 13_estimate_phq2_glm2.R and 13b_estimate_gad2_glm2.R
 
 library(survey)
 library(svrep)
@@ -129,7 +129,7 @@ cat("  - Sample size:", nrow(phq_data), "parent-child pairs\n")
 cat("  - Bootstrap method: Rao-Wu-Yue-Beaumont\n")
 cat("  - Number of replicates:", n_boot, "\n")
 cat("  - File size:", file_size_mb, "MB\n")
-cat("  - Shared design ready for use in 13_estimate_phq2.R\n\n")
+cat("  - Shared design ready for use in 13_estimate_phq2_glm2.R and 13b_estimate_gad2_glm2.R\n\n")
 
 if (n_boot < 100) {
   cat("NOTE: Running in TEST MODE with", n_boot, "replicates\n")

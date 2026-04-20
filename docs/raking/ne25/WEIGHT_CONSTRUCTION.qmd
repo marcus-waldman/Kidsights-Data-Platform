@@ -61,7 +61,7 @@ Four constraints shaped the choice of estimator:
 
 ## Alternatives considered
 
-Four alternatives were implemented and rejected in the repository. The archaeology is still visible in script 27/28 triplets and in the stub Stan model `rake_to_targets.stan`.
+Four alternatives were implemented and rejected in the repository. The archaeology is preserved under `scripts/raking/ne25/archive/` — see that directory's `README.md` for a guided tour.
 
 ::: {.callout-tip icon=false}
 ### Classical raking / IPF (`survey::rake`, `rake_to_targets.R`)
@@ -292,7 +292,7 @@ Three places in the tree contain artifacts that look like production code but ar
 | `27_rake_nhis_to_nebraska.R`, `28_rake_nsch_to_nebraska.R` | **Deprecated** | Classical IPF via `utils/rake_to_targets.R`             | Cannot match a covariance structure; only marginals                     |
 | `27_calibrate_nhis_to_nebraska.R`, `28_calibrate_nsch_to_nebraska.R` | **Deprecated** | Two-stage calibrate-to-Nebraska design                  | Superseded by one-shot pooled-moment approach (script 30b → 33)         |
 | `33_compute_kl_weights_ne25.R`                  | **Stub**      | Intent-file for multi-imputation weight orchestration (M = 1..5) | KL optimization never implemented here; sits alongside the real `33_compute_kl_divergence_weights.R` |
-| `rake_to_targets.stan`, `rake_to_targets_cmdstan.R` | **Unused** | Alternative Stan model (logit-space squared marginal error) designed for scripts 27/28 | Never promoted into the pipeline that went into production              |
+| (Stan model described in [`STAN_RAKING_MODEL.md`](../../../scripts/raking/ne25/STAN_RAKING_MODEL.md)) | **Designed but never implemented** | Alternative Stan model (logit-space squared marginal error) intended for scripts 27/28 | Source files were never committed; doc is the only surviving artifact    |
 | `02_estimate_sex.R`, `02_estimate_sex_final.R`  | **Deprecated** | Early `svyglm` implementations of the sex target        | Superseded by `02_estimate_sex_glm2.R` (see §[4.3](#glm-glm2-transition)) |
 | `03..07*` pre-`_glm2` variants                  | **Deprecated** | Same story as sex                                       | Same                                                                    |
 | `14_estimate_maternal_aces.R`, `14_estimate_maternal_aces_v2.R` | **Orphaned** | Maternal ACE estimand (Phase 3)                         | Phase 3 disabled in current orchestrator; unclear whether re-enabled    |

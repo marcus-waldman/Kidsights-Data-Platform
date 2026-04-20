@@ -90,7 +90,8 @@ Prerequisite: Run ACS pipeline to generate these estimates first.
 | Script | Purpose | Method |
 |--------|---------|--------|
 | `12_filter_nhis_parents.R` | Filter to NE parents with children 0-5 | DuckDB query |
-| `13_estimate_phq2.R` | Estimate PHQ-2 positive (≥3) by age | GLM by age |
+| `13_estimate_phq2_glm2.R` | Estimate PHQ-2 positive (≥3) by age | GLM2 by age |
+| `13b_estimate_gad2_glm2.R` | Estimate GAD-2 positive (≥3) by age | GLM2 by age |
 | `14_validate_save_nhis.R` | Validate and save estimates | Checks + save |
 
 **Output:** `data/raking/ne25/nhis_estimates.rds`

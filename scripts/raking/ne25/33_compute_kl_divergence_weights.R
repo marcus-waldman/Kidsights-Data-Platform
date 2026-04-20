@@ -167,21 +167,21 @@ if (n_missing_total > 0) {
 
 cat("[4] Running Stan KL divergence optimization...\n\n")
 
-cat("    Model: Linear calibration (K+1 parameters)\n")
-cat(sprintf("      - Intercept (α): 1 parameter\n"))
-cat(sprintf("      - Coefficients (β): %d parameters (one per calibration variable)\n",
-            length(calibration_vars)))
-cat(sprintf("      - Total parameters: %d\n\n", length(calibration_vars) + 1))
+cat("    Model: Simplex calibration (N-dimensional simplex parameterization)\n")
+cat(sprintf("      - Simplex weights (wgt_raw): %d parameters (one per observation)\n",
+            nrow(ne25_complete)))
+cat(sprintf("      - Dirichlet prior concentration: 1.0 (uniform, flat over simplex)\n"))
+cat(sprintf("      - Final weights scaled by N and constrained to [min_weight, max_weight]\n\n"))
 
-cat("    Objective: Minimize KL(target || achieved)\n")
-cat("      - Matches 24 target means (μ)\n")
-cat("      - Matches factorized 24×24 covariance structure (Σ)\n")
-cat("      - Factorization: Observed blocks from ACS/NHIS/NSCH, unobserved cross-blocks set to 0\n\n")
+cat("    Objective: Minimize masked moment-matching loss (see WEIGHT_CONSTRUCTION.qmd §3.3)\n")
+cat("      - Mean-matching: all 24 target means (diagonal Z-score weighting)\n")
+cat("      - Covariance-matching: 488 observed cells of 24x24 target covariance\n")
+cat("      - Masking: 88 cells structurally unidentified (PUMA*MH, PUMA*outcome, MH*outcome) -> excluded\n\n")
 
 cat("    Stan optimization settings:\n")
 cat("      - Algorithm: BFGS (full Hessian)\n")
-cat("      - Convergence: Strict tolerances (1e-10 gradient, 1e-6 objective)\n")
-cat("      - Max iterations: 10,000\n\n")
+cat("      - Convergence tolerances: 1e-10 gradient, 1e-6 objective\n")
+cat("      - Max iterations: 10,000 (set in R wrapper; current production run converges earlier)\n\n")
 
 cat("    NOTE: This may take 2-5 minutes for K=24 variables...\n\n")
 
