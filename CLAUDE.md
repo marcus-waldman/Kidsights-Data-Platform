@@ -62,6 +62,14 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/verify_pipeline.R
 ```
 
+**NE25 Raking Weights (M=5 multi-imputation, Bucket 2 — April 2026):**
+```bash
+# Full M=5 calibrated raking-weight pipeline (scripts 32 -> 33 -> 34).
+# Prerequisites: run_raking_targets_pipeline.R + scripts 25..30b + imputation pipeline.
+# Output: ne25_raked_weights DuckDB table (5 x N rows). Typical runtime ~17-20 min.
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_ne25_raking_full.R
+```
+
 **Imputation Pipeline:**
 ```bash
 # Setup database schema (one-time, study-specific)

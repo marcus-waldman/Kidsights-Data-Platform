@@ -1,6 +1,6 @@
 # NE25 Weight Construction — Execution Roadmap
 
-**Created:** 2026-04-20 | **Updated:** 2026-04-20 | **Status:** Bucket 1 complete; Bucket 2 pending plan-mode session | **Repository:** Kidsights-Data-Platform
+**Created:** 2026-04-20 | **Updated:** 2026-04-20 | **Status:** Buckets 1 and 2 complete; Bucket 3 (MIB bootstrap) deferred | **Repository:** Kidsights-Data-Platform
 
 ---
 
@@ -48,20 +48,24 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
 
 ---
 
-## Bucket 2 — Medium (dedicated plan-mode session)
+## Bucket 2 — Complete (shipped April 2026)
 
-### 4. Multi-imputation integration M = 2..5 (`WEIGHT_CONSTRUCTION.qmd §5.1`)
+### 4. Multi-imputation integration M = 1..5 (`WEIGHT_CONSTRUCTION.qmd §5.1`) ✅
 
-- **Effort:** M (~2–3 days of engineering)
-- **Priority:** P0
-- **Plan mode:** **yes** — coordinated edits across scripts 32, 33, and pipeline Step 6.9; needs a design decision on whether to finish the existing stub `33_compute_kl_weights_ne25.R` or replace it.
-- **What (high level):**
-  - Script 32 loops MICE CART imputation m = 1..5, emitting `ne25_harmonized_m{1..5}.feather`.
-  - Script 33 (or its successor) orchestrates per-imputation Stan optimization, reusing the compiled model across imputations.
-  - Pipeline Step 6.9 joins per-imputation weights by `(pid, record_id, imputation_m)`.
-  - Validation: Kish N and correlation RMSE stable across the five imputations.
-- **Dependencies:** Bucket 1 complete is nice-to-have (cleaner codebase) but not strictly required.
-- **Acceptance:** Five calibrated-weight feather files exist; diagnostics comparable across imputations; pipeline integration tests pass.
+- **Status:** Complete. Commits: `b4e1756` (DDL) → `18ee863` (script 32) → `7467c45` (script 33) → `2c7810c` (script 34) → `f876540` (orchestrator) → `217d775` (pipeline cut-over).
+- **What was shipped:**
+  - **New DuckDB table `ne25_raked_weights`** (long format, `(pid, record_id, study_id, imputation_m, calibrated_weight)`) populated with 5 × 2,645 = 13,225 rows.
+  - **Script 32 rewritten** to consume production imputations via `R/imputation/helpers.R::get_completed_dataset()` instead of running its own MICE. Closes a latent consistency bug where raking used a different imputation methodology than downstream MI analysis. Five harmonized feathers emitted per run.
+  - **Script 33 converted** to a loop over M imputations; `cmdstanr` compile cache keeps compilation cost to one call.
+  - **Script 34** consolidates per-m feathers into the long-format DuckDB table.
+  - **New orchestrator** `run_ne25_raking_full.R` runs scripts 32 → 33 → 34 end-to-end.
+  - **Pipeline Step 6.9 cut-over** to read m=1 from `ne25_raked_weights` instead of the legacy feather (fallback retained for backward compatibility).
+  - **Pipeline Step 6.10** renamed from "BANDAID FIX" to "OUT-OF-STATE EXCLUSION" with clarified comment.
+- **Verification shipped with the cut-over:**
+  - All 5 imputations produce 2,645-row feathers; numerically distinct (SHA256).
+  - Cross-imputation stability: Kish N CV = 0.007, correlation RMSE range = 0.00046, Stan terminated normally for all five.
+  - DuckDB read path produces byte-identical weights to the legacy feather for m=1.
+- **Follow-on (not blocking Bucket 3):** `reports/ne25/helpers/model_fitting.R` still uses the single `calibrated_weight` column via the backward-compat default. Add an MI-aware `weights_table = "ne25_raked_weights"` argument in a separate ticket when convenient.
 
 ---
 
@@ -86,11 +90,12 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
 
 ## Suggested cadence
 
-| When | Work |
-|------|------|
-| Next focused day | Bucket 1 items 1 → 2 → 3, in order. Single commit per item. |
-| Next scheduled planning session | Enter plan mode for Bucket 2 (§5.1). |
-| After §5.1 ships and is validated | Consider scheduling Bucket 3 (§5.4). |
+| When | Work | Status |
+|------|------|------|
+| Focused day in April 2026 | Bucket 1 items 1 → 2 → 3, in order. Single commit per item. | ✅ Complete |
+| Planning session in April 2026 | Plan mode for Bucket 2 (§5.1). | ✅ Complete |
+| Next 1–2 week window (optional) | Bucket 3 (§5.4) MIB bootstrap — large compute budget (~10 h) and architectural implications. | Deferred |
+| Separate ticket | `model_fitting.R` gains `weights_table` argument for MI-aware analysis. | Not started |
 
 ## Out of scope (per `WEIGHT_CONSTRUCTION.qmd §5`)
 

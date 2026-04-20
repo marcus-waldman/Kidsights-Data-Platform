@@ -350,24 +350,88 @@ WHERE meets_inclusion = TRUE;
 
 ---
 
-## Imputation Strategy (M=2-5)
+## Multi-Imputation Integration (M=5)
 
-Currently **only M=1 weights are generated** from script 33. For complete MI analysis:
+**Status:** Shipped April 2026. Full M=5 multi-imputation is the current production state.
 
-**Option A: Repeat weights across imputations (current approach)**
-```
-M=1 weights → Apply to all M imputations (M=2-5)
-Assumption: Weight structure stable across imputations
+### Architecture
+
+For each of `M = 5` imputations from the production imputation pipeline, Stan is refit against the full 24-variable calibration targets, producing an independent weight set. All weights are stored in a single long-format DuckDB table:
+
+```sql
+-- Table: ne25_raked_weights
+CREATE TABLE ne25_raked_weights (
+    pid               INTEGER  NOT NULL,
+    record_id         INTEGER  NOT NULL,
+    study_id          VARCHAR,
+    imputation_m      INTEGER  NOT NULL,
+    calibrated_weight DOUBLE   NOT NULL,
+    PRIMARY KEY (pid, record_id, imputation_m)
+);
+-- 13,225 rows for NE25 (5 imputations × 2,645 records)
 ```
 
-**Option B: Generate M-specific weights (future enhancement)**
-```
-Run script 33 for each imputation M=1,2,3,4,5
-Output: ne25_calibrated_weights_m2.feather, ..., ne25_calibrated_weights_m5.feather
-Join corresponding weights for each imputation
+This mirrors the `ne25_imputed_*` convention so downstream consumers recognize the pattern.
+
+### How to use
+
+**MI-aware analysis** (recommended) — join the appropriate per-imputation weight inside your mice loop:
+
+```r
+library(DBI); library(duckdb); library(survey)
+con <- DBI::dbConnect(duckdb::duckdb(),
+                      "data/duckdb/kidsights_local.duckdb", read_only = TRUE)
+
+results <- lapply(1:5, function(m) {
+  weights_m <- DBI::dbGetQuery(con, sprintf("
+    SELECT pid, record_id, calibrated_weight
+    FROM ne25_raked_weights
+    WHERE imputation_m = %d
+  ", m))
+  ne25_m <- get_completed_dataset(m)
+  ne25_m <- ne25_m %>%
+    dplyr::inner_join(weights_m, by = c("pid", "record_id"))
+  design_m <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = ne25_m)
+  survey::svyglm(outcome ~ age + male, design = design_m, family = binomial())
+})
+
+pooled <- mitools::MIcombine(results)  # Rubin's rules
 ```
 
-**Recommendation:** Option B is more rigorous (respects variation across imputations) but ~5x more computation time. Current Option A acceptable if imputation variation primarily affects missing values, not calibration structure.
+**Single-imputation default** (backward compatible) — the `calibrated_weight` column on `ne25_transformed` is populated from `imputation_m = 1` at Step 6.9 of the main pipeline, so existing consumers (including `model_fitting.R`) keep working unchanged.
+
+### Execution
+
+Run the full M=5 raking-weight pipeline end-to-end:
+
+```bash
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_ne25_raking_full.R
+```
+
+This orchestrator:
+1. Verifies prerequisites (`unified_moments.rds` present from scripts 25–30b).
+2. Ensures `ne25_raked_weights` DuckDB schema exists.
+3. Runs script 32 (harmonize for all M imputations; consumes `ne25_imputed_*` via `R/imputation/helpers.R::get_completed_dataset()`).
+4. Runs script 33 (Stan calibration loop; `cmdstanr` compile cache makes iterations 2..M compile-free).
+5. Runs script 34 (long-format insert).
+
+Typical runtime: ~17–20 minutes for M=5.
+
+### Cross-imputation stability (M=5, April 2026 run)
+
+| m | Kish N | Efficiency | Weight ratio | Corr RMSE |
+|---|--------|------------|--------------|-----------|
+| 1 | 1,518 | 57.4% | 27.4 | 0.01086 |
+| 2 | 1,514 | 57.2% | 34.4 | 0.01073 |
+| 3 | 1,514 | 57.3% | 33.2 | 0.01077 |
+| 4 | 1,511 | 57.1% | 35.2 | 0.01081 |
+| 5 | 1,538 | 58.1% | 28.8 | 0.01119 |
+
+Kish N CV = 0.007, correlation RMSE range = 0.00046 — imputation variation is small relative to target sampling variance (as expected; imputation chiefly affects tail records, not population moments).
+
+### Next: MIB bootstrap (Bucket 3, deferred)
+
+The M=5 per-imputation weights are the foundation for the Multiple Imputation then Bootstrap (MIB) variance estimator (`docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd` §5.4; `memory/project_ne25_weight_variance_framework.md`). That work is deferred — when implemented, it will refit Stan 200 times per imputation (1,000 total) and store the bootstrap weights as a sibling long table.
 
 ---
 
