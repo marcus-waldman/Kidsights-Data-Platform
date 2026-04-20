@@ -6,7 +6,12 @@
 #   - N parameters (one weight per observation) instead of K+1
 #   - Weight constraints: min_weight <= wgt[i] <= max_weight
 #   - Handles factorized (singular) covariance matrices
-#   - Dirichlet prior for smoothing
+#   - Flat Dirichlet(1,...,1) prior on wgt_raw (no gradient contribution at
+#     the simplex boundary)
+#   - Bayesian-bootstrap integration via `bbw` argument: per-observation
+#     multiplicative weight that enters the moment-matching loss (not the
+#     prior). bbw = rep(1, N) reproduces the baseline/Bucket 2 behavior
+#     exactly. bbw = rexp(N, 1) draw produces a Bayesian-bootstrap replicate.
 
 library(cmdstanr)
 library(dplyr)
@@ -20,8 +25,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
                                                       calibration_vars,
                                                       min_weight = 0.1,
                                                       max_weight = 10.0,
-                                                      concentration = 1.0,
-                                                      dirichlet_alpha = NULL,
+                                                      bbw = NULL,
                                                       init = 0,
                                                       verbose = TRUE,
                                                       history_size = 100,
@@ -30,15 +34,15 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
 
   cat("\n========================================\n")
   cat("Calibrating Survey Weights (Simplex Parameterization)\n")
-  cat("(Masked KL divergence with weight constraints)\n")
+  cat("(Masked moment-matching loss with weight constraints)\n")
   cat("========================================\n\n")
 
   cat(sprintf("Weight constraints: %.1f <= wgt[i] <= %.1f\n", min_weight, max_weight))
-  if (is.null(dirichlet_alpha)) {
-    cat(sprintf("Dirichlet prior: flat (concentration = %.2f for all N)\n\n", concentration))
+  if (is.null(bbw)) {
+    cat("Bayesian-bootstrap weight: OFF (bbw = rep(1, N); flat Bucket-2-equivalent)\n\n")
   } else {
-    cat(sprintf("Dirichlet prior: per-observation vector (min=%.3f, max=%.3f, mean=%.3f)\n\n",
-                min(dirichlet_alpha), max(dirichlet_alpha), mean(dirichlet_alpha)))
+    cat(sprintf("Bayesian-bootstrap weight: ON (bbw min=%.3f, max=%.3f, mean=%.3f)\n\n",
+                min(bbw), max(bbw), mean(bbw)))
   }
 
   # Validate inputs
@@ -64,20 +68,18 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   N <- nrow(data)
   K <- length(calibration_vars)
 
-  # Resolve dirichlet_alpha (per-observation Dirichlet prior concentration).
-  # If not supplied, default to rep(concentration, N) — this exactly reproduces
-  # the flat-prior behavior from before this parameter was added.
-  if (is.null(dirichlet_alpha)) {
-    dirichlet_alpha <- rep(concentration, N)
+  # Resolve bbw (per-observation Bayesian-bootstrap data-weight multiplier).
+  # When NULL, use rep(1, N) -- identical to Bucket 2 behavior since
+  # w_eff = wgt * bbw / sum(wgt * bbw) reduces to wgt for uniform bbw.
+  # Scale is arbitrary (Stan renormalizes internally); any positive vector works.
+  if (is.null(bbw)) {
+    bbw <- rep(1.0, N)
   } else {
-    if (length(dirichlet_alpha) != N) {
-      stop(sprintf(
-        "dirichlet_alpha length (%d) must equal N (%d)",
-        length(dirichlet_alpha), N
-      ))
+    if (length(bbw) != N) {
+      stop(sprintf("bbw length (%d) must equal N (%d)", length(bbw), N))
     }
-    if (any(dirichlet_alpha <= 0)) {
-      stop("all dirichlet_alpha values must be strictly positive")
+    if (any(bbw <= 0)) {
+      stop("all bbw values must be strictly positive")
     }
   }
 
@@ -173,7 +175,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     target_mean = as.vector(target_mean),
     target_cov = target_cov,
     cov_mask = cov_mask,
-    dirichlet_alpha = as.vector(dirichlet_alpha),
+    bbw = as.vector(bbw),
     min_weight_multiplier = min_weight,
     max_weight_multiplier = max_weight,
     # NEW: Standardization factors for improved optimizer efficiency
@@ -472,8 +474,7 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
     pct_observed_cov = pct_observed,
     min_weight = min_weight,
     max_weight = max_weight,
-    concentration = concentration,
-    dirichlet_alpha = dirichlet_alpha,
+    bbw = bbw,
     # Standardization factors (for documentation)
     scale_mean = scale_mean,
     scale_sd = scale_sd,

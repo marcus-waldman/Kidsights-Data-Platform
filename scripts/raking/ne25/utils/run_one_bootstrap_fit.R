@@ -1,26 +1,33 @@
 # ============================================================================
-# run_one_bootstrap_fit — Single (m, b) Bayesian-bootstrap Stan refit worker
+# run_one_bootstrap_fit -- Single (m, b) Bayesian-bootstrap Stan refit worker
 # ============================================================================
 #
-# Invoked via callr::r() from the Bucket 3 orchestrator (script 35). Each call
-# runs one Stan optimization with a Dirichlet(1, 1, ..., 1) draw as the
-# per-observation prior concentration (Bayesian bootstrap) and a baseline
-# simplex vector as the init (warm-start).
+# Invoked via callr::r_bg() from the Bucket 3 orchestrator (script 35).
+# Each call runs one Stan optimization with:
+#   - the flat Dirichlet(1,...,1) prior on wgt_raw (no gradient contribution),
+#   - a Bayesian-bootstrap data weight `bbw_b` drawn from Gamma(1, 1)
+#     (equivalent to Dirichlet(1,...,1) up to scale) passed as a per-obs
+#     multiplier that enters the MOMENT-MATCHING LOSS (never the prior).
+#
+# This mirrors the NE22 pattern (C:/Users/marcu/git-repositories/
+# Kidsights-Disparities-NE22/utils/utils.R::make_design_weights), where
+# `wgts_mxb = optim_par * bbw_b` is the final replicate weight. In our Stan
+# model the equivalent is
+#   w_eff     = (wgt * bbw_b) / sum(wgt * bbw_b)
+#   wgt_final = N * w_eff
+# computed inside the Stan `transformed parameters` block. bbw enters the
+# moment-matching loss but never the prior, so there is no Dirichlet-gradient
+# singularity (the flat prior contributes nothing to the gradient).
 #
 # Produces a single feather at output_dir/weights_m{m}_b{b}.feather so the
-# orchestrator can resume after interruption by skipping any (m, b) pair whose
-# output already exists.
+# orchestrator can resume after interruption by skipping any (m, b) pair
+# whose output already exists.
 #
 # Arguments:
 #   m, b                   Integers identifying (imputation, bootstrap draw)
-#   seed                   Integer for reproducibility of the Dirichlet draw
-#   harmonized_dir         Directory holding ne25_harmonized_m{m}.feather files
-#   unified_moments_file   Path to unified_moments.rds (shared across all m, b)
-#   baseline_wgt_raw_file  Path to an RDS containing a named list:
-#                          list("1" = numeric N-vector on simplex scale, ...,
-#                               "5" = numeric N-vector)
-#                          Produced by the orchestrator from the 5 baseline
-#                          (flat-prior) fits.
+#   seed                   Integer for reproducibility of the bbw draw
+#   harmonized_dir         Directory holding ne25_harmonized_m{m}.feather
+#   unified_moments_file   Path to unified_moments.rds (shared across all m,b)
 #   output_dir             Where to write weights_m{m}_b{b}.feather
 #   wrapper_file           Path to calibrate_weights_simplex_factorized_cmdstan.R
 #   history_size, iter     Stan L-BFGS tuning; defaults match production
@@ -34,7 +41,6 @@ run_one_bootstrap_fit <- function(m, b,
                                   seed,
                                   harmonized_dir,
                                   unified_moments_file,
-                                  baseline_wgt_raw_file,
                                   output_dir,
                                   wrapper_file,
                                   history_size = 50,
@@ -64,57 +70,25 @@ run_one_bootstrap_fit <- function(m, b,
 
   unified <- readRDS(unified_moments_file)
 
-  baseline_list <- readRDS(baseline_wgt_raw_file)
-  baseline_key  <- as.character(m)
-  if (!baseline_key %in% names(baseline_list)) {
-    stop(sprintf("Baseline wgt_raw for m=%d not found in %s",
-                 m, baseline_wgt_raw_file))
-  }
-  baseline_wgt_raw <- baseline_list[[baseline_key]]
-  if (length(baseline_wgt_raw) != N) {
-    stop(sprintf("Baseline wgt_raw length (%d) != N (%d) for m=%d",
-                 length(baseline_wgt_raw), N, m))
-  }
-
   # -------------------------------------------------------------------------
-  # Draw Bayesian-bootstrap concentration vector.
+  # Draw Bayesian-bootstrap data weight.
   #
-  # Classical Bayesian bootstrap draws w ~ Dirichlet(1,...,1) and uses w as
-  # *data weights*. Here we adapt it by using (1 + wb_b) as the Dirichlet
-  # prior concentration on wgt_raw: the +1 shift keeps every alpha_i >= 1,
-  # avoiding the log-prior boundary singularity that arises when any alpha
-  # is < 1. This preserves the per-observation bootstrap perturbation while
-  # keeping the optimization numerically stable. Mean concentration = 2
-  # (vs. the flat-prior concentration of 1).
+  # Classical Rubin (1981) Bayesian bootstrap draws w ~ Dirichlet(1,...,1)
+  # on the N-simplex. Equivalently, draw g ~ Gamma(1, 1) = Exp(1) and use
+  # g / sum(g). The Stan model renormalizes (w_eff = wgt .* bbw / sum(...)),
+  # so the absolute scale of bbw is irrelevant -- we just need strictly
+  # positive values with the right distribution shape.
   #
-  # If the bootstrap-variance magnitude comes out too small, the +1 offset
-  # can be tuned (smaller offset => more spread, but risk of instability).
+  # Using bbw = rexp(N, 1) directly (unnormalized) is simplest and
+  # equivalent to a Dirichlet(1,...,1) draw after the Stan renormalization.
   # -------------------------------------------------------------------------
   set.seed(seed)
-  g     <- rexp(N, rate = 1)
-  wb_b  <- (g / sum(g)) * N    # classical Bayesian-bootstrap draw; mean = 1
-  alpha <- 1 + wb_b            # shift up so all concentrations >= 1
+  bbw_b <- rexp(N, rate = 1)
 
   # -------------------------------------------------------------------------
-  # Call Stan wrapper with Bayesian-bootstrap prior.
-  #
-  # init = 0 (cold start). Why not warm-start from baseline_wgt_raw?
-  # Two sub-problems combine:
-  #   (1) Baseline wgt_raw has 140-266 obs (per imputation) with values
-  #       <= 1e-8 (down to ~5e-13) -- observations pinned at the min_wgt
-  #       floor. cmdstanr's constrained -> unconstrained simplex transform
-  #       is log-based; log(~5e-13) ~= -28 -> infinite gradients on iter 1.
-  #       Fixed by clipping to eps = 1e-6 before passing as init; empirical
-  #       smoke test confirms stan_ok = TRUE with clip+renormalize.
-  #   (2) Even with the clip fix, Stan's L-BFGS here is iteration-limited
-  #       (not tolerance-limited): gradient plateaus at ~4e-7 well above
-  #       tol_grad=1e-10, so the optimizer always runs to iter = 1000
-  #       regardless of starting point. Warm-start in smoke test ran ~30%
-  #       slower (230s vs 180s cold) due to transform overhead + plateau
-  #       wandering without a compensating iteration-count reduction.
-  # Net: warm-start is recoverable numerically but not profitable here.
-  # Keep cold-start as the active path. baseline_wgt_raw stays loaded so
-  # a future run with tuned iter (e.g., iter=200) could profitably revisit.
+  # Call Stan wrapper with Bayesian-bootstrap data weight.
+  # Prior stays flat; bbw enters the moment-matching loss inside Stan.
+  # Init = 0 (cold start) is safe and sufficient here.
   # -------------------------------------------------------------------------
   result <- calibrate_weights_simplex_factorized_stan(
     data             = ne25,
@@ -124,7 +98,7 @@ run_one_bootstrap_fit <- function(m, b,
     calibration_vars = unified$variable_names,
     min_weight       = min_weight,
     max_weight       = max_weight,
-    dirichlet_alpha  = alpha,
+    bbw              = bbw_b,
     init             = 0,
     verbose          = FALSE,
     history_size     = history_size,
