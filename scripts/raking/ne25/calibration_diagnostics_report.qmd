@@ -61,10 +61,15 @@ This report summarizes the quality of the calibrated raking weights produced by 
 ## Headline metrics
 
 ```{r headline, results='asis'}
+# Support both new (post-fix) and legacy diagnostics files
+stan_ok <- if (!is.null(diag$stan_terminated_normally)) diag$stan_terminated_normally else NA
+within_1pct <- if (!is.null(diag$marginals_within_1pct)) diag$marginals_within_1pct else diag$converged
+
 headline <- tibble::tibble(
   Metric = c(
     "Records calibrated (complete cases)",
-    "Optimizer converged",
+    "Stan optimizer terminated normally",
+    "All marginals within 1% of target",
     "Correlation RMSE — unweighted",
     "Correlation RMSE — weighted",
     "Correlation RMSE improvement",
@@ -74,7 +79,8 @@ headline <- tibble::tibble(
   ),
   Value = c(
     formatC(diag$n_complete_cases, big.mark = ","),
-    as.character(diag$converged),
+    if (is.na(stan_ok)) "(not recorded — pre-fix diagnostics file)" else as.character(stan_ok),
+    as.character(within_1pct),
     fmt_num(diag$unweighted_rmse_corr),
     fmt_num(diag$weighted_rmse_corr),
     fmt_pct(diag$correlation_improvement_pct, 1),
@@ -87,7 +93,7 @@ knitr::kable(headline, align = c("l", "r"))
 ```
 
 ::: {.callout-note}
-**Convergence status:** `r diag$converged`. The primary calibration objective is correlation matching (see WEIGHT_CONSTRUCTION.qmd §3.3); convergence = FALSE typically reflects the optimizer hitting the iteration cap at a plateau rather than a failure to find useful weights.
+**Two distinct convergence concepts.** `Stan optimizer terminated normally` indicates whether L-BFGS found a minimum cleanly (numerical convergence). `All marginals within 1%` indicates whether the solution satisfies the business-level calibration tolerance. These are orthogonal — Stan can converge to a minimum while some marginals remain outside 1% because of structural tension in the loss function (e.g., mental-health items at ~19% driven by the factorization, not a Stan failure). See [WEIGHT_CONSTRUCTION.qmd §3.3](../../docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) for the method and §5.2 for the mental-health discussion.
 :::
 
 # Weight Distribution

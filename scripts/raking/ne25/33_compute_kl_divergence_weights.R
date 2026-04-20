@@ -226,8 +226,16 @@ cat(sprintf("      - %d records × %d columns\n", nrow(output_data), ncol(output
 cat(sprintf("      - New column: calibrated_weight\n\n"))
 
 # Save diagnostics
+# Two distinct convergence concepts (see WEIGHT_CONSTRUCTION.qmd discussion):
+#   stan_terminated_normally: did Stan's optimizer finish cleanly?
+#   marginals_within_1pct: are all 24 marginal means within 1% of target?
+# Keep legacy $converged field populated for backward compatibility with existing
+# consumers; it now aliases marginals_within_1pct.
 diagnostics <- list(
-  converged = calibration_result$converged,
+  stan_terminated_normally = calibration_result$stan_terminated_normally,
+  stan_return_code = calibration_result$stan_return_code,
+  marginals_within_1pct = calibration_result$marginals_within_1pct,
+  converged = calibration_result$marginals_within_1pct,  # deprecated alias
   final_marginals = calibration_result$final_marginals,
   effective_n = calibration_result$effective_n,
   efficiency_pct = calibration_result$efficiency_pct,
@@ -282,8 +290,13 @@ cat(sprintf("  - Block 2 effective N: %.1f (NHIS)\n", unified$n_eff$block2))
 cat(sprintf("  - Block 3 effective N: %.1f (NSCH)\n\n", unified$n_eff$block3))
 
 cat("Calibration Results:\n")
-cat(sprintf("  - Convergence: %s\n",
-            ifelse(calibration_result$converged, "[OK] Achieved", "[WARNING] Not achieved")))
+cat(sprintf("  - Stan optimizer: %s\n",
+            ifelse(calibration_result$stan_terminated_normally,
+                   "[OK] Terminated normally",
+                   sprintf("[WARNING] Return code %s",
+                           paste(calibration_result$stan_return_code, collapse=",")))))
+cat(sprintf("  - All marginals <1%%: %s\n",
+            ifelse(calibration_result$marginals_within_1pct, "[OK]", "[INFO] No — see below")))
 cat(sprintf("  - Effective N (Kish): %.1f\n", calibration_result$effective_n))
 cat(sprintf("  - Efficiency: %.1f%%\n", calibration_result$efficiency_pct))
 cat(sprintf("  - Weight ratio (max/min): %.2f\n\n", calibration_result$weight_ratio))

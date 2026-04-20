@@ -275,17 +275,32 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   cat(sprintf("    Effective N (Kish): %.1f\n", n_eff))
   cat(sprintf("    Efficiency: %.1f%%\n\n", n_eff / N * 100))
 
-  # Check convergence
-  tolerance_default <- 0.01  # 1%
-  converged <- all(final_check$Pct_Diff < tolerance_default)
+  # Two distinct convergence concepts:
+  #   (1) Stan's numerical optimization convergence — did L-BFGS find a minimum?
+  #   (2) Calibration tolerance — are all marginal means within 1% of target?
+  # These are orthogonal: Stan can terminate normally while some marginals remain >1% off
+  # (structural tension in the loss function). Report both separately.
 
-  if (converged) {
-    cat("[OK] Convergence achieved (all marginals within 1%)\n")
+  stan_return_code <- tryCatch(fit$return_codes(), error = function(e) NA_integer_)
+  stan_terminated_normally <- isTRUE(all(stan_return_code == 0))
+
+  tolerance_pct <- 1.0  # 1% — Pct_Diff is expressed in percentage units (e.g., 19.92 = 19.92%)
+  marginals_within_1pct <- all(final_check$Pct_Diff < tolerance_pct)
+
+  if (stan_terminated_normally) {
+    cat("[OK] Stan optimization terminated normally (return code 0)\n")
+  } else {
+    cat(sprintf("[WARNING] Stan return code: %s (non-zero indicates optimizer issue)\n",
+                paste(stan_return_code, collapse = ", ")))
+  }
+
+  if (marginals_within_1pct) {
+    cat("[OK] All marginals within 1% of target\n")
     cat(sprintf("     Max %% difference: %.2f%%\n\n", max(final_check$Pct_Diff)))
   } else {
-    cat("[WARNING] Did not achieve <1%% convergence\n")
-    cat(sprintf("     Max %% difference: %.2f%%\n", max(final_check$Pct_Diff)))
-    cat("     Consider re-running optimization\n\n")
+    cat("[INFO] Not all marginals within 1% of target (may reflect structural tension in the loss,\n")
+    cat("       not an optimizer failure — see Stan status above)\n")
+    cat(sprintf("     Max %% difference: %.2f%%\n\n", max(final_check$Pct_Diff)))
   }
 
   # Extract optimization diagnostics
@@ -398,7 +413,9 @@ calibrate_weights_simplex_factorized_stan <- function(data, target_mean, target_
   list(
     data = data %>% dplyr::mutate(calibrated_weight = final_weights),
     calibrated_weight = final_weights,
-    converged = converged,
+    stan_terminated_normally = stan_terminated_normally,
+    stan_return_code = stan_return_code,
+    marginals_within_1pct = marginals_within_1pct,
     final_marginals = final_check,
     effective_n = n_eff,
     efficiency_pct = n_eff / N * 100,
