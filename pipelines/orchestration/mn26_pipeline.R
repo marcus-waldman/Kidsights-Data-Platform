@@ -223,23 +223,39 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     message("\n--- Step 8: Kidsights Developmental Scoring ---")
     step_start <- Sys.time()
 
+    # Score only eligible records (those with meets_inclusion == TRUE).
+    # score_kidsights() requires complete years_old values, which only
+    # eligible records reliably have.
     tryCatch({
-      kidsights_scores <- KidsightsPublic::score_kidsights(
-        transformed_data,
-        id_cols = c("pid", "record_id", "child_num"),
-        min_responses = 5
-      )
+      scoring_subset <- transformed_data %>%
+        dplyr::filter(isTRUE(meets_inclusion) | meets_inclusion %in% TRUE)
 
-      # Join theta back to transformed data
-      transformed_data <- transformed_data %>%
-        safe_left_join(
-          kidsights_scores %>% dplyr::rename(kidsights_theta = theta),
-          by_vars = c("pid", "record_id", "child_num")
+      message(sprintf("  Scoring %d eligible children (of %d total)...",
+                      nrow(scoring_subset), nrow(transformed_data)))
+
+      if (nrow(scoring_subset) == 0) {
+        message("  [WARN] No eligible records to score")
+        transformed_data$kidsights_theta <- NA_real_
+        metrics$n_kidsights_scored <- 0
+      } else {
+        kidsights_scores <- KidsightsPublic::score_kidsights(
+          scoring_subset,
+          id_cols = c("pid", "record_id", "child_num"),
+          min_responses = 5
         )
 
-      n_scored <- sum(!is.na(transformed_data$kidsights_theta))
-      message(sprintf("  Scored: %d of %d children", n_scored, nrow(transformed_data)))
-      metrics$n_kidsights_scored <- n_scored
+        # Join theta back to full transformed data (non-eligible get NA)
+        transformed_data <- transformed_data %>%
+          safe_left_join(
+            kidsights_scores %>% dplyr::rename(kidsights_theta = theta),
+            by_vars = c("pid", "record_id", "child_num")
+          )
+
+        n_scored <- sum(!is.na(transformed_data$kidsights_theta))
+        message(sprintf("  Scored: %d of %d eligible children",
+                        n_scored, nrow(scoring_subset)))
+        metrics$n_kidsights_scored <- n_scored
+      }
     }, error = function(e) {
       message("  [WARN] Kidsights scoring failed: ", e$message)
       transformed_data$kidsights_theta <<- NA_real_

@@ -14,7 +14,7 @@
 #   Rscript scripts/mn26/reconciliation_audit.R
 #
 # Prerequisites:
-#   - MN26 REDCap API credentials at C:/my_auths/kidsights_redcap_norc_test_MN.csv
+#   - MN26 REDCap API credentials at C:/my_auths/kidsights_redcap_norc_MN_2026.csv
 #   - NE25 dictionary cached at data/export/ne25/ne25_data_dictionary.csv
 #   - kidsights-norc repo at C:/Users/marcu/git-repositories/kidsights-norc
 # ==============================================================================
@@ -36,7 +36,7 @@ for (pkg in required_packages) {
 # Paths
 project_root <- normalizePath(".", winslash = "/")
 norc_repo    <- "C:/Users/marcu/git-repositories/kidsights-norc"
-mn26_creds   <- "C:/my_auths/kidsights_redcap_norc_test_MN.csv"
+mn26_creds   <- "C:/my_auths/kidsights_redcap_norc_MN_2026.csv"
 ne25_dict_path <- file.path(project_root, "data/export/ne25/ne25_data_dictionary.csv")
 redcap_url   <- "https://unmcredcap.unmc.edu/redcap/api/"
 

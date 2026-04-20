@@ -11,7 +11,7 @@ redcap:
 
   # API credentials file location (NOT committed to git)
   # Override via REDCAP_API_CREDENTIALS_PATH_MN26 env var in .env
-  api_credentials_file: "C:/my_auths/kidsights_redcap_norc_test_MN.csv"
+  api_credentials_file: "C:/my_auths/kidsights_redcap_norc_MN_2026.csv"
 
   # MN26 uses 1-2 REDCap projects (vs NE25's 4)
   # PIDs are loaded dynamically from credentials CSV

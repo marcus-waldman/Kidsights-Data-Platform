@@ -15,6 +15,11 @@ library(REDCapR)
 library(httr)
 library(dplyr)
 
+# Shared utility for combining data frames with mixed column types
+# (needed for multi-project REDCap extracts where timestamp columns may be
+# character in some projects and datetime in others)
+source("R/utils/flexible_bind_rows.R")
+
 #' Load MN26 API credentials from CSV file
 #'
 #' CSV format: project, pid, api_code
@@ -204,8 +209,9 @@ extract_mn26_data <- function(credentials,
     stop("No data retrieved from any MN26 REDCap project")
   }
 
-  # Combine data from all projects
-  combined_data <- dplyr::bind_rows(all_data)
+  # Combine data from all projects (resolves type conflicts — e.g., timestamps
+  # that are character in some projects and datetime in others)
+  combined_data <- flexible_bind_rows(all_data)
 
   # Ensure ZIP codes are character (preserve leading zeros)
   if ("sq001" %in% names(combined_data)) {
