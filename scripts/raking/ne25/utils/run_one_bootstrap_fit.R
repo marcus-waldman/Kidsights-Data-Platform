@@ -98,14 +98,23 @@ run_one_bootstrap_fit <- function(m, b,
   # -------------------------------------------------------------------------
   # Call Stan wrapper with Bayesian-bootstrap prior.
   #
-  # NOTE: init is deliberately 0 (cold start) rather than the baseline
-  # wgt_raw. Warm-starting from the baseline caused cmdstanr's constrained
-  # -> unconstrained transform to blow up on boundary-adjacent wgt_raw
-  # values, triggering "Fitting failed" during gradient evaluation. Cold
-  # start takes longer per fit (~3 min vs ~1 min warm) but is numerically
-  # robust. We keep baseline_wgt_raw loaded so a future iteration could
-  # test a clipped warm-start (e.g., pmax(baseline, eps)) without a
-  # worker signature change.
+  # init = 0 (cold start). Why not warm-start from baseline_wgt_raw?
+  # Two sub-problems combine:
+  #   (1) Baseline wgt_raw has 140-266 obs (per imputation) with values
+  #       <= 1e-8 (down to ~5e-13) -- observations pinned at the min_wgt
+  #       floor. cmdstanr's constrained -> unconstrained simplex transform
+  #       is log-based; log(~5e-13) ~= -28 -> infinite gradients on iter 1.
+  #       Fixed by clipping to eps = 1e-6 before passing as init; empirical
+  #       smoke test confirms stan_ok = TRUE with clip+renormalize.
+  #   (2) Even with the clip fix, Stan's L-BFGS here is iteration-limited
+  #       (not tolerance-limited): gradient plateaus at ~4e-7 well above
+  #       tol_grad=1e-10, so the optimizer always runs to iter = 1000
+  #       regardless of starting point. Warm-start in smoke test ran ~30%
+  #       slower (230s vs 180s cold) due to transform overhead + plateau
+  #       wandering without a compensating iteration-count reduction.
+  # Net: warm-start is recoverable numerically but not profitable here.
+  # Keep cold-start as the active path. baseline_wgt_raw stays loaded so
+  # a future run with tuned iter (e.g., iter=200) could profitably revisit.
   # -------------------------------------------------------------------------
   result <- calibrate_weights_simplex_factorized_stan(
     data             = ne25,
