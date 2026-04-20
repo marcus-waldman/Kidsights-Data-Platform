@@ -774,20 +774,59 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
 
     # STEP 6.9: OPTIONAL - JOIN CALIBRATED WEIGHTS IF AVAILABLE
     # NOTE: Must be done BEFORE Step 7 (database storage) so weights are included in database
+    #
+    # Reads from the long-format ne25_raked_weights DuckDB table (M=5
+    # imputations; see todo/ne25_weights_roadmap.md and
+    # docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd section 5.1). This join pulls
+    # the m=1 weights as the backward-compatible default `calibrated_weight`
+    # column on ne25_transformed; MI-aware analysis should join per-imputation
+    # weights from ne25_raked_weights directly.
+    #
+    # Falls back to the legacy feather file if the table doesn't exist (for
+    # environments where the Bucket 2 migration hasn't been applied yet).
     message("\n--- Step 6.9: Checking for Calibrated Weights ---")
-    weights_file <- "data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather"
 
-    if (file.exists(weights_file)) {
-      message("Found calibrated weights file. Attempting to join...")
+    weights_from_db <- tryCatch({
+      db_path_for_weights <- Sys.getenv("KIDSIGHTS_DB_PATH")
+      if (db_path_for_weights == "") {
+        db_path_for_weights <- "data/duckdb/kidsights_local.duckdb"
+      }
+      con_w <- DBI::dbConnect(duckdb::duckdb(), db_path_for_weights, read_only = TRUE)
+      on.exit(DBI::dbDisconnect(con_w, shutdown = TRUE), add = TRUE)
+      tbls <- DBI::dbListTables(con_w)
+      if (!"ne25_raked_weights" %in% tbls) {
+        NULL
+      } else {
+        # m=1 as the backward-compat default; MI analysis uses the long table directly
+        DBI::dbGetQuery(con_w, "
+          SELECT pid, record_id, calibrated_weight
+          FROM ne25_raked_weights
+          WHERE imputation_m = 1
+        ")
+      }
+    }, error = function(e) {
+      message(paste("  (DuckDB read failed:", e$message, "- will try feather fallback)"))
+      NULL
+    })
+
+    legacy_weights_file <- "data/raking/ne25/ne25_weights/ne25_calibrated_weights_m1.feather"
+
+    weights_to_join <- NULL
+    weights_source <- NA_character_
+    if (!is.null(weights_from_db) && nrow(weights_from_db) > 0) {
+      weights_to_join <- weights_from_db
+      weights_source <- "ne25_raked_weights (DuckDB, imputation_m=1)"
+    } else if (file.exists(legacy_weights_file)) {
+      weights_data <- arrow::read_feather(legacy_weights_file)
+      weights_to_join <- weights_data %>%
+        dplyr::select(pid, record_id, calibrated_weight)
+      weights_source <- paste("legacy feather:", legacy_weights_file)
+    }
+
+    if (!is.null(weights_to_join)) {
+      message(sprintf("Found calibrated weights. Source: %s", weights_source))
 
       tryCatch({
-        # Load weights
-        weights_data <- arrow::read_feather(weights_file)
-
-        # Extract weight column and join key
-        weights_to_join <- weights_data %>%
-          dplyr::select(pid, record_id, calibrated_weight)
-
         message(sprintf("  - Loaded %d weight records", nrow(weights_to_join)))
 
         # Join to final_data via (pid, record_id)
@@ -804,7 +843,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
                        n_matched, 100 * n_matched / n_before, n_before))
 
         if (n_matched < n_before) {
-          message(sprintf("  - WARNING: %d records have no matching weight", n_before - n_matched))
+          message(sprintf("  - NOTE: %d records have no matching weight (out-of-state; see Step 6.10)",
+                          n_before - n_matched))
         }
 
         message("  ✓ Calibrated weights successfully joined to transformed data")
@@ -814,13 +854,19 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
         message("  Continuing without weights")
       })
     } else {
-      message("  - No calibrated weights file found. Continuing without weights.")
-      message(sprintf("    Expected location: %s", weights_file))
-      message("    To generate weights, run scripts 25-33 in the raking pipeline.")
+      message("  - No calibrated weights available. Continuing without weights.")
+      message("    Expected: ne25_raked_weights DuckDB table populated (run")
+      message("    scripts/raking/ne25/run_ne25_raking_full.R), or legacy feather at")
+      message(sprintf("    %s", legacy_weights_file))
     }
 
-    # STEP 6.10: BANDAID FIX - Mark out-of-state records (meets_inclusion=T but no weight)
-    message("\n--- Step 6.10: Marking Out-of-State Records ---")
+    # STEP 6.10: OUT-OF-STATE EXCLUSION - Mark records with no ZCTA->PUMA match
+    # These records have zipcodes not in the Nebraska ZCTA->PUMA crosswalk, so
+    # the calibration pipeline cannot produce a weight for them. They are
+    # genuinely out-of-state (or have invalid zipcodes); exclusion is the
+    # correct final treatment, not a workaround. Marked as out_of_state=TRUE
+    # for audit trail, and meets_inclusion=FALSE for analytic filtering.
+    message("\n--- Step 6.10: Out-of-State Exclusion ---")
 
     # If meets_inclusion=T but calibrated_weight is NA, set out_of_state=T and meets_inclusion=F
     final_data <- final_data %>%
