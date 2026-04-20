@@ -398,6 +398,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 - **NHIS Pipeline:** [docs/nhis/](docs/nhis/) - NHIS variables reference, pipeline usage, testing guide, transformation mappings
 - **NSCH Pipeline:** [docs/nsch/](docs/nsch/) - Database schema, example queries, troubleshooting, variables reference
 - **Raking Targets:** [docs/raking/](docs/raking/) - Raking targets pipeline, statistical methods, implementation plan
+- **NE25 Weight Construction:** [docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) - Narrative: method, rationale, and roadmap (render to HTML with `quarto render`)
 - **Imputation Pipeline:** [docs/imputation/](docs/imputation/) - Multiple imputation architecture, helper functions, usage examples
 - **IRT Calibration:** [docs/irt_scoring/](docs/irt_scoring/) - Calibration pipeline, Mplus workflow, constraint specification, quality assurance tools
 
@@ -468,7 +469,7 @@ pip install pyreadstat
   - **Target Moments:** Pooled across ACS (25%), NHIS (17%), NSCH (58%) with effective sample sizes per block
   - **Database Column:** `calibrated_weight` in `ne25_transformed` table
   - **Execution:** Scripts 25-33 in raking pipeline (~10 minutes total)
-  - **Documentation:** See [Raking Integration Guide](docs/raking/RAKING_INTEGRATION.md)
+  - **Documentation:** See [Raking Integration Guide](docs/raking/RAKING_INTEGRATION.md) for operator detail and [Weight Construction narrative](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) for method/rationale/roadmap
 - **Out-of-State Handling (Step 6.10):** Bandaid fix for records with no PUMA match
   - **Problem:** 140 records from out-of-state zipcodes (no match in ZCTA→PUMA crosswalk)
   - **Solution:** Marked as `out_of_state = TRUE` and excluded with `meets_inclusion = FALSE`

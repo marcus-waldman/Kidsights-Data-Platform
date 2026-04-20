@@ -1,0 +1,417 @@
+---
+title: "NE25 Weight Construction"
+subtitle: "Method, Rationale, and Roadmap for Calibrated Raking Weights"
+author: "Kidsights Data Platform"
+date: last-modified
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+    number-sections: true
+    code-fold: false
+    theme: cosmo
+    embed-resources: true
+    smooth-scroll: true
+    fig-cap-location: bottom
+---
+
+::: {.callout-note}
+This is the **narrative** document for NE25 weight construction. It explains *why* the weights are built the way they are, gives a one-page mental model of the pipeline, and tracks outstanding work. It deliberately does **not** duplicate math, operational run instructions, or per-variable diagnostics — those live in the cross-referenced documents listed in [References](#references).
+
+**Audience:** methodological reviewers first, future maintainers second. A reader who has never opened this repository should be able to leave knowing why raking was done, why *this flavor* of raking, how the pipeline is laid out, and what remains to finish.
+:::
+
+# Executive Summary
+
+The Nebraska 2025 (NE25) study is a **convenience sample** of 0–5-year-olds recruited via REDCap. To make population inference on Nebraska, the sample is reweighted to match **24 calibration targets** pooled from three external benchmarks: the American Community Survey (ACS), the National Health Interview Survey (NHIS), and the National Survey of Children's Health (NSCH). The weights are produced by a **CmdStan optimization** that minimizes a two-part loss: the weighted sample is pulled toward (i) the full **target mean vector** (all 24 means, each residual standardized by its target standard deviation) *and* (ii) the **observed blocks of the factorized target covariance matrix** (488 of 576 cells, each residual standardized to correlation scale). The 88 structurally unobservable covariance cells are masked out and contribute nothing to the loss.
+
+The headline numbers for the current production run (M = 1 imputation):
+
+| Quantity                              | Value                 |
+|---------------------------------------|-----------------------|
+| Harmonized records (`meets_inclusion=TRUE` pre-join) | 2,785                 |
+| Records with weights (post-Step 6.10) | **2,645**             |
+| Out-of-state records (no ZCTA→PUMA match) | 140                   |
+| Calibration variables                 | 24                    |
+| Observed covariance mask coverage     | 488 / 576 = 84.7%     |
+| Correlation RMSE (unweighted → weighted) | 0.0381 → **0.0107** (71.9% ↓) |
+| Kish effective N                      | **1,518.9**           |
+| Weight efficiency                     | 57.4%                 |
+| Weight ratio (max/min)                | 33.55                 |
+
+Full per-variable diagnostics live in [`RAKING_INTEGRATION.md`](../RAKING_INTEGRATION.md).
+
+# Rationale: Why This Approach
+
+## The problem
+
+The NE25 recruitment pipeline does not draw a probability sample from the target population (Nebraska residents aged 0–5). Without adjustment, summary statistics and regression coefficients from the raw sample are biased estimators of the population quantities they are meant to describe. The standard remedy — post-stratification weighting — requires a target distribution over calibration variables that is both trustworthy and measurable on the sample.
+
+No single external survey covers everything NE25 measures. ACS has PUMA geography and rich demographics but no mental-health or child-outcome items; NHIS has PHQ-2 and GAD-2 at the parent level but no PUMA; NSCH has child health ratings but limited geography. The sample therefore needs to be calibrated against a *union* of partially overlapping benchmarks.
+
+## Design constraints
+
+Four constraints shaped the choice of estimator:
+
+1. **Block-diagonal covariance observability.** Because the three benchmarks are disjoint surveys, certain cross-variable covariances are structurally unobservable — e.g., PUMA × PHQ-2, because no single record has both. The target covariance matrix is therefore **singular by construction** (rank deficient), with condition number ≈ 10^14.
+2. **Moderate sample size.** With ~2,600 calibrated records and 24 targets, any approach with N-order parameters must rely on smoothing rather than convergence-via-data.
+3. **Single weight column for downstream use.** Analysts use `survey::svyglm` and `srvyr` pipelines and expect one weight per row. Bayesian posteriors or multi-run ensembles cannot be the final deliverable without a collapsing rule.
+4. **Variance estimation compatibility.** Bootstrap variance for ACS estimands is already in place ([`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)); the weight estimator must not foreclose carrying that uncertainty forward.
+
+## Alternatives considered
+
+Four alternatives were implemented and rejected in the repository. The archaeology is still visible in script 27/28 triplets and in the stub Stan model `rake_to_targets.stan`.
+
+::: {.callout-tip icon=false}
+### Classical raking / IPF (`survey::rake`, `rake_to_targets.R`)
+
+Iterative proportional fitting adjusts weights by looping over *marginals*. It cannot match a covariance structure, so it cannot use the 488 observed off-diagonal cells in the target covariance matrix. For calibration against 24 variables whose joint distribution carries signal beyond the marginals, this is a lossy projection. Implemented as scripts `27_rake_nhis_to_nebraska.R` and `28_rake_nsch_to_nebraska.R`; both are deprecated.
+:::
+
+::: {.callout-tip icon=false}
+### Propensity scoring (`26_estimate_propensity_model.R` + `27_apply_propensity_nhis.R`)
+
+A logistic model for "is this observation from Nebraska?" produces inverse-propensity weights for NHIS/NSCH records against an ACS Nebraska reference. In practice, pooling across three surveys with non-overlapping variable sets left the propensity model chronically misspecified and the resulting weight ratios unacceptable. Kept in the tree as an implemented-but-unused alternative.
+:::
+
+::: {.callout-tip icon=false}
+### Two-stage calibrate-to-Nebraska (`27_calibrate_nhis_to_nebraska.R`, `28_calibrate_nsch_to_nebraska.R`)
+
+An intermediate design that first reweighted NHIS and NSCH to match ACS Nebraska targets, then pooled the reweighted samples. Conceptually reasonable but accumulates error across two optimizations. Superseded by the current one-shot design that pools *moments* (not records) once in script `30b_pool_moments.R` and calibrates NE25 directly against the pooled moments.
+:::
+
+::: {.callout-tip icon=false}
+### Log-linear (K+1) parameter calibration
+
+The classical Deville–Särndal calibration form `log(w_i) = α + X_i β` was explicitly considered and rejected by the developers: with K = 24 calibration variables and constraints on both 24 means and 488 covariance elements, a 25-parameter model is under-constrained relative to the target structure. See [`KL_DIVERGENCE_WEIGHTING.md`](KL_DIVERGENCE_WEIGHTING.md) §"Method: Simplex Parameterization" ("too constrained for 24 variables").
+
+**Terminology warning:** older comments in `33_compute_kl_divergence_weights.R` and sections of `RAKING_INTEGRATION.md` still describe the production model as log-linear K+1. This is **not correct** — the code actually calls a simplex-N Stan model. See [Terminology](#terminology-authoritative) below. The mislabeled output is tracked in the roadmap as a P1 cleanup item.
+:::
+
+## Why masked factorized KL
+
+The chosen estimator — a simplex-N-parameter model with a masked KL-divergence loss — was selected because it is the only one of the four that jointly (a) matches the full **target mean vector** over all 24 calibration variables, (b) matches the **observed blocks of the target covariance structure** while ignoring the structurally unobservable cross-blocks, (c) produces smooth, bounded weights, and (d) accommodates a rank-deficient target matrix without ad-hoc regularization. Classical IPF achieves (a) but not (b); the log-linear form struggles with (c) and (d) at K = 24; propensity scoring collapses (a) and (b) into a single logit that doesn't hold up across disjoint surveys. The Stan implementation adds two practical conveniences on top: inside-model Z-score standardization, and a soft prior on Kish efficiency that acts as a regularizer against extreme weights.
+
+# Method: How the Weights Are Calculated
+
+This section is deliberately thin. Mathematical detail lives in [`KL_DIVERGENCE_WEIGHTING.md`](KL_DIVERGENCE_WEIGHTING.md); Stan internals live in [`STAN_RAKING_MODEL.md`](../../../scripts/raking/ne25/STAN_RAKING_MODEL.md).
+
+## Terminology (authoritative) {#terminology-authoritative}
+
+Four terms recur across docs and are sometimes used inconsistently. This table is the single source of truth for this repository:
+
+| Term          | Definition                                                                                                                                                                       |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Simplex**   | Describes the Stan parameterization. Weights are declared `simplex[N] wgt_raw` — one free parameter per observation, constrained to sum to 1. See [`calibrate_weights_simplex_factorized.stan:102`](../../../scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.stan). This is the **production model**. |
+| **Log-linear** | Describes the *alternative* parameterization `log(w_i) = α + X_i β` (25 parameters: 1 intercept + 24 slopes). Rejected. Still mentioned in stale runtime output and parts of `RAKING_INTEGRATION.md` — those are bugs, not the implementation. |
+| **Factorized** | Describes the **block structure** of the target covariance. The 24 × 24 matrix breaks into Block 1 (7 demographics + 14 PUMAs, from pooled ACS/NHIS/NSCH / ACS alone), Block 2 (2 mental-health items, NHIS only), Block 3 (1 child outcome, NSCH only). Cross-blocks involving surveys that can't jointly observe their variables are **unidentified by design**. |
+| **Masked**    | Describes what the loss function *ignores*. A 24 × 24 binary `cov_mask` marks the 488 observed covariance cells with 1 and the 88 structurally unobservable cells with 0. The KL loss sums squared standardized residuals only over the `cov_mask == 1` cells. |
+
+One more subtle point: the loss *also* standardizes the observed covariance residuals by `σ_target[i] × σ_target[j]`, which converts them into correlation-scale residuals. The estimator is therefore better described as **correlation-matching** than covariance-matching — this is why the headline diagnostic is correlation RMSE, not covariance RMSE.
+
+## Pipeline in one page
+
+```
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                       TARGET CONSTRUCTION                        │
+ │                                                                  │
+ │  scripts 25 → 30b                                                │
+ │  ACS (North Central subset)                                      │
+ │     ├─ 25  extract                                               │
+ │     ├─ 26  propensity model                (used by deprecated)  │
+ │     └─ 29  design matrices                                       │
+ │  NHIS / NSCH pooled demographics                                 │
+ │     └─ 30  per-source covariance matrices                        │
+ │  30b  pool_moments  →  unified_moments.rds                       │
+ │                        (μ vector, Σ matrix, cov_mask, n_eff)     │
+ └──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                        HARMONIZATION                             │
+ │                                                                  │
+ │  script 32  prepare_ne25_for_weighting                           │
+ │     ne25_transformed (meets_inclusion=TRUE, 2,785 rows)          │
+ │        ├─ MICE CART imputation (m = 1; m = 2..5 deferred)        │
+ │        ├─ harmonize_puma, harmonize_demographics,                │
+ │        │  harmonize_outcomes                                     │
+ │        └─ emit  ne25_harmonized_m1.feather                       │
+ │                (2,785 rows × 27 cols = pid + record_id +         │
+ │                 study_id + 24 calibration variables)             │
+ └──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                       WEIGHT OPTIMIZATION                        │
+ │                                                                  │
+ │  script 33  compute_kl_divergence_weights                        │
+ │     utils/calibrate_weights_simplex_factorized_cmdstan.R         │
+ │        wraps calibrate_weights_simplex_factorized.stan           │
+ │     BFGS optimization over simplex[N] wgt_raw                    │
+ │        loss = ½ ( Σ (μ̂−μ*)²/σ*² + Σ_mask ρ̂/ρ* residuals )       │
+ │        → ne25_calibrated_weights_m1.feather  (2,645 × 28)        │
+ │        → calibration_diagnostics_m1.rds                          │
+ └──────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+ ┌──────────────────────────────────────────────────────────────────┐
+ │                     PIPELINE INTEGRATION                         │
+ │                                                                  │
+ │  pipelines/orchestration/ne25_pipeline.R                         │
+ │     Step 6.9   left-join calibrated_weight by (pid, record_id)   │
+ │                if weights feather present (soft dependency)      │
+ │     Step 6.10  140 out-of-state records get out_of_state = TRUE  │
+ │                and meets_inclusion flipped to FALSE              │
+ │     Step 7     persist to ne25_transformed in DuckDB             │
+ └──────────────────────────────────────────────────────────────────┘
+```
+
+Operational run commands for each stage are documented in [`RAKING_INTEGRATION.md`](../RAKING_INTEGRATION.md#weight-generation-pipeline).
+
+## What the loss actually does
+
+In plain English: the objective measures how far the **weighted sample** is from the **target benchmarks**, in two senses. First, for each of the 24 calibration variables, the weighted sample mean should match the target mean; the residual is standardized by the target standard deviation, which converts the distance into a Z-score. Second, for each of the 488 covariance cells that is actually observable, the weighted sample covariance should match the target covariance; that residual is standardized by the product of the two variables' target standard deviations, which converts the distance onto correlation scale. The loss is half the sum of both sets of squared standardized residuals. The 88 structurally unobservable covariance cells — e.g., PUMA × PHQ-2 — contribute nothing to the loss because no target value exists for them.
+
+The next four subsections make this precise. The math matters here because "masked factorized KL divergence" is not a standard technique in the survey calibration literature — the name is inherited from entropy-balancing raking but the objective differs from the classical KL form in structurally important ways, and a reviewer should see exactly what was optimized.
+
+### Notation
+
+Let:
+
+- $N$ = 2,645 (in-state records with a valid Nebraska ZCTA→PUMA match; see §[3.2](#pipeline-in-one-page) Step 6.10) and $K = 24$ (calibration variables).
+- $X \in \mathbb{R}^{N \times K}$: the harmonized design matrix.
+- $\mu^{\ast} \in \mathbb{R}^{K}$: target mean vector, pooled across ACS/NHIS/NSCH via effective-sample-size weighting in script `30b_pool_moments.R`.
+- $\Sigma^{\ast} \in \mathbb{R}^{K \times K}$: target covariance matrix, **singular by construction** (block-factorized across three disjoint surveys; see below).
+- $\sigma^{\ast}_k \equiv \sqrt{\Sigma^{\ast}_{kk}}$: target standard deviations.
+- $M \in \{0, 1\}^{K \times K}$: the **covariance mask**, with $M_{ij} = 1$ iff the $(i, j)$ cell of $\Sigma^{\ast}$ is identified by some data source that jointly observes variables $i$ and $j$.
+- $w \in \Delta^{N-1}$: the simplex-constrained weight vector, $w_i \geq 0$ and $\sum_i w_i = 1$. Final analyst-facing weights are $N \cdot w$, constrained to $[w_{\min}, w_{\max}] = [0.01, 100]$.
+
+### Empirical weighted moments
+
+The weighted sample moments induced by $w$ are
+$$
+\hat{\mu}_k(w) \;=\; \sum_{i=1}^{N} w_i \, X_{ik}, \qquad k = 1, \ldots, K,
+$$
+$$
+\hat{\Sigma}_{ij}(w) \;=\; \sum_{n=1}^{N} w_n \bigl(X_{ni} - \hat{\mu}_i(w)\bigr) \bigl(X_{nj} - \hat{\mu}_j(w)\bigr).
+$$
+
+### The objective function
+
+The Stan model minimizes
+$$
+\mathcal{L}(w) \;=\; \frac{1}{2} \underbrace{\sum_{k=1}^{K} \left( \frac{\hat{\mu}_k(w) - \mu^{\ast}_k}{\sigma^{\ast}_k} \right)^{2}}_{\text{mean matching (all 24 targets)}} \;+\; \frac{1}{2} \underbrace{\sum_{\substack{i, j = 1 \\ M_{ij} = 1}}^{K} \left( \frac{\hat{\Sigma}_{ij}(w) - \Sigma^{\ast}_{ij}}{\sigma^{\ast}_i \, \sigma^{\ast}_j} \right)^{2}}_{\text{masked covariance matching (488 of 576 cells)}}.
+$$
+
+Two features of this form deserve emphasis:
+
+1. **The mean-matching term uses a *diagonal* weighting**, not a full Mahalanobis metric. Classical calibration would use $(\hat{\mu} - \mu^{\ast})^{\top} \Sigma^{\ast\,-1} (\hat{\mu} - \mu^{\ast})$, but $\Sigma^{\ast}$ is singular by construction and cannot be inverted. Using only the diagonal $\sigma^{\ast}_k$ for mean-matching sidesteps the singularity without having to regularize $\Sigma^{\ast}$ itself.
+2. **The covariance-matching term is normalized to correlation scale.** Since $\frac{\hat{\Sigma}_{ij} - \Sigma^{\ast}_{ij}}{\sigma^{\ast}_i \sigma^{\ast}_j} \approx \hat{\rho}_{ij} - \rho^{\ast}_{ij}$ when the variances are well-matched (which the $i = j$ diagonal terms in this same sum enforce), the estimator is effectively **correlation-matching**, not raw-covariance matching. This is why the headline diagnostic in §[3.4](#interpretation-of-diagnostics) is correlation RMSE.
+
+### Why this is not a classical KL divergence
+
+The "KL divergence" label is inherited from the entropy-balancing raking literature (Hainmueller 2012; Zhang 2000), where the objective takes the form
+$$
+\min_{w} \; \mathrm{KL}\!\left(w \,\|\, 1/N\right) \;=\; \sum_{i=1}^{N} w_i \log\!\bigl(N w_i\bigr) \qquad \text{subject to} \quad \sum_i w_i X_{ik} = \mu^{\ast}_k \; \forall k.
+$$
+That **is** a genuine KL divergence — between the weight distribution $w$ and the uniform distribution $1/N$ — with moment-matching as *hard* equality constraints. The estimator deployed here differs from that template in three structural ways:
+
+1. **Moment matches are soft, not hard.** The squared standardized residuals in $\mathcal{L}(w)$ are *penalties*, not equality constraints. This is necessary because with $K = 24$ mean constraints *and* 488 masked covariance constraints against a singular target, exact simultaneous satisfaction is generically infeasible; soft penalties degrade gracefully when constraints are in mild tension.
+2. **The entropy term is absent.** The Stan model's Dirichlet($\mathbf{1}$) prior on $w_{\text{raw}}$ is *flat* over the simplex (concentration = 1, i.e., uniform). It supplies the simplex support and nothing else — it is not contributing an entropy regularizer.
+3. **Covariance targets, not just marginals.** Classical raking/entropy balancing matches marginal means only. The objective here extends the target space to include 488 off-diagonal covariance cells, which is what makes the technique nonstandard.
+
+A more honest name for what is being minimized is a **masked moment-matching loss with correlation-scale weighting** — effectively a generalized method of moments (GMM) objective with a block-structured weighting matrix whose unobservable blocks are zeroed out. The "KL divergence" nomenclature is kept here because it is already used throughout the repository (`33_compute_kl_divergence_weights.R`, `KL_DIVERGENCE_WEIGHTING.md`), but a reviewer should read it as a **convention**, not a technical description.
+
+### Factorized target structure
+
+The target covariance $\Sigma^{\ast}$ decomposes into blocks corresponding to the four observability regimes of the calibration variables:
+
+- **A** — 7 pooled demographics (`male`, `age`, `white_nh`, `black`, `hispanic`, `educ_years`, `poverty_ratio`), identified from all three benchmarks.
+- **B** — 14 PUMA indicators, identified only from ACS.
+- **C** — 2 parent mental-health items (`phq2_total`, `gad2_total`), identified only from NHIS.
+- **D** — 1 child health rating (`excellent_health`), identified only from NSCH.
+
+The full $24 \times 24$ target covariance has this block layout:
+
+$$
+\Sigma^{\ast} \;=\;
+\begin{pmatrix}
+\Sigma^{\ast}_{AA} & \Sigma^{\ast}_{AB} & \Sigma^{\ast}_{AC} & \Sigma^{\ast}_{AD} \\[2pt]
+\Sigma^{\ast\,\top}_{AB} & \Sigma^{\ast}_{BB} & \boldsymbol{0} & \boldsymbol{0} \\[2pt]
+\Sigma^{\ast\,\top}_{AC} & \boldsymbol{0} & \Sigma^{\ast}_{CC} & \boldsymbol{0} \\[2pt]
+\Sigma^{\ast\,\top}_{AD} & \boldsymbol{0} & \boldsymbol{0} & \Sigma^{\ast}_{DD}
+\end{pmatrix}.
+$$
+
+The bold $\boldsymbol{0}$ entries represent cross-blocks that are structurally unidentified — no single data source jointly observes PUMA with parent mental health, PUMA with child outcomes, or parent mental health with child outcomes. These cells enter the target matrix as literal zeros, but they also have $M_{ij} = 0$ so they never enter the loss. Cell counts per block:
+
+| Block pair | Size     | Identified from           | $M_{ij}$ |
+|------------|----------|---------------------------|----------|
+| A × A      | 7 × 7    | Pooled ACS/NHIS/NSCH      | 1        |
+| A × B      | 7 × 14   | ACS                       | 1        |
+| A × C      | 7 × 2    | NHIS                      | 1        |
+| A × D      | 7 × 1    | NSCH                      | 1        |
+| B × B      | 14 × 14  | ACS                       | 1        |
+| B × C      | 14 × 2   | — (no joint observation)  | **0**    |
+| B × D      | 14 × 1   | — (no joint observation)  | **0**    |
+| C × C      | 2 × 2    | NHIS                      | 1        |
+| C × D      | 2 × 1    | — (no joint observation)  | **0**    |
+| D × D      | 1 × 1    | NSCH                      | 1        |
+
+The unobserved blocks total $2 \cdot (14 \cdot 2) + 2 \cdot (14 \cdot 1) + 2 \cdot (2 \cdot 1) = 88$ cells, leaving $576 - 88 = 488$ observed cells ≈ 84.7% coverage. This is the **factorization**: the observable support of $\Sigma^{\ast}$ is a strict subset of its 24 × 24 shape, and the estimator respects that subset exactly. The target matrix therefore does not need to be positive-definite, and the optimizer converges without having to invert it.
+
+### Regularization and parameterization
+
+Three model-level choices beyond the loss itself deserve flagging:
+
+- **Simplex parameterization.** Weights are declared `simplex[N] wgt_raw` and then scaled to $[w_{\min}, w_{\max}]$ and renormalized. This gives $N$ free parameters rather than the $K + 1$ of a log-linear form, enabling exact satisfaction of the simplex constraint without penalty terms.
+- **Dirichlet($\mathbf{1}$) prior.** Flat over the simplex. Contributes only the support; does not regularize against extreme weights.
+- **Soft prior on Kish efficiency.** The model block includes `efficiency_pct ~ Normal(100, 75)` on the *derived* quantity $100 \cdot N_{\text{eff}} / N$ where $N_{\text{eff}} = (\sum w)^2 / \sum w^2$. This is an unusual construct — a model statement on a transformed parameter rather than a raw one — and functions as a mild regularizer pushing the optimizer toward more uniform weights. At $\sigma = 75$ the prior is weak enough to bend, not dominate, the moment-matching terms.
+
+## Interpretation of diagnostics
+
+The calibration run produces four diagnostics a reviewer cares about. Rules of thumb for the NE25 setup:
+
+- **Correlation RMSE** — primary objective. Below 0.02 is strong; M = 1 achieved 0.0107. Above 0.05 warrants refitting with either relaxed weight bounds or more iterations.
+- **Kish effective N** — measures how much sample is "lost" to weight imbalance, defined as `(Σw)² / Σw²`. NE25 M = 1 achieved 1,518.9 (57.4% efficiency). Below 40% indicates extreme weight heterogeneity; above 80% suggests the targets are close to the unweighted sample and raking is cosmetic.
+- **Weight ratio** — `max(w) / min(w)`. At 33.55, NE25 is in the tolerable range for a convenience sample being pulled to a population target. A ratio above ~50 is concerning; above 100 suggests weight bounds should tighten.
+- **Per-variable marginal residual** — `|μ̂ − μ*| / |μ*|`. Mostly under 2% for NE25; the outlier is `gad2_total` at 19.8%, a known issue from hitting `max_iter` (see roadmap §[5.3](#p1-gad2_total-marginal-residual)).
+
+[`KL_DIVERGENCE_WEIGHTING.md`](KL_DIVERGENCE_WEIGHTING.md) quotes aspirational targets of 85–95% Kish efficiency; those numbers predate the full 24-variable production run and should be read as upper bounds rather than achieved state.
+
+# Archaeology: The Road Not Taken
+
+Three places in the tree contain artifacts that look like production code but aren't. Future maintainers should treat these as read-only historical evidence unless they are actively replacing the current approach.
+
+## Script variant map
+
+| Script(s)                                       | Status        | What it was / tried                                     | Why it isn't production                                                 |
+|-------------------------------------------------|---------------|---------------------------------------------------------|-------------------------------------------------------------------------|
+| `27_apply_propensity_nhis.R`, `28_apply_propensity_nsch.R` | **Deprecated** | Propensity-score reweighting using `26_estimate_propensity_model.R` | Propensity model on pooled cross-survey data was chronically misspecified |
+| `27_rake_nhis_to_nebraska.R`, `28_rake_nsch_to_nebraska.R` | **Deprecated** | Classical IPF via `utils/rake_to_targets.R`             | Cannot match a covariance structure; only marginals                     |
+| `27_calibrate_nhis_to_nebraska.R`, `28_calibrate_nsch_to_nebraska.R` | **Deprecated** | Two-stage calibrate-to-Nebraska design                  | Superseded by one-shot pooled-moment approach (script 30b → 33)         |
+| `33_compute_kl_weights_ne25.R`                  | **Stub**      | Intent-file for multi-imputation weight orchestration (M = 1..5) | KL optimization never implemented here; sits alongside the real `33_compute_kl_divergence_weights.R` |
+| `rake_to_targets.stan`, `rake_to_targets_cmdstan.R` | **Unused** | Alternative Stan model (logit-space squared marginal error) designed for scripts 27/28 | Never promoted into the pipeline that went into production              |
+| `02_estimate_sex.R`, `02_estimate_sex_final.R`  | **Deprecated** | Early `svyglm` implementations of the sex target        | Superseded by `02_estimate_sex_glm2.R` (see §[4.3](#glm-glm2-transition)) |
+| `03..07*` pre-`_glm2` variants                  | **Deprecated** | Same story as sex                                       | Same                                                                    |
+| `14_estimate_maternal_aces.R`, `14_estimate_maternal_aces_v2.R` | **Orphaned** | Maternal ACE estimand (Phase 3)                         | Phase 3 disabled in current orchestrator; unclear whether re-enabled    |
+| `18_estimate_nsch_outcomes.R` (pre-`_glm2`)     | **Deprecated** | Early NSCH outcomes implementation                      | Same refactor                                                           |
+
+## What to do with deprecated files
+
+The most conservative action is to move deprecated scripts to an `archive/` subdirectory with a one-line header noting the superseding script. Outright deletion is safe only after confirming no external notebooks or READMEs still reference them. This cleanup is tracked below as [P1 §5.4](#p1-deprecated-script-cleanup).
+
+## GLM → glm2 transition {#glm-glm2-transition}
+
+Several target-generation scripts exist in pre- and post-`_glm2` forms because of a refactor from `survey::svyglm` to `glm2::glm2` + bootstrap replicate weights. The change preserves statistical validity (replicate weights encode design) while simplifying code and speeding up bootstrap loops by 30–50%. Full rationale in [`GLM2_REFACTORING_PLAN.md`](GLM2_REFACTORING_PLAN.md). The `_glm2` versions are production; the originals are kept for diff-ability during the transition and should be removed once that's confirmed stable.
+
+# Roadmap: What Remains {#roadmap}
+
+This section is the de facto tracker for raking work. Items are prioritized P0 (blocker), P1 (non-blocking but important), P2 (nice-to-have), and sized S / M / L. Each item states the problem, the proposed approach, acceptance criteria, and dependencies.
+
+## P0 — Multi-imputation integration (M = 2..5) {#p0-multi-imputation}
+
+::: {.callout-warning icon=false}
+**Effort:** M · **Status:** not started
+
+**Problem.** Only `m = 1` weights exist. The downstream analysis pipeline uses 5 imputations of sociodemographic, childcare, and mental-health variables ([NE25 Status — Imputation Pipeline](../../../CLAUDE.md#-imputation-pipeline---production-ready-december-2025)), but currently reuses the same `m = 1` weights across `m = 2..5`. That implicitly assumes imputation variation does not propagate to the calibration structure — plausible for mean-matching, questionable for covariance-matching.
+
+**Approach (Option B).** Run script 33 for each `m ∈ {1, 2, 3, 4, 5}`, producing `ne25_calibrated_weights_m{1..5}.feather`. In the pipeline integration step, join the correct file per imputation. Stan compilation can be cached so the incremental cost per imputation is pure optimization time (~2–5 minutes each).
+
+**Option A** (continue reusing M = 1 weights) is the current interim state and is acceptable for analysis plans that explicitly state the assumption and do not rely on precise variance estimates.
+
+**Acceptance criteria:**
+
+1. Five feather files produced, each with the in-state record count (2,645 for M = 1; may differ across imputations if the set of complete cases shifts).
+2. Step 6.9 of the pipeline joins per-imputation weights by `(pid, record_id, imputation_m)`.
+3. Diagnostics comparable across imputations — no catastrophic drift in Kish N or correlation RMSE.
+
+**Dependencies.** Script 32 needs to run for `m ∈ 2..5`; the stub `33_compute_kl_weights_ne25.R` is the intended orchestration wrapper and should be completed or replaced.
+:::
+
+## P1 — `gad2_total` marginal residual {#p1-gad2_total-marginal-residual}
+
+::: {.callout-note icon=false}
+**Effort:** S · **Status:** known issue
+
+**Problem.** At M = 1, the weighted mean of `gad2_total` is 19.8% off its target. Correlation matching was the primary objective and was achieved (RMSE 0.0107), but this marginal residual is a blemish.
+
+**Approach.** Raise the L-BFGS `max_iter` from 100 to 200–500 and refit. If marginal residual does not improve, the issue is tension between mean-matching and correlation-matching constraints — in that case, rebalance the two loss terms (currently both weighted 0.5) or relax weight bounds.
+
+**Acceptance criteria:** `gad2_total` marginal residual < 5%, with no degradation of correlation RMSE beyond 0.015.
+:::
+
+## P1 — Deprecated script cleanup {#p1-deprecated-script-cleanup}
+
+::: {.callout-note icon=false}
+**Effort:** S · **Status:** not started
+
+**Problem.** The variants table in §[4.1](#script-variant-map) lists 10+ deprecated/orphaned scripts living alongside production code. They confuse new maintainers and inflate the size of `scripts/raking/ne25/` beyond what its active use justifies.
+
+**Approach.** Create `scripts/raking/ne25/archive/` and move deprecated scripts there with a one-line header noting the superseding script. Leave orchestrators (`run_complete_pipeline.R`, `run_raking_targets_pipeline.R`) and production-path scripts in place.
+
+**Related subtask: fix misleading "Linear calibration (K+1 parameters)" runtime output in `33_compute_kl_divergence_weights.R` lines ~170–174** — the print statements describe a log-linear model but the code calls a simplex-N model. Fix the print output and any stale `RAKING_INTEGRATION.md` paragraphs that describe the model as log-linear.
+
+**Acceptance criteria:** production tree grep for `_apply_propensity_`, `_rake_nhis`, `_rake_nsch`, `compute_kl_weights_ne25.R`, or `rake_to_targets` returns no active-path hits.
+:::
+
+## P2 — Bootstrap variance for raked weights {#p2-bootstrap-variance}
+
+::: {.callout-note icon=false}
+**Effort:** L · **Status:** design only
+
+**Problem.** Bootstrap replicates exist for the ACS *targets* (4096 per estimand, via [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)) but the downstream *weights* are currently treated as fixed quantities. A fully rigorous uncertainty propagation would refit weights against each bootstrap draw of the targets.
+
+**Approach.** Distill the 4096 ACS replicates into ~200 representative draws, refit weights per draw, and store a `calibrated_weight_boot_{1..200}` matrix alongside the point-estimate weights. Downstream `survey::svyglm` users can then ignore the bootstrap matrix or use it for variance estimation per Rubin's rules.
+
+**Acceptance criteria:** per-observation bootstrap weight matrix available; at least one analysis demonstrates variance inflation vs. fixed-weight approach.
+:::
+
+## P2 — Publication-ready diagnostics report {#p2-publication-diagnostics}
+
+::: {.callout-note icon=false}
+**Effort:** S · **Status:** design only
+
+**Problem.** `calibration_diagnostics_m1.rds` is a flat R object that's hard to present. Reviewers expect a renderable report.
+
+**Approach.** Write a Quarto template (`scripts/raking/ne25/calibration_diagnostics_report.qmd`) that reads any `calibration_diagnostics_m*.rds` and produces a styled HTML report with weight distributions, marginal residual tables, and correlation-improvement heatmaps. Rendering becomes a final step of the production pipeline.
+
+**Acceptance criteria:** running `quarto render calibration_diagnostics_report.qmd --execute-param imputation=1` produces a self-contained HTML suitable for emailing to a methodological reviewer.
+:::
+
+## Out of scope
+
+These will not be done as part of the NE25 weighting project:
+
+- **Reweighting to states other than Nebraska.** Targets are structurally NE-specific.
+- **Formal comparison against `survey::rake` or `anesrake`.** Rejected alternatives are documented; head-to-head benchmarking would be a methodological paper, not a data-platform task.
+- **Bayesian posterior over weights.** The simplex parameterization technically admits a full HMC pass, but the cost/benefit doesn't justify it for the analysis goals.
+
+# References
+
+**Operator guide (primary cross-reference):**
+- [`RAKING_INTEGRATION.md`](../RAKING_INTEGRATION.md) — end-to-end run commands, full per-variable diagnostics, Step 6.9 / 6.10 integration detail.
+
+**Method detail:**
+- [`KL_DIVERGENCE_WEIGHTING.md`](KL_DIVERGENCE_WEIGHTING.md) — masked KL loss math, factorized covariance structure, block-by-block variable breakdown.
+- [`STAN_RAKING_MODEL.md`](../../../scripts/raking/ne25/STAN_RAKING_MODEL.md) — Stan model internals for the (deprecated) rake-to-targets model. Useful for history, less so for production.
+- [`calibrate_weights_simplex_factorized.stan`](../../../scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.stan) — production Stan source.
+
+**Target construction:**
+- [`NE25_RAKING_TARGETS_PIPELINE.md`](../NE25_RAKING_TARGETS_PIPELINE.md) — full Phase 1–5 target generation walkthrough.
+- [`STATISTICAL_METHODS_RAKING_TARGETS.md`](STATISTICAL_METHODS_RAKING_TARGETS.md) — GLM / GLMM estimation methodology for targets.
+- [`MULTINOMIAL_APPROACH_DECISION.md`](MULTINOMIAL_APPROACH_DECISION.md) — why FPL and PUMA use separate binary models instead of multinomial logistic regression.
+
+**Uncertainty and design:**
+- [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md) — ACS bootstrap-replicate weight design.
+- [`GLM2_REFACTORING_PLAN.md`](GLM2_REFACTORING_PLAN.md) — refactor from `survey::svyglm` to `glm2::glm2`.
+
+**Pipeline front-door:**
+- [`docs/raking/README.md`](../README.md) — raking pipeline overview.
+- [`scripts/raking/ne25/README.md`](../../../scripts/raking/ne25/README.md) — script inventory for target generation.
+
+**External theory:**
+- Deville & Särndal (1992), "Calibration estimators in survey sampling," *JASA* 87, 376–382.
+- Kish (1965), *Survey Sampling* — effective-N formula.
+- Stan Development Team (2024), *Stan Modeling Language Reference Manual* — simplex parameterization, BFGS optimization.
