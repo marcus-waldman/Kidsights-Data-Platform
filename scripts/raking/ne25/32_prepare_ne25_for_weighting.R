@@ -1,505 +1,388 @@
 # ==============================================================================
 # Script: 32_prepare_ne25_for_weighting.R
-# Purpose: Create M=1 harmonized NE25 dataset matching unified moment structure
-#          for KL divergence weighting using database-imputed PUMA + CART
+# Purpose: Produce M=5 harmonized NE25 datasets matching the unified-moments
+#          24-variable structure, one per imputation, for KL-divergence raking.
 #
 # Overview:
-#     1. Load base NE25 data (meets_inclusion=TRUE, n=2,785)
-#     2. Join imputed PUMA from ne25_imputed_puma table (M=1)
-#     3. Preprocess CBSA (extract first value from semicolon-delimited strings)
-#     4. Impute remaining missing values using CART (mice package, M=1)
-#     5. Harmonize to 24-variable structure (7 demo + 14 PUMA + 2 mental health + 1 outcome)
-#     6. Validate data quality
-#     7. Save ne25_harmonized_m1.feather
+#     For each imputation m in 1..M:
+#       1. Call get_completed_dataset(m, variables = ...) from R/imputation/helpers.R
+#          to merge the production pipeline's imputed values onto the observed
+#          base (ne25_transformed). Observed values take precedence; imputed
+#          values fill NAs.
+#       2. Filter to meets_inclusion = TRUE.
+#       3. Compute derived variables:
+#            phq2_total = phq2_interest + phq2_depressed
+#            gad2_total = gad2_nervous + gad2_worry
+#            fpl        = income / get_poverty_threshold(consent_date, family_size) * 100
+#       4. Drop out-of-state records (puma is NA after completion).
+#       5. Run a per-m lightweight fallback mice pass on residual NAs in
+#          years_old / mmi100 (production pipeline doesn't impute these; <1%
+#          missing in practice).
+#       6. Harmonize to the 24-variable structure (7 demographics + 14 PUMA
+#          dummies + 2 mental health + 1 child outcome).
+#       7. Validate range and consistency.
+#       8. Save ne25_harmonized_m{m}.feather.
+#     After the loop, check that all M feathers differ numerically (distinctness
+#     across imputations).
 #
-# Output:
-#   - ne25_harmonized_m1.feather (2,785 rows × 27 columns)
-#   - Columns: pid, record_id, study_id + 24 harmonized variables
+# Design decisions (locked in April 2026; see plan file and
+# docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd Section 5.1):
+#   - Option B (consume production pipeline): eliminates the in-script MICE
+#     that previously ran in this script, so raking weights are fit against
+#     the SAME imputed values that downstream MI analysis uses. This closes
+#     a latent consistency bug.
+#   - poverty_ratio derivation (Q1): use the platform-canonical formula
+#     income / federal_poverty_threshold(family_size, consent_date). No
+#     second definition of poverty_ratio introduced.
+#
+# Outputs:
+#   - data/raking/ne25/ne25_harmonized/ne25_harmonized_m{1..M}.feather
+#   - Each: N_in_state rows (typically ~2,645) by 27 columns
+#           (pid, record_id, study_id + 24 harmonized variables)
 #
 # Dependencies:
-#   - ne25_transformed table (base data without geography)
-#   - ne25_imputed_puma table (from imputation pipeline)
-#   - mice package (for CART imputation of non-geographic variables)
-#   - harmonize_puma.R (PUMA binary dummies)
-#   - harmonize_ne25_demographics.R
-#   - harmonize_ne25_outcomes.R
-#
+#   - R/imputation/helpers.R   :: get_completed_dataset()
+#   - R/imputation/config.R    :: get_n_imputations()
+#   - R/utils/poverty_utils.R  :: get_poverty_threshold()
+#   - scripts/raking/ne25/utils/harmonize_puma.R
+#   - scripts/raking/ne25/utils/harmonize_ne25_demographics.R
+#   - scripts/raking/ne25/utils/harmonize_ne25_outcomes.R
+#   - DuckDB tables: ne25_transformed, ne25_imputed_*
 # ==============================================================================
 
 # ==============================================================================
-# SECTION 0: Setup and Configuration
+# SECTION 0: Setup
 # ==============================================================================
 
 library(duckdb)
 library(dplyr)
 library(arrow)
-library(mice)  # For CART imputation
+library(mice)        # for per-m fallback on residual years_old / mmi100
 
-# Source utility functions
 source("scripts/raking/ne25/utils/harmonize_puma.R")
 source("scripts/raking/ne25/utils/harmonize_ne25_demographics.R")
 source("scripts/raking/ne25/utils/harmonize_ne25_outcomes.R")
+source("R/imputation/helpers.R")
+source("R/imputation/config.R")
+source("R/utils/poverty_utils.R")
+source("R/utils/safe_joins.R")  # required by get_poverty_threshold()
 
-# Database path (from environment or default)
-db_path <- Sys.getenv("KIDSIGHTS_DB_PATH")
-if (db_path == "") {
-  db_path <- "data/duckdb/kidsights_local.duckdb"
-}
-
-# Output directory
 output_dir <- "data/raking/ne25/ne25_harmonized"
-if (!dir.exists(output_dir)) {
-  dir.create(output_dir, recursive = TRUE)
-}
+if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
 
 cat("========================================\n")
-cat("Phase 1: Prepare NE25 for KL Weighting\n")
+cat("Phase 1: Prepare NE25 for KL Weighting (M imputations)\n")
 cat("========================================\n\n")
 
-# ==============================================================================
-# SECTION 1: Load Base NE25 Data and Derive PUMA from ZIP Code
-# ==============================================================================
+M <- get_n_imputations()
+cat(sprintf("Number of imputations (from config): M = %d\n\n", M))
 
-cat("[1] Loading base NE25 data with ZIP codes...\n")
-
-con <- dbConnect(duckdb(), db_path)
-
-# Load records with meets_inclusion filter including sq001 (ZIP code)
-base_data <- dbGetQuery(con, "
-  SELECT
-    pid,
-    record_id,
-    sq001 as zipcode,
-    years_old,
-    female,
-    raceG,
-    educ_mom,
-    fpl,
-    phq2_total,
-    gad2_total,
-    child_ace_total,
-    mmi100
-  FROM ne25_transformed
-  WHERE meets_inclusion = TRUE
-")
-
-cat(sprintf("    ✓ Loaded %d records (meets_inclusion=TRUE)\n", nrow(base_data)))
+# Imputed variables to request from the production pipeline. These are the
+# ones the imputation pipeline produces tables for; we request only what's
+# needed for the 24-variable harmonization.
+imputed_vars <- c(
+  "puma",
+  "female", "raceG", "educ_mom",
+  "income", "family_size",
+  "phq2_interest", "phq2_depressed",
+  "gad2_nervous", "gad2_worry",
+  "child_ace_total"
+)
 
 # ==============================================================================
-# SECTION 1.1: Join PUMA from ZIP Code Crosswalk
+# SECTION 1: Per-Imputation Loop
 # ==============================================================================
 
-cat("\n[1.1] Deriving PUMA from ZIP codes...\n")
+harmonized_list <- vector("list", M)
 
-# Query geo_zip_to_puma crosswalk
-zip_to_puma <- dbGetQuery(con, "
-  SELECT
-    zcta as zipcode,
-    puma22 as puma,
-    afact,
-    ROW_NUMBER() OVER (PARTITION BY zcta ORDER BY afact DESC) as puma_rank
-  FROM geo_zip_to_puma
-")
+for (m in seq_len(M)) {
+  cat(sprintf("\n----------------------------------------\n"))
+  cat(sprintf("  Imputation m = %d of %d\n", m, M))
+  cat(sprintf("----------------------------------------\n"))
 
-# Count ZIPs with single vs multiple PUMAs
-zip_puma_counts <- zip_to_puma %>%
-  dplyr::group_by(zipcode) %>%
-  dplyr::summarise(n_pumas = dplyr::n(), .groups = "drop")
+  # ----------------------------------------------------------------------------
+  # 1a: Fetch completed dataset from production imputation pipeline
+  # ----------------------------------------------------------------------------
+  cat("[1a] get_completed_dataset() ... ")
+  completed <- get_completed_dataset(
+    imputation_m = m,
+    variables = imputed_vars,
+    base_table = "ne25_transformed",
+    study_id = "ne25",
+    include_observed = TRUE
+  )
+  cat(sprintf("loaded %d rows x %d cols\n", nrow(completed), ncol(completed)))
 
-n_single_puma_zips <- sum(zip_puma_counts$n_pumas == 1)
-n_multi_puma_zips <- sum(zip_puma_counts$n_pumas > 1)
+  # Coerce imputed columns to atomic vectors (reticulate round-trip can leave
+  # some of them as list-columns which break downstream arithmetic / factor
+  # coercion). Numeric-looking vars become numeric; the rest become character.
+  numeric_imputed <- c("income", "family_size",
+                       "phq2_interest", "phq2_depressed",
+                       "gad2_nervous", "gad2_worry",
+                       "child_ace_total")
+  for (v in imputed_vars) {
+    if (v %in% names(completed) && is.list(completed[[v]])) {
+      completed[[v]] <- unlist(completed[[v]], use.names = FALSE)
+    }
+    if (v %in% numeric_imputed && v %in% names(completed)) {
+      completed[[v]] <- as.numeric(completed[[v]])
+    }
+  }
+  # female is Boolean/integer in ne25_transformed; coerce safely
+  if ("female" %in% names(completed)) {
+    completed$female <- as.integer(as.logical(completed$female))
+  }
 
-cat(sprintf("    Crosswalk: %d ZIPs with single PUMA, %d ZIPs with multiple PUMAs\n",
-            n_single_puma_zips, n_multi_puma_zips))
+  # ----------------------------------------------------------------------------
+  # 1b: Filter to meets_inclusion = TRUE (pre-Step-6.10; out-of-state filtered
+  # further down by puma NA)
+  # ----------------------------------------------------------------------------
+  completed <- completed %>% dplyr::filter(meets_inclusion == TRUE)
+  cat(sprintf("[1b] filtered to meets_inclusion=TRUE: %d rows\n", nrow(completed)))
 
-# For deterministic matching, take highest afact PUMA for each ZIP
-zip_to_puma_primary <- zip_to_puma %>%
-  dplyr::filter(puma_rank == 1) %>%
-  dplyr::select(zipcode, puma, afact)
+  # ----------------------------------------------------------------------------
+  # 1c: Compute derived variables (phq2_total, gad2_total, fpl)
+  # ----------------------------------------------------------------------------
+  # Mental-health composites
+  completed$phq2_total <- completed$phq2_interest + completed$phq2_depressed
+  completed$gad2_total <- completed$gad2_nervous + completed$gad2_worry
 
-# Join primary PUMA to base data
-base_data <- base_data %>%
-  dplyr::mutate(zipcode = as.character(zipcode)) %>%
-  dplyr::left_join(zip_to_puma_primary, by = "zipcode")
+  # Poverty ratio from imputed income and family_size
+  # Use consent_date for year-appropriate poverty threshold; fall back to 2025
+  # if consent_date is NA (very rare)
+  poverty_dates <- as.Date(completed$consent_date)
+  if (any(is.na(poverty_dates))) {
+    poverty_dates[is.na(poverty_dates)] <- as.Date("2025-01-01")
+  }
+  thresholds <- get_poverty_threshold(poverty_dates, completed$family_size)
+  completed$fpl <- (completed$income / thresholds) * 100
 
-n_puma_from_zip <- sum(!is.na(base_data$puma))
-cat(sprintf("    ✓ Matched PUMA from ZIP for %d/%d records (%.1f%%)\n",
-            n_puma_from_zip, nrow(base_data),
-            100 * n_puma_from_zip / nrow(base_data)))
+  cat(sprintf("[1c] derived: phq2_total, gad2_total, fpl (from imputed income/family_size)\n"))
 
-# ==============================================================================
-# SECTION 1.2: Use Imputed PUMA for Ambiguous Cases
-# ==============================================================================
+  # ----------------------------------------------------------------------------
+  # 1d: Drop out-of-state records (puma is NA even after imputation for ZIPs
+  # not in the Nebraska ZCTA->PUMA crosswalk)
+  # ----------------------------------------------------------------------------
+  n_before <- nrow(completed)
+  completed <- completed %>% dplyr::filter(!is.na(puma))
+  n_after <- nrow(completed)
+  cat(sprintf("[1d] dropped %d out-of-state records; retained %d\n",
+              n_before - n_after, n_after))
 
-cat("\n[1.2] Using imputed PUMA for ambiguous ZIP-to-PUMA mappings...\n")
-
-# Load imputed PUMA for records with multiple possible PUMAs
-imputed_puma <- dbGetQuery(con, "
-  SELECT
-    pid,
-    record_id,
-    puma as puma_imputed
-  FROM ne25_imputed_puma
-  WHERE imputation_m = 1
-")
-
-cat(sprintf("    ✓ Loaded %d imputed PUMA records (for ambiguous cases)\n",
-            nrow(imputed_puma)))
-
-dbDisconnect(con)
-
-# Join imputed PUMA
-base_data <- base_data %>%
-  dplyr::left_join(imputed_puma, by = c("pid", "record_id"))
-
-# Use imputed PUMA if available (for ambiguous cases), otherwise use ZIP-derived PUMA
-base_data <- base_data %>%
-  dplyr::mutate(
-    puma_final = dplyr::coalesce(puma_imputed, puma),
-    puma_source = dplyr::case_when(
-      !is.na(puma_imputed) ~ "imputed",
-      !is.na(puma) ~ "zipcode",
-      TRUE ~ "missing"
+  # ----------------------------------------------------------------------------
+  # 1e: Fallback mice for residual NAs across all harmonization inputs.
+  # Most NAs are resolved by get_completed_dataset (which merges the
+  # production imputation pipeline's M=5 imputed values). A small number of
+  # records remain NA because either the pipeline didn't impute them or
+  # variables like years_old / mmi100 aren't produced by the pipeline at all.
+  # Residuals should be <5% per variable; if larger, something is wrong.
+  # ----------------------------------------------------------------------------
+  fallback_vars <- c("years_old", "mmi100", "female", "raceG",
+                     "educ_mom", "fpl", "phq2_total", "gad2_total",
+                     "child_ace_total")
+  na_rates <- vapply(fallback_vars, function(v) mean(is.na(completed[[v]])),
+                     numeric(1))
+  if (any(na_rates > 0.05)) {
+    offenders <- names(na_rates)[na_rates > 0.05]
+    stop(sprintf(
+      "Unexpected residual missingness > 5%% in: %s. Investigate.",
+      paste(offenders, collapse = ", ")
+    ))
+  }
+  if (any(na_rates > 0)) {
+    # Assemble mice input. Coerce text vars to factor so CART handles them.
+    fallback_data <- data.frame(
+      years_old       = as.numeric(completed$years_old),
+      mmi100          = as.numeric(completed$mmi100),
+      female          = as.factor(completed$female),
+      raceG           = as.factor(as.character(completed$raceG)),
+      educ_mom        = as.factor(as.character(completed$educ_mom)),
+      fpl             = as.numeric(completed$fpl),
+      phq2_total      = as.numeric(completed$phq2_total),
+      gad2_total      = as.numeric(completed$gad2_total),
+      child_ace_total = as.numeric(completed$child_ace_total),
+      stringsAsFactors = FALSE
     )
+    fallback_impute <- mice::mice(
+      fallback_data,
+      m = 1,
+      method = "cart",
+      maxit = 5,
+      seed = 20251209L + m,
+      printFlag = FALSE
+    )
+    filled <- mice::complete(fallback_impute, 1)
+    completed$years_old       <- filled$years_old
+    completed$mmi100          <- filled$mmi100
+    completed$female          <- as.integer(as.character(filled$female))
+    completed$raceG           <- as.character(filled$raceG)
+    completed$educ_mom        <- as.character(filled$educ_mom)
+    completed$fpl             <- filled$fpl
+    completed$phq2_total      <- filled$phq2_total
+    completed$gad2_total      <- filled$gad2_total
+    completed$child_ace_total <- filled$child_ace_total
+    filled_counts <- round(na_rates * n_after)
+    filled_nonzero <- filled_counts[filled_counts > 0]
+    cat(sprintf("[1e] fallback mice filled %d NA(s) total across: %s\n",
+                sum(filled_nonzero),
+                paste(names(filled_nonzero), "=", filled_nonzero, collapse = ", ")))
+  } else {
+    cat("[1e] no residual NAs in harmonization inputs\n")
+  }
+
+  # ----------------------------------------------------------------------------
+  # 1f: Harmonize to 24-variable structure
+  # ----------------------------------------------------------------------------
+  completed$study_id <- "ne25"
+
+  block1_demo <- dplyr::tibble(
+    male = 1L - as.integer(completed$female),
+    age  = completed$years_old,
+    white_nh = as.integer(completed$raceG == "White, non-Hisp."),
+    black    = as.integer(completed$raceG %in% c(
+      "Black or African American, non-Hisp.",
+      "Black or African American, Hispanic")),
+    hispanic = as.integer(grepl("Hispanic", as.character(completed$raceG))),
+    # Education years — unchanged regex mapping from prior version. Keep
+    # in sync if educ_mom categories change upstream.
+    educ_years = dplyr::case_when(
+      grepl("Less than|8th grade|9th-12th|Some High School",
+            as.character(completed$educ_mom)) ~ 10,
+      grepl("High School Graduate|GED", as.character(completed$educ_mom)) ~ 12,
+      grepl("Some College", as.character(completed$educ_mom)) ~ 14,
+      grepl("vocational|trade|business school",
+            as.character(completed$educ_mom)) ~ 13,
+      grepl("Associate", as.character(completed$educ_mom)) ~ 14,
+      grepl("Bachelor",  as.character(completed$educ_mom)) ~ 16,
+      grepl("Master",    as.character(completed$educ_mom)) ~ 18,
+      grepl("Doctorate|Professional",
+            as.character(completed$educ_mom)) ~ 20,
+      TRUE ~ NA_real_
+    ),
+    # Poverty ratio capped to calibration range [50, 400]
+    poverty_ratio = pmin(pmax(completed$fpl, 50), 400)
   )
 
-# Report PUMA coverage
-puma_summary <- base_data %>%
-  dplyr::group_by(puma_source) %>%
-  dplyr::summarise(count = dplyr::n(), .groups = "drop")
+  block1_puma <- harmonize_puma(completed$puma)   # 14 binary dummies
 
-cat("\n    PUMA derivation summary:\n")
-for (i in 1:nrow(puma_summary)) {
-  cat(sprintf("      %s: %d records\n",
-              puma_summary$puma_source[i],
-              puma_summary$count[i]))
-}
+  block1 <- dplyr::bind_cols(block1_demo, block1_puma)
 
-# Replace puma with final derived value
-base_data$puma <- base_data$puma_final
-base_data <- base_data %>%
-  dplyr::select(-puma_imputed, -puma_final, -puma_source, -afact)
+  block2 <- dplyr::tibble(
+    phq2_total = completed$phq2_total,
+    gad2_total = completed$gad2_total
+  )
 
-n_puma_final <- sum(!is.na(base_data$puma))
-cat(sprintf("\n    ✓ Final PUMA coverage: %d/%d records (%.1f%%)\n",
-            n_puma_final, nrow(base_data),
-            100 * n_puma_final / nrow(base_data)))
+  block3 <- dplyr::tibble(
+    excellent_health = harmonize_ne25_excellent_health(completed$mmi100)
+  )
 
-# Report missing data before imputation
-cat("\n[1.1] Missing data summary (before imputation):\n")
-missing_counts <- colSums(is.na(base_data))
-missing_pct <- round(missing_counts / nrow(base_data) * 100, 2)
-for (var in names(missing_counts)[missing_counts > 0]) {
-  cat(sprintf("      %s: %d (%.1f%%)\n", var, missing_counts[var], missing_pct[var]))
-}
+  harmonized <- dplyr::bind_cols(
+    dplyr::select(completed, pid, record_id, study_id),
+    block1, block2, block3
+  )
 
-# ==============================================================================
-# SECTION 2: Prepare PUMA for Harmonization
-# ==============================================================================
-
-cat("\n[2] Preparing PUMA for harmonization...\n")
-
-# Rename PUMA for consistency with downstream harmonization code
-base_data$puma_clean <- base_data$puma
-
-cat(sprintf("    ✓ PUMA ready for %d records\n",
-            sum(!is.na(base_data$puma_clean))))
-
-# ==============================================================================
-# SECTION 3: Impute Missing Values with CART
-# ==============================================================================
-
-cat("\n[3] Imputing missing values using CART...\n")
-
-# Prepare data for mice
-# PUMA already imputed from database - exclude from MICE
-# Exclude CBSA from imputation (not needed for calibration)
-# Exclude identifiers
-impute_data <- base_data %>%
-  dplyr::select(years_old, female, raceG, educ_mom, fpl,
-                phq2_total, gad2_total, child_ace_total, mmi100)
-
-# Run mice with CART method, M=1 imputation
-set.seed(20251209)  # For reproducibility
-
-cat("    Running mice (CART, M=1, maxit=5)...\n")
-imputed <- mice::mice(
-  impute_data,
-  m = 1,                    # Single imputation
-  method = "cart",          # CART method for all variables
-  maxit = 5,                # 5 iterations
-  printFlag = FALSE         # Suppress iteration output
-)
-
-cat("    ✓ Imputation complete\n")
-
-# Extract completed data
-imputed_data <- mice::complete(imputed, 1)
-
-# Add back identifiers and PUMA
-imputed_data$pid <- base_data$pid
-imputed_data$record_id <- base_data$record_id
-imputed_data$puma_clean <- base_data$puma_clean # Use ZIP/imputed PUMA (not MICE)
-imputed_data$study_id <- "ne25"
-imputed_data$authenticity_weight <- 1.0  # Placeholder
-
-# Report missing data after imputation (CBSA may still have NAs)
-cat("\n[3.1] Missing data summary (after MICE imputation):\n")
-missing_after <- colSums(is.na(imputed_data))
-if (sum(missing_after) == 0) {
-  cat("      ✓ No missing values remaining\n")
-} else {
-  cat("      Note: Some variables may retain missing values:\n")
-  for (var in names(missing_after)[missing_after > 0]) {
-    pct <- round(missing_after[var] / nrow(imputed_data) * 100, 1)
-    cat(sprintf("        %s: %d (%.1f%%)\n", var, missing_after[var], pct))
+  # ----------------------------------------------------------------------------
+  # 1g: Validation (same checks as prior version)
+  # ----------------------------------------------------------------------------
+  missing_counts <- colSums(is.na(harmonized))
+  if (sum(missing_counts) > 0) {
+    cat("[1g] WARNING: missing values in harmonized output:\n")
+    for (var in names(missing_counts)[missing_counts > 0]) {
+      cat(sprintf("      %s: %d\n", var, missing_counts[var]))
+    }
   }
-}
 
-# ==============================================================================
-# [3.2] Drop Records Without PUMA (Out-of-State Participants)
-# ==============================================================================
-
-cat("\n[3.2] Dropping records without PUMA (out-of-state participants)...\n")
-
-n_puma_missing <- sum(is.na(imputed_data$puma_clean))
-n_before <- nrow(imputed_data)
-
-if (n_puma_missing > 0) {
-  cat(sprintf("      Found %d records without PUMA (likely out-of-state ZIP codes)\n", n_puma_missing))
-
-  # Filter to records with complete PUMA
-  imputed_data <- imputed_data %>%
-    dplyr::filter(!is.na(puma_clean))
-
-  n_after <- nrow(imputed_data)
-  cat(sprintf("      ✓ Dropped %d out-of-state records\n", n_before - n_after))
-  cat(sprintf("      ✓ Retained %d Nebraska records with complete PUMA\n", n_after))
-} else {
-  cat(sprintf("      ✓ All %d records have complete PUMA\n", nrow(imputed_data)))
-}
-
-# Verify 100% PUMA coverage
-n_puma_final <- sum(!is.na(imputed_data$puma_clean))
-if (n_puma_final == nrow(imputed_data)) {
-  cat(sprintf("\n      [OK] 100%% PUMA coverage: %d/%d records\n",
-              n_puma_final, nrow(imputed_data)))
-} else {
-  stop(sprintf("ERROR: Expected 100%% PUMA coverage but got %d/%d",
-               n_puma_final, nrow(imputed_data)))
-}
-
-# ==============================================================================
-# SECTION 4: Harmonize to 24-Variable Structure
-# ==============================================================================
-
-cat("\n[4] Harmonizing to 24-variable structure...\n")
-
-# Block 1: Demographics (7 variables) + PUMA (14 binary dummies) = 21 variables
-cat("    Harmonizing Block 1 (demographics + PUMA)...\n")
-
-# Harmonize demographics directly (skip CBSA/principal_city)
-block1_demo <- dplyr::tibble(
-  # Variable 1: male (invert female)
-  male = as.integer(!imputed_data$female),
-
-  # Variable 2: age (direct mapping)
-  age = imputed_data$years_old,
-
-  # Variables 3-5: race dummies (from raceG)
-  white_nh = as.integer(imputed_data$raceG == "White, non-Hisp."),
-  black = as.integer(imputed_data$raceG %in% c("Black or African American, non-Hisp.", "Black or African American, Hispanic")),
-  hispanic = as.integer(grepl("Hispanic", as.character(imputed_data$raceG))),
-
-  # Variable 6: education years (from educ_mom)
-  # IMPORTANT: CART imputation in lines 73-84 produces text strings from REDCap education categories.
-  # The following regex patterns MUST cover ALL variations or records with unmatched patterns get
-  # listwise deletion in script 33. Pattern history:
-  #   - "Less than|8th grade|9th-12th|Some High School" (added "8th grade|9th-12th" Dec 2025)
-  #   - "vocational|trade|business school" (added Dec 2025, was missing ~14 records)
-  # These two patterns fixed ~336 missing values (12.7% → 0% completion rate).
-  # Verify: missing_check <- ne25_harmonized %>% dplyr::select(educ_years) %>%
-  #         dplyr::summarise(n_missing = sum(is.na(.)))  # Should be 0
-  educ_years = dplyr::case_when(
-    grepl("Less than|8th grade|9th-12th|Some High School", as.character(imputed_data$educ_mom)) ~ 10,
-    grepl("High School Graduate|GED", as.character(imputed_data$educ_mom)) ~ 12,
-    grepl("Some College", as.character(imputed_data$educ_mom)) ~ 14,
-    grepl("vocational|trade|business school", as.character(imputed_data$educ_mom)) ~ 13,
-    grepl("Associate", as.character(imputed_data$educ_mom)) ~ 14,
-    grepl("Bachelor", as.character(imputed_data$educ_mom)) ~ 16,
-    grepl("Master", as.character(imputed_data$educ_mom)) ~ 18,
-    grepl("Doctorate|Professional", as.character(imputed_data$educ_mom)) ~ 20,
-    TRUE ~ NA_real_
-  ),
-
-  # Variable 7: poverty ratio (from fpl, capped at [50, 400])
-  poverty_ratio = pmin(pmax(imputed_data$fpl, 50), 400)
-)
-
-# Harmonize PUMA to 14 binary dummies
-block1_puma <- harmonize_puma(imputed_data$puma_clean)  # 14 variables
-
-# Combine: demographics (1-7) + PUMA (8-21) = 21 variables
-block1 <- dplyr::bind_cols(block1_demo, block1_puma)
-
-# Block 2: Mental Health (2 variables)
-cat("    Harmonizing Block 2 (mental health)...\n")
-
-block2 <- dplyr::tibble(
-  phq2_total = imputed_data$phq2_total,
-  gad2_total = imputed_data$gad2_total
-)
-
-# Block 3: Child Outcome (1 variable, no ACEs)
-cat("    Harmonizing Block 3 (child outcome)...\n")
-
-block3 <- dplyr::tibble(
-  excellent_health = harmonize_ne25_excellent_health(imputed_data$mmi100)
-)
-
-# Combine all blocks
-harmonized <- dplyr::bind_cols(
-  dplyr::select(imputed_data, pid, record_id, study_id),
-  block1,
-  block2,
-  block3
-)
-
-cat("    ✓ Harmonization complete\n")
-
-# ==============================================================================
-# SECTION 5: Validation
-# ==============================================================================
-
-cat("\n[5] Validating harmonized data...\n")
-
-# Check completeness
-missing_harmonized <- colSums(is.na(harmonized))
-if (sum(missing_harmonized) > 0) {
-  cat("    ⚠ Warning: Missing values in harmonized data:\n")
-  for (var in names(missing_harmonized)[missing_harmonized > 0]) {
-    pct <- round(missing_harmonized[var] / nrow(harmonized) * 100, 2)
-    cat(sprintf("      %s: %d (%.1f%%)\n", var, missing_harmonized[var], pct))
-  }
-} else {
-  cat("    ✓ No missing values in harmonized data\n")
-}
-
-# Check variable ranges
-cat("\n[5.1] Range validation:\n")
-
-range_checks <- list(
-  male = c(0, 1),
-  age = c(0, 6),
-  white_nh = c(0, 1),
-  black = c(0, 1),
-  hispanic = c(0, 1),
-  educ_years = c(2, 20),
-  poverty_ratio = c(50, 400),  # NSCH standard range
-  phq2_total = c(0, 6),
-  gad2_total = c(0, 6),
-  excellent_health = c(0, 1)
-)
-
-range_issues <- 0
-for (var in names(range_checks)) {
-  if (var %in% names(harmonized)) {
-    vals <- harmonized[[var]][!is.na(harmonized[[var]])]
+  range_checks <- list(
+    male = c(0, 1), age = c(0, 6),
+    white_nh = c(0, 1), black = c(0, 1), hispanic = c(0, 1),
+    educ_years = c(2, 20), poverty_ratio = c(50, 400),
+    phq2_total = c(0, 6), gad2_total = c(0, 6),
+    excellent_health = c(0, 1)
+  )
+  for (v in names(range_checks)) {
+    vals <- harmonized[[v]][!is.na(harmonized[[v]])]
     if (length(vals) > 0) {
-      min_val <- min(vals)
-      max_val <- max(vals)
-      expected_min <- range_checks[[var]][1]
-      expected_max <- range_checks[[var]][2]
-
-      if (min_val < expected_min || max_val > expected_max) {
-        cat(sprintf("      ⚠ %s: [%.2f, %.2f] outside expected [%d, %d]\n",
-                    var, min_val, max_val, expected_min, expected_max))
-        range_issues <- range_issues + 1
+      if (min(vals) < range_checks[[v]][1] || max(vals) > range_checks[[v]][2]) {
+        cat(sprintf("      [WARN] %s: [%.2f, %.2f] outside [%d, %d]\n",
+                    v, min(vals), max(vals),
+                    range_checks[[v]][1], range_checks[[v]][2]))
       }
     }
   }
-}
 
-if (range_issues == 0) {
-  cat("    ✓ All variables within expected ranges\n")
-}
-
-# Check PUMA dummies
-cat("\n[5.2] PUMA consistency check:\n")
-puma_cols <- grep("^puma_", names(harmonized), value = TRUE)
-if (length(puma_cols) > 0) {
-  # Each row should have at most one PUMA = 1 (or all NA)
+  puma_cols <- grep("^puma_", names(harmonized), value = TRUE)
   puma_sums <- rowSums(harmonized[, puma_cols], na.rm = TRUE)
-  invalid_puma <- sum(puma_sums > 1, na.rm = TRUE)
-  if (invalid_puma > 0) {
-    cat(sprintf("      ⚠ %d records with multiple PUMA = 1\n", invalid_puma))
-  } else {
-    cat("      ✓ PUMA dummies are mutually exclusive (0 or 1 per record)\n")
+  if (any(puma_sums > 1, na.rm = TRUE)) {
+    cat(sprintf("      [WARN] %d records with multiple PUMA = 1\n",
+                sum(puma_sums > 1, na.rm = TRUE)))
   }
 
-  # Check range [0, 1]
-  puma_range_invalid <- 0
-  for (col in puma_cols) {
-    vals <- harmonized[[col]][!is.na(harmonized[[col]])]
-    if (any(vals < 0 | vals > 1)) {
-      puma_range_invalid <- puma_range_invalid + 1
-    }
-  }
-  if (puma_range_invalid == 0) {
-    cat("      ✓ All PUMA variables in range [0, 1]\n")
-  }
-} else {
-  cat("      ⚠ No PUMA variables found\n")
-}
+  # ----------------------------------------------------------------------------
+  # 1h: Save
+  # ----------------------------------------------------------------------------
+  output_path <- file.path(output_dir,
+                           sprintf("ne25_harmonized_m%d.feather", m))
+  arrow::write_feather(harmonized, output_path)
+  size_mb <- file.size(output_path) / (1024^2)
+  cat(sprintf("[1h] saved: %s (%.2f MB, %d rows x %d cols)\n",
+              output_path, size_mb,
+              nrow(harmonized), ncol(harmonized)))
 
-# Check dimensions
-cat(sprintf("\n[5.3] Final dimensions: %d rows × %d columns\n",
-            nrow(harmonized), ncol(harmonized)))
-
-puma_codes <- c(100, 200, 300, 400, 500, 600, 701, 702, 801, 802, 901, 902, 903, 904)
-puma_names <- sprintf("puma_%d", puma_codes)
-expected_cols <- c("pid", "record_id", "study_id",
-                   "male", "age", "white_nh", "black", "hispanic",
-                   "educ_years", "poverty_ratio",
-                   puma_names,
-                   "phq2_total", "gad2_total",
-                   "excellent_health")
-
-if (length(setdiff(expected_cols, names(harmonized))) == 0) {
-  cat("    ✓ All expected columns present\n")
-} else {
-  cat("    ⚠ Missing columns:\n")
-  print(setdiff(expected_cols, names(harmonized)))
+  harmonized_list[[m]] <- harmonized
 }
 
 # ==============================================================================
-# SECTION 6: Save Output
-# ==============================================================================
-
-cat("\n[6] Saving harmonized dataset...\n")
-
-output_path <- file.path(output_dir, "ne25_harmonized_m1.feather")
-arrow::write_feather(harmonized, output_path)
-
-file_size_mb <- file.size(output_path) / (1024^2)
-cat(sprintf("    ✓ Saved: %s (%.1f MB)\n", output_path, file_size_mb))
-
-# ==============================================================================
-# SECTION 7: Final Summary
+# SECTION 2: Cross-Imputation Distinctness Check
 # ==============================================================================
 
 cat("\n========================================\n")
-cat("✓ NE25 Harmonization Complete\n")
+cat("Cross-imputation distinctness check\n")
+cat("========================================\n\n")
+
+# All M feathers should have identical row counts but different values.
+row_counts <- vapply(harmonized_list, nrow, integer(1))
+if (length(unique(row_counts)) > 1) {
+  stop(sprintf("Row counts differ across imputations: %s",
+               paste(row_counts, collapse = ", ")))
+}
+cat(sprintf("[OK] All %d imputations have identical row counts: %d\n",
+            M, row_counts[1]))
+
+# Between-m variance in a few variables that SHOULD differ across imputations
+check_vars <- c("phq2_total", "gad2_total", "educ_years", "poverty_ratio")
+for (v in check_vars) {
+  per_m_means <- vapply(harmonized_list, function(d) mean(d[[v]], na.rm = TRUE),
+                        numeric(1))
+  between_m_var <- stats::var(per_m_means)
+  cat(sprintf("[CHECK] %s: between-m SD of the mean = %.6f ", v,
+              sqrt(between_m_var)))
+  if (between_m_var <= 1e-12) {
+    cat("[WARN] (zero or near-zero — imputations may be identical for this var)\n")
+  } else {
+    cat("[OK]\n")
+  }
+}
+
+# SHA256 of numeric columns per imputation — all M hashes must differ
+if (requireNamespace("digest", quietly = TRUE)) {
+  hashes <- vapply(harmonized_list, function(d) {
+    numeric_d <- d %>% dplyr::select(dplyr::where(is.numeric))
+    digest::digest(numeric_d, algo = "sha256")
+  }, character(1))
+  if (length(unique(hashes)) == M) {
+    cat(sprintf("[OK] All %d harmonized datasets are numerically distinct (SHA256)\n", M))
+  } else {
+    cat(sprintf("[WARN] Only %d/%d distinct SHA256 hashes across imputations\n",
+                length(unique(hashes)), M))
+  }
+}
+
+cat("\n========================================\n")
+cat("NE25 Multi-Imputation Harmonization Complete\n")
 cat("========================================\n\n")
 
 cat("Summary:\n")
-cat(sprintf("  Sample size: %d\n", nrow(harmonized)))
-cat(sprintf("  Total variables: %d\n", ncol(harmonized)))
-cat("  Structure:\n")
-cat("    - 3 identifiers (pid, record_id, study_id)\n")
-cat("    - 21 Block 1 (7 demographics + 14 PUMA dummies)\n")
-cat("    - 2 Block 2 (phq2_total, gad2_total)\n")
-cat("    - 1 Block 3 (excellent_health)\n")
-cat(sprintf("  Imputation method: CART (M=1)\n"))
-cat(sprintf("  Output: %s\n", output_path))
-cat("\nReady for Phase 2: KL divergence weighting (script 33_compute_kl_weights_ne25.R)\n")
+cat(sprintf("  Imputations:   %d\n", M))
+cat(sprintf("  Per-m rows:    %d\n", row_counts[1]))
+cat(sprintf("  Output dir:    %s\n", output_dir))
+cat("\nReady for Phase 2: 33_compute_kl_divergence_weights.R\n")
