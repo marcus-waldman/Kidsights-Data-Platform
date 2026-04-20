@@ -1,0 +1,283 @@
+---
+title: "MN26 Pipeline"
+subtitle: "The Essentials"
+author: "Kidsights Data Platform"
+date: today
+format:
+  revealjs:
+    theme: simple
+    slide-number: true
+    incremental: false
+    scrollable: true
+    preview-links: auto
+    transition: slide
+    background-transition: fade
+    code-fold: false
+    code-line-numbers: false
+    width: 1200
+    height: 750
+    margin: 0.08
+    embed-resources: true
+    fig-cap-location: bottom
+execute:
+  eval: false
+  echo: true
+---
+
+## What is the MN26 Pipeline? {.smaller}
+
+**ETL pipeline for the Minnesota 2026 Kidsights study**, a NORC-administered
+REDCap survey measuring early childhood development in children ages 0–5.
+
+::: {.columns}
+::: {.column width="50%"}
+### What it does
+
+- Pulls raw data from 4 REDCap projects via API
+- Pivots multi-child households (up to 2 children) to long format
+- Recodes raw REDCap fields into ~600 analysis-ready variables
+- Applies eligibility filter (consent + child age)
+- Computes Kidsights IRT developmental score
+- Stores results in DuckDB
+:::
+
+::: {.column width="50%"}
+### Production scale (latest run)
+
+| Stage | Count |
+|---|---:|
+| Records extracted | 10,200 |
+| Rows after pivot | 10,517 |
+| Eligible | 964 |
+| Scored | 848 |
+| Runtime (no DB) | 2.0 sec |
+
+**Entry point:** `run_mn26_pipeline.R`
+**Full guide:** `docs/mn26/pipeline_guide.qmd`
+:::
+:::
+
+---
+
+## Data Flow {.smaller}
+
+::: {.r-stretch}
+```{=html}
+<svg viewBox="0 0 1100 600" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-height:560px" role="img">
+  <defs>
+    <marker id="slide-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .s-step   { rx: 8; ry: 8; stroke-width: 1.5; }
+      .s-title  { font-size: 15px; font-weight: 600; fill: #0f172a; font-family: sans-serif; }
+      .s-file   { font-size: 10px; font-family: Consolas, monospace; fill: #475569; }
+      .s-count  { font-size: 13px; font-weight: 700; fill: #b91c1c; font-family: sans-serif; }
+      .s-flow   { stroke: #475569; stroke-width: 2; fill: none; }
+      .s-ext    { fill: #fff; stroke: #94a3b8; stroke-dasharray: 5 3; }
+      .s-ext-t  { font-size: 13px; fill: #475569; font-style: italic; font-family: sans-serif; }
+      .p-ext    { fill: #dbeafe; stroke: #2563eb; }
+      .p-piv    { fill: #e0f2fe; stroke: #0284c7; }
+      .p-tx     { fill: #dcfce7; stroke: #16a34a; }
+      .p-el     { fill: #fef3c7; stroke: #d97706; }
+      .p-sc     { fill: #fae8ff; stroke: #c026d3; }
+      .p-st     { fill: #f1f5f9; stroke: #64748b; }
+    </style>
+  </defs>
+
+  <!-- Source -->
+  <rect x="380" y="10" width="340" height="40" class="s-ext"/>
+  <text x="550" y="35" text-anchor="middle" class="s-ext-t">REDCap API — 4 NORC projects</text>
+
+  <!-- Step 1 & 2: Extract -->
+  <rect x="60" y="80" width="300" height="50" class="s-step p-ext"/>
+  <text x="210" y="100" text-anchor="middle" class="s-title">1 · Load credentials</text>
+  <text x="210" y="117" text-anchor="middle" class="s-file">R/extract/mn26.R</text>
+
+  <rect x="740" y="80" width="300" height="50" class="s-step p-ext"/>
+  <text x="890" y="100" text-anchor="middle" class="s-title">2 · Extract data + dictionary</text>
+  <text x="890" y="117" text-anchor="middle" class="s-file">R/extract/mn26.R</text>
+
+  <path d="M 720 50 L 890 80" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <path d="M 360 105 L 740 105" class="s-flow" marker-end="url(#slide-arrow)"/>
+
+  <path d="M 890 130 L 890 165" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <text x="890" y="153" text-anchor="middle" class="s-count">10,200 rec</text>
+
+  <!-- Step 3: Pivot -->
+  <rect x="740" y="165" width="300" height="50" class="s-step p-piv"/>
+  <text x="890" y="185" text-anchor="middle" class="s-title">3 · Wide-to-long pivot</text>
+  <text x="890" y="202" text-anchor="middle" class="s-file">R/transform/mn26_pivot.R</text>
+
+  <path d="M 890 215 L 890 250" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <text x="890" y="238" text-anchor="middle" class="s-count">10,517 rows</text>
+
+  <!-- Step 5: Transform -->
+  <rect x="740" y="250" width="300" height="50" class="s-step p-tx"/>
+  <text x="890" y="270" text-anchor="middle" class="s-title">5 · recode_it() transforms</text>
+  <text x="890" y="287" text-anchor="middle" class="s-file">R/transform/mn26_transforms.R</text>
+
+  <path d="M 890 300 L 890 335" class="s-flow" marker-end="url(#slide-arrow)"/>
+
+  <!-- Step 6-7: Eligibility -->
+  <rect x="740" y="335" width="300" height="50" class="s-step p-el"/>
+  <text x="890" y="355" text-anchor="middle" class="s-title">6–7 · Eligibility + inclusion</text>
+  <text x="890" y="372" text-anchor="middle" class="s-file">R/harmonize/mn26_eligibility.R</text>
+
+  <path d="M 890 385 L 890 420" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <text x="890" y="408" text-anchor="middle" class="s-count">964 eligible</text>
+
+  <!-- Step 8: Scoring -->
+  <rect x="740" y="420" width="300" height="50" class="s-step p-sc"/>
+  <text x="890" y="440" text-anchor="middle" class="s-title">8 · Kidsights scoring (MAP)</text>
+  <text x="890" y="457" text-anchor="middle" class="s-file">KidsightsPublic::score_kidsights()</text>
+
+  <path d="M 890 470 L 890 505" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <text x="890" y="493" text-anchor="middle" class="s-count">848 scored</text>
+
+  <!-- Storage -->
+  <rect x="740" y="505" width="300" height="50" class="s-step p-st"/>
+  <text x="890" y="525" text-anchor="middle" class="s-title">4, 9, 10 · DuckDB storage</text>
+  <text x="890" y="542" text-anchor="middle" class="s-file">pipelines/python/insert_raw_data.py</text>
+
+  <!-- Database -->
+  <path d="M 740 530 L 380 530" class="s-flow" marker-end="url(#slide-arrow)"/>
+  <rect x="60" y="505" width="300" height="50" class="s-ext"/>
+  <text x="210" y="530" text-anchor="middle" class="s-ext-t">DuckDB</text>
+  <text x="210" y="547" text-anchor="middle" class="s-file">mn26_raw_wide · mn26_raw · mn26_transformed</text>
+
+  <!-- Legend -->
+  <g transform="translate(60, 580)">
+    <rect x="0"   y="0" width="12" height="12" class="p-ext"/> <text x="18" y="10" font-size="11" fill="#334155">Extract</text>
+    <rect x="80"  y="0" width="12" height="12" class="p-piv"/> <text x="98" y="10" font-size="11" fill="#334155">Pivot</text>
+    <rect x="150" y="0" width="12" height="12" class="p-tx"/>  <text x="168" y="10" font-size="11" fill="#334155">Transform</text>
+    <rect x="240" y="0" width="12" height="12" class="p-el"/>  <text x="258" y="10" font-size="11" fill="#334155">Eligibility</text>
+    <rect x="330" y="0" width="12" height="12" class="p-sc"/>  <text x="348" y="10" font-size="11" fill="#334155">Scoring</text>
+    <rect x="410" y="0" width="12" height="12" class="p-st"/>  <text x="428" y="10" font-size="11" fill="#334155">Storage</text>
+  </g>
+</svg>
+```
+:::
+
+---
+
+## How to Run It {.smaller}
+
+::: {.columns}
+::: {.column width="55%"}
+### One-line invocation
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" \
+  run_mn26_pipeline.R --skip-database
+```
+
+- `--skip-database` runs everything *except* DB insertion (recommended for first run)
+- Drop the flag for full run with DuckDB storage
+- Add `--credentials <path>` to override credentials CSV
+
+### Prerequisites
+
+- R 4.5.1 · CmdStan · KidsightsPublic package
+- Credentials CSV at
+  `C:/my_auths/kidsights_redcap_norc_MN_2026.csv`
+  (columns: `project,pid,api_code`)
+:::
+
+::: {.column width="45%"}
+### Expected output
+
+```
+MN26 Pipeline Complete
+========================================
+  Records extracted:   10200
+  After pivot:         10517
+    (10200 c1 + 317 c2)
+  Eligible:              964
+  Meets inclusion:       964
+  Kidsights scored:      848
+  Total duration:    2.0 sec
+========================================
+```
+
+### Interactive use
+
+```{.r code-line-numbers="false"}
+source("pipelines/orchestration/mn26_pipeline.R")
+result <- run_mn26_pipeline(skip_database = TRUE)
+head(result$data)     # transformed + scored
+result$metrics        # timing & counts
+```
+:::
+:::
+
+---
+
+## Variable Recoding (Key Derived Variables) {.smaller}
+
+| Derived var | Source REDCap | Transform location | NE25 → MN26 change |
+|---|---|---|---|
+| `sex`, `female` | `cqr009` | `recode__()` L460–487 | Same coding (1=F, 0=M) |
+| `race`, `hisp`, `raceG` | `cqr010b___100..105` + `cqr011` | `recode__()` L333–410 | **Structural**: 15→6 categories |
+| `a1_race`, `a1_hisp`, `a1_raceG` | `sq002b___100..105` + `sq003` | Same branch | **Structural**: 15→6 categories |
+| `years_old`, `months_old`, `days_old` | `age_in_days_n` | `recode__()` L489–508 | **Renamed** from `age_in_days` |
+| `female_a1` | `mn2` | `recode__()` L411–458 | **Renamed** from `cqr002`, added non-binary=97 |
+| `educ_a1`, `educ4_*`, `educ6_*` | `cqr004` + `nschj017` | `recode__()` L555–700 | Same coding (0–8) |
+| `income`, `inc99`, `fpl`, `fplcat` | `cqr006`, `consent_date_n`, `fqlive1_*` | `recode__()` L510–553 | **Recoded**: slider $500K → $250K+ |
+| `eligible`, `meets_inclusion` | `eq001`, `age_in_days_n` | `check_mn26_eligibility()` | NORC pre-screened |
+
+- **Dispatcher:** `recode_it(data, dict, what = "all")` in `R/transform/mn26_transforms.R`
+- **Spot-check pattern:** `table(result$data$cqr009, result$data$female, useNA="always")` — diagonal should be clean
+- **Full reference:** `docs/mn26/pipeline_guide.qmd` § Variable Recoding Reference
+
+---
+
+## Eligibility: NORC Pre-Screening Model {.smaller}
+
+::: {.columns}
+::: {.column width="50%"}
+### Key design decision
+
+NORC screens participants **before** routing to REDCap for:
+
+- Caregiver age ≥ 19
+- Primary caregiver status
+- Minnesota residence
+
+Only approved participants ever see the REDCap survey.
+
+**Consequence:** the legacy NE25 fields (`eq002`, `eq003`, `mn_eqstate`)
+are **absent** from production data exports — those columns
+don't exist in the real data.
+
+:::
+
+::: {.column width="50%"}
+### Adaptive criteria
+
+**Always required** (pipeline errors if missing):
+
+| Criterion | Field |
+|---|---|
+| Informed consent | `eq001 == 1` |
+| Child age 0–5 | `age_in_days_n ≤ 1825` |
+
+**Applied only if columns exist** (skipped in production):
+
+- Parent age ≥ 19 · `eq003`
+- Primary caregiver · `eq002`
+- Minnesota residence · `mn_eqstate`
+
+Verbose output shows exactly which criteria were applied vs. skipped:
+
+```
+Consent (eq001):        1217 [required]
+Child age (<=5yr):      964  [required]
+Parent age (eq003):     column absent [NORC pre-screened, skipped]
+Primary CG (eq002):     column absent [NORC pre-screened, skipped]
+MN residence:           column absent [NORC pre-screened, skipped]
+```
+:::
+:::
+
+**Bottom line:** eligible = passed consent AND valid child age. Scored records (Step 8) are the further subset with ≥ 5 non-missing item responses.
