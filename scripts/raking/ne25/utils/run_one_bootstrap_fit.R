@@ -77,15 +77,35 @@ run_one_bootstrap_fit <- function(m, b,
   }
 
   # -------------------------------------------------------------------------
-  # Draw Bayesian-bootstrap concentration vector
-  #   g ~ Exp(1); wb = (g / sum(g)) * N   (scales so mean(wb) = 1)
+  # Draw Bayesian-bootstrap concentration vector.
+  #
+  # Classical Bayesian bootstrap draws w ~ Dirichlet(1,...,1) and uses w as
+  # *data weights*. Here we adapt it by using (1 + wb_b) as the Dirichlet
+  # prior concentration on wgt_raw: the +1 shift keeps every alpha_i >= 1,
+  # avoiding the log-prior boundary singularity that arises when any alpha
+  # is < 1. This preserves the per-observation bootstrap perturbation while
+  # keeping the optimization numerically stable. Mean concentration = 2
+  # (vs. the flat-prior concentration of 1).
+  #
+  # If the bootstrap-variance magnitude comes out too small, the +1 offset
+  # can be tuned (smaller offset => more spread, but risk of instability).
   # -------------------------------------------------------------------------
   set.seed(seed)
-  g    <- rexp(N, rate = 1)
-  wb_b <- (g / sum(g)) * N
+  g     <- rexp(N, rate = 1)
+  wb_b  <- (g / sum(g)) * N    # classical Bayesian-bootstrap draw; mean = 1
+  alpha <- 1 + wb_b            # shift up so all concentrations >= 1
 
   # -------------------------------------------------------------------------
-  # Call Stan wrapper with Bayesian-bootstrap prior + warm-start init
+  # Call Stan wrapper with Bayesian-bootstrap prior.
+  #
+  # NOTE: init is deliberately 0 (cold start) rather than the baseline
+  # wgt_raw. Warm-starting from the baseline caused cmdstanr's constrained
+  # -> unconstrained transform to blow up on boundary-adjacent wgt_raw
+  # values, triggering "Fitting failed" during gradient evaluation. Cold
+  # start takes longer per fit (~3 min vs ~1 min warm) but is numerically
+  # robust. We keep baseline_wgt_raw loaded so a future iteration could
+  # test a clipped warm-start (e.g., pmax(baseline, eps)) without a
+  # worker signature change.
   # -------------------------------------------------------------------------
   result <- calibrate_weights_simplex_factorized_stan(
     data             = ne25,
@@ -95,8 +115,8 @@ run_one_bootstrap_fit <- function(m, b,
     calibration_vars = unified$variable_names,
     min_weight       = min_weight,
     max_weight       = max_weight,
-    dirichlet_alpha  = wb_b,
-    init             = list(wgt_raw = baseline_wgt_raw),
+    dirichlet_alpha  = alpha,
+    init             = 0,
     verbose          = FALSE,
     history_size     = history_size,
     refresh          = iter,   # silence per-iteration prints in callr workers
