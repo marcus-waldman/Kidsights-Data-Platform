@@ -1,8 +1,38 @@
 # MN26 Sample Monitoring Scripts
 
+> ## ⚠️ Looking for the main MN26 pipeline?
+>
+> **This directory contains supplementary *monitoring* scripts**, separate
+> from the full ETL pipeline. For the authoritative MN26 pipeline
+> documentation — including how to run it, variable recoding, eligibility
+> logic, scoring, and troubleshooting — see:
+>
+> **→ [`docs/mn26/pipeline_guide.qmd`](../../docs/mn26/pipeline_guide.qmd)**
+>
+> The guide is a single Quarto document with a sidebar table of contents,
+> an embedded data flow diagram, and step-by-step walkthroughs. It's the
+> recommended starting point for code reviewers and new collaborators.
+>
+> **To view:** render the `.qmd` to HTML with
+> `quarto render docs/mn26/pipeline_guide.qmd --to html`,
+> then open `docs/mn26/pipeline_guide.html` in a browser. The rendered
+> HTML is gitignored per repository convention, so each reader renders
+> their own copy.
+
 Scripts for NORC researchers to monitor Minnesota 2026 (MN26) study recruitment progress and demographic distribution during data collection.
 
-## Current Status
+## Historical context
+
+The content below dates from the pre-production **TEMPLATE MODE** phase
+when the MN26 REDCap instruments were still being finalized. Much of it
+refers to NE25 field names (e.g., `cqr002`, `eqstate`, `age_in_days`)
+that have since been renamed in the production MN26 data
+(`mn2`, `mn_eqstate`, `age_in_days_n`). The **current production state** is documented in
+`docs/mn26/pipeline_guide.qmd`. This file is retained for historical reference only.
+
+---
+
+## Current Status (historical)
 
 **TEMPLATE MODE**: These scripts currently use **NE25 data as a template** to demonstrate functionality. Once MN26 data collection begins, variables will need to be updated (marked with `[MN26 TODO]` comments throughout the code).
 

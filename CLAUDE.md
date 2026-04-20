@@ -394,6 +394,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 - **[codebook/README.md](docs/codebook/README.md)** - JSON-based metadata system, IRT parameters, utility functions, dashboard
 
 ### Pipeline-Specific Documentation
+- **MN26 Pipeline:** [docs/mn26/pipeline_guide.qmd](docs/mn26/pipeline_guide.qmd) - Single Quarto guide (render to HTML): Quick Start, data flow diagram, variable recoding reference, eligibility logic, scoring, troubleshooting
 - **ACS Pipeline:** [docs/acs/](docs/acs/) - IPUMS variables reference, pipeline usage, testing guide, cache management
 - **NHIS Pipeline:** [docs/nhis/](docs/nhis/) - NHIS variables reference, pipeline usage, testing guide, transformation mappings
 - **NSCH Pipeline:** [docs/nsch/](docs/nsch/) - Database schema, example queries, troubleshooting, variables reference
@@ -546,6 +547,7 @@ pip install pyreadstat
   - Child ACEs stage validated: 2,585 total rows across 9 ACE tables with binary/valid range checks passing
 
 ### 🚧 MN26 Pipeline - Core Complete (April 2026)
+- **📖 Full Guide:** [`docs/mn26/pipeline_guide.qmd`](docs/mn26/pipeline_guide.qmd) — authoritative documentation for code reviewers (Quick Start, data flow diagram, variable recoding reference, eligibility logic, scoring, troubleshooting)
 - **Status:** Core pipeline runs end-to-end. Kidsights scoring integrated. Raking and imputation deferred.
 - **Study:** Minnesota 2026 (NORC-administered REDCap survey)
 - **Multi-Child:** Up to 2 children per household, wide-to-long pivot (pid + record_id + child_num)

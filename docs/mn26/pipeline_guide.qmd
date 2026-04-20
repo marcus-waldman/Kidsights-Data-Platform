@@ -1,0 +1,1275 @@
+---
+title: "MN26 Pipeline Guide"
+subtitle: "Code review documentation for the Minnesota 2026 ETL pipeline"
+author: "Kidsights Data Platform"
+date: today
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 3
+    toc-expand: 2
+    number-sections: true
+    number-depth: 3
+    code-overflow: wrap
+    code-line-numbers: false
+    code-copy: true
+    theme:
+      light: cosmo
+    highlight-style: github
+    embed-resources: true
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    callout-appearance: simple
+    callout-icon: true
+  gfm:
+    toc: true
+    toc-depth: 3
+execute:
+  eval: false
+  echo: true
+---
+
+# Quick Start {#sec-quick-start}
+
+::: {.callout-tip}
+**Reading this in raw `.qmd` form?** This document is designed to be
+rendered to HTML for the best experience (sidebar TOC, diagram, syntax
+highlighting). To render:
+
+```bash
+quarto render docs/mn26/pipeline_guide.qmd --to html
+# then open docs/mn26/pipeline_guide.html in a browser
+```
+
+The rendered HTML is gitignored per repository convention — each reader
+renders their own copy.
+:::
+
+::: {.callout-note}
+This document is the **authoritative reference** for the MN26 (Minnesota 2026)
+pipeline. It targets a code reviewer who has not worked on the project before
+and who needs to (a) run the pipeline against production REDCap data and
+(b) audit how raw REDCap fields get recoded into derived variables.
+
+For a deep statistical review of the GRM scoring math, see the
+[KidsightsPublic package](https://github.com/marcus-waldman/KidsightsPublic).
+The MN26 pipeline treats scoring as a black-box function and validates only
+that inputs and outputs are well-formed.
+:::
+
+## TL;DR: Run the pipeline in one line
+
+**Prerequisite:** A CSV of REDCap API credentials at
+`C:/my_auths/kidsights_redcap_norc_MN_2026.csv` (format: `project,pid,api_code`).
+
+**Command (from project root):**
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_mn26_pipeline.R --skip-database
+```
+
+The `--skip-database` flag runs the entire pipeline **except** the three
+DuckDB insertion steps. This is the recommended mode for a first run: it
+proves extraction, pivot, transforms, eligibility, and scoring all work
+end-to-end without modifying any persistent state. Drop the flag to store
+results in `data/duckdb/kidsights_local.duckdb`.
+
+## Expected output
+
+As of the most recent production run (4 NORC REDCap projects,
+10,200 records), you should see this summary at the end:
+
+```
+========================================
+MN26 Pipeline Complete
+========================================
+  Records extracted:    10200
+  Records after pivot:  10517 (child 1: 10200, child 2: 317)
+  Eligible:             964
+  Meets inclusion:      964
+  Kidsights scored:     848
+  Total duration:       2.0 seconds
+========================================
+```
+
+Key numbers to sanity-check:
+
+- **Records after pivot > records extracted.** The pipeline pivots wide
+  (1 row per household) to long (1 row per child). Households with two
+  children contribute two rows. See [pivot logic](#sec-overview).
+- **Eligible « extracted.** NORC projects contain records at all screening
+  stages, not just consented participants. Only records with `eq001 == 1`
+  (informed consent) AND `age_in_days_n <= 1825` (child 0–5 years) pass
+  eligibility. See [eligibility logic](#sec-eligibility) for details.
+- **Scored < eligible.** `KidsightsPublic::score_kidsights()` requires at
+  least 5 non-missing developmental item responses. Eligible children who
+  fell short of this threshold (e.g., partial completions) get `NA` for
+  `kidsights_theta`.
+
+::: {.callout-tip}
+If your run produces very different numbers, that's usually a sign that
+REDCap data has changed (new records, schema updates) rather than a
+pipeline bug. Compare your numbers to the commit log of the
+`kidsights_redcap_norc_MN_2026.csv` credentials file to see if new projects
+were added.
+:::
+
+## What to do next
+
+1. Skim the [Pipeline Overview](#sec-overview) diagram to see the full flow.
+2. Use the [Code Organization Map](#sec-code-map) to find the file
+   responsible for each concern.
+3. For a code review focused on recoding accuracy, jump to
+   [Variable Recoding Reference](#sec-recoding).
+4. If something fails, see [Troubleshooting](#sec-troubleshooting).
+
+# Pipeline Overview {#sec-overview}
+
+## Data flow diagram
+
+The diagram below shows the 10-step MN26 pipeline with **real row counts
+from the most recent production run** (10,200 records across 4 NORC
+REDCap projects). Steps are color-coded by phase and annotated with the
+file responsible for each step.
+
+```{=html}
+<style>
+  .mn26-pipeline-diagram {
+    max-width: 960px;
+    margin: 1.5rem auto;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .mn26-pipeline-diagram svg {
+    width: 100%;
+    height: auto;
+  }
+  .mn26-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+  }
+  .mn26-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .mn26-legend .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+</style>
+
+<div class="mn26-pipeline-diagram">
+<svg viewBox="0 0 960 1280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="MN26 pipeline data flow diagram">
+  <defs>
+    <marker id="mn26arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <style>
+      .step-box { rx: 8; ry: 8; stroke-width: 1.5; }
+      .step-title { font-size: 15px; font-weight: 600; fill: #0f172a; }
+      .step-file  { font-size: 11px; font-family: Consolas, "Courier New", monospace; fill: #475569; }
+      .phase-extract  { fill: #dbeafe; stroke: #2563eb; }
+      .phase-pivot    { fill: #e0f2fe; stroke: #0284c7; }
+      .phase-store    { fill: #f1f5f9; stroke: #64748b; }
+      .phase-transform{ fill: #dcfce7; stroke: #16a34a; }
+      .phase-eligible { fill: #fef3c7; stroke: #d97706; }
+      .phase-score    { fill: #fae8ff; stroke: #c026d3; }
+      .arrow-label    { font-size: 12px; fill: #1e293b; font-weight: 500; }
+      .count-badge    { font-size: 13px; font-weight: 700; fill: #b91c1c; }
+      .flow-line      { stroke: #475569; stroke-width: 2; fill: none; }
+      .external       { fill: #fff; stroke: #94a3b8; stroke-dasharray: 5 3; }
+      .external-text  { font-size: 13px; fill: #475569; font-style: italic; }
+    </style>
+  </defs>
+
+  <!-- Title -->
+  <text x="480" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">MN26 Pipeline — 10 Steps</text>
+  <text x="480" y="50" text-anchor="middle" font-size="12" fill="#64748b">Data flow with production row counts (4 NORC REDCap projects)</text>
+
+  <!-- External: REDCap source (outside pipeline) -->
+  <rect x="330" y="80" width="300" height="50" class="external"/>
+  <text x="480" y="102" text-anchor="middle" class="external-text">REDCap API (UNMC server)</text>
+  <text x="480" y="120" text-anchor="middle" class="step-file">4 projects: Kidsights Survey NORC 1–4</text>
+
+  <!-- Step 1: Credentials -->
+  <rect x="80" y="160" width="380" height="60" class="step-box phase-extract"/>
+  <text x="270" y="185" text-anchor="middle" class="step-title">Step 1 — Load API credentials</text>
+  <text x="270" y="205" text-anchor="middle" class="step-file">R/extract/mn26.R :: load_mn26_credentials()</text>
+
+  <!-- Step 2: Extract -->
+  <rect x="500" y="160" width="380" height="60" class="step-box phase-extract"/>
+  <text x="690" y="185" text-anchor="middle" class="step-title">Step 2 — Extract data + dictionary</text>
+  <text x="690" y="205" text-anchor="middle" class="step-file">R/extract/mn26.R :: extract_mn26_data()</text>
+
+  <!-- Arrow from REDCap to Step 2 -->
+  <path d="M 630 130 L 690 160" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <!-- Step 1 → Step 2 -->
+  <path d="M 460 190 L 500 190" class="flow-line" marker-end="url(#mn26arrow)"/>
+
+  <!-- Count badge after Step 2 -->
+  <path d="M 690 220 L 690 270" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="600" y="232" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="248" text-anchor="middle" class="count-badge">10,200 records (wide)</text>
+
+  <!-- Step 3: Pivot -->
+  <rect x="500" y="270" width="380" height="60" class="step-box phase-pivot"/>
+  <text x="690" y="295" text-anchor="middle" class="step-title">Step 3 — Wide-to-long pivot</text>
+  <text x="690" y="315" text-anchor="middle" class="step-file">R/transform/mn26_pivot.R</text>
+
+  <!-- Count after pivot -->
+  <path d="M 690 330 L 690 380" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="560" y="342" width="260" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="358" text-anchor="middle" class="count-badge">10,517 child-rows (10,200 + 317)</text>
+
+  <!-- Step 4: Store raw -->
+  <rect x="80" y="380" width="380" height="60" class="step-box phase-store"/>
+  <text x="270" y="405" text-anchor="middle" class="step-title">Step 4 — Store raw (wide + long)</text>
+  <text x="270" y="425" text-anchor="middle" class="step-file">pipelines/python/insert_raw_data.py</text>
+
+  <!-- Step 5: Transform -->
+  <rect x="500" y="380" width="380" height="60" class="step-box phase-transform"/>
+  <text x="690" y="405" text-anchor="middle" class="step-title">Step 5 — Data transformation</text>
+  <text x="690" y="425" text-anchor="middle" class="step-file">R/transform/mn26_transforms.R :: recode_it()</text>
+
+  <!-- Step 3 → Step 4 (side branch) -->
+  <path d="M 500 410 L 460 410" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <text x="480" y="395" text-anchor="middle" class="arrow-label">(raw storage)</text>
+
+  <!-- Count after transform -->
+  <path d="M 690 440 L 690 490" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="600" y="452" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="468" text-anchor="middle" class="count-badge">10,517 × 627 cols</text>
+
+  <!-- Step 6: Eligibility -->
+  <rect x="500" y="490" width="380" height="60" class="step-box phase-eligible"/>
+  <text x="690" y="515" text-anchor="middle" class="step-title">Step 6 — Eligibility validation</text>
+  <text x="690" y="535" text-anchor="middle" class="step-file">R/harmonize/mn26_eligibility.R :: check_mn26_eligibility()</text>
+
+  <!-- Count after eligibility -->
+  <path d="M 690 550 L 690 600" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="600" y="562" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="578" text-anchor="middle" class="count-badge">964 eligible (9.2%)</text>
+
+  <!-- Step 7: Inclusion filter -->
+  <rect x="500" y="600" width="380" height="60" class="step-box phase-eligible"/>
+  <text x="690" y="625" text-anchor="middle" class="step-title">Step 7 — Create meets_inclusion flag</text>
+  <text x="690" y="645" text-anchor="middle" class="step-file">R/harmonize/mn26_eligibility.R :: apply_mn26_inclusion()</text>
+
+  <!-- Count after inclusion -->
+  <path d="M 690 660 L 690 710" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="600" y="672" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="688" text-anchor="middle" class="count-badge">964 meets_inclusion</text>
+
+  <!-- Step 8: Scoring -->
+  <rect x="500" y="710" width="380" height="60" class="step-box phase-score"/>
+  <text x="690" y="735" text-anchor="middle" class="step-title">Step 8 — Kidsights scoring (MAP)</text>
+  <text x="690" y="755" text-anchor="middle" class="step-file">KidsightsPublic::score_kidsights()</text>
+
+  <!-- Count after scoring -->
+  <path d="M 690 770 L 690 820" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="600" y="782" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
+  <text x="690" y="798" text-anchor="middle" class="count-badge">848 scored (of 964)</text>
+
+  <!-- Step 9: Store transformed -->
+  <rect x="500" y="820" width="380" height="60" class="step-box phase-store"/>
+  <text x="690" y="845" text-anchor="middle" class="step-title">Step 9 — Store transformed data</text>
+  <text x="690" y="865" text-anchor="middle" class="step-file">pipelines/python/insert_raw_data.py → mn26_transformed</text>
+
+  <!-- Step 10: Store dictionary -->
+  <path d="M 690 880 L 690 910" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="500" y="910" width="380" height="60" class="step-box phase-store"/>
+  <text x="690" y="935" text-anchor="middle" class="step-title">Step 10 — Store data dictionary</text>
+  <text x="690" y="955" text-anchor="middle" class="step-file">pipelines/python/insert_raw_data.py → mn26_data_dictionary</text>
+
+  <!-- External: DuckDB destination -->
+  <path d="M 270 440 L 270 1040" class="flow-line"/>
+  <path d="M 690 970 L 690 1010 L 270 1010 L 270 1040" class="flow-line" marker-end="url(#mn26arrow)"/>
+  <rect x="120" y="1040" width="300" height="50" class="external"/>
+  <text x="270" y="1062" text-anchor="middle" class="external-text">DuckDB: data/duckdb/kidsights_local.duckdb</text>
+  <text x="270" y="1080" text-anchor="middle" class="step-file">mn26_raw_wide · mn26_raw · mn26_transformed · mn26_data_dictionary</text>
+
+  <!-- Orchestrator annotation -->
+  <rect x="40" y="1130" width="880" height="60" rx="6" ry="6" fill="#f8fafc" stroke="#cbd5e1" stroke-dasharray="4 3"/>
+  <text x="480" y="1155" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Orchestrator: pipelines/orchestration/mn26_pipeline.R</text>
+  <text x="480" y="1175" text-anchor="middle" font-size="12" fill="#475569">All 10 steps coordinated in run_mn26_pipeline(). Entry point: run_mn26_pipeline.R</text>
+
+  <!-- Time annotation -->
+  <text x="480" y="1220" text-anchor="middle" font-size="12" fill="#64748b">Total runtime: ~2.0 seconds (without database insertion) · ~30–60 seconds with full DB storage</text>
+</svg>
+
+<div class="mn26-legend">
+  <span><span class="swatch" style="background:#dbeafe;border:1px solid #2563eb;"></span>Extraction</span>
+  <span><span class="swatch" style="background:#e0f2fe;border:1px solid #0284c7;"></span>Pivot</span>
+  <span><span class="swatch" style="background:#dcfce7;border:1px solid #16a34a;"></span>Transform</span>
+  <span><span class="swatch" style="background:#fef3c7;border:1px solid #d97706;"></span>Eligibility</span>
+  <span><span class="swatch" style="background:#fae8ff;border:1px solid #c026d3;"></span>Scoring</span>
+  <span><span class="swatch" style="background:#f1f5f9;border:1px solid #64748b;"></span>Storage</span>
+</div>
+</div>
+```
+
+## Narrative walkthrough
+
+The pipeline is organized into six logical phases. A reviewer can think
+of each phase as answering one question.
+
+### Extraction (Steps 1–2): "What data do we have?"
+
+The pipeline loads REDCap API credentials from a local CSV (Step 1) and
+pulls raw data plus the project data dictionary from each of the 4 NORC
+REDCap projects (Step 2). Each project contributes ~2,500 records;
+they're combined using `flexible_bind_rows()` which resolves column
+type conflicts (e.g., timestamps that are character in some projects
+and datetime in others). Output: **10,200 wide-format records**.
+
+### Pivot (Step 3): "One row per child"
+
+MN26 is a **multi-child survey** — each household can enroll up to 2
+children, stored in wide format (columns like `cqr009_c2`,
+`age_in_days_c2_n`). The pivot expands the wide data into long format
+with one row per child, identified by `pid + record_id + child_num`.
+Households with no child-2 data stay as single rows. Output:
+**10,517 child rows** = 10,200 child-1 + 317 child-2.
+
+### Transform (Step 5): "Recode raw into derived variables"
+
+`recode_it(what = "all")` dispatches through 10 transformation
+categories (race, sex, age, education, income, geographic, mental
+health, childcare, caregiver relationship, eligibility). Each category
+reads raw REDCap fields and produces derived analysis-ready variables.
+See [Variable Recoding Reference](#sec-recoding) for the mapping from
+raw fields to derived columns. Output: same 10,517 rows, expanded from
+883 raw columns to ~627 (many raw columns collapse into derived ones).
+
+### Eligibility (Steps 6–7): "Who counts?"
+
+Because NORC pre-screens participants before they reach REDCap, only
+two criteria are checked on-REDCap: informed consent (`eq001 == 1`)
+and child age 0–5 years (`age_in_days_n <= 1825`). The legacy NE25
+criteria (`eq002`, `eq003`, `mn_eqstate`) are absent from production
+exports and automatically skipped. Output: **964 eligible children**
+(9.2% of 10,517). For MN26, `meets_inclusion` equals `eligible` with no
+additional filters.
+
+### Scoring (Step 8): "What's their developmental score?"
+
+Only eligible children are passed to `KidsightsPublic::score_kidsights()`,
+which runs a CmdStan MAP optimization with fixed item parameters from
+the 2023 Mplus calibration. Children with fewer than 5 non-missing item
+responses are not scored (`min_responses = 5`). Output: **848 scored**
+children (88% of eligible).
+
+### Storage (Steps 4, 9–10): "Persist for analysis"
+
+Three storage steps write to DuckDB via a Python helper
+(`pipelines/python/insert_raw_data.py`):
+
+- **Step 4**: raw wide format (audit trail) + raw long format (working copy)
+- **Step 9**: fully transformed + scored data → `mn26_transformed`
+- **Step 10**: REDCap data dictionary → `mn26_data_dictionary`
+
+The `--skip-database` CLI flag suppresses all three. Database steps are
+the slowest part of the pipeline (file I/O + Python subprocess) —
+skipping them drops total runtime from ~30–60 seconds to ~2 seconds.
+
+# Setup & Prerequisites {#sec-setup}
+
+## System requirements
+
+| Requirement | Tested version | Notes |
+|---|---|---|
+| R | 4.5.1 | Windows build at `C:/Program Files/R/R-4.5.1/bin/` |
+| Python | 3.13+ | Only needed if you want database insertion (Steps 4 and 9) |
+| CmdStan | latest via `cmdstanr` | Required for Kidsights scoring |
+| DuckDB | bundled with R `duckdb` package | Only needed for Step 9 database insertion |
+
+This pipeline runs on Windows with Unix-style paths (forward slashes).
+Commands use `Rscript.exe` explicitly to avoid PATH ambiguity.
+
+## R package dependencies
+
+The pipeline script sources each dependency file directly at startup
+(no `DESCRIPTION` / no `renv.lock`). The required CRAN packages are:
+
+```{.r}
+# Core pipeline
+install.packages(c(
+  "dplyr", "tidyr", "stringr",   # data manipulation
+  "yaml",                          # config file parsing
+  "arrow",                         # feather file I/O (for database handoff)
+  "REDCapR",                       # REDCap API extraction
+  "httr",                          # HTTP for dictionary retrieval
+  "plyr",                          # mapvalues() in recode_it (LOAD BEFORE dplyr)
+  "labelled",                      # variable labels
+  "lubridate",                     # date arithmetic (CPI/FPL)
+  "fredr"                          # FRED API for CPI ratios
+))
+```
+
+Additional packages used only by specific transform categories:
+
+```{.r}
+install.packages(c(
+  "stringdist",                    # fuzzy matching in reconciliation_audit.R
+  "htmltools"                      # audit report rendering
+))
+```
+
+## Installing KidsightsPublic (required for scoring)
+
+The pipeline's Step 8 (Kidsights developmental scoring) calls
+`KidsightsPublic::score_kidsights()`. This package ships the item
+parameters from the 2023 Mplus calibration and the CmdStan models for
+MAP scoring. Install from GitHub:
+
+```{.r}
+# Install dev tools if needed
+install.packages("devtools")
+
+# Install KidsightsPublic
+devtools::install_github("marcus-waldman/KidsightsPublic")
+
+# Install CmdStan (one-time setup, ~15 minutes)
+cmdstanr::install_cmdstan()
+```
+
+Verify both are working:
+
+```{.r}
+library(KidsightsPublic)
+cmdstanr::cmdstan_version()  # should print e.g., "2.35.0"
+```
+
+::: {.callout-warning}
+If `cmdstanr::install_cmdstan()` fails with compiler errors, you may need
+to install Rtools (Windows) or a C++ toolchain. The CmdStan maintainers
+keep up-to-date setup instructions at
+<https://mc-stan.org/cmdstanr/articles/cmdstanr.html>.
+:::
+
+## REDCap API credentials
+
+MN26 uses **4 production REDCap projects** hosted on the UNMC REDCap
+server. Access requires individual API tokens — one per project.
+
+### Credentials file format
+
+Create a CSV at `C:/my_auths/kidsights_redcap_norc_MN_2026.csv` with
+three columns:
+
+```
+project,pid,api_code
+Kidsights Survey NORC 1,8723,<64-char hex token>
+Kidsights Survey NORC 2,8724,<64-char hex token>
+Kidsights Survey NORC 3,8725,<64-char hex token>
+Kidsights Survey NORC 4,8726,<64-char hex token>
+```
+
+- `project`: descriptive name; propagated as `source_project` in output
+- `pid`: REDCap project ID (integer)
+- `api_code`: API token (alphanumeric, typically 64 characters)
+
+### Where the pipeline looks for credentials
+
+The pipeline resolves credentials in this order:
+
+1. `--credentials <path>` CLI flag on `run_mn26_pipeline.R`
+2. `REDCAP_API_CREDENTIALS_PATH_MN26` environment variable (set via `.env`)
+3. `api_credentials_file` field in `config/sources/mn26.yaml`
+   (default: `C:/my_auths/kidsights_redcap_norc_MN_2026.csv`)
+
+::: {.callout-important}
+**Never commit the credentials CSV to git.** The repository `.gitignore`
+excludes `*api*.csv`, but the safest practice is to keep credentials in a
+separate directory outside the repo (e.g., `C:/my_auths/`). Each
+collaborator maintains their own copy.
+:::
+
+## Directory layout expected at runtime
+
+The pipeline is designed to be run from the **project root**, not from
+`pipelines/` or any subdirectory. Relative `source()` calls depend on this.
+
+```
+Kidsights-Data-Platform/              <- run commands from here
+├── R/
+│   ├── extract/mn26.R               <- extraction functions
+│   ├── transform/mn26_pivot.R       <- wide-to-long
+│   ├── transform/mn26_transforms.R  <- recode_it() dispatcher
+│   ├── harmonize/mn26_eligibility.R <- 4-criteria check
+│   └── utils/                       <- shared helpers
+├── config/sources/mn26.yaml         <- config
+├── pipelines/orchestration/
+│   └── mn26_pipeline.R              <- 10-step orchestrator
+├── schemas/landing/mn26.sql         <- DuckDB schema
+├── run_mn26_pipeline.R              <- entry point
+└── data/duckdb/                     <- output DB (created on first run)
+```
+
+# Running the Pipeline {#sec-running}
+
+## Entry point
+
+The top-level script is `run_mn26_pipeline.R`. It parses command-line
+flags, sources the orchestrator, and calls `run_mn26_pipeline()`.
+
+## Supported flags
+
+| Flag | Effect |
+|---|---|
+| `--skip-database` | Skip Steps 4, 9 (wide storage, long storage, dictionary storage). Transforms, eligibility, and scoring still run, but nothing writes to DuckDB. |
+| `--credentials <path>` | Override the credentials CSV path. Takes precedence over env var and config. |
+| (no flags) | Full pipeline including database insertion. |
+
+## Command examples
+
+**First run / dry run** (recommended for new reviewers):
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_mn26_pipeline.R --skip-database
+```
+
+**Full run with database insertion:**
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_mn26_pipeline.R
+```
+
+**Run against a test/dev credentials file:**
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_mn26_pipeline.R \
+  --credentials "C:/my_auths/kidsights_redcap_norc_test_MN.csv" \
+  --skip-database
+```
+
+**Interactive run from an R session** (useful for debugging; gives you
+access to the intermediate `result` object):
+
+```{.r}
+source("pipelines/orchestration/mn26_pipeline.R")
+result <- run_mn26_pipeline(
+  config_path = "config/sources/mn26.yaml",
+  skip_database = TRUE
+)
+
+# Inspect stages
+head(result$raw_wide)   # pre-pivot
+head(result$raw_long)   # post-pivot
+head(result$data)       # final transformed + scored
+result$metrics          # step-by-step timing and counts
+```
+
+## Reading the console output
+
+Each step prints a banner and key metrics. The format is:
+
+```
+--- Step N: <Step name> ---
+  <progress message or metric>
+  [OK] <success indicator>  OR  [WARN] <non-fatal issue>
+```
+
+Here's what healthy output looks like for each step, annotated:
+
+```
+--- Step 1: Loading API Credentials ---
+[OK] Loaded 4 MN26 API credential(s)             <- matches rows in CSV
+
+--- Step 2: Extracting REDCap Data ---
+  Extracting: Kidsights Survey NORC 1 (PID 8723)
+    [OK] 2500 records, 883 columns                <- one line per project
+  Extracting: Kidsights Survey NORC 2 (PID 8724)
+    [OK] 2500 records, 883 columns
+  ... (projects 3, 4)
+[OK] MN26 extraction complete: 10200 records, 883 columns
+
+--- Step 3: Wide-to-Long Pivot ---
+MN26 Pivot: 10200 household records
+  Child 2 columns detected: 368                   <- identifies _c2 columns
+  Mappable to child 1: 329                        <- have a matching base column
+  Child-2-only columns: 39                        <- no NE25 equivalent
+  Child 1 rows: 10200
+  Households with child 2: 317 of 10200           <- ~3% multi-child
+  Final long format: 10517 rows                   <- 10200 + 317
+
+--- Step 4: SKIPPED (skip_database=TRUE) ---      <- or would store to DB
+
+--- Step 5: Data Transformation ---
+  Transformed: 10517 records, 627 columns         <- derived vars added
+
+--- Step 6: Eligibility Validation ---
+Checking MN26 eligibility (NORC production-aligned)...
+  Total children:      10517
+  Eligible:            964 (9.2%)
+  Criterion breakdown:
+    Consent (eq001):         1217 [required]
+    Child age (<=5yr):       964 [required]
+    Parent age (eq003):      column absent [NORC pre-screened, skipped]
+    Primary CG (eq002):      column absent [NORC pre-screened, skipped]
+    MN residence (mn_eqstate): column absent [NORC pre-screened, skipped]
+
+--- Step 7: Inclusion Filter ---
+  Meets inclusion: 964 of 10517                   <- = eligible for MN26
+
+--- Step 8: Kidsights Developmental Scoring ---
+  Scoring 964 eligible children (of 10517 total)...
+Initial log joint probability = -44379.1
+Optimization terminated normally:
+  Convergence detected: relative change in objective function was below tolerance
+Finished in  0.7 seconds.
+  Scored: 848 of 964 eligible children           <- ~12% short of 5-item min
+
+--- Step 9: SKIPPED (skip_database=TRUE) ---
+
+========================================
+MN26 Pipeline Complete                           <- summary banner
+========================================
+```
+
+## What to verify after a run
+
+A reviewer running the pipeline end-to-end should check these four things:
+
+1. **Extraction count matches REDCap.** Compare `Records extracted` with
+   a direct query to each REDCap project (record count should match
+   exactly — this pipeline does no filtering during extraction).
+2. **Pivot row count is correct.** `records_after_pivot == records_extracted + households_with_child2`.
+3. **Eligibility is plausible.** `Eligible` should be between ~5% and
+   ~15% of extracted during early data collection and converge higher
+   as recruitment matures.
+4. **Scoring attrition is reasonable.** `Scored / Eligible` should be
+   >80%. If it drops significantly below that, the item responses in
+   REDCap may have changed encoding (see [troubleshooting](#sec-troubleshooting)).
+
+# Code Organization Map {#sec-code-map}
+
+The MN26 pipeline is organized into single-responsibility modules. This
+section tells you **which file to open for any given concern**.
+
+## File-by-file responsibilities
+
+| File | Lines | Responsibility | Key exports |
+|---|---:|---|---|
+| `run_mn26_pipeline.R` | 41 | Entry point. Parses CLI flags, sources the orchestrator. | — |
+| `pipelines/orchestration/mn26_pipeline.R` | 344 | 10-step orchestrator. Coordinates all other modules. | `run_mn26_pipeline()` |
+| `config/sources/mn26.yaml` | 188 | Pipeline configuration (REDCap URL, credentials path, instruments, validation rules). | — |
+| `R/extract/mn26.R` | 235 | REDCap API extraction. Loads credentials, pulls data + dictionary from N projects. | `load_mn26_credentials()`, `extract_mn26_data()`, `extract_mn26_dictionary()` |
+| `R/transform/mn26_pivot.R` | 207 | Wide-to-long pivot for multi-child households. | `pivot_mn26_wide_to_long()` |
+| `R/transform/mn26_transforms.R` | 1390 | Variable recoding dispatcher (race, sex, age, education, income, etc.). | `recode_it()`, `recode__()` (internal) |
+| `R/harmonize/mn26_eligibility.R` | 157 | 4-criteria eligibility check (NORC production-aligned). | `check_mn26_eligibility()`, `apply_mn26_inclusion()` |
+| `R/utils/flexible_bind_rows.R` | 92 | Resolves column type conflicts when combining multi-project REDCap extracts. | `flexible_bind_rows()` |
+| `R/utils/recode_utils.R` | 23 | Recode sentinel missing codes (99, 9, -99, etc.) to NA. | `recode_missing()` |
+| `R/utils/cpi_utils.R` | 49 | CPI adjustment ratios via FRED API (for income deflation). | `cpi_ratio_1999()` |
+| `R/utils/poverty_utils.R` | 69 | Federal poverty thresholds 2020–2026. | `get_poverty_threshold()` |
+| `R/utils/safe_joins.R` | 95 | Safe `left_join` wrapper (validates row count, detects column collisions). | `safe_left_join()` |
+| `schemas/landing/mn26.sql` | 239 | DuckDB table schemas for `mn26_raw_wide`, `mn26_raw`, `mn26_transformed`, `mn26_data_dictionary`. | — |
+
+## Pipeline step → file mapping
+
+Each of the 10 orchestrator steps calls into specific modules:
+
+| Step | What it does | Primary file | Key function |
+|---|---|---|---|
+| 1 | Load API credentials | `R/extract/mn26.R` | `load_mn26_credentials()` |
+| 2 | Extract REDCap data + dictionary | `R/extract/mn26.R` | `extract_mn26_data()` |
+| 3 | Wide-to-long pivot | `R/transform/mn26_pivot.R` | `pivot_mn26_wide_to_long()` |
+| 4 | Store raw (wide + long) in DuckDB | `pipelines/python/insert_raw_data.py` (via `system2()`) | — |
+| 5 | Variable transformation | `R/transform/mn26_transforms.R` | `recode_it(data, dict, what = "all")` |
+| 6 | Eligibility validation | `R/harmonize/mn26_eligibility.R` | `check_mn26_eligibility()` |
+| 7 | Create `meets_inclusion` filter | `R/harmonize/mn26_eligibility.R` | `apply_mn26_inclusion()` |
+| 8 | Kidsights developmental scoring | `KidsightsPublic` package | `KidsightsPublic::score_kidsights()` |
+| 9 | Store transformed data in DuckDB | `pipelines/python/insert_raw_data.py` | — |
+| 10 | Store data dictionary in DuckDB | `pipelines/python/insert_raw_data.py` | — |
+
+## Relationship to the NE25 pipeline
+
+The MN26 pipeline is a **sibling** of the NE25 pipeline, not a fork.
+Shared utilities live in `R/utils/` and are sourced by both:
+
+- `R/utils/flexible_bind_rows.R` — both extract modules use this
+- `R/utils/recode_utils.R` — both transforms use this
+- `R/utils/cpi_utils.R` — both use this for income deflation
+- `R/utils/poverty_utils.R` — both use this for FPL calculation
+- `R/utils/safe_joins.R` — both use this for joins
+
+Study-specific code (extraction, transforms, eligibility, orchestrator)
+is duplicated per study. Duplication is intentional: the two studies have
+enough differences in raw field names and eligibility logic that a
+single "generic" version would need too many study flags to be readable.
+
+::: {.callout-tip}
+**If you're coming from the NE25 pipeline** and are looking for the MN26
+equivalent of a file, the naming is consistent:
+
+- `R/extract/ne25.R` → `R/extract/mn26.R`
+- `R/transform/ne25_transforms.R` → `R/transform/mn26_transforms.R`
+- `R/harmonize/ne25_eligibility.R` → `R/harmonize/mn26_eligibility.R`
+- `pipelines/orchestration/ne25_pipeline.R` → `pipelines/orchestration/mn26_pipeline.R`
+:::
+
+## Navigation by concern
+
+If you're reviewing for…
+
+- **Credentials handling or API calls** → `R/extract/mn26.R`
+- **Multi-child pivot correctness** → `R/transform/mn26_pivot.R`
+- **Race / sex / age / income recoding** → `R/transform/mn26_transforms.R` (see [Variable Recoding Reference](#sec-recoding) for function line numbers)
+- **Who counts as "eligible"** → `R/harmonize/mn26_eligibility.R`
+- **How the pipeline decides what to run** → `pipelines/orchestration/mn26_pipeline.R`
+- **What tables exist in the database** → `schemas/landing/mn26.sql`
+- **Configuration knobs (URLs, file paths, thresholds)** → `config/sources/mn26.yaml`
+
+# Variable Recoding Reference {#sec-recoding}
+
+This section documents the **key derived variables** that a code
+reviewer is most likely to audit for recoding accuracy. All transforms
+live in `R/transform/mn26_transforms.R` and are dispatched by the
+`recode_it()` function (line 1359) via the internal `recode__()` helper
+(line 297).
+
+::: {.callout-note}
+The recoding is intentionally a direct adaptation of the NE25 pipeline
+transforms. The reconciliation audit
+(`scripts/mn26/reconciliation_audit.R`) established that 459 of 471
+shared fields are **identical** between studies — so most transforms
+port directly. Changes concentrate in 4 sections: race, caregiver
+relationship, age, and income.
+:::
+
+## How recode_it() dispatches transforms
+
+`recode_it()` calls `recode__()` for each category in this list when
+invoked with `what = "all"`:
+
+```{.r}
+c("include", "race", "caregiver relationship", "education",
+  "sex", "age", "income", "geographic", "mental health", "childcare")
+```
+
+Each category is a self-contained branch inside `recode__()`. The table
+below maps each **key derived variable** to the raw REDCap field(s) it's
+derived from, the line range in `R/transform/mn26_transforms.R`, and any
+NE25↔MN26 differences a reviewer should check.
+
+## Key derived variables
+
+### Child sex
+
+| Aspect | Value |
+|---|---|
+| Source REDCap field | `cqr009` |
+| Transform branch | `recode__()` lines 460–487 (`what == "sex"`) |
+| Output variables | `sex` (factor with "Female"/"Male"), `female` (logical) |
+| Coding | `1 = Female, 0 = Male` — **same in NE25 and MN26** |
+| Approach | Dictionary-driven: `plyr::mapvalues()` using labels from REDCap dictionary |
+
+::: {.callout-important}
+The sex coding is **identical** between NE25 and MN26 despite earlier
+documentation claims of a swap. Both studies code `1 = Female`,
+`0 = Male` in the REDCap dictionary. See reconciliation audit output
+for confirmation; the kidsights-norc repo was updated to remove the
+incorrect "swapped" claim.
+:::
+
+---
+
+### Child race and ethnicity
+
+| Aspect | Value |
+|---|---|
+| Source REDCap fields | `cqr010b___100` through `cqr010b___105` (6 checkboxes) + `cqr011` (Hispanic) |
+| Transform branch | `recode__()` lines 333–410 (`what %in% c("race", "ethnicity")`) |
+| Output variables | `race` (factor), `hisp` (factor), `raceG` (combined) |
+| NE25 vs MN26 | **STRUCTURAL CHANGE**: NE25 had `cqr010___1..15` (15 granular categories that got collapsed in code). MN26 has `cqr010b___100..105` — 6 pre-collapsed categories. **No in-R collapse needed for MN26.** |
+| Checkbox decoding | Each `cqr010b___NNN` column is 0/1 for that race being selected. Multiple selections → "Two or More Races". |
+| Race code map | 100=AIAN, 101=Asian, 102=Black, 103=NHPI, 104=White, 105=Other |
+
+---
+
+### Caregiver race and ethnicity
+
+| Aspect | Value |
+|---|---|
+| Source REDCap fields | `sq002b___100` through `sq002b___105` + `sq003` |
+| Transform branch | Same branch as child race, lines 333–410 |
+| Output variables | `a1_race`, `a1_hisp`, `a1_raceG` (parent/caregiver versions) |
+| NE25 vs MN26 | **STRUCTURAL CHANGE**: same collapse-in-REDCap pattern as child race (`sq002___*` → `sq002b___*`). |
+
+---
+
+### Child age
+
+| Aspect | Value |
+|---|---|
+| Source REDCap field | `age_in_days_n` (calculated field: `datediff([dob_n], [consent_date_n], 'd')`) |
+| Transform branch | `recode__()` lines 489–508 (`what == "age"`) |
+| Output variables | `years_old` (= `age_in_days_n / 365.25`), `months_old`, `days_old` (= `age_in_days_n`) |
+| NE25 vs MN26 | **RENAMED**: NE25's `age_in_days` → MN26's `age_in_days_n`. Same calculation underneath; only the field name changed. |
+
+---
+
+### Caregiver age
+
+| Aspect | Value |
+|---|---|
+| Source REDCap field | `cqr003` |
+| Transform branch | Same `age` branch, lines 489–508 |
+| Output variable | `a1_years_old` |
+| Coding | Direct numeric passthrough |
+
+---
+
+### Parent gender
+
+| Aspect | Value |
+|---|---|
+| Source REDCap field | `mn2` |
+| Transform branch | `recode__()` lines 411–458 (`what %in% c("caregiver relationship")`) |
+| Output variable | `female_a1` (logical) |
+| NE25 vs MN26 | **RENAMED + EXPANDED**: NE25's `cqr002` → MN26's `mn2`. NE25 was binary (0/1); MN26 adds non-binary code 97. Transform uses `mn2 == 0` (Female), so non-binary respondents get `female_a1 = FALSE`. |
+
+---
+
+### Education
+
+| Aspect | Value |
+|---|---|
+| Source REDCap fields | `cqr004` (primary caregiver), `nschj017` (secondary caregiver, if present) |
+| Transform branch | `recode__()` lines 555–700 (`what %in% c("education")`) |
+| Output variables | `educ_a1`, `educ_a2` (8-category); `educ4_a1`, `educ4_a2` (4-category); `educ6_a1`, `educ6_a2` (6-category); `educ_mom`, `educ4_mom`, `educ6_mom`, `educ_max` |
+| Coding | **Identical in both studies**: 0 = 8th grade or less, …, 8 = Doctorate/Professional. |
+| Approach | Dictionary-driven: factor levels read from REDCap dictionary, so reclassification into 4- and 6-category versions is resilient to label changes. |
+| Category collapses | 8→4: (0,1)=Less than HS, (2)=HS, (3,4,5)=Some College, (6,7,8)=College+. 8→6: splits "College+" into Bachelor's, Master's, Doctorate. |
+
+---
+
+### Income & federal poverty level (FPL)
+
+| Aspect | Value |
+|---|---|
+| Source REDCap fields | `cqr006` (family income), `consent_date_n` (for CPI adjustment), `fqlive1_1` + `fqlive1_2` (family size) |
+| Transform branch | `recode__()` lines 510–553 (`what == "income"`) |
+| Output variables | `income` (nominal $), `cpi99` (CPI ratio), `inc99` (1999 dollars), `family_size`, `federal_poverty_threshold`, `fpl` (% of FPL), `fplcat` (factor: <100%, 100–199%, 200–299%, 300–399%, 400+%) |
+| NE25 vs MN26 | **RENAMED**: NE25's `consent_date` → MN26's `consent_date_n`. **RECODED**: `cqr006` slider range changed — NE25 max was $500,000, MN26 max is $250,000+ (slider clipped at 250K with "+" label). Family size formula unchanged. |
+| External calls | `cpi_ratio_1999()` from `R/utils/cpi_utils.R` (FRED API), `get_poverty_threshold()` from `R/utils/poverty_utils.R` (hardcoded HHS guidelines 2020–2026) |
+
+::: {.callout-warning}
+The `cqr006` recode is the one transform most likely to produce subtly
+different distributions between NE25 and MN26. Households earning
+$250K–$500K in NE25 land at their actual value; in MN26, they're all
+clipped to 250K. A reviewer looking at FPL distributions for high-income
+families should expect a mass point at 250K in MN26 that isn't there in
+NE25.
+:::
+
+---
+
+### Marital status
+
+| Aspect | Value |
+|---|---|
+| Source REDCap field | `cqfa001` |
+| Transform branch | Not directly in `recode__()`; labeled factor is generated by the dictionary value_labels at load time |
+| Output variable | `cqfa001` (labeled factor): 0=Married, 1=Not married but living with partner, 2=Never married, 3=Divorced, 4=Separated, 5=Widowed |
+| NE25 vs MN26 | **Coding identical.** Earlier documentation claimed a shift (NE25 1–6, MN26 0–5), but reconciliation audit confirmed both studies use 0–5. |
+
+---
+
+### Eligibility & inclusion
+
+| Aspect | Value |
+|---|---|
+| Source REDCap fields | `eq001` (consent), `age_in_days_n` (child age); optionally `eq002`, `eq003`, `mn_eqstate` |
+| Function | `check_mn26_eligibility()` + `apply_mn26_inclusion()` in `R/harmonize/mn26_eligibility.R` |
+| Output variables | `pass_consent`, `pass_child_age`, `pass_parent_age`, `pass_primary_caregiver`, `pass_minnesota_residence`, `eligible`, `meets_inclusion`, `exclusion_reason` |
+| NE25 vs MN26 | **ARCHITECTURALLY DIFFERENT**. See [Eligibility Logic](#sec-eligibility) for full details. Required: `eq001 == 1` AND `age_in_days_n <= 1825`. Optional (if columns present): `eq002/eq003/mn_eqstate`. NE25 required all 9 CID checks; MN26 offloads caregiver screening to NORC. |
+
+---
+
+## How to spot-check a recode
+
+A good audit pattern:
+
+1. Pick a raw REDCap variable and its expected output (e.g., `cqr009` → `female`).
+2. Run the pipeline with `--skip-database` and capture the result:
+
+```{.r}
+source("pipelines/orchestration/mn26_pipeline.R")
+result <- run_mn26_pipeline(skip_database = TRUE)
+```
+
+3. Cross-tab the raw and derived columns:
+
+```{.r}
+# Sex check: cqr009 codes 1=Female, 0=Male
+table(result$data$cqr009, result$data$female, useNA = "always")
+```
+
+4. Expected output for a correct transform:
+
+```
+        FALSE  TRUE  <NA>
+   0    XXXX    0     0
+   1      0   YYYY    0
+   <NA>   0     0    ZZZZ
+```
+
+5. Investigate any off-diagonal values — they indicate a miscoding.
+
+::: {.callout-tip}
+The `recode_missing()` utility in `R/utils/recode_utils.R` converts
+sentinel missing codes (99, 9, -99, 999, etc.) to NA **before** any
+arithmetic on composite variables. This is critical for composite
+scores (PHQ-2 total, GAD-2 total, ACE totals) and is a common source of
+recoding bugs when it's missed. Search for `recode_missing(` in the
+transforms file to find all uses.
+:::
+
+# Eligibility Logic {#sec-eligibility}
+
+The MN26 eligibility logic differs from NE25 in one critical way:
+**NORC pre-screens participants before they reach REDCap**. This has
+consequences for which fields are collected, which criteria the pipeline
+can check, and how the pipeline adapts to partial data.
+
+## Production architecture
+
+```
+Prospective participant
+        │
+        ▼
+┌──────────────────────┐
+│ NORC pre-screening   │  ← caregiver status, age ≥19, Minnesota residence
+│ (happens off-REDCap) │    screened HERE
+└──────────────────────┘
+        │
+        ▼ (approved participants only)
+┌──────────────────────┐
+│ REDCap survey        │  ← consent, child age, developmental items
+│ (what this pipeline  │    collected HERE
+│  sees)               │
+└──────────────────────┘
+```
+
+Because NORC vets caregiver age, primary caregiver status, and state
+residence **before** routing participants to the Kidsights instrument,
+the legacy NE25 eligibility fields (`eq002`, `eq003`, `mn_eqstate`) are
+not administered. They're present in the REDCap data dictionary (as
+dormant legacy fields from the NE25 instrument template), but they're
+**not exported in the production data** because no records ever have
+values for them.
+
+## What the pipeline checks
+
+The pipeline's eligibility function (`check_mn26_eligibility()` in
+`R/harmonize/mn26_eligibility.R`) is adaptive: it always checks the
+required criteria, and conditionally applies legacy criteria if the
+columns happen to be present.
+
+### Required criteria (always checked)
+
+| # | Criterion | Field | Rule |
+|---|---|---|---|
+| 1 | Informed consent | `eq001` | `eq001 == 1` |
+| 2 | Child age 0–5 | `age_in_days_n` | `age_in_days_n <= 1825` |
+
+If either required column is missing from the data, the function raises
+an error immediately — this is a structural problem, not a data problem.
+
+### Optional criteria (checked only if columns present)
+
+| # | Criterion | Field | Status in production |
+|---|---|---|---|
+| 3 | Caregiver age ≥19 | `eq003` | **Absent** — NORC pre-screened |
+| 4 | Primary caregiver | `eq002` | **Absent** — NORC pre-screened |
+| 5 | Minnesota residence | `mn_eqstate` | **Absent** — NORC pre-screened |
+
+If a column is absent, the function logs `column absent [NORC pre-screened, skipped]`
+in its verbose output and treats that criterion as effectively passed.
+This is safe because NORC only routes approved participants to REDCap.
+
+### Final `eligible` flag
+
+```
+eligible = pass_consent
+         & pass_child_age
+         & (pass_parent_age          | is.na(pass_parent_age))
+         & (pass_primary_caregiver   | is.na(pass_primary_caregiver))
+         & (pass_minnesota_residence | is.na(pass_minnesota_residence))
+```
+
+The `| is.na(...)` clauses mean "if this criterion is missing entirely,
+don't count it against the participant". Legacy fields contribute NA
+rather than FALSE, so they short-circuit correctly.
+
+## Inclusion filter
+
+`apply_mn26_inclusion()` copies `eligible` into `meets_inclusion`. For
+MN26, no additional filters (authenticity screening, influential
+observation flagging) are applied — that differs from NE25, which layers
+those checks on top of eligibility.
+
+## Historical context
+
+The design decision to offload eligibility to NORC is documented in the
+sibling repository
+[`kidsights-norc`](https://github.com/marcus-waldman/kidsights-norc),
+specifically commit `4d97629` ("Restructure monitoring output per NORC
+feedback"). That commit dropped the on-REDCap eligibility evaluation
+from the monitoring tool entirely, replacing it with a raw-field dump.
+Our pipeline takes the intermediate position: check what we can
+(consent + age), trust NORC for the rest.
+
+---
+
+# Scoring {#sec-scoring}
+
+The Kidsights developmental score is produced by
+`KidsightsPublic::score_kidsights()`, an R package that wraps a CmdStan
+model for MAP (maximum a posteriori) IRT scoring with fixed item
+parameters from the 2023 Mplus calibration.
+
+::: {.callout-note}
+**For a reviewer focused on recoding accuracy**: you can treat
+`score_kidsights()` as a black box. The pipeline's responsibility is to
+(1) give it the correct inputs (eligible children with valid ages and
+item responses) and (2) join the output back correctly. The scoring
+math itself lives in the KidsightsPublic package and is out of scope
+for this document.
+:::
+
+## What gets scored
+
+**Input**: rows from `transformed_data` where `meets_inclusion == TRUE`.
+
+**Required columns per row**:
+
+- `pid`, `record_id`, `child_num` — composite identifier
+- `years_old` — child's age in years (used by the age-informed prior)
+- 264 developmental item columns (names follow the MN26 lexicon, e.g.,
+  `c020`, `nom001`, `cahmi22_001`); the package auto-detects the lexicon
+
+## How scoring is called
+
+In `pipelines/orchestration/mn26_pipeline.R` (Step 8):
+
+```{.r}
+# Filter to eligible records first (score_kidsights requires valid years_old)
+scoring_subset <- transformed_data %>%
+  dplyr::filter(isTRUE(meets_inclusion) | meets_inclusion %in% TRUE)
+
+# Run MAP scoring
+kidsights_scores <- KidsightsPublic::score_kidsights(
+  scoring_subset,
+  id_cols = c("pid", "record_id", "child_num"),
+  min_responses = 5
+)
+
+# Join back; non-eligible records get NA theta
+transformed_data <- transformed_data %>%
+  safe_left_join(
+    kidsights_scores %>% dplyr::rename(kidsights_theta = theta),
+    by_vars = c("pid", "record_id", "child_num")
+  )
+```
+
+## Why filter before scoring?
+
+`score_kidsights()` requires `years_old` to be non-missing for every row
+passed in (the age-informed prior needs a valid age). Non-eligible
+records frequently have missing ages, either because they haven't
+progressed past the screening instruments or because their `dob_n` is
+still being entered. Passing them in would cause the scoring call to
+error.
+
+Filtering to `meets_inclusion == TRUE` before scoring means:
+
+- Scoring only runs on records that passed consent + valid child age
+- The joined `kidsights_theta` is `NA` for everyone else, matching their
+  `NA` `meets_inclusion` status
+- Attrition is transparent: `Eligible - Scored` = children who passed
+  eligibility but didn't meet the `min_responses = 5` threshold
+
+## Expected attrition
+
+On the latest production run:
+
+| Stage | Count | Note |
+|---|---:|---|
+| Extracted | 10,200 | Records from all 4 REDCap projects |
+| After pivot | 10,517 | + 317 child-2 rows |
+| Eligible | 964 | Passed consent + child age |
+| **Scored** | **848** | ≥5 item responses; 12% attrition from eligible |
+
+The 116 eligible-but-unscored children are partial completions —
+consented and age-valid, but with fewer than 5 developmental items
+answered. This is expected during early recruitment when many
+participants have just started the survey.
+
+## Output variable
+
+`kidsights_theta` is added to `transformed_data` after scoring. It's on
+the latent IRT scale (approximately N(0,1) centered). Higher values
+indicate more advanced development relative to other children of the
+same age. The distribution is documented in the KidsightsPublic
+vignette.
+
+---
+
+# Troubleshooting {#sec-troubleshooting}
+
+## "MN26 API credentials file not found"
+
+```
+Error in load_mn26_credentials() :
+  MN26 API credentials file not found. Set REDCAP_API_CREDENTIALS_PATH_MN26
+  in .env or provide csv_path argument.
+```
+
+**Cause**: The credentials CSV doesn't exist at the expected path.
+
+**Fix**: Verify the file exists:
+
+```bash
+ls "C:/my_auths/kidsights_redcap_norc_MN_2026.csv"
+```
+
+If the path is different, override via the CLI:
+
+```bash
+"C:/Program Files/R/R-4.5.1/bin/Rscript.exe" run_mn26_pipeline.R \
+  --credentials "C:/actual/path/to/creds.csv"
+```
+
+Or edit `config/sources/mn26.yaml` line 14:
+
+```{.yaml}
+api_credentials_file: "C:/actual/path/to/creds.csv"
+```
+
+---
+
+## "Can't combine `..1$foo` <character> and `..2$foo` <datetime<UTC>>"
+
+**Cause**: Before the `flexible_bind_rows` fix, a `dplyr::bind_rows()`
+across multi-project extracts failed when a timestamp column was a
+character string in some projects (empty, no completions yet) and a
+datetime in others. Fixed in commit `2a27259` by switching to
+`flexible_bind_rows()`, which promotes all conflicting columns to the
+highest shared type (character wins over datetime).
+
+**If you see this now**: it means a new column type conflict has
+appeared that isn't covered by `flexible_bind_rows`. Check
+`R/utils/flexible_bind_rows.R` — the type hierarchy is defined there
+and you may need to add a new type mapping.
+
+---
+
+## "Required column 'eq001' not found in data"
+
+**Cause**: The REDCap export no longer includes `eq001` (informed
+consent). This is a structural problem — the pipeline cannot proceed
+without it.
+
+**Fix**: Verify with NORC that `eq001` is still in the `consent_doc`
+instrument and being collected. If it's been renamed, update
+`R/harmonize/mn26_eligibility.R` to reference the new name.
+
+---
+
+## "`years_old` contains missing values" during scoring
+
+**Cause**: `score_kidsights()` received records where age could not be
+computed. This usually means the eligibility filter in Step 8 is not
+being applied — every record passed in should have
+`meets_inclusion == TRUE`.
+
+**Fix**: Check that the orchestrator's Step 8 is filtering before
+calling `score_kidsights()`:
+
+```{.r}
+scoring_subset <- transformed_data %>%
+  dplyr::filter(isTRUE(meets_inclusion) | meets_inclusion %in% TRUE)
+```
+
+If filtering is correct but some `meets_inclusion == TRUE` records
+still have missing `years_old`, investigate the age transform
+(`R/transform/mn26_transforms.R` lines 489–508).
+
+---
+
+## Scored count is dramatically lower than eligible count
+
+**Example**: 964 eligible, only 200 scored.
+
+**Cause**: Developmental item responses have been encoded in an
+unexpected way that `score_kidsights()` can't parse. The package applies
+a `min_responses = 5` threshold — if items are being marked as missing
+when they shouldn't be, many eligible children fall below that cutoff.
+
+**Diagnostic**:
+
+```{.r}
+# Count non-missing item responses per eligible child
+result <- run_mn26_pipeline(skip_database = TRUE)
+eligible <- result$data %>% dplyr::filter(meets_inclusion == TRUE)
+
+# Count non-missing values in item columns (c020, c023, ...)
+item_cols <- grep("^c[0-9]{3}", names(eligible), value = TRUE)
+eligible$n_items <- rowSums(!is.na(eligible[, item_cols]))
+hist(eligible$n_items, main = "Item responses per eligible child")
+```
+
+If the histogram shows a mass near 0, items aren't being extracted
+properly. If it shows a healthy spread with most children having 20+
+items, the issue is elsewhere.
+
+---
+
+## CmdStan compilation errors
+
+```
+Error: CmdStan installation not found
+```
+
+**Fix**:
+
+```{.r}
+cmdstanr::install_cmdstan()
+```
+
+If that fails with compiler errors, install Rtools44 (Windows):
+<https://cran.r-project.org/bin/windows/Rtools/>.
+
+---
+
+## Pipeline runs but row counts look wrong
+
+**Symptom**: Records-after-pivot ≠ records-extracted + households-with-child-2.
+
+**Cause**: The pivot detected a column that looks like a child-2
+suffix but doesn't belong to a child-2 instrument (false positive). Or
+the `dob_c2_n` detection missed some households.
+
+**Diagnostic**: Interactive run with verbose output:
+
+```{.r}
+source("pipelines/orchestration/mn26_pipeline.R")
+result <- run_mn26_pipeline(skip_database = TRUE)
+
+# Compare pivot metrics
+result$metrics$n_child1  # should equal records extracted
+result$metrics$n_child2  # should equal households with non-empty dob_c2_n
+```
+
+Compare with what you expect from the REDCap project. If they don't
+match, the pivot logic in `R/transform/mn26_pivot.R` may need to
+account for a new column naming pattern that NORC has introduced.

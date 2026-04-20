@@ -38,6 +38,9 @@ Welcome to the Kidsights Data Platform documentation. This platform provides mul
 
 ## 📚 Pipeline-Specific Documentation
 
+### MN26 Pipeline (Minnesota 2026 REDCap Survey)
+- **[MN26 Pipeline Guide](mn26/pipeline_guide.qmd)** ⭐ — Single Quarto guide (render to HTML): Quick Start, data flow diagram, variable recoding reference, eligibility logic, scoring, troubleshooting. Recommended for code reviewers.
+
 ### ACS Pipeline (Census Data)
 - [ACS Documentation](acs/) - IPUMS variables, pipeline usage, testing, cache management
 
