@@ -169,6 +169,20 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 
 ---
 
+## Project-Scoped Claude Skills
+
+Three skills live in `.claude/skills/` of this repo and encapsulate the regeneration recipes for the platform's living documentation. Invoke from Claude Code via the slash command shown. Each skill's `SKILL.md` documents the workflow, constraints, and success criteria.
+
+| Skill | Purpose | When to invoke | SKILL.md |
+|---|---|---|---|
+| `/refresh-onboarding` | Regenerate `docs/index.html` (the public GitHub Pages orientation page). | Pipeline added/removed, status change, drift item resolved, quarterly minimum. | [.claude/skills/refresh-onboarding/SKILL.md](.claude/skills/refresh-onboarding/SKILL.md) |
+| `/refresh-handoff` | Surgically update HANDOFF.md (this doc). Preserves hand-crafted prose; updates volatile fields only. | Material commit lands, drift item resolves, in-flight workstream shifts, weekly during pre-handoff. | [.claude/skills/refresh-handoff/SKILL.md](.claude/skills/refresh-handoff/SKILL.md) |
+| `/refresh-database-inventory` | Regenerate `docs/database/TABLES.md` from live DB introspection + hand-written YAML metadata. | Table added/dropped/renamed, row counts drift materially, cleanup candidates purged. | [.claude/skills/refresh-database-inventory/SKILL.md](.claude/skills/refresh-database-inventory/SKILL.md) |
+
+All three skills require explicit user authorization before pushing to remote. See CLAUDE.md → Documentation Maintenance for the broader cadence guidance. If a fourth project-scoped skill is added, extend both this table and the equivalent section on the onboarding page.
+
+---
+
 ## Recommended First-Week Plan
 
 **Day 1:** Read CLAUDE.md fully. Skim README.md, INDEX.md, QUICK_REFERENCE.md to know what's where.

@@ -92,7 +92,9 @@ If the dominant workstream changed (e.g., MIBB Bucket 3 finished and now MN26 ra
 
 Before editing, write a short mental list:
 - Volatile fields that need updating: [list]
-- Stable sections to NOT touch: Tips, Recommended First-Week Plan, Knowledge Areas, Reading Order, Documentation Map subsection structure, Doc Audit Outcomes (historical), Credentials section (mostly stable)
+- Stable sections to NOT touch: Tips, Recommended First-Week Plan, Knowledge Areas, Reading Order, Documentation Map subsection structure, Doc Audit Outcomes (historical), Credentials section (mostly stable), Project-Scoped Claude Skills table (only edit when a skill is added, removed, or has a material purpose change)
+
+**Project-Scoped Claude Skills table:** HANDOFF.md has a table listing every skill in `.claude/skills/`. When a new skill ships, append a row; when one is retired, remove the row. If `.claude/skills/` contains a directory that isn't in the table, that's a drift item — flag it and add a row. Parity constraint: the same three-skill inventory must also appear on `docs/index.html` (sister skill `/refresh-onboarding` handles that surface).
 
 If the changes are extensive enough that you're rewriting >40% of the doc, you're past "refresh" territory — pause and ask the user whether the HANDOFF doc itself needs structural revision, not just a refresh.
 
@@ -145,7 +147,7 @@ In-flight section: rewrite only the bulleted status lines, not the surrounding h
 - **Use `Edit`, not `Write`.** Surgical edits preserve the carefully-crafted prose. Full regeneration is for `/refresh-onboarding` (which targets a different artifact with a stable structure).
 - **Snapshot date and footer date must match today's ISO date.** Both fields together — don't update one and miss the other.
 - **Drift items must be re-verified.** Never copy forward without checking against the live DB.
-- **Stable sections are stable.** Tips, Knowledge Areas, Recommended First-Week Plan, Doc Audit Outcomes, Reading Order — do not touch unless there's a specific reason (e.g., a doc was renamed, a new tip is genuinely needed).
+- **Stable sections are stable.** Tips, Knowledge Areas, Recommended First-Week Plan, Doc Audit Outcomes, Reading Order, Project-Scoped Claude Skills — do not touch unless there's a specific reason (e.g., a doc was renamed, a new tip is genuinely needed, a new skill was added).
 - **No emojis in body text** (per repo CLAUDE.md house rule).
 
 ## Anti-patterns (do not repeat)

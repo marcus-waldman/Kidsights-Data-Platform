@@ -735,12 +735,13 @@
       <li><a href="#pipelines"><span class="toc__num">01</span> Pipelines</a></li>
       <li><a href="#architecture"><span class="toc__num">02</span> Architecture</a></li>
       <li><a href="#reading"><span class="toc__num">03</span> Reading order</a></li>
-      <li><a href="#active"><span class="toc__num">04</span> Active work</a></li>
-      <li><a href="#deferred"><span class="toc__num">05</span> Deferred</a></li>
-      <li><a href="#drift"><span class="toc__num">06</span> DB notes</a></li>
-      <li><a href="#stack"><span class="toc__num">07</span> Tech stack</a></li>
-      <li><a href="#setup"><span class="toc__num">08</span> Setup</a></li>
-      <li><a href="#contact"><span class="toc__num">09</span> Contact</a></li>
+      <li><a href="#skills"><span class="toc__num">04</span> Project skills</a></li>
+      <li><a href="#active"><span class="toc__num">05</span> Active work</a></li>
+      <li><a href="#deferred"><span class="toc__num">06</span> Deferred</a></li>
+      <li><a href="#drift"><span class="toc__num">07</span> DB notes</a></li>
+      <li><a href="#stack"><span class="toc__num">08</span> Tech stack</a></li>
+      <li><a href="#setup"><span class="toc__num">09</span> Setup</a></li>
+      <li><a href="#contact"><span class="toc__num">10</span> Contact</a></li>
     </ol>
   </aside>
 
@@ -1015,9 +1016,32 @@
       </div>
     </section>
 
-    <!-- 04 ACTIVE WORK -->
+    <!-- 04 PROJECT SKILLS -->
+    <section id="skills">
+      <div class="section-label"><span class="section-label__num">04 ·</span> Project skills</div>
+      <h2>Slash commands that regenerate living docs.</h2>
+      <p style="margin: 14px 0 24px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Three skills live in <code style="font-family: var(--font-mono); font-size: 12px;">.claude/skills/</code> of this repo. Each encapsulates the recipe for regenerating one of the platform's living documentation artifacts, so the work doesn't need to be re-derived from scratch each time.</p>
+
+      <div class="stack" style="margin-top: 24px;">
+        <div class="stack-item">
+          <span class="stack-item__name">/refresh-onboarding</span>
+          <span class="stack-item__desc">Regenerate <code style="font-family: var(--font-mono); font-size: 11px;">docs/index.html</code> — this page. Invoke when a pipeline is added or removed, status changes materially, or a drift item resolves. Quarterly minimum. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/.claude/skills/refresh-onboarding/SKILL.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">SKILL.md →</a></span>
+        </div>
+        <div class="stack-item">
+          <span class="stack-item__name">/refresh-handoff</span>
+          <span class="stack-item__desc">Surgically update <code style="font-family: var(--font-mono); font-size: 11px;">HANDOFF.md</code>. Preserves carefully crafted prose; updates only volatile fields (in-flight work, drift table, snapshot date). Weekly during pre-handoff work. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/.claude/skills/refresh-handoff/SKILL.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">SKILL.md →</a></span>
+        </div>
+        <div class="stack-item">
+          <span class="stack-item__name">/refresh-database-inventory</span>
+          <span class="stack-item__desc">Regenerate <code style="font-family: var(--font-mono); font-size: 11px;">docs/database/TABLES.md</code> from live DuckDB introspection + the hand-written YAML metadata. Invoke when a table is added, dropped, renamed, or when row counts drift materially. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/.claude/skills/refresh-database-inventory/SKILL.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">SKILL.md →</a></span>
+        </div>
+      </div>
+      <p style="margin: 18px 0 0; color: var(--ink-faint); font-size: 13px; line-height: 1.55;">All three skills require explicit maintainer authorization before pushing to remote. Cadence guidance: <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md#documentation-maintenance" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">CLAUDE.md → Documentation Maintenance</a>.</p>
+    </section>
+
+    <!-- 05 ACTIVE WORK -->
     <section id="active">
-      <div class="section-label"><span class="section-label__num">04 ·</span> Active in-flight work</div>
+      <div class="section-label"><span class="section-label__num">05 ·</span> Active in-flight work</div>
       <div class="callout callout--flight">
         <div class="callout__header">
           <h3 class="callout__title">NE25 MIBB Variance Estimation — Complete</h3>
@@ -1035,9 +1059,9 @@
       </div>
     </section>
 
-    <!-- 05 DEFERRED -->
+    <!-- 06 DEFERRED -->
     <section id="deferred">
-      <div class="section-label"><span class="section-label__num">05 ·</span> Deferred work</div>
+      <div class="section-label"><span class="section-label__num">06 ·</span> Deferred work</div>
       <div class="callout callout--deferred">
         <div class="callout__header">
           <h3 class="callout__title">Known gaps and parking-lot items</h3>
@@ -1051,9 +1075,9 @@
       </div>
     </section>
 
-    <!-- 06 DB DRIFT -->
+    <!-- 07 DB DRIFT -->
     <section id="drift">
-      <div class="section-label"><span class="section-label__num">06 ·</span> DB notes</div>
+      <div class="section-label"><span class="section-label__num">07 ·</span> DB notes</div>
       <h2>One remaining naming inconsistency.</h2>
       <p style="margin: 14px 0 22px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">The 2026-04-20 audit surfaced six doc-vs-DB divergences. After a follow-up review on 2026-04-21, five were closed as acceptable — the DB represents current intent and the older doc claims were stale design text or pre-QA counts. One item remains open:</p>
 
@@ -1067,9 +1091,9 @@
       <p style="margin: 22px 0 0; color: var(--ink-dim); max-width: 64ch; line-height: 1.55; font-size: 0.92em;">Closed on review: <code>raking_targets_ne25</code> row count, <code>calibration_dataset_2020_2025</code> record count, missing <code>ne25_calibration</code> and per-study calibration tables, and the <code>overall_influence_cutoff</code> / <code>authenticity_weight</code> columns on <code>ne25_transformed</code>. See <code>HANDOFF.md</code> &quot;DB Drift Items&quot; for the audit trail.</p>
     </section>
 
-    <!-- 07 TECH STACK -->
+    <!-- 08 TECH STACK -->
     <section id="stack">
-      <div class="section-label"><span class="section-label__num">07 ·</span> Tech stack</div>
+      <div class="section-label"><span class="section-label__num">08 ·</span> Tech stack</div>
       <h2>What you need to be comfortable with.</h2>
       <div class="stack" style="margin-top: 24px;">
         <div class="stack-item">
@@ -1099,9 +1123,9 @@
       </div>
     </section>
 
-    <!-- 08 SETUP -->
+    <!-- 09 SETUP -->
     <section id="setup">
-      <div class="section-label"><span class="section-label__num">08 ·</span> Setup quick-glance</div>
+      <div class="section-label"><span class="section-label__num">09 ·</span> Setup quick-glance</div>
       <h2>Five steps to a working local install.</h2>
       <div class="setup" style="margin-top: 24px;">
         <div class="setup__step">
@@ -1123,9 +1147,9 @@
       </div>
     </section>
 
-    <!-- 09 CONTACT -->
+    <!-- 10 CONTACT -->
     <section id="contact">
-      <div class="section-label"><span class="section-label__num">09 ·</span> Outgoing maintainer</div>
+      <div class="section-label"><span class="section-label__num">10 ·</span> Outgoing maintainer</div>
       <div class="contact">
         <div class="contact__avatar">MW</div>
         <div>
