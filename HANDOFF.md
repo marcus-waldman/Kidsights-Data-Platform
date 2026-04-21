@@ -166,6 +166,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 | HRTL scoring | docs/hrtl/README.md | scripts/hrtl/README.md, CLAUDE.md HRTL section |
 | Authenticity screening | docs/authenticity_screening/README.md | scripts/influence_diagnostics/README.md |
 | Codebook system | docs/codebook/README.md | docs/codebook/codebook_api.md |
+| Database tables | [docs/database/TABLES.md](docs/database/TABLES.md) | [docs/database/table_metadata.yaml](docs/database/table_metadata.yaml) (hand-written source of truth) |
 
 ---
 

@@ -94,10 +94,10 @@ Build the content brief for the `visual-explainer` skill. The page structure is 
 2. **The N pipelines** — visual grid; one card per pipeline; status badge per card
 3. **Architecture diagram** — inline SVG; data flow from sources → R/Python (with Feather between) → DuckDB → outputs. Update only if the architecture itself has changed (new source type, new processing layer, new output type)
 4. **Reading order** — typically 5 numbered cards: HANDOFF → CLAUDE → INSTALLATION_GUIDE → QUICK_REFERENCE → per-pipeline. Update if doc names changed.
-5. **Project skills** — grid or table listing every skill in `.claude/skills/`. Each entry shows invocation (e.g., `/refresh-onboarding`), one-line purpose, trigger conditions, and a link to the SKILL.md on GitHub via the `blob/HEAD/` pattern. If `.claude/skills/` contains a directory that isn't rendered here, the inventory is stale — treat it as a drift item and add the row. The mirrored section on HANDOFF.md (`## Project-Scoped Claude Skills`) must stay in parity.
+5. **Project skills** — grid or table listing every skill in `.claude/skills/`. Each entry shows invocation (e.g., `/refresh-onboarding`), one-line purpose, trigger conditions, and a link to the SKILL.md on GitHub via the `blob/HEAD/` pattern. If `.claude/skills/` contains a directory that isn't rendered here, the inventory is stale — treat it as a drift item and add the row. The mirrored section on HANDOFF.md (`## Project-Scoped Claude Skills`) must stay in parity. The `/refresh-database-inventory` card must also expose a direct "Catalog →" link to `docs/database/TABLES.md` so the public catalog is reachable from this section, not only from section 07.
 6. **Active in-flight callout** — single dominant workstream
 7. **Deferred work callout** — bullet list
-8. **Critical DB drift** — numbered list of specific items
+8. **Critical DB drift** — numbered list of specific items. End the section with an explicit pointer to `docs/database/TABLES.md` (catalog) and `docs/database/table_metadata.yaml` (source of truth) so readers landing here have a one-click path to the full table inventory, not just the drift subset.
 9. **Tech stack** — chip grid (R + Python + DuckDB + Mplus + Arrow + CmdStan)
 10. **Setup quick-glance** — 5 numbered steps
 11. **Contact card** — outgoing maintainer
