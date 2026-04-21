@@ -58,7 +58,7 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 
 **Follow-on (separate ticket, not yet started):** wire `reports/ne25/helpers/model_fitting.R` to iterate over `(imputation_m, boot_b)` pairs and pool variance via Rubin's rules. Today it consumes only the point-estimate `calibrated_weight` column.
 
-**Closed-out references:** [`todo/ne25_weights_roadmap.md`](todo/ne25_weights_roadmap.md) (all three buckets now marked complete); [`docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd`](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) §5.4 documents the shipped implementation and Rubin's-rules formula.
+**Closed-out references:** [`docs/archive/raking/ne25/ne25_weights_roadmap.md`](docs/archive/raking/ne25/ne25_weights_roadmap.md) (archived 2026-04-21 after all three buckets shipped); [`docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd`](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) §5.4 documents the shipped implementation and Rubin's-rules formula.
 
 ### MN26 (Minnesota 2026)
 
@@ -161,7 +161,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 | Coding standards | docs/guides/CODING_STANDARDS.md | CLAUDE.md "Critical Coding Standards" |
 | Missing data handling | docs/guides/MISSING_DATA_GUIDE.md | (REQUIRED reading before adding derived vars) |
 | NE25 raking weights | docs/raking/RAKING_INTEGRATION.md | docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd |
-| NE25 MIBB variance work | todo/ne25_weights_roadmap.md | scripts/raking/ne25/35_run_bayesian_bootstrap.R |
+| NE25 MIBB variance work | docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd §5.4 | scripts/raking/ne25/35_run_bayesian_bootstrap.R (archived roadmap: docs/archive/raking/ne25/ne25_weights_roadmap.md) |
 | MN26 multi-child pipeline | docs/mn26/pipeline_guide.qmd | todo/mn26_pipeline_plan.md |
 | Imputation | docs/imputation/IMPUTATION_PIPELINE.md | docs/imputation/ADDING_NEW_STUDY.md |
 | IRT calibration | docs/irt_scoring/CALIBRATION_PIPELINE_USAGE.md | docs/irt_scoring/MPLUS_CALIBRATION_WORKFLOW.md |
@@ -183,7 +183,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 
 **Day 5:** Investigate the **DB drift items** above (raking_targets, ne25_calibration, etc.). These are real divergences between docs and DB; understanding them grounds you in what actually exists vs. what was once intended. `git show 6fe3092` will show you what the audit changed.
 
-After week 1: dive into the NE25 MIBB variance work if continuing it (read `todo/ne25_weights_roadmap.md` first), or whatever your specific brief is.
+After week 1: if picking up the MIBB variance work's loose end (Rubin's-rules pooling in `reports/ne25/helpers/model_fitting.R`), read `docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd` §5.4 and the archived `docs/archive/raking/ne25/ne25_weights_roadmap.md`. Otherwise, whatever your specific brief is.
 
 ---
 

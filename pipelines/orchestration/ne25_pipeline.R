@@ -776,7 +776,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     # NOTE: Must be done BEFORE Step 7 (database storage) so weights are included in database
     #
     # Reads from the long-format ne25_raked_weights DuckDB table (M=5
-    # imputations; see todo/ne25_weights_roadmap.md and
+    # imputations; see docs/archive/raking/ne25/ne25_weights_roadmap.md and
     # docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd section 5.1). This join pulls
     # the m=1 weights as the backward-compatible default `calibrated_weight`
     # column on ne25_transformed; MI-aware analysis should join per-imputation

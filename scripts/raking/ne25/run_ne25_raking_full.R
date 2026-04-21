@@ -28,7 +28,7 @@
 #   Total: ~17-20 min
 #
 # Part of NE25 Bucket 2 (multi-imputation integration). Step 5 of 7.
-# See todo/ne25_weights_roadmap.md and WEIGHT_CONSTRUCTION.qmd section 5.1.
+# See docs/archive/raking/ne25/ne25_weights_roadmap.md and WEIGHT_CONSTRUCTION.qmd section 5.1.
 # ============================================================================
 
 suppressPackageStartupMessages({

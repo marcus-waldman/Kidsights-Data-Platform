@@ -51,4 +51,4 @@ Classical iterative proportional fitting cannot match a covariance structure, so
 
 ## Roadmap
 
-- Reconciling `run_raking_targets_pipeline.R` (still calls pre-`_glm2` `18_estimate_nsch_outcomes.R`) with `run_complete_pipeline.R` (uses `_glm2`) is a follow-up; see [`todo/ne25_weights_roadmap.md`](../../../../todo/ne25_weights_roadmap.md).
+- Reconciling `run_raking_targets_pipeline.R` (still calls pre-`_glm2` `18_estimate_nsch_outcomes.R`) with `run_complete_pipeline.R` (uses `_glm2`) is a follow-up; see [`docs/archive/raking/ne25/ne25_weights_roadmap.md`](../../../../docs/archive/raking/ne25/ne25_weights_roadmap.md).

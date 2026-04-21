@@ -32,7 +32,7 @@
 # Typical timing: ~3 min per imputation; ~15 min total for M=5.
 #
 # Part of NE25 Bucket 2 (multi-imputation integration). See
-# todo/ne25_weights_roadmap.md and WEIGHT_CONSTRUCTION.qmd section 5.1.
+# docs/archive/raking/ne25/ne25_weights_roadmap.md and WEIGHT_CONSTRUCTION.qmd section 5.1.
 # ============================================================================
 
 suppressPackageStartupMessages({
