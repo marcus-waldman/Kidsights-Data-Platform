@@ -380,6 +380,29 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 
 ---
 
+## Documentation Maintenance
+
+### Onboarding Page (GitHub Pages)
+
+The repository serves a visual onboarding page at:
+
+**[https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)**
+
+| Item | Detail |
+|---|---|
+| **Source file** | `docs/index.html` (committed; tracked despite the `*.html` ignore via a `!docs/index.html` exception) |
+| **Pages config** | Source: `main` branch, `/docs` folder. Jekyll disabled via `docs/.nojekyll`. |
+| **Auto-rebuild** | Pages rebuilds automatically on every push to `main` that touches `/docs`. Build time ~20s. |
+| **Regeneration recipe** | `/refresh-onboarding` skill at `.claude/skills/refresh-onboarding/SKILL.md` |
+
+**When to regenerate:** When platform state materially changes — pipeline added/removed/status-changed, new env var, drift item resolved or new one surfaced, outgoing-maintainer transition, or roughly every 3 months regardless of changes.
+
+**How to regenerate:** Invoke the skill via `/refresh-onboarding`. The skill walks the agent through re-verifying DB state, picking up CLAUDE.md changes, and regenerating the page via the `visual-explainer` skill. Output goes to `docs/index.html`; commit and push and Pages rebuilds.
+
+**The page is a snapshot, not a living document.** Small drift between regenerations is acceptable; large drift triggers a refresh. The authoritative current-state reference is always **this CLAUDE.md file**, not the onboarding page.
+
+---
+
 ## Documentation Directory
 
 ### Architecture & Pipeline Guides
