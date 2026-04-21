@@ -1,6 +1,6 @@
 # Kidsights Data Platform - Installation Guide
 
-**Version:** 3.2.0 | **Last Updated:** October 2025
+**Version:** 3.8.0 | **Last Updated:** April 2026 (drift-checked 2026-04-20)
 
 This guide walks you through setting up the Kidsights Data Platform on a new machine or for a new collaborator. The platform is designed to be portable across Windows, macOS, and Linux systems.
 
@@ -332,6 +332,34 @@ REDCAP_API_CREDENTIALS_PATH=C:/Users/YOUR_USERNAME/my-APIs/kidsights_redcap_api.
 REDCAP_API_CREDENTIALS_PATH=/home/YOUR_USERNAME/.kidsights/kidsights_redcap_api.csv
 ```
 
+### FRED API Key (for NE25 + MN26 Income Transformations)
+
+The NE25 and MN26 pipelines use the FRED (Federal Reserve Economic Data) API to fetch CPI series for inflation-adjusting household income to a constant-dollar reference year. Without it, the income transformation in `R/utils/cpi_utils.R` cannot complete.
+
+**1. Register and get API key:**
+- Register at https://fred.stlouisfed.org/
+- Get an API key from https://fredaccount.stlouisfed.org/apikeys
+
+**2. Save to file:**
+
+```bash
+# Windows
+echo YOUR_FRED_KEY > C:\Users\YOUR_USERNAME\my-APIs\FRED.txt
+
+# Mac/Linux
+echo YOUR_FRED_KEY > ~/.kidsights/FRED.txt
+```
+
+**3. Update `.env`:**
+
+```bash
+# Windows
+FRED_API_KEY_PATH=C:/Users/YOUR_USERNAME/my-APIs/FRED.txt
+
+# Mac/Linux
+FRED_API_KEY_PATH=/home/YOUR_USERNAME/.kidsights/FRED.txt
+```
+
 ---
 
 ## Verification
@@ -546,12 +574,17 @@ IPUMS_API_KEY_PATH=C:/Users/JohnDoe/my-APIs/IPUMS.txt
 After completing installation:
 
 1. **Read the Quick Reference:** `docs/QUICK_REFERENCE.md`
-2. **Explore Pipeline Documentation:**
-   - NE25: `docs/architecture/PIPELINE_OVERVIEW.md`
+2. **Explore Pipeline Documentation** (8 pipelines):
+   - NE25: `docs/architecture/PIPELINE_OVERVIEW.md` and `CLAUDE.md`
+   - MN26: `docs/mn26/pipeline_guide.qmd`
    - ACS: `docs/acs/README.md`
    - NHIS: `docs/nhis/README.md`
    - NSCH: `docs/nsch/README.md`
+   - Raking Targets: `docs/raking/`
+   - Imputation: `docs/imputation/`
+   - IRT Calibration: `docs/irt_scoring/`
 3. **Review Coding Standards:** `docs/guides/CODING_STANDARDS.md`
+4. **Read CLAUDE.md** — the authoritative current-state reference for the platform
 
 ---
 
@@ -569,3 +602,27 @@ After completing installation:
 ---
 
 **Installation complete! You're ready to run the pipelines.**
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 3 of doc audit)
+
+### Corrections applied
+- Version: 3.2.0 → 3.8.0; date: October 2025 → April 2026
+- **Added missing FRED API key setup section** (was in `.env.template` but not documented; required for NE25 + MN26 income transformations via `R/utils/cpi_utils.R`)
+- "Next Steps" pipeline list expanded from 4 pipelines to all 8 (added MN26, Raking Targets, Imputation, IRT Calibration)
+- Added pointer to CLAUDE.md as authoritative current-state reference
+
+### Confirmed
+- All R/Python version requirements match current platform (R 4.5.1+, Python 3.13+)
+- `.env`-based config approach matches `.env.template` (verified)
+- pyarrow installation guidance for reticulate is accurate
+- `scripts/setup/verify_installation.py` exists ✓
+- `scripts/acs/test_ipums_api_connection.py` exists ✓
+- Path resolution priority logic matches `R/utils/environment_config.R`
+
+### Known remaining drift (not surgically fixed)
+- "Test 4: REDCap API Connection" references `scripts/redcap/test_redcap_connection.py` with "(if script exists)" hedge — the directory does not exist; consider removing or pointing to actual REDCap test
+- N_CORES env variable (parallel processing) is in `.env.template` but not documented in this guide

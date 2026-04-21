@@ -171,6 +171,22 @@ REDCAP_API_CREDENTIALS_PATH=C:/Users/YOUR_USERNAME/my-APIs/kidsights_redcap_api.
 
 ---
 
+#### ☐ Configure FRED API Key Path (NE25/MN26 income transformations)
+**Verification:**
+```bash
+python -c "from dotenv import load_dotenv; import os; load_dotenv(); print(os.getenv('FRED_API_KEY_PATH') or '[NOT SET]')"
+```
+**Expected:** Shows your FRED API key file path
+
+**Fix if failed:**
+Edit `.env` and set:
+```
+FRED_API_KEY_PATH=C:/Users/YOUR_USERNAME/my-APIs/FRED.txt
+```
+(or your preferred location). The FRED key is required for CPI inflation adjustment of household income via `R/utils/cpi_utils.R`.
+
+---
+
 ### 5. API Keys
 
 #### ☐ Create IPUMS API Key File
@@ -356,3 +372,18 @@ python -c "from python.acs.auth import get_client; client = get_client(); print(
 - ✅ `verify_installation.py` returns exit code 0
 
 **Then you're ready to run pipelines!**
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 3 of doc audit)
+
+### Corrections applied
+- Added FRED API key path step (was in `.env.template` but missing from this checklist)
+
+### Confirmed
+- All R/Python version checks match current platform requirements
+- `scripts/setup/verify_installation.py` exists and is the right entry point for full verification
+- `scripts/acs/test_ipums_api_connection.py` exists
+- All env variables match `.env.template`

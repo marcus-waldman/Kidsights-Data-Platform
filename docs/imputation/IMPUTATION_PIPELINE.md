@@ -1,10 +1,12 @@
 # Imputation Pipeline Architecture
 
-**Last Updated:** October 2025 | **Version:** 2.1.0
+**Last Updated:** April 2026 (drift-checked 2026-04-20) | **Version:** 3.0.0
 
 ## Overview
 
-The Kidsights Data Platform implements a **9-stage sequential multiple imputation pipeline** that handles geographic, sociodemographic, childcare, and mental health uncertainty through variable-specific database storage. The system supports multiple independent studies (ne25, ia26, co27) with M=5 imputations per study, storing 21 variables per study in normalized tables for flexibility, transparency, and consistency across the imputation workflow.
+The Kidsights Data Platform implements an **11-stage sequential multiple imputation pipeline** that handles geographic, sociodemographic, childcare, mental health, and child ACEs uncertainty through variable-specific database storage. The system supports multiple independent studies (ne25, ia26, co27) with M=5 imputations per study, storing **29 variables** per study in normalized tables for flexibility, transparency, and consistency across the imputation workflow.
+
+> **Note:** Earlier versions of this doc described a 9-stage / 21-variable design. Stages 10-11 (child ACEs imputation, 9 variables) were added December 2025 — see [CLAUDE.md → Imputation Pipeline](../../CLAUDE.md#-imputation-pipeline---production-ready-december-2025) for current state.
 
 ## Design Philosophy
 
@@ -748,4 +750,20 @@ FROM imputation_metadata;
 
 ---
 
-**Status:** ✅ Production Ready | **Last Updated:** October 2025 | **Version:** 2.0.0
+**Status:** ✅ Production Ready | **Last Updated:** April 2026 (drift-checked 2026-04-20) | **Version:** 3.0.0
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+### Corrections applied
+- Stage count: "9-stage" → "11-stage" (Stages 10-11 child ACEs added Dec 2025)
+- Variable count: "21 variables" → "29 variables" (added 7 mental health + 9 child ACEs since 2.1.0)
+- Version bumped 2.1.0 → 3.0.0 to reflect material expansion
+- Last Updated date refreshed
+- Added pointer to CLAUDE.md for current state
+
+### Known remaining drift (not surgically fixed in this pass)
+- The detailed tables/sections describe stages 1-7 (geography + sociodem + childcare). Stages 8-11 (mental health, child ACEs) have less detailed coverage here — see CLAUDE.md and `docs/imputation/STAGE8_*` (now archived to `docs/archive/imputation/`) for fuller detail.

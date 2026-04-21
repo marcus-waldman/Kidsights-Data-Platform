@@ -1,8 +1,10 @@
 # Directory Structure
 
-**Last Updated:** October 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
 
 This document provides a comprehensive guide to the Kidsights Data Platform directory structure, organized by pipeline and functional area.
+
+> **Note:** Directory layout for the **MN26 pipeline** (added April 2026) and the **Raking Targets**, **IRT Calibration** pipelines is captured under their respective `scripts/` subdirectories (`scripts/mn26/`, `scripts/raking/ne25/`, `scripts/irt_scoring/`). This doc has detailed sections for the original 4 pipelines (NE25, ACS, NHIS, NSCH) plus Imputation; for the others see the respective per-pipeline guides linked from [docs/INDEX.md](INDEX.md).
 
 ---
 
@@ -10,20 +12,23 @@ This document provides a comprehensive guide to the Kidsights Data Platform dire
 
 1. [Overview](#overview)
 2. [Core Directories (NE25 Pipeline)](#core-directories-ne25-pipeline)
-3. [ACS Pipeline Directories](#acs-pipeline-directories)
-4. [NHIS Pipeline Directories](#nhis-pipeline-directories)
-5. [NSCH Pipeline Directories](#nsch-pipeline-directories)
-6. [Imputation Pipeline Directories](#imputation-pipeline-directories)
-7. [Shared Directories](#shared-directories)
-8. [Data Storage](#data-storage)
-9. [Quick Navigation](#quick-navigation)
+3. [MN26 Pipeline Directories](#mn26-pipeline-directories) *(see [docs/mn26/pipeline_guide.qmd](mn26/pipeline_guide.qmd))*
+4. [ACS Pipeline Directories](#acs-pipeline-directories)
+5. [NHIS Pipeline Directories](#nhis-pipeline-directories)
+6. [NSCH Pipeline Directories](#nsch-pipeline-directories)
+7. [Raking Targets Pipeline](#raking-targets-pipeline) *(see [docs/raking/](raking/))*
+8. [Imputation Pipeline Directories](#imputation-pipeline-directories)
+9. [IRT Calibration Pipeline](#irt-calibration-pipeline) *(see [docs/irt_scoring/](irt_scoring/))*
+10. [Shared Directories](#shared-directories)
+11. [Data Storage](#data-storage)
+12. [Quick Navigation](#quick-navigation)
 
 ---
 
 ## Overview
 
 The Kidsights Data Platform uses a **modular directory structure** that separates concerns by:
-- **Pipeline:** Each pipeline (NE25, ACS, NHIS, NSCH) has dedicated directories
+- **Pipeline:** Each of the 8 pipelines (NE25, MN26, ACS, NHIS, NSCH, Raking Targets, Imputation, IRT Calibration) has dedicated directories
 - **Language:** Python and R code are organized separately
 - **Function:** Extract, transform, load, validate, and utility functions are grouped logically
 
@@ -702,7 +707,7 @@ childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 **Query the codebook:**
 - Functions: `R/codebook/query_codebook.R`
 - Dashboard: `codebook/dashboard/index.qmd`
-- Guide: `docs/codebook_utilities.md`
+- Guide: `docs/codebook/codebook_utilities.md`
 
 **Debug database issues:**
 - Connection: `python/db/connection.py`
@@ -737,4 +742,22 @@ childcare = get_childcare_imputations(study_id='ne25', imputation_number=1)
 
 ---
 
-*Last Updated: October 2025*
+*Last Updated: April 2026 (drift-checked 2026-04-20)*
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 2 of doc audit)
+
+### Corrections applied
+- Pipeline count: "(NE25, ACS, NHIS, NSCH)" → "8 pipelines" (intro)
+- TOC expanded to include MN26, Raking Targets, IRT Calibration entries (linking to per-pipeline docs)
+- Added a notice at the top explaining that detailed directory layout for newer pipelines lives in their own docs
+- Last Updated date refreshed
+
+### Known remaining drift (not surgically fixed)
+- The body of this doc has detailed `/python/`, `/R/`, `/scripts/`, etc. sections but those sections describe paths from the original 4-pipeline + Imputation era. Newer pipelines (MN26, Raking Targets, IRT Calibration, HRTL scoring) have additional directories not catalogued here.
+- "Validate data" and "Configure a pipeline" sections at the bottom only list the original 4 pipelines + omit raking, MN26, etc.
+
+For the canonical current directory layout, see [CLAUDE.md → Directory Structure section](../CLAUDE.md) and the per-pipeline READMEs.

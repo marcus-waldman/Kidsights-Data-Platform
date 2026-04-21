@@ -1,6 +1,6 @@
 # Raking Targets Documentation
 
-**Last Updated:** October 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
 
 This directory contains comprehensive documentation for the NE25 raking targets pipeline - a system for generating population-representative targets for post-stratification weighting of survey data.
 
@@ -15,7 +15,7 @@ This directory contains comprehensive documentation for the NE25 raking targets 
 ```
 
 **Execution time:** ~2-3 minutes
-**Output:** 180 raking targets in `raking_targets_ne25` database table
+**Output:** 180 raking targets by design in `raking_targets_ne25` database table *(⚠️ as of 2026-04-20 the table contains only 11 rows — verify whether the full target table needs regeneration)*
 
 ### Run Bootstrap Replicates (ACS Only)
 
@@ -24,7 +24,7 @@ This directory contains comprehensive documentation for the NE25 raking targets 
 ```
 
 **Execution time:** ~15-20 minutes (4096 replicates, 16 workers)
-**Output:** 614,400 bootstrap replicates in `raking_targets_boot_replicates` table
+**Output:** 737,280 bootstrap replicates in `raking_targets_boot_replicates` table (verified 2026-04-20; was 614,400 in earlier docs — bootstrap was expanded from 150 to 180 target slots)
 **Note:** Bootstrap currently implemented for ACS estimands only (25 of 30)
 
 ### Verify Results
@@ -50,14 +50,16 @@ This directory contains comprehensive documentation for the NE25 raking targets 
 
 Located in `ne25/` subdirectory:
 
-- **[IMPLEMENTATION_TODO.md](ne25/IMPLEMENTATION_TODO.md)** - Task tracking (Phases 1-5 complete)
-- **[RAKING_TARGETS_ESTIMATION_PLAN.md](ne25/RAKING_TARGETS_ESTIMATION_PLAN.md)** - Detailed estimation plan
+- **[IMPLEMENTATION_TODO.md](../archive/raking/ne25/IMPLEMENTATION_TODO.md)** - Task tracking (archived after Phases 1-5 complete)
+- **[RAKING_TARGETS_ESTIMATION_PLAN.md](ne25/RAKING_TARGETS_ESTIMATION_PLAN.md)** - Detailed estimation plan (active reference)
 - **[STATISTICAL_METHODS_RAKING_TARGETS.md](ne25/STATISTICAL_METHODS_RAKING_TARGETS.md)** - Statistical methodology + bootstrap variance estimation
-- **[BOOTSTRAP_IMPLEMENTATION_PLAN.md](ne25/BOOTSTRAP_IMPLEMENTATION_PLAN.md)** - Bootstrap replicate weights implementation (complete)
-- **[BOOTSTRAP_TASK_LIST.md](ne25/BOOTSTRAP_TASK_LIST.md)** - Phase-by-phase task tracking for bootstrap
+- **[BOOTSTRAP_IMPLEMENTATION_PLAN.md](../archive/raking/ne25/BOOTSTRAP_IMPLEMENTATION_PLAN.md)** - Bootstrap replicate weights implementation (archived; work completed Oct 2025)
+- **[BOOTSTRAP_TASK_LIST.md](../archive/raking/ne25/BOOTSTRAP_TASK_LIST.md)** - Phase-by-phase task tracking for bootstrap (archived)
 - **[MULTINOMIAL_APPROACH_DECISION.md](ne25/MULTINOMIAL_APPROACH_DECISION.md)** - Why separate binary models for FPL/PUMA
 - **[MOTHER_EDUCATION_ADDITION.md](ne25/MOTHER_EDUCATION_ADDITION.md)** - Mother's education implementation
 - **[MOTHER_MARITAL_STATUS_ADDITION.md](ne25/MOTHER_MARITAL_STATUS_ADDITION.md)** - Marital status implementation
+- **[RAKING_INTEGRATION.md](RAKING_INTEGRATION.md)** ⭐ — NE25 raking weight integration guide (April 2026, current)
+- **[ne25/WEIGHT_CONSTRUCTION.qmd](ne25/WEIGHT_CONSTRUCTION.qmd)** — Weight construction narrative (April 2026, current)
 
 ---
 
@@ -292,4 +294,17 @@ The pipeline includes comprehensive validation:
 
 **For questions or issues, see the main documentation or open an issue in the repository.**
 
-*Last Updated: October 2025*
+*Last Updated: April 2026 (drift-checked 2026-04-20)*
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+### Corrections applied
+- 3 broken links to docs archived in Bucket B repointed to `../archive/raking/ne25/` (`IMPLEMENTATION_TODO.md`, `BOOTSTRAP_IMPLEMENTATION_PLAN.md`, `BOOTSTRAP_TASK_LIST.md`)
+- Bootstrap replicate count: 614,400 → 737,280 (verified — bootstrap was expanded from 4096×150 to 4096×180)
+- Added pointers to current April 2026 docs (`RAKING_INTEGRATION.md`, `WEIGHT_CONSTRUCTION.qmd`)
+- Flagged `raking_targets_ne25` table DB drift (180 designed vs 11 actual)
+- Last Updated date refreshed

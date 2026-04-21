@@ -1,6 +1,6 @@
 # NHIS Data Pipeline
 
-Complete NHIS (National Health Interview Survey) data extraction pipeline for the Kidsights Data Platform. Extracts data from IPUMS Health Surveys API for years 2019-2024 with 64 variables covering demographics, parent characteristics, ACEs, and mental health.
+Complete NHIS (National Health Interview Survey) data extraction pipeline for the Kidsights Data Platform. Extracts data from IPUMS Health Surveys API for years 2019-2024 with **66 variables** (verified 2026-04-20) covering demographics, parent characteristics, ACEs, and mental health.
 
 ---
 
@@ -11,13 +11,13 @@ Complete NHIS (National Health Interview Survey) data extraction pipeline for th
 **Required Software:**
 - Python 3.13+ with packages: `ipumspy`, `pandas`, `pyyaml`, `duckdb`, `structlog`
 - R 4.5.1+ with packages: `arrow`, `dplyr`
-- IPUMS API key stored at: `C:/Users/waldmanm/my-APIs/IPUMS.txt`
+- IPUMS API key configured via `IPUMS_API_KEY_PATH` in `.env` file (see [Environment Configuration in CLAUDE.md](../../CLAUDE.md#environment-configuration))
 
 **Get IPUMS API Key:**
 1. Register at [IPUMS Health Surveys](https://healthsurveys.ipums.org/)
 2. Navigate to Account → API Keys
 3. Generate new API key
-4. Save to `C:/Users/waldmanm/my-APIs/IPUMS.txt`
+4. Save to a local file and reference it via `IPUMS_API_KEY_PATH` in `.env`
 
 ### Run Complete Pipeline (3 Steps)
 
@@ -283,4 +283,14 @@ conn.execute("SELECT MIN(SAMPWEIGHT), MAX(SAMPWEIGHT), AVG(SAMPWEIGHT) FROM nhis
 
 ---
 
-*Created: 2025-10-03 | Pipeline Version: 1.0.0*
+*Created: 2025-10-03 | Pipeline Version: 1.0.0 | Drift-checked: 2026-04-20*
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+- Variable count: "64 variables" → "66 variables" (verified by `nhis_raw` column count)
+- Hardcoded `C:/Users/waldmanm/my-APIs/IPUMS.txt` → `.env`-based config (3 locations)
+- `nhis_raw` table verified: 229,609 records ✓

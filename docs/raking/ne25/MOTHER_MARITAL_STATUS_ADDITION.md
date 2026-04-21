@@ -229,8 +229,8 @@ Would require re-extracting ACS data to include all household members (not just 
 
 - **ACS Variable Documentation:** https://usa.ipums.org/usa-action/variables/MARST_HEAD
 - **Household Relationship Variables:** https://usa.ipums.org/usa-action/variables/MOMLOC
-- **Main Raking Plan:** `docs/raking/RAKING_TARGETS_ESTIMATION_PLAN.md`
-- **Mother's Education Addition:** `docs/raking/MOTHER_EDUCATION_ADDITION.md`
+- **Main Raking Plan:** `docs/raking/ne25/RAKING_TARGETS_ESTIMATION_PLAN.md`
+- **Mother's Education Addition:** `docs/raking/ne25/MOTHER_EDUCATION_ADDITION.md`
 
 ---
 

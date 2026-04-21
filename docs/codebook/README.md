@@ -56,7 +56,7 @@ summary <- codebook_extract_study_summary(codebook, "NE25")
 
 ### Utility Functions Reference
 
-**File:** `R/codebook/extract_codebook.R` | **Documentation:** `docs/codebook_utilities.md`
+**File:** `R/codebook/extract_codebook.R` | **Documentation:** `codebook_utilities.md`
 
 | Function | Purpose |
 |----------|---------|

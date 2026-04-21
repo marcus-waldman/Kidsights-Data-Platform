@@ -1,6 +1,6 @@
 # Environment Configuration Guide
 
-**Last Updated:** October 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
 
 This guide explains how to configure the Kidsights Data Platform for cross-platform portability using environment variables.
 
@@ -73,10 +73,17 @@ PYTHON_EXECUTABLE=C:/Users/YOUR_USERNAME/AppData/Local/Programs/Python/Python313
 
 #### `REDCAP_API_CREDENTIALS_PATH`
 - **Purpose:** Location of REDCap API credentials CSV
-- **Used by:** NE25 pipeline
+- **Used by:** NE25 and MN26 pipelines
 - **Format:** CSV with columns: `project,pid,api_code`
 - **Example:** `C:/Users/marcu/my-APIs/kidsights_redcap_api.csv`
 - **How to get:** Contact REDCap administrator
+
+#### `FRED_API_KEY_PATH`
+- **Purpose:** Location of FRED (Federal Reserve Economic Data) API key file
+- **Used by:** NE25 and MN26 income transformations (CPI inflation adjustment in `R/utils/cpi_utils.R`)
+- **Format:** Plain text file with single API key (one line, no whitespace)
+- **Example:** `C:/Users/marcu/my-APIs/FRED.txt`
+- **How to get:** Register at https://fred.stlouisfed.org/, then https://fredaccount.stlouisfed.org/apikeys
 
 #### `PYTHON_EXECUTABLE`
 - **Purpose:** Path to Python executable
@@ -106,6 +113,12 @@ ACS_DATA_DIR=data/acs          # ACS cache location
 NHIS_DATA_DIR=data/nhis        # NHIS cache location
 NSCH_DATA_DIR=data/nsch        # NSCH cache location
 ```
+
+#### `N_CORES`
+- **Purpose:** Number of CPU cores for parallel processing
+- **Used by:** Authenticity screening LOOCV, bootstrap pipelines, raking weights, other parallel tasks
+- **Default:** Half of available CPU cores (auto-detected; safe default that leaves headroom)
+- **Examples:** `N_CORES=8` (full utilization on 8-core machine) or `N_CORES=4` (light background processing)
 
 ---
 
@@ -172,17 +185,21 @@ $pythonPath = (Get-Content .env | Where-Object {$_ -match "^PYTHON_EXECUTABLE="}
 
 **IPUMS:**
 ```python
-from python.utils.environment_config import get_ipums_api_key
-api_key = get_ipums_api_key()
+from python.acs.auth import get_api_key
+api_key = get_api_key()
 print(f"API key loaded: {api_key[:10]}..." if api_key else "ERROR: Key not found")
 ```
 
 **REDCap:**
 ```python
-from python.utils.environment_config import get_redcap_credentials
-creds = get_redcap_credentials()
-print(f"Found {len(creds)} REDCap projects")
+from python.db.config import get_api_credentials_file
+from pathlib import Path
+creds_path = get_api_credentials_file()
+print(f"REDCap credentials file: {creds_path}")
+print(f"File exists: {Path(creds_path).exists()}")
 ```
+
+> **Note:** Earlier versions of this doc referenced `python.utils.environment_config` with functions `get_ipums_api_key()` and `get_redcap_credentials()` — those modules/functions do not exist. The canonical APIs are `python.acs.auth.get_api_key` (and `python.nhis.auth.get_api_key`) for IPUMS keys, and `python.db.config.get_api_credentials_file` for REDCap.
 
 ---
 
@@ -368,3 +385,22 @@ where.exe python
 ---
 
 **For questions or issues with environment configuration, consult the main documentation or create an issue on GitHub.**
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 3 of doc audit)
+
+### Corrections applied
+- Date: October 2025 → April 2026
+- **Added FRED_API_KEY_PATH section** (was in `.env.template` but not documented here; required for NE25 + MN26 income transformations)
+- **Added N_CORES section** (was in `.env.template` but not documented here)
+- Updated REDCap usage to mention both NE25 and MN26 pipelines (MN26 was added April 2026)
+- **Fixed fabricated API references**: `from python.utils.environment_config import get_ipums_api_key/get_redcap_credentials` corrected to actual module paths (`python.acs.auth.get_api_key` and `python.db.config.get_api_credentials_file`). The original module/functions never existed.
+
+### Confirmed against source
+- All env variables documented match those in `.env.template`
+- `R/utils/environment_config.R` exists and matches the documented behavior
+- `python-dotenv` is the correct library for `.env` loading
+- Path resolution priority logic is accurate

@@ -334,5 +334,18 @@ print(df['fpl_percent'].describe())
 ---
 
 **Version:** 1.0.0
-**Last Updated:** 2025-10-03
+**Last Updated:** 2025-10-03 (drift-checked 2026-04-20 — all numbers verified accurate)
 **Status:** Production Ready
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+### Confirmed against DB
+- `acs_data` table: 24,449 records ✓
+- `acs_value_labels`: 1,144 ✓
+- `acs_variables`: 42 ✓
+
+No corrections needed — this doc was found to be accurate.

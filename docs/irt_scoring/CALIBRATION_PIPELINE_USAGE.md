@@ -1,6 +1,6 @@
 # IRT Calibration Pipeline - Usage Guide
 
-**Last Updated:** November 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
 
 This guide explains how to generate and export IRT calibration datasets for Mplus analysis.
 
@@ -23,8 +23,9 @@ This guide explains how to generate and export IRT calibration datasets for Mplu
 
 **Execution time:** ~5-7 minutes (includes long format creation, ~3-5 minutes with --skip-long-format)
 
-**Output:**
-- Database tables: `ne20_calibration`, `ne22_calibration`, `ne25_calibration`, `nsch21_calibration`, `nsch22_calibration`, `usa24_calibration`
+**Output (verified 2026-04-20 — actual table names differ from earlier docs):**
+- Combined database tables: `calibration_dataset_2020_2025` (wide, 9,319 rows × 312 cols), `calibration_dataset_long` (1,332,042 rows × 9 cols), `calibration_dataset_with_flags`, `calibration_dataset_full_with_flags`, `historical_calibration_2020_2024`
+- ⚠️ **NOT present in current DB:** Per-study `ne20_calibration`, `ne22_calibration`, `ne25_calibration`, `nsch21_calibration`, `nsch22_calibration`, `usa24_calibration` tables that earlier versions of this doc referenced. Investigate whether these were consolidated into the combined `calibration_dataset_*` tables.
 - Mplus file: `mplus/calibdat.dat` (space-delimited, ready for IRT modeling)
 
 ---
@@ -723,4 +724,18 @@ dbGetQuery(conn, "
 
 ---
 
-**Last Updated:** November 2025 | **Pipeline Version:** 2.0
+**Last Updated:** April 2026 (drift-checked 2026-04-20) | **Pipeline Version:** 2.0
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+### Corrections applied
+- Output table list rewritten: per-study `ne**_calibration` table names removed; replaced with the actual combined `calibration_dataset_2020_2025`, `calibration_dataset_long`, etc. tables that exist in the DB
+- Flagged that `ne25_calibration` (and the other per-study calibration tables) do NOT exist in the current DB
+
+### Known drift items flagged for maintainer follow-up
+- Investigate whether the per-study `ne**_calibration` tables were intentionally consolidated into the combined `calibration_dataset_*` tables, or whether the per-study tables were dropped in error
+- `calibration_dataset_2020_2025` row count is 9,319 (was claimed 47,084 in earlier docs) — see CLAUDE.md verification summary for full details

@@ -273,7 +273,7 @@ If you still see segmentation faults, check:
 ### Documentation Out of Date
 - **Current docs**: [docs/python/](python/)
 - **Archived docs**: [docs/archive/](archive/)
-- **Migration guide**: [docs/guides/migration-guide.md](guides/migration-guide.md)
+- **Migration guide**: [docs/archive/guides/migration-guide.md](archive/guides/migration-guide.md)
 
 ## 📞 Getting Help
 

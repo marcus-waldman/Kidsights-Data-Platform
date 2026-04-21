@@ -2,7 +2,7 @@
 
 **National Survey of Children's Health (NSCH) Data Integration Pipeline**
 
-Version 1.0 | Last Updated: October 2025
+Version 1.1 | Last Updated: April 2026 (drift-checked 2026-04-20)
 
 ---
 
@@ -34,14 +34,16 @@ The National Survey of Children's Health (NSCH) is an annual survey conducted by
 
 **✅ Production Ready**
 
-- **Data Loaded**: 284,496 records across 7 years (2017-2023)
+- **Data Loaded**: 284,496 records across 7 years (2017-2023) — *verified 2026-04-20*
 - **Variables**: 6,867 variable definitions
-- **Value Labels**: 36,164 value label mappings
+- **Value Labels**: 36,164 value label mappings — *verified 2026-04-20*
 - **Database Size**: 0.27 MB (efficient columnar storage)
 - **Processing Time**: ~2 minutes for 6 years
 
 **Known Limitations:**
 - 2016 data table exists but is empty due to schema differences (documented, will be addressed in harmonization phase)
+
+**⚠️ Table naming inconsistency:** Years 2017-2020 and 2023 use the `nsch_{year}_raw` naming pattern; years 2021 and 2022 use `nsch_{year}` (no `_raw` suffix). Worth standardizing in a future cleanup. Year-specific row counts: 2017=21,599; 2018=30,530; 2019=29,433; 2020=42,777; 2021=50,892; 2022=54,103; 2023=55,162 (verified 2026-04-20).
 
 ---
 
@@ -382,6 +384,22 @@ This pipeline is part of the Kidsights Data Platform. See main project documenta
 
 ---
 
-**Last Updated:** October 3, 2025
-**Pipeline Version:** 1.0
-**Status:** Production Ready (7/8 years loaded)
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
+**Pipeline Version:** 1.1
+**Status:** Production Ready (7/8 years loaded; 2016 empty)
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 4 of doc audit)
+
+### Confirmed against DB
+- 284,496 records across 7 years ✓ (verified — earlier "missing" finding was an artifact of the 2021/2022 tables using `nsch_{year}` instead of `nsch_{year}_raw` naming)
+- 36,164 value labels ✓
+- 6,867 variable definitions ✓
+- 2016 table exists but empty ✓
+
+### Corrections applied
+- Last Updated: October 2025 → April 2026
+- Added explicit per-year row counts (2017-2023) and flagged the table-naming inconsistency (`nsch_2017_raw` vs `nsch_2021`)

@@ -323,7 +323,7 @@ docs/QUICK_REFERENCE.md
 docs/DIRECTORY_STRUCTURE.md
 
 ✅ CORRECT (Guides)
-docs/guides/migration-guide.md
+docs/archive/guides/migration-guide.md
 docs/acs/pipeline_usage.md
 docs/nhis/testing_guide.md
 

@@ -20,7 +20,7 @@ This directory contains domain-expert subagents for the Kidsights Data Platform.
 **Key Documentation:**
 - `docs/raking/README.md`
 - `docs/raking/NE25_RAKING_TARGETS_PIPELINE.md`
-- `docs/raking/ne25/BOOTSTRAP_IMPLEMENTATION_PLAN.md`
+- `docs/archive/raking/ne25/BOOTSTRAP_IMPLEMENTATION_PLAN.md`
 
 **Created:** October 2025
 **Status:** Production ready

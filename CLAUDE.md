@@ -324,9 +324,10 @@ quarto render codebook/dashboard/index.qmd
 from python.db.connection import DatabaseManager
 db = DatabaseManager()
 
-# Get record count
-result = db.execute_query("SELECT COUNT(*) FROM ne25_raw")
-print(f"Total records: {result[0][0]}")
+# Get record count using context-managed connection (no execute_query method exists)
+with db.get_connection(read_only=True) as con:
+    result = con.execute("SELECT COUNT(*) FROM ne25_raw").fetchone()
+    print(f"Total records: {result[0]}")
 ```
 
 ### Create IRT Calibration Dataset
@@ -382,7 +383,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 ## Documentation Directory
 
 ### Architecture & Pipeline Guides
-- **[PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)** - Comprehensive architecture for all 6 pipelines, design rationales, ACS metadata system
+- **[PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)** - Comprehensive architecture for all 8 pipelines, design rationales, ACS metadata system
 - **[PIPELINE_STEPS.md](docs/architecture/PIPELINE_STEPS.md)** - Step-by-step execution instructions, timing expectations, troubleshooting
 - **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** - Complete directory structure for all pipelines, data storage locations
 
@@ -448,22 +449,22 @@ pip install pyreadstat
 
 ---
 
-## Current Status (October 2025)
+## Current Status (April 2026)
 
 ### ✅ NE25 Pipeline - Production Ready (December 2025)
 - **Reliability:** 100% success rate (eliminated segmentation faults)
-- **Data:** 3,908 records from 4 REDCap projects, 2,645 with calibrated raking weights
+- **Data:** 4,966 records from 4 REDCap projects, 2,645 with calibrated raking weights
 - **Derived Variables:** 99 variables created by recode_it()
 - **Influential Observations:** MANUAL workflow (Step 6.5 joins influence diagnostics from database if available)
   - Diagnostics stored in `ne25_flagged_observations` table (must be created manually via Cook's Distance analysis)
   - See `scripts/influence_diagnostics/README.md` for influence diagnostics workflow
   - Pipeline creates `influential` column (TRUE if observation manually identified as high-leverage)
   - Pipeline creates `overall_influence_cutoff` column (influence score threshold used for flagging)
-- **Storage:** Local DuckDB with 11 tables, 7,812 records
+- **Storage:** Local DuckDB with ~60 `ne25_*` tables (raw, transformed, scoring outputs, imputations, weights); 97 total tables in DB
 - **GSED Person-Fit Scores (Step 6.7):** Joins manually calibrated person-fit scores from 2023 scale
   - 7 domain scores: General GSED, Feeding, Externalizing, Internalizing, Sleeping, Social Competency, Overall Kidsights
   - Created via fixed item calibration in Mplus (171 fixed + 53 free items)
-  - Scores stored in `ne25_kidsights_gsed_pf_scores_2022_scale` table (2,831 records)
+  - Scores stored in `ne25_kidsights_gsed_pf_scores_2022_scale` table (2,785 records)
   - Conditional standard errors (`_csem`) included for all domains
   - Also joins `ne25_too_few_items` exclusion flags (718 records)
   - See `calibration/ne25/manual_2023_scale/` for workflow
@@ -527,7 +528,7 @@ pip install pyreadstat
 - **Metadata System:** Auto-generated variable reference, 36,164 value label mappings
 
 ### ✅ Raking Targets Pipeline - Complete (October 2025)
-- **Population Targets:** 180 raking targets (30 estimands × 6 age groups)
+- **Population Targets:** 180 raking targets (30 estimands × 6 age groups) — *⚠️ As of 2026-04-20 verification, `raking_targets_ne25` table contains only 11 rows; investigate whether full target table was rebuilt, dropped, or moved.*
 - **Data Sources:** ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
 - **Database Integration:** `raking_targets_ne25` table with 4 indexes for efficient querying
 - **Execution:** Streamlined pipeline (~2-3 minutes), automated verification
@@ -546,7 +547,7 @@ pip install pyreadstat
 - **Child ACEs:** 9 variables via random forest imputation (8 ACE items + child_ace_total)
 - **Storage Pattern:** Study-specific variable tables (`ne25_imputed_{variable}`) with **storage convention:** only imputed/derived values stored (observed values remain in base table)
 - **Total Variables:** 29 imputed variables (3 geo + 6 sociodem + 4 childcare + 7 mental health + 9 ACEs)
-- **Database Tables:** 32 imputation tables created with 5 imputations each (M=5)
+- **Database Tables:** 34 `ne25_imputed_*` tables in current DB (verified 2026-04-20; includes 4 likely-defunct double-prefixed tables `ne25_imputed_imputed_cc_*` with 0 rows)
 - **Execution Time:** 195.2 seconds (3.3 minutes) for complete 11-stage pipeline
 - **Recent Updates (December 2025):**
   - Removed `authentic` column references (replaced by `authenticity_weight` in NE25 pipeline)
@@ -582,15 +583,15 @@ pip install pyreadstat
 - **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
 
 ### 🚧 IRT Calibration Pipeline - In Development (November 2025)
-- **Multi-Study Dataset:** 47,084 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24)
+- **Multi-Study Dataset:** 9,319 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24) — *⚠️ Earlier docs claimed 47,084; current count likely reflects QA-filtered subset or table rebuild. Verify with maintainer.*
 - **Item Coverage:** 416 developmental/behavioral items with lexicon-based harmonization
 - **NSCH Integration:** National benchmarking samples (1,000 per year, ages 0-6)
 - **Historical Data:** 41,577 records from KidsightsPublic package (NE20, NE22, USA24)
 - **Mplus Compatibility:** Space-delimited .dat format, 38.71 MB output file
 - **Performance:** 28 seconds execution time
 - **Database Tables:**
-  - `calibration_dataset_2020_2025` (wide format): 303 columns (id, study, years, wgt + 299 items), 47,084 records
-  - `calibration_dataset_long` (long format): 9 columns (id, years, study, studynum, lex_equate, y, cooksd_quantile, maskflag, devflag), 1,316,391 rows
+  - `calibration_dataset_2020_2025` (wide format): 312 columns, 9,319 records (verified 2026-04-20)
+  - `calibration_dataset_long` (long format): 9 columns (id, years, study, studynum, lex_equate, y, cooksd_quantile, maskflag, devflag), 1,332,042 rows (verified 2026-04-20)
   - Long format benefits: Full NSCH data (787K holdout rows), devflag/maskflag QA system, storage efficiency (~20 MB vs 290+ MB)
 - **Weighted Estimation:** wgt column (1.0 for all studies, authenticity_weight 0.42-1.96 for NE25 inauthentic responses)
 - **Output:** `mplus/calibdat.dat` ready for weighted graded response model IRT calibration
@@ -617,14 +618,13 @@ pip install pyreadstat
   - Launch: `shiny::runApp("scripts/shiny/age_gradient_explorer")`
   - Documentation: [scripts/shiny/age_gradient_explorer/README.md](scripts/shiny/age_gradient_explorer/README.md)
 
-### ✅ NE25 Calibration Table - Optimized (November 2025)
-- **Automated Creation:** Step 11 in NE25 pipeline (no manual intervention required)
-- **Streamlined Schema:** 279 columns (id, years, authenticity_weight + 276 calibration items)
-- **Storage Efficiency:** ~0.5 MB (vs 15 MB bloated version, 97% reduction)
-- **Inclusion Filter:** `meets_inclusion=TRUE` (2,831 participants)
-- **Weighted Calibration:** authenticity_weight column (0.42-1.96) for IRT estimation
-- **Database:** `ne25_calibration` table with 2 indexes (id, years)
-- **Execution Time:** ~5-10 seconds (Step 11)
+### ⚠️ NE25 Calibration Table - Documented but absent from DB (verified 2026-04-20)
+- **Status:** `ne25_calibration` table is documented as Step 11 output but does NOT exist in the current DB. Verify whether Step 11 was disabled, the table was dropped, or it lives under a different name.
+- **Documented Schema (per design):** 279 columns (id, years, authenticity_weight + 276 calibration items)
+- **Documented Storage Efficiency:** ~0.5 MB (vs 15 MB bloated version, 97% reduction)
+- **Documented Inclusion Filter:** `meets_inclusion=TRUE` (2,831 participants)
+- **Documented Database name:** `ne25_calibration` with 2 indexes (id, years)
+- **Documented Execution:** ~5-10 seconds (Step 11)
 - **Purpose:** Optimized source for combined IRT calibration dataset with authenticity weighting
 
 ### ✅ Manual 2023 Scale Calibration - Complete (December 2025)
@@ -640,7 +640,7 @@ pip install pyreadstat
   - Sleeping: `sleeping_gsed_pf_2022`, `sleeping_gsed_pf_2022_csem`
   - Social Competency: `social_competency_gsed_pf_2022`, `social_competency_gsed_pf_2022_csem`
 - **Database Tables:**
-  - `ne25_kidsights_gsed_pf_scores_2022_scale` - Person-fit scores (2,831 records with scores)
+  - `ne25_kidsights_gsed_pf_scores_2022_scale` - Person-fit scores (2,785 records with scores)
   - `ne25_too_few_items` - Exclusion flags for insufficient item responses (718 records)
 - **Pipeline Integration:** Automatically joined in NE25 pipeline Step 6.7 (if tables exist)
 - **Workflow Location:** `calibration/ne25/manual_2023_scale/`
@@ -672,7 +672,7 @@ pip install pyreadstat
   - Overall HRTL: Marked as NA (incomplete without Motor domain)
   - Masking applied in pipeline with explicit GitHub issue reference
 - **Database Tables:**
-  - `ne25_hrtl_domain_scores` (5,652 records: 4 scored domains × 1,412 + masked Motor)
+  - `ne25_hrtl_domain_scores` (7,086 records: 5 domains × ~1,411-1,425 records each, with Motor classification masked to NA)
   - `ne25_hrtl_overall` (1,412 records: hrtl=NA for all due to Motor exclusion)
 - **Execution Time:** ~13.4 seconds (extraction + Rasch fitting + imputation + scoring)
 - **Pipeline Location:** Step 7.7 (4 sub-steps) in `pipelines/orchestration/ne25_pipeline.R`
@@ -687,7 +687,7 @@ pip install pyreadstat
 ### Architecture Highlights
 - **Hybrid R-Python Design:** R for transformations, Python for database operations
 - **Feather Format:** 3x faster R/Python data exchange, perfect type preservation
-- **Independent Pipelines:** NE25 (local survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting) + Imputation (uncertainty) + IRT Calibration (psychometrics)
+- **Independent Pipelines:** NE25 (local survey) + MN26 (multi-child survey) + ACS (census) + NHIS (national health) + NSCH (child health) + Raking Targets (weighting) + Imputation (uncertainty) + IRT Calibration (psychometrics)
 - **Statistical Integration:** Raking targets + Multiple imputation ready for post-stratification weighting + IRT scoring
 
 **📖 Complete status and architecture:** [PIPELINE_OVERVIEW.md](docs/architecture/PIPELINE_OVERVIEW.md)
@@ -698,3 +698,60 @@ pip install pyreadstat
 
 *Updated: April 2026 | Version: 3.8.0*
 - pid does not uniquely identify an individual in the nebraska 2025 (ne25) data. It is the pid + record_id combination.
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 1 of doc audit prior to repo handoff)
+
+### Scope
+~30 quantitative claims + ~25 file path / function reference claims + internal consistency checks.
+
+### Confirmed (sample)
+- All 11 referenced run scripts exist (`run_ne25_pipeline.R`, `run_mn26_pipeline.R`, `scripts/raking/ne25/run_*.R`, `scripts/irt_scoring/run_calibration_pipeline.R`, etc.)
+- All scoring R files exist (`R/credi/score_credi.R`, `R/dscore/score_dscore.R`, `R/hrtl/score_*.R`)
+- All `R/utils/*.R` helpers exist (`safe_joins`, `environment_config`, `recode_utils`, `cpi_utils`, `poverty_utils`)
+- 4 distinct REDCap project pids in `ne25_raw` ✓
+- 2,645 records have non-null `calibrated_weight` ✓ (matches `meets_inclusion = TRUE`)
+- 140 records flagged `out_of_state = TRUE` ✓
+- 718 records in `ne25_too_few_items` ✓
+- 1,412 records in `ne25_hrtl_overall` ✓
+- 884 CREDI-scored children ✓ (non-null COG out of 1,678 eligible)
+- All Bucket A/B archive moves preserved file history (`git mv`)
+
+### Corrections applied (15 edits)
+1. Section header date: "October 2025" → "April 2026"
+2. `ne25_raw` count: 3,908 → 4,966
+3. Storage claim "11 tables, 7,812 records" → "~60 `ne25_*` tables; 97 total"
+4. GSED person-fit scores table size: 2,831 → 2,785 (two locations)
+5. `db.execute_query(...)` API example → corrected to `with db.get_connection() as con:` context manager (the documented method does not exist)
+6. `raking_targets_ne25` rows: flagged "180 (design)" vs **11 (actual)** — see drift item below
+7. Imputation tables: 32 → 34 (with note about 4 defunct double-prefixed tables)
+8. IRT calibration `calibration_dataset_2020_2025`: 47,084/303 → **9,319/312** (with maintainer-verify flag)
+9. IRT calibration `calibration_dataset_long`: 1,316,391 → 1,332,042 rows
+10. `NE25 Calibration Table` section: flagged as documented but absent from DB (`ne25_calibration` does not exist)
+11. PIPELINE_OVERVIEW link description: "6 pipelines" → "8 pipelines"
+12. Architecture summary (line near end): added missing **MN26** to pipeline list
+13. HRTL `ne25_hrtl_domain_scores`: 5,652 → 7,086 (all 5 domains stored uniformly, not 4+1)
+
+### Drift items flagged for maintainer follow-up
+These are real divergences between docs and DB state that need investigation, not just documentation fixes:
+
+| Item | Documented | Actual | Suspected Cause |
+|---|---|---|---|
+| `raking_targets_ne25` rows | 180 | 11 | Table possibly rebuilt/dropped; targets may live elsewhere |
+| `calibration_dataset_2020_2025` records | 47,084 | 9,319 | Likely QA-filtered subset, or table rebuild |
+| `ne25_calibration` table | exists (Step 11) | does not exist | Step 11 may have been disabled/renamed |
+| `overall_influence_cutoff` column in `ne25_transformed` | exists | missing | May have been removed in refactor |
+| `authenticity_weight` column in `ne25_transformed` | exists per "Recent Updates" note | missing | May live only in (currently-missing) `ne25_calibration` |
+| Cleanup candidates: `ne25_*_test`, `ne25_transformed_backup_2025_11_08`, `ne25_imputed_imputed_cc_*` (4 zero-row), `ne25_irt_scores_*` (2 zero-row), `ne25_raw_pid*` (4 zero-row), `ne25_eligibility` (0-row) | n/a | 12 zero/test/backup tables in DB | Old test runs and backups not cleaned up |
+
+### Unverified claims (require pipeline rerun or deep-dive)
+- "99 derived variables created by recode_it()" — function exists; couldn't be invoked from a one-shot script
+- `ne25_dscore_scores` "2,639 scored" (99.8% of 2,645) — table has full 2,645 eligible; non-null score count not verified
+- Statistical metrics: "Effective N (Kish) = 1,518.9", "57.4% efficiency", "weight ratio = 33.55", "71.9% RMSE improvement"
+- Execution times (e.g., "~17-20 min", "195.2 seconds", "~13.4 seconds")
+- "1,000 NSCH per year" sample, "41,577 historical KidsightsPublic records"
+- HRTL on-track percentages by domain (1,005/1,413 etc.)
+- `mplus/calibdat.dat` file size "38.71 MB"

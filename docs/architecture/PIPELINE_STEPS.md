@@ -1,8 +1,13 @@
 # Pipeline Execution Steps
 
-**Last Updated:** December 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20)
 
-This document provides step-by-step execution instructions for all four data pipelines. Each pipeline follows a similar pattern (Extract → Validate → Load) but with pipeline-specific tools and data sources.
+This document provides step-by-step execution instructions for **eight data pipelines**. Each pipeline follows a similar pattern (Extract → Validate → Load) but with pipeline-specific tools and data sources.
+
+> **Note:** This doc has step-by-step detail for 5 pipelines (NE25, ACS, NHIS, NSCH, Imputation). For the 3 newer pipelines, see:
+> - **MN26** → [`docs/mn26/pipeline_guide.qmd`](../mn26/pipeline_guide.qmd) (Quarto guide with full architecture + steps)
+> - **Raking Targets** → [`docs/raking/`](../raking/) and [`docs/QUICK_REFERENCE.md`](../QUICK_REFERENCE.md#raking-targets-pipeline)
+> - **IRT Calibration** → [`docs/irt_scoring/`](../irt_scoring/) and [`docs/QUICK_REFERENCE.md`](../QUICK_REFERENCE.md#irt-calibration-pipeline)
 
 ---
 
@@ -11,11 +16,14 @@ This document provides step-by-step execution instructions for all four data pip
 1. [Prerequisites](#prerequisites)
 2. [R Execution Guidelines](#r-execution-guidelines-critical)
 3. [NE25 Pipeline](#ne25-pipeline-steps)
-4. [ACS Pipeline](#acs-pipeline-steps)
-5. [NHIS Pipeline](#nhis-pipeline-steps)
-6. [NSCH Pipeline](#nsch-pipeline-steps)
-7. [Imputation Pipeline](#imputation-pipeline-steps)
-8. [Troubleshooting](#troubleshooting)
+4. [MN26 Pipeline](../mn26/pipeline_guide.qmd) *(see linked Quarto guide)*
+5. [ACS Pipeline](#acs-pipeline-steps)
+6. [NHIS Pipeline](#nhis-pipeline-steps)
+7. [NSCH Pipeline](#nsch-pipeline-steps)
+8. [Raking Targets Pipeline](../QUICK_REFERENCE.md#raking-targets-pipeline) *(see Quick Reference)*
+9. [Imputation Pipeline](#imputation-pipeline-steps)
+10. [IRT Calibration Pipeline](../QUICK_REFERENCE.md#irt-calibration-pipeline) *(see Quick Reference)*
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -26,8 +34,9 @@ This document provides step-by-step execution instructions for all four data pip
 - **Python 3.13+** with packages: duckdb, pandas, pyyaml, ipumspy, pyreadstat, structlog
 
 ### API Keys
-- **IPUMS API key:** `C:/Users/waldmanm/my-APIs/IPUMS.txt` (for ACS and NHIS pipelines)
-- **REDCap API key:** `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv` (for NE25 pipeline)
+- **IPUMS API key:** Set `IPUMS_API_KEY_PATH` in `.env` file (used by ACS and NHIS pipelines)
+- **REDCap API key:** Set `REDCAP_API_CREDENTIALS_PATH` in `.env` file (used by NE25 pipeline)
+- See [Environment Configuration in CLAUDE.md](../../CLAUDE.md#environment-configuration) for full setup
 
 ### File Paths
 - **R:** `C:/Program Files/R/R-4.5.1/bin`
@@ -61,7 +70,7 @@ echo 'library(dplyr); cat("Success\n")' > scripts/temp/temp_script.R
 ## NE25 Pipeline Steps
 
 **Purpose:** Process REDCap survey data from Nebraska 2025 study
-**Run Time:** ~5-10 minutes for 3,900+ records
+**Run Time:** ~5-10 minutes for 4,966 records (verified 2026-04-20)
 **Frequency:** Run whenever new REDCap data is available
 
 ### Quick Command
@@ -78,14 +87,14 @@ python pipelines/python/init_database.py --config config/sources/ne25.yaml
 ```
 **What it does:**
 - Creates/validates DuckDB database structure
-- Initializes 11 tables (ne25_raw, ne25_transformed, 9 validation/metadata tables)
+- Initializes core tables (ne25_raw, ne25_transformed, validation/metadata tables); current DB has ~60 ne25_* tables across all sub-pipelines (verified 2026-04-20)
 - Checks database connection
 
 #### 2. Data Extraction (R)
 **Executed by:** `R/extract/ne25_extract.R`
 **What it does:**
 - Connects to 4 REDCap projects via REDCapR
-- Extracts raw survey responses (~3,900 records)
+- Extracts raw survey responses (~4,966 records as of 2026-04-20)
 - Applies initial data cleaning
 
 #### 3. Raw Storage (Python via Feather)
@@ -896,11 +905,12 @@ python scripts/imputation/00_setup_imputation_schema.py --study-id ne25
 
 ### Expected Output
 
-**Database Tables:**
+**Database Tables (October 2025 snapshot — current DB has more after mental-health and child-ACEs stages added):**
 - **Geography:** 3 tables, 25,480 rows
-- **Sociodemographic:** 7 tables, 26,438 rows
+- **Sociodemographic:** 7 tables, 26,438 rows (current production: 6 sociodem + fplcat as derived; see CLAUDE.md)
 - **Childcare:** 4 tables, 24,718 rows
 - **Total:** 14 tables, 76,636 rows
+- **Current production total:** 29 imputed variables across 30+ tables (incl. mental health × 7, child ACEs × 9 added in Stages 8-11). See [CLAUDE.md → Imputation Pipeline](../../CLAUDE.md#-imputation-pipeline---production-ready-december-2025) for current state.
 
 **Console Output:**
 ```
@@ -1008,7 +1018,7 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
 
 #### 2. IPUMS API Authentication Failed
 **Symptom:** "Invalid API key" or "Authentication failed"
-**Solution:** Verify API key file exists at `C:/Users/waldmanm/my-APIs/IPUMS.txt`
+**Solution:** Verify `IPUMS_API_KEY_PATH` in `.env` points to a valid file (was hardcoded `C:/Users/waldmanm/my-APIs/IPUMS.txt` in earlier docs)
 
 #### 3. Cache Not Found
 **Symptom:** "Extract not found in cache, submitting new request"
@@ -1056,5 +1066,24 @@ pip install duckdb pandas pyyaml ipumspy pyreadstat structlog
 - **NSCH Documentation:** [../nsch/README.md](../nsch/README.md)
 
 ---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 2 of doc audit)
+
+### Corrections applied
+- Pipeline count: "all four data pipelines" → "all eight" (intro + TOC)
+- Added TOC entries for MN26, Raking Targets, IRT Calibration (linking to per-pipeline docs rather than duplicating step-by-step here)
+- API key paths: hardcoded `C:/Users/waldmanm/my-APIs/...` → `.env`-based config (3 locations)
+- NE25 record count: ~3,900 → 4,966
+- Storage table count: "11 tables" → "core tables; current DB has ~60 ne25_* tables across all sub-pipelines"
+- Imputation totals updated with note that current production has 29 variables (vs 14 documented), with link to CLAUDE.md for current state
+
+### Known remaining drift (not surgically fixed)
+- Detailed step-by-step sections for MN26, Raking Targets, and IRT Calibration are not added here — pointers to existing per-pipeline docs are used instead
+- Stage-row counts (25,480 / 26,438 / 24,718 / 76,636) are October 2025 snapshots
+- The Imputation pipeline detailed sections (Stages 1-7) describe the 7-stage version; current production has 11 stages (Stages 8-11 = mental health + child ACEs) — see CLAUDE.md
+
+See CLAUDE.md `## Verification Summary` for the comprehensive list of database drift items affecting this doc.
 
 *Last Updated: October 2025*

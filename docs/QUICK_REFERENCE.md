@@ -1,6 +1,6 @@
 # Quick Reference Guide
 
-**Last Updated:** December 2025
+**Last Updated:** April 2026 (drift-checked 2026-04-20 — see Verification Summary at bottom)
 
 This document provides a quick reference cheatsheet for common Kidsights Data Platform operations. For detailed documentation, see the linked guides.
 
@@ -268,22 +268,22 @@ python scripts/imputation/create_new_study.py --study-id ia26 --study-name "Iowa
   --file=scripts/irt_scoring/import_historical_calibration.R
 ```
 
-**Note:** NE25 calibration table is automatically created by NE25 pipeline (Step 11) - manual execution rarely needed
+**Note:** NE25 calibration table is documented as automatically created by NE25 pipeline (Step 11) - *⚠️ As of 2026-04-20 verification, `ne25_calibration` table does NOT exist in the DB. Investigate whether Step 11 was disabled.*
 
 **What it does:**
 - Combines 6 studies: NE20, NE22, NE25, NSCH21, NSCH22, USA24
 - Harmonizes 416 items via lexicon mappings (ne25/cahmi21/cahmi22 → lex_equate)
 - Creates two database tables:
-  - `calibration_dataset_2020_2025` (wide format): 47,084 records × 303 columns
-  - `calibration_dataset_long` (long format): 1,316,391 rows × 9 columns
+  - `calibration_dataset_2020_2025` (wide format): 9,319 records × 312 columns *(verified 2026-04-20; was 47,084 in earlier docs)*
+  - `calibration_dataset_long` (long format): 1,332,042 rows × 9 columns *(verified 2026-04-20)*
 - Exports Mplus .dat file (space-delimited, missing as ".")
 - Computes Cook's D influence diagnostics for QA masking
 
 **Timing:** ~5-7 minutes (full pipeline), ~3-5 minutes (with --skip-long-format)
 
 **Output:**
-- Wide format: 47,084 records × 419 columns (~38 MB) for Mplus
-- Long format: 1.3M rows for QA analysis (~20 MB, includes full NSCH holdout sample)
+- Wide format: 9,319 records × ~419 columns (~38 MB) for Mplus *(verified 2026-04-20)*
+- Long format: 1.33M rows for QA analysis (~20 MB, includes full NSCH holdout sample)
 
 **⚠️ REQUIRED NEXT STEP:** After creating the calibration dataset, you MUST run the Age-Response Gradient Explorer for visual quality assurance before proceeding to Mplus calibration.
 
@@ -426,7 +426,7 @@ result <- generate_kidsights_model_syntax(
 **What it does:**
 - Loads codebook.json and builds equate table (jid <-> lex_equate)
 - Extracts param_constraints from psychometric metadata
-- Loads calibration dataset from DuckDB (47,084 records, 416 items)
+- Loads calibration dataset from DuckDB (9,319 records, 416 items) *(verified 2026-04-20)*
 - Generates MODEL syntax (factor loadings, thresholds)
 - Generates MODEL CONSTRAINT syntax (5 constraint types + 1-PL)
 - Generates MODEL PRIOR syntax (N(1,1) Bayesian priors)
@@ -489,7 +489,7 @@ cd calibration/ne25/manual_2023_scale
 **Timing:** 3-5 minutes
 
 **Output Database Tables:**
-1. **`ne25_kidsights_gsed_pf_scores_2022_scale`** (2,831 records)
+1. **`ne25_kidsights_gsed_pf_scores_2022_scale`** (2,785 records — verified 2026-04-20)
    - Overall kidsights score: `kidsights_2022`, `kidsights_2022_csem`
    - 6 domain scores: general, feeding, externalizing, internalizing, sleeping, social_competency
    - Each domain has person-fit score and conditional standard error (CSEM)
@@ -537,7 +537,7 @@ calibration/ne25/manual_2023_scale/
 | NE25 total participants | 4,966 | From REDCap |
 | Eligible (meets_inclusion) | 3,507 | Inclusion criteria met |
 | Calibration sample (≥5 items) | 2,785 | Used for Mplus |
-| Person-fit scores generated | 2,831 | 56.1% coverage |
+| Person-fit scores generated | 2,785 | (verified 2026-04-20; was 2,831 in earlier docs) |
 | Too few items (<5) | 718 | 14.5% flagged |
 | Fixed item parameters | 171 | From 2023 mirt |
 | Free item parameters | 53 | Estimated from NE25 |
@@ -670,11 +670,11 @@ python -c "import duckdb, pandas, ipumspy, pyreadstat; print('[OK] All packages 
 
 ### API Keys
 
-**REDCap API key:** `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv`
+**REDCap API key:** Set `REDCAP_API_CREDENTIALS_PATH` in `.env` file (was `C:/Users/waldmanm/my-APIs/kidsights_redcap_api.csv` in earlier docs)
 - Used by: NE25 pipeline
 - Format: CSV with `project_id`, `api_key` columns
 
-**IPUMS API key:** `C:/Users/waldmanm/my-APIs/IPUMS.txt`
+**IPUMS API key:** Set `IPUMS_API_KEY_PATH` in `.env` file (was `C:/Users/waldmanm/my-APIs/IPUMS.txt` in earlier docs)
 - Used by: ACS and NHIS pipelines
 - Format: Plain text file with API key
 - Obtain from: https://account.ipums.org/api_keys
@@ -796,7 +796,7 @@ from python.db.connection import DatabaseManager
 db = DatabaseManager()
 
 # Get record count
-result = db.execute_query("SELECT COUNT(*) FROM ne25_raw")
+result = db.get_connection(read_only=True)  # use as context manager; execute_query() does not exist
 print(f"Total records: {result[0][0]}")
 
 # Get age distribution
@@ -933,7 +933,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 ## Pipeline Status Summary
 
 ### NE25 Pipeline
-✅ **Production Ready** | 3,908 records | 11 tables | 100% reliability
+✅ **Production Ready** | 4,966 records | ~60 ne25-prefix tables | 100% reliability
 
 ### ACS Pipeline
 ✅ **Complete** | Census data | State-specific extracts | 90+ day cache
@@ -945,7 +945,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 ✅ **Production Ready** | 284,496 records | 3,780 variables | 7 years (2017-2023)
 
 ### Raking Targets Pipeline
-✅ **Production Ready** | 180 raking targets | 614,400 bootstrap replicates | ~2-3 min runtime
+✅ **Production Ready** | 180 raking targets *(⚠️ DB shows only 11 rows as of 2026-04-20 — investigate)* | 614,400 bootstrap replicates | ~2-3 min runtime
 
 ### Imputation Pipeline
 ✅ **Production Ready** | 30 variables | 85,746 rows | M=5 imputations | 11-stage sequential | ~3 min runtime
@@ -972,4 +972,20 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 
 ---
 
-*Last Updated: October 2025 | Quick Reference v1.0*
+*Last Updated: April 2026 (drift-checked 2026-04-20) | Quick Reference v1.1*
+
+---
+
+## Verification Summary
+
+**Last fact-check:** 2026-04-20 (Bucket C Tier 1 of doc audit)
+
+- Fixed `db.execute_query()` API references (method does not exist; corrected to `with db.get_connection() as con:` pattern)
+- Updated IRT calibration record counts: 47,084 → 9,319 (multiple locations)
+- Updated `calibration_dataset_long` row count: 1,316,391 → 1,332,042
+- Flagged `ne25_calibration` table as documented but absent from current DB
+- Updated GSED person-fit scores count: 2,831 → 2,785
+- Updated NE25 pipeline status: 3,908 records → 4,966
+- Replaced hardcoded `C:/Users/waldmanm/my-APIs/...` paths with `.env` references
+- Flagged raking targets DB drift (180 designed vs 11 actual)
+- See CLAUDE.md `## Verification Summary` for the comprehensive list of corrections and unverified claims.

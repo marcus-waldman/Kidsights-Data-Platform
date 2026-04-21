@@ -173,7 +173,7 @@ After adding the rows and calculating estimates:
 
 - **ACS Variable Documentation:** https://usa.ipums.org/usa-action/variables/EDUC_MOM
 - **ACS Transformation Guide:** `docs/acs/transformation_mappings.md`
-- **Main Raking Plan:** `docs/raking/RAKING_TARGETS_ESTIMATION_PLAN.md`
+- **Main Raking Plan:** `docs/raking/ne25/RAKING_TARGETS_ESTIMATION_PLAN.md`
 
 ---
 
