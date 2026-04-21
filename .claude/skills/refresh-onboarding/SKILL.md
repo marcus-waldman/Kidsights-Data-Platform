@@ -90,7 +90,7 @@ If a previously-flagged drift item has been resolved (table now exists, count no
 
 Build the content brief for the `visual-explainer` skill. The page structure is fixed; only the content within sections updates. Keep these sections in this order:
 
-1. **Hero** — title, one-sentence pitch, snapshot date (today's ISO date), repo URL, key meta (snapshot date, source-of-truth doc, pipeline count)
+1. **Hero** — title, one-sentence pitch, snapshot date (today's ISO date), repo URL, key meta (snapshot date, source-of-truth doc, pipeline count). Between the pitch paragraph and the meta grid, embed the 5-minute orientation YouTube video via iframe (YouTube video ID `miRkkDAd18Y`). Wrap the iframe in a container with `max-width: 560px` and apply CSS `width: 100%; aspect-ratio: 16/9;` to the iframe itself so it stays responsive on narrow screens. Preserve the video embed on every regeneration — it is the literal referent of the H1's "Five-minute orientation" subtitle, not decoration.
 2. **The N pipelines** — visual grid; one card per pipeline; status badge per card
 3. **Architecture diagram** — inline SVG; data flow from sources → R/Python (with Feather between) → DuckDB → outputs. Update only if the architecture itself has changed (new source type, new processing layer, new output type). Directly below the SVG legend, include a one-sentence paragraph pointing readers from the DuckDB cylinder to the full table catalog (`docs/database/TABLES.md`) and its YAML source of truth — that pointer is how a reader gets from "what's in the DuckDB?" (which the diagram raises) to "here's the answer" without digging.
 4. **Reading order** — typically 5 numbered cards: HANDOFF → CLAUDE → INSTALLATION_GUIDE → QUICK_REFERENCE → per-pipeline. Update if doc names changed.
