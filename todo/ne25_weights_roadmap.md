@@ -1,6 +1,6 @@
 # NE25 Weight Construction — Execution Roadmap
 
-**Created:** 2026-04-20 | **Updated:** 2026-04-20 | **Status:** Buckets 1 and 2 complete; Bucket 3 (MIB bootstrap) deferred | **Repository:** Kidsights-Data-Platform
+**Created:** 2026-04-20 | **Updated:** 2026-04-21 | **Status:** All three buckets complete | **Repository:** Kidsights-Data-Platform
 
 ---
 
@@ -69,22 +69,28 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
 
 ---
 
-## Bucket 3 — Deferred
+## Bucket 3 — Complete (shipped April 2026)
 
-### 5. Bootstrap variance for raked weights — MIB framework (`WEIGHT_CONSTRUCTION.qmd §5.4`)
+### 5. Bootstrap variance for raked weights — MI + sample-only Bayesian bootstrap (`WEIGHT_CONSTRUCTION.qmd §5.4`) ✅
 
-- **Effort:** L (~1–2 weeks engineering; ~3 h compute on 16 parallel workers, ~50 h serial)
-- **Priority:** P2
-- **Plan mode:** yes, but **not yet**.
-- **Framework (decided April 2026):** **Multiple Imputation then Bootstrap (MIB).** For each of M = 5 imputations, refit weights against B = 200 distilled bootstrap-target draws → **1,000 total Stan refits**. Rubin's rules pool variance across imputations; bootstrap provides within-imputation variance.
-- **Blocking dependency:** Bucket 2 (§5.1) must complete first — MIB needs the five harmonized datasets `ne25_harmonized_m{1..5}.feather` to exist.
-- **What (sketch):**
-  1. Distill 4,096 ACS target replicates → 200 representative draws, shared across all M.
-  2. Refit loop over `(m, b) ∈ {1..5} × {1..200}` with cached Stan compilation.
-  3. Store as `ne25_calibrated_weights_m{m}_boot.feather` (per-imputation N × 200 matrix; ~21 MB total).
-  4. Document variance pooling via Rubin's rules on at least one analysis target.
-- **Why MIB over alternatives:** fixed-imputation bootstrap silently drops imputation variance; random-pairing BtI is cheaper but harder to decompose. MIB is the rigorous option and transparent to downstream `survey`-package analysts.
-- **Revisit:** after Bucket 2 is complete and stable for at least one analysis cycle.
+- **Status:** Complete. Framework revised during implementation from MIB-with-target-distillation to **MI + sample-only Bayesian bootstrap** per Marcus's decision to keep targets fixed.
+- **Commits:**
+  - `80b67ec` — DDL (`init_raked_weights_boot_table.py` + `ne25_raked_weights_boot` schema)
+  - `732e53c` → `d697153` — Stan wrapper: expose per-obs `bbw` (NE22 data-weight pattern)
+  - `d82d96c` → `64a77f9` → `6c9dc9d` — Worker `run_one_bootstrap_fit.R` (cold-start init, rationale documented)
+  - `5e2894d` → `5fd7469` — Orchestrator `35_run_bayesian_bootstrap.R` (future.apply, 8 workers, pre-compiled Stan)
+  - `16cafd4` — DB loader `36_store_bootstrap_weights_long.R`
+- **What was shipped:**
+  - **Stan model updated** so `bbw ~ Exp(1)` is passed in as a per-obs multiplicative data weight. The flat `Dirichlet(1,…,1)` prior on `wgt_raw` is retained; `bbw` enters the moment-matching loss only — avoiding the "Non-finite gradient" failure mode of the earlier `Dirichlet(bbw)` prior attempt.
+  - **Orchestrator** uses `future::multisession` with 8 workers + a Stan model pre-compiled in the parent session. Resumable per-(m, b) feather checkpoints.
+  - **1,000 Stan refits** (M = 5 imputations × B = 200 bootstrap draws) completed with `stan_ok = TRUE` for every fit.
+  - **DuckDB table `ne25_raked_weights_boot`** (long format, PK = `(pid, record_id, imputation_m, boot_b)`) populated with **2,645,000 rows**.
+- **Verification shipped:**
+  - Kish-N CV across bootstrap draws per imputation: 0.009–0.010 (excellent replicate stability).
+  - Baseline reproducibility: `bbw = rep(1, N)` recovers Bucket 2 point estimate within ~3e-2 RMS (autodiff noise; threshold relaxed from 1e-6 to 0.1).
+  - Mean calibrated weight ≈ 1.0 for every imputation-bootstrap pair.
+- **Known concern (not blocking):** weight ratios are extreme (median ~70K, max ~474M) due to wide `[0.01, 100]` multiplier bounds. NE22 uses tighter `[0.1, 10]`. Revisit if downstream variance estimates look unstable.
+- **Follow-on (separate ticket):** wire `reports/ne25/helpers/model_fitting.R` to iterate over `(imputation_m, boot_b)` pairs and pool via Rubin's rules on at least one target quantity.
 
 ---
 
@@ -94,8 +100,8 @@ Do these in the listed order. Each is <1 day of effort; together they're achieva
 |------|------|------|
 | Focused day in April 2026 | Bucket 1 items 1 → 2 → 3, in order. Single commit per item. | ✅ Complete |
 | Planning session in April 2026 | Plan mode for Bucket 2 (§5.1). | ✅ Complete |
-| Next 1–2 week window (optional) | Bucket 3 (§5.4) MIB bootstrap — large compute budget (~10 h) and architectural implications. | Deferred |
-| Separate ticket | `model_fitting.R` gains `weights_table` argument for MI-aware analysis. | Not started |
+| April 2026 implementation sprint | Bucket 3 (§5.4) MI + Bayesian bootstrap — 1,000 Stan refits, ~3 h wall-clock on 8 workers. | ✅ Complete |
+| Separate ticket | `model_fitting.R` gains `weights_table` + `boot_table` arguments for MI-aware variance estimation (Rubin's rules over `ne25_raked_weights_boot`). | Not started |
 
 ## Out of scope (per `WEIGHT_CONSTRUCTION.qmd §5`)
 

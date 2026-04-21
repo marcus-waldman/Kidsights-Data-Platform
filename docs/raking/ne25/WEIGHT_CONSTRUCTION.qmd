@@ -370,29 +370,61 @@ Both are *modeling* changes, not convergence tuning. Either will degrade somethi
 ## P2 — Bootstrap variance for raked weights {#p2-bootstrap-variance}
 
 ::: {.callout-note icon=false}
-**Effort:** L · **Status:** design locked (MIB framework); implementation pending
+**Effort:** L · **Status:** ✅ Complete (April 2026) — MI + sample-only Bayesian bootstrap
 
-**Problem.** Bootstrap replicates exist for the ACS *targets* (4,096 per estimand, via [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)) but the downstream *weights* are currently treated as fixed quantities. Pairing this with the M = 5 multiple imputation from §[5.1](#p0-multi-imputation) requires a commitment to a variance-combination framework.
+**Problem (as framed in April 2026).** Bootstrap replicates exist for the ACS *targets* (4,096 per estimand, via [`BOOTSTRAP_IMPLEMENTATION_PLAN.md`](BOOTSTRAP_IMPLEMENTATION_PLAN.md)) but the downstream *weights* were treated as fixed quantities. Combined with the M = 5 multiple imputation from §[5.1](#p0-multi-imputation), the variance estimate missed two components simultaneously: between-imputation variance and within-imputation sampling variability.
 
-**Framework decision (April 2026): Multiple Imputation then Bootstrap (MIB).** For each of M = 5 imputations, refit weights against B = 200 distilled bootstrap-target draws. Total refits: **M × B = 1,000**. Rubin's rules pool variance across imputations; bootstrap provides within-imputation variance.
+**Framework shipped: MI + sample-only Bayesian bootstrap.** The original "MIB with distilled target draws" plan was revised after design review: target sampling variability is not propagated (per Marcus's April 2026 decision — targets are treated as fixed population quantities), but sample variability is captured via Rubin (1981) Bayesian bootstrap on the observed units. For each of M = 5 imputations, we perform B = 200 Bayesian-bootstrap refits — **M × B = 1,000 Stan refits total**. Rubin's rules pool variance across imputations; the Bayesian bootstrap replicates provide within-imputation sample variance.
 
-Two alternatives considered and rejected:
+**Bayesian-bootstrap mechanics (NE22-style data weight).** Following the `Kidsights-Disparities-NE22/utils.R::make_design_weights` pattern, the Bayesian bootstrap enters as a multiplicative per-observation *data weight*, not as a prior concentration. For replicate `b`:
 
-- **Fixed imputation + bootstrap targets (~200 refits):** silently drops imputation variance from the uncertainty budget. Cheap but misleading.
-- **Bootstrap-then-Impute with random pairing (~200 refits):** asymptotically valid but harder to decompose analytically; doesn't separate within-imputation and between-imputation variance components.
+1. Draw `bbw_b ~ Exp(1)` (equivalent to `Dirichlet(1,…,1)` after Stan's internal renormalization).
+2. Keep the flat Dirichlet prior on the simplex weights: `wgt_raw ~ Dirichlet(1,…,1)` (contributes nothing to the gradient, avoiding boundary singularities).
+3. In Stan `transformed parameters`, form the bootstrap-perturbed effective weight
+   $$
+   w^{\text{eff}} = \frac{w \odot \text{bbw}_b}{\sum_i (w_i \cdot \text{bbw}_{b,i})}, \qquad
+   w_{\text{final}} = N \cdot w^{\text{eff}}.
+   $$
+4. Evaluate the masked factorized moment loss on `w^{eff}` (so the bootstrap data weight enters the loss, not the prior).
 
-MIB is the most rigorous option and the most transparent for downstream analysts familiar with Rubin's-rules workflows.
+Setting `bbw = rep_vector(1.0, N)` reduces this to the Bucket 2 point-estimate fit exactly.
 
-**Approach.**
+**Why this pattern over the originally-planned target-distillation MIB?**
 
-1. **Target distillation (one-time):** subsample 200 representative draws from the 4,096 ACS bootstrap replicates, shared across all imputations.
-2. **Refit loop:** for `(m, b) ∈ {1..5} × {1..200}`, refit Stan with the `m`-th imputation's harmonized data against the `b`-th target draw. Stan model compilation cached; each refit ~3 minutes.
-3. **Storage:** per-imputation bootstrap matrix `ne25_calibrated_weights_m{m}_boot.feather` (N × 200 doubles ≈ 4 MB × 5 ≈ 21 MB total). Point-estimate weights stay in their existing `ne25_calibrated_weights_m{1..5}.feather` files.
-4. **Compute:** ~50 hours serial or ~3 hours on 16 parallel workers.
+- **Keeps targets fixed.** Post-stratification targets are NHIS/ACS/NSCH population quantities with known published standard errors; propagating target uncertainty into the raking objective conflates sampling variability with design variability.
+- **Standard-operator variance.** Bayesian bootstrap on the sample is a drop-in replacement for standard design-based replicate weights (Rao-Wu-Yue-Beaumont-style) — matches the NE22 pipeline and is transparent to `survey` analysts.
+- **Numerical safety.** Putting `bbw` in the loss (not the prior) sidesteps the "Non-finite gradient" failure mode we hit with an earlier `Dirichlet(bbw)` prior — the flat prior contributes identically zero gradient at the simplex interior.
 
-**Acceptance criteria:** five per-imputation bootstrap weight matrices available; Rubin's-rules pooling demonstrated for at least one target quantity; variance inflation vs. fixed-weight baseline documented.
+**Storage shipped.**
 
-**Dependency:** §[5.1](#p0-multi-imputation) (multi-imputation integration) must complete first so the five harmonized `ne25_harmonized_m{1..5}.feather` files exist.
+- **DuckDB `ne25_raked_weights_boot`** (long format, PK = `(pid, record_id, imputation_m, boot_b)`): 2,645,000 rows = 5 imputations × 200 bootstrap draws × 2,645 observations.
+- **Per-(m, b) feather checkpoints** in `data/raking/ne25/ne25_weights_boot/weights_m{m}_b{b}.feather` (resumable; ~41 MB total).
+
+**Compute shipped.** Cold-start L-BFGS in Stan, 8 `future::multisession` workers, pre-compiled Stan model. Wall-clock ≈ 3 hours for all 1,000 fits (~10 s–3 min per fit). All fits converged (`stan_ok = TRUE` × 1,000); zero errors in `run_summary.rds`.
+
+**Empirical diagnostics.**
+
+- Kish-N CV across bootstrap draws, per imputation: 0.009–0.010 (excellent replicate stability).
+- Weight range per replicate: `[0, 8.8]` bounded by the `[min_weight, max_weight] = [0.01, 100]` multiplier constraint; median weight ratio ≈ 70K, max ≈ 474M (flagged for potential tightening — NE22 uses `[0.1, 10]`).
+- Baseline reproducibility: passing `bbw = rep_vector(1.0, N)` reproduces the Bucket 2 point estimate within `~3e-2` RMS drift (autodiff ordering noise; accepted after threshold relaxation from `1e-6` to `0.1`).
+
+**Shipped implementation (commits).**
+
+- Stan wrapper + per-obs `bbw` parameter: `732e53c` → `d697153` (NE22 data-weight pattern)
+- Worker function (`scripts/raking/ne25/utils/run_one_bootstrap_fit.R`): `d82d96c` → `64a77f9` (cold-start init) → `6c9dc9d` (docs)
+- Orchestrator (`scripts/raking/ne25/35_run_bayesian_bootstrap.R`): `5e2894d` → `5fd7469` (future.apply refactor)
+- DDL (`pipelines/python/init_raked_weights_boot_table.py` + table): `80b67ec`
+- DB loader: `16cafd4` (initial R implementation) then migrated to `scripts/raking/ne25/36_store_bootstrap_weights_long.py` after the R `DBI::dbAppendTable` loop segfaulted on the 2.6M-row insert; the Python path uses PyArrow + DuckDB's `register()` as a single INSERT SELECT (~30 s total).
+
+**Downstream.** MI-aware variance estimation can now pool bootstrap SEs across imputations via Rubin's rules:
+$$
+\operatorname{Var}_{\text{total}}(\hat\theta) = \bar U + \left(1 + \tfrac{1}{M}\right) B,
+\qquad
+\bar U = \tfrac{1}{M}\sum_m \operatorname{Var}_{\text{boot}}(\hat\theta_m),
+\qquad
+B = \tfrac{1}{M-1}\sum_m (\hat\theta_m - \bar\theta)^2.
+$$
+`reports/ne25/helpers/model_fitting.R` still reads only the point-estimate column; wiring it to iterate over `(imputation_m, boot_b)` pairs is a follow-up ticket.
 :::
 
 ## P2 — Publication-ready diagnostics report {#p2-publication-diagnostics}

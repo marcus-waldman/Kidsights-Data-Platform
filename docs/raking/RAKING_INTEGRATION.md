@@ -429,9 +429,93 @@ Typical runtime: ~17–20 minutes for M=5.
 
 Kish N CV = 0.007, correlation RMSE range = 0.00046 — imputation variation is small relative to target sampling variance (as expected; imputation chiefly affects tail records, not population moments).
 
-### Next: MIB bootstrap (Bucket 3, deferred)
+### Bayesian-bootstrap replicate weights (Bucket 3, shipped April 2026)
 
-The M=5 per-imputation weights are the foundation for the Multiple Imputation then Bootstrap (MIB) variance estimator (`docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd` §5.4; `memory/project_ne25_weight_variance_framework.md`). That work is deferred — when implemented, it will refit Stan 200 times per imputation (1,000 total) and store the bootstrap weights as a sibling long table.
+The M=5 per-imputation weights are now paired with **B=200 Bayesian-bootstrap replicates per imputation**, stored in a sibling long-format DuckDB table `ne25_raked_weights_boot`. Framework: MI + sample-only Bayesian bootstrap (Rubin 1981). Target moments are treated as fixed population quantities; replicate variability captures within-imputation sample variability only. Rubin's rules pool variance across imputations.
+
+**Schema:**
+
+```sql
+-- Table: ne25_raked_weights_boot
+CREATE TABLE ne25_raked_weights_boot (
+    pid               INTEGER  NOT NULL,
+    record_id         INTEGER  NOT NULL,
+    study_id          VARCHAR,
+    imputation_m      INTEGER  NOT NULL,
+    boot_b            INTEGER  NOT NULL,
+    calibrated_weight DOUBLE   NOT NULL,
+    PRIMARY KEY (pid, record_id, imputation_m, boot_b)
+);
+-- 2,645,000 rows for NE25 (5 imputations × 200 bootstrap draws × 2,645 records)
+```
+
+**Bayesian-bootstrap mechanics (NE22-style data weight).** For replicate `b`:
+
+1. Draw `bbw_b ~ Exp(1)` (equivalently `Dirichlet(1,…,1)` after renormalization).
+2. Pass `bbw` into the Stan model as a per-observation multiplicative data weight.
+3. Stan forms `w_eff = (w ⊙ bbw_b) / sum(w ⊙ bbw_b)` inside `transformed parameters`.
+4. The masked factorized moment loss is evaluated on `w_eff`; the flat `Dirichlet(1,…,1)` prior on `wgt_raw` contributes zero gradient (no boundary singularities).
+
+Setting `bbw = rep(1, N)` recovers the point-estimate (Bucket 2) weights exactly — the replicate family nests the point estimate.
+
+**MI-aware variance via Rubin's rules:**
+
+```r
+library(DBI); library(duckdb); library(mitools)
+con <- DBI::dbConnect(duckdb::duckdb(),
+                      "data/duckdb/kidsights_local.duckdb", read_only = TRUE)
+
+# One estimate per (m, b) — parallelize via future.apply if needed
+estimates <- list()
+for (m in 1:5) {
+  ne25_m <- get_completed_dataset(m)
+  for (b in 1:200) {
+    wb <- DBI::dbGetQuery(con, sprintf("
+      SELECT pid, record_id, calibrated_weight
+      FROM ne25_raked_weights_boot
+      WHERE imputation_m = %d AND boot_b = %d
+    ", m, b))
+    d <- ne25_m %>% dplyr::inner_join(wb, by = c("pid","record_id"))
+    design <- survey::svydesign(ids = ~1, weights = ~calibrated_weight, data = d)
+    estimates[[paste(m, b)]] <- list(m = m, b = b,
+      est = coef(survey::svyglm(outcome ~ age + male, design = design, family = binomial()))
+    )
+  }
+}
+
+# Pool: within-imputation bootstrap variance + between-imputation variance (Rubin's rules)
+per_m <- split(estimates, sapply(estimates, `[[`, "m"))
+theta_m  <- sapply(per_m, function(ms) colMeans(do.call(rbind, lapply(ms, `[[`, "est"))))
+U_m      <- sapply(per_m, function(ms) apply(do.call(rbind, lapply(ms, `[[`, "est")), 2, var))
+theta    <- rowMeans(theta_m)
+U_bar    <- rowMeans(U_m)                               # within-imputation variance
+B        <- apply(theta_m, 1, var)                      # between-imputation variance
+var_total <- U_bar + (1 + 1/5) * B                      # Rubin's rules
+```
+
+**Execution.** The bootstrap weights are produced by scripts 35 → 36:
+
+```bash
+# ~3 hours wall-clock on 8 future::multisession workers, pre-compiled Stan
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/35_run_bayesian_bootstrap.R
+
+# Populate DuckDB from 1,000 per-(m,b) feather checkpoints (~30 s)
+py scripts/raking/ne25/36_store_bootstrap_weights_long.py
+```
+
+Per-(m, b) feather checkpoints under `data/raking/ne25/ne25_weights_boot/` make the orchestrator resumable after interruption.
+
+**Stability (April 2026 run, M=5 × B=200 = 1,000 fits):**
+
+| Metric | Value |
+|--------|-------|
+| Stan convergence (`stan_ok = TRUE`) | 1,000 / 1,000 |
+| Kish-N CV across bootstrap draws (per imputation) | 0.009–0.010 |
+| Baseline reproducibility (`bbw = rep(1,N)` vs Bucket 2) | ~3e-2 RMS (autodiff noise) |
+| Weight ratio per replicate | median ~70K, max ~474M |
+| Wall-clock runtime | ~3 h (8 workers) |
+
+The extreme weight ratios reflect the wide `[min_weight, max_weight] = [0.01, 100]` bounds. NE22 uses tighter `[0.1, 10]`; revisit for NE25 if downstream variance estimates look unstable.
 
 ---
 

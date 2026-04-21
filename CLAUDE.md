@@ -70,6 +70,17 @@ python scripts/nsch/process_all_years.py --years all  # Process all years (2016-
 "C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/run_ne25_raking_full.R
 ```
 
+**NE25 Bayesian-Bootstrap Replicate Weights (Bucket 3 — April 2026):**
+```bash
+# MI + sample-only Bayesian bootstrap: M=5 imputations x B=200 replicates = 1,000 Stan refits.
+# Prerequisites: Bucket 2 weights (ne25_raked_weights) and harmonized feathers.
+# Resumable per-(m,b) feathers under data/raking/ne25/ne25_weights_boot/.
+# Output: ne25_raked_weights_boot DuckDB table (1000 x N = 2,645,000 rows).
+# Runtime: ~3 hours wall-clock on 8 future::multisession workers with pre-compiled Stan.
+"C:\Program Files\R\R-4.5.1\bin\Rscript.exe" scripts/raking/ne25/35_run_bayesian_bootstrap.R
+py scripts/raking/ne25/36_store_bootstrap_weights_long.py
+```
+
 **Imputation Pipeline:**
 ```bash
 # Setup database schema (one-time, study-specific)
@@ -573,6 +584,18 @@ pip install pyreadstat
 - **Bootstrap Variance:** 614,400 bootstrap replicates for ACS estimands (4096 replicates × 150 targets)
 - **Method:** Rao-Wu-Yue-Beaumont bootstrap with shared design across all 25 ACS estimands
 - **Execution Time:** ~15-20 minutes (4096 replicates, 16 parallel workers)
+
+### ✅ NE25 Bayesian-Bootstrap Replicate Weights - Complete (April 2026)
+- **Framework:** MI + sample-only Bayesian bootstrap (Rubin 1981). Targets treated as fixed; sample variability captured via per-obs `bbw ~ Exp(1)` data-weight draws.
+- **Pattern:** Follows `Kidsights-Disparities-NE22/utils.R::make_design_weights` — `bbw` enters the masked factorized moment loss (not the prior), so the flat `Dirichlet(1,…,1)` prior contributes zero gradient.
+- **Scale:** 5 imputations × 200 bootstrap draws = **1,000 Stan refits**, all `stan_ok = TRUE`.
+- **Storage:** `ne25_raked_weights_boot` DuckDB table (long format, PK = (pid, record_id, imputation_m, boot_b)), 2,645,000 rows.
+- **Resumability:** per-(m, b) feathers under `data/raking/ne25/ne25_weights_boot/` (`weights_m{m}_b{b}.feather`).
+- **Compute:** ~3 h wall-clock on 8 `future::multisession` workers with Stan pre-compiled in the parent session.
+- **Stability:** Kish-N CV across bootstrap draws per imputation = 0.009–0.010. Baseline reproducibility (`bbw = rep(1, N)` vs Bucket 2) within ~3e-2 RMS (autodiff noise).
+- **Known concern:** weight ratios extreme (median ~70K, max ~474M) due to wide `[0.01, 100]` bounds. NE22 uses tighter `[0.1, 10]`. Revisit if downstream variance estimates look unstable.
+- **Downstream:** Rubin's-rules pooling over `(imputation_m, boot_b)` pairs — `reports/ne25/helpers/model_fitting.R` consumes the point-estimate column only; MI-aware variance integration is a separate ticket.
+- **Documentation:** [Bayesian Bootstrap Weights §](docs/raking/RAKING_INTEGRATION.md#bayesian-bootstrap-replicate-weights-bucket-3-shipped-april-2026) and [WEIGHT_CONSTRUCTION.qmd §5.4](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd).
 
 ### ✅ Imputation Pipeline - Production Ready (December 2025)
 - **Multi-Study Architecture:** Independent studies (ne25, ia26, co27) with shared codebase
