@@ -426,6 +426,14 @@
     padding: 16px 18px;
     position: relative;
     counter-increment: read;
+    color: inherit;
+    text-decoration: none;
+    display: block;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  a.reading__step:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
   }
   .reading__step::before {
     content: counter(read);
@@ -753,7 +761,7 @@
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Source of truth</span>
-          <span class="hero__meta-val">CLAUDE.md (root)</span>
+          <span class="hero__meta-val"><a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md" target="_blank" rel="noopener noreferrer">CLAUDE.md (root)</a></span>
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Pipelines</span>
@@ -984,26 +992,26 @@
       <p style="margin: 14px 0 24px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Resist the urge to dive into source files. The intent of the audit was that these five docs would let you build an accurate mental model before you touch any code.</p>
 
       <div class="reading">
-        <div class="reading__step">
+        <a class="reading__step" href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/HANDOFF.md" target="_blank" rel="noopener noreferrer">
           <h3>HANDOFF.md</h3>
           <p>Synthesis doc for the incoming maintainer. Status, contacts, in-flight work, drift items.</p>
-        </div>
-        <div class="reading__step">
+        </a>
+        <a class="reading__step" href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md" target="_blank" rel="noopener noreferrer">
           <h3>CLAUDE.md</h3>
           <p>Authoritative current-state reference. The doc that gets updated when reality changes.</p>
-        </div>
-        <div class="reading__step">
+        </a>
+        <a class="reading__step" href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/setup/INSTALLATION_GUIDE.md" target="_blank" rel="noopener noreferrer">
           <h3>docs/setup/<br>INSTALLATION_GUIDE.md</h3>
           <p>Set up your local machine: R, Python, DuckDB, .env file with API keys.</p>
-        </div>
-        <div class="reading__step">
+        </a>
+        <a class="reading__step" href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/QUICK_REFERENCE.md" target="_blank" rel="noopener noreferrer">
           <h3>docs/<br>QUICK_REFERENCE.md</h3>
           <p>Command cheatsheet for all 8 pipelines. Print it.</p>
-        </div>
-        <div class="reading__step">
+        </a>
+        <a class="reading__step" href="https://github.com/marcus-waldman/Kidsights-Data-Platform/tree/HEAD/docs" target="_blank" rel="noopener noreferrer">
           <h3>Per-pipeline docs</h3>
           <p>Under <code style="font-family: var(--font-mono); font-size: 11px;">docs/{nsch,nhis,acs,raking,imputation,irt_scoring,mn26}/</code> as needed.</p>
-        </div>
+        </a>
       </div>
     </section>
 
@@ -1020,7 +1028,7 @@
           <li><strong>Method:</strong> 1,000 warm-started Stan refits, parallelized via <code>future.apply</code> with 8 workers.</li>
           <li><strong>Wall-clock:</strong> approximately 3 hours per full run.</li>
           <li><strong>Status:</strong> Bucket 1 (M=1) and Bucket 2 (M=5) are complete. Bucket 3 is the in-flight piece.</li>
-          <li><strong>Driver:</strong> <code>todo/ne25_weights_roadmap.md</code></li>
+          <li><strong>Driver:</strong> <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/todo/ne25_weights_roadmap.md" target="_blank" rel="noopener noreferrer"><code>todo/ne25_weights_roadmap.md</code></a></li>
           <li><strong>Orchestrator:</strong> <code>scripts/raking/ne25/35_run_bayesian_bootstrap.R</code></li>
         </ul>
       </div>
@@ -1128,7 +1136,7 @@
         <div class="setup__step">
           <div class="setup__body">Smoke test: <code>R --slave --no-restore --file=run_ne25_pipeline.R</code>. If it completes, you're operational.</div>
         </div>
-        <div class="setup__cta">Full walkthrough → <a href="setup/INSTALLATION_GUIDE.md">docs/setup/INSTALLATION_GUIDE.md</a></div>
+        <div class="setup__cta">Full walkthrough → <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/setup/INSTALLATION_GUIDE.md" target="_blank" rel="noopener noreferrer">docs/setup/INSTALLATION_GUIDE.md</a></div>
       </div>
     </section>
 
@@ -1151,7 +1159,7 @@
     <!-- FOOTER -->
     <footer>
       <p><strong>Snapshot date:</strong> 2026-04-20. Regenerate via the <code>/refresh-onboarding</code> skill when platform state materially changes (new pipeline, deferred-work shifts, major status changes).</p>
-      <p><code>CLAUDE.md</code> is the living reference. This page is a read-once orientation snapshot — it will go stale.</p>
+      <p><a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md" target="_blank" rel="noopener noreferrer"><code>CLAUDE.md</code></a> is the living reference. This page is a read-once orientation snapshot — it will go stale.</p>
     </footer>
   </main>
 </div>

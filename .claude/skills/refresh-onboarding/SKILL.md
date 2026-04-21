@@ -113,6 +113,16 @@ Invoke the `visual-explainer` skill with a prompt that:
 - Specifies the constraints: editorial aesthetic, inline SVG architecture diagram, no external JS dependencies (per the no-CDN-libs rule established for this page), preserve the existing palette (deep navy `#1e3a5f` + warm gold `#b88b1f` on warm cream `#faf6ef` background)
 - States the snapshot date in ISO format (YYYY-MM-DD) and updates the footer regen instruction to mention this skill name
 
+**Link pattern for doc references (IMPORTANT):** Jekyll is disabled for Pages, so `.md` files served via Pages download as raw text instead of rendering. All in-page references to markdown files must use **absolute GitHub blob URLs** so they render nicely on github.com:
+
+- Blob (files): `https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/<path>` — e.g., `blob/HEAD/CLAUDE.md`, `blob/HEAD/HANDOFF.md`, `blob/HEAD/docs/setup/INSTALLATION_GUIDE.md`
+- Tree (directories): `https://github.com/marcus-waldman/Kidsights-Data-Platform/tree/HEAD/<path>` — e.g., `tree/HEAD/docs` for the per-pipeline docs directory
+- Use `/blob/HEAD/` and `/tree/HEAD/` (not `/blob/main/`) — `HEAD` follows the default branch, so links survive a future `main` → `master` rename or a release-branch cut
+- Open reading-order cards and other primary-navigation links in a new tab: `target="_blank" rel="noopener noreferrer"` — so the orientation page stays visible while readers consume the doc
+- Inline mentions (callout lists, footer code references) can open in same tab or new tab at your judgment
+
+Never use Pages-relative paths like `setup/INSTALLATION_GUIDE.md` or `docs/CLAUDE.md` — those resolve against the Pages URL and return raw markdown.
+
 For reference on the existing aesthetic and structure, the agent can read the current `docs/index.html` before invoking visual-explainer — but should treat it as a stylistic template, not a content source.
 
 ### Phase 4: Verify and commit
