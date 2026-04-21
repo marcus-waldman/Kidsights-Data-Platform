@@ -382,11 +382,11 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 
 ## Documentation Maintenance
 
-### Onboarding Page (GitHub Pages)
+Two living documents need periodic refresh during active development. Each has a dedicated Claude skill that encapsulates the regeneration recipe so the work doesn't need to be re-derived from scratch each time.
 
-The repository serves a visual onboarding page at:
+### 1. Onboarding Page (public — GitHub Pages)
 
-**[https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)**
+**Live URL:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
 
 | Item | Detail |
 |---|---|
@@ -394,12 +394,27 @@ The repository serves a visual onboarding page at:
 | **Pages config** | Source: `main` branch, `/docs` folder. Jekyll disabled via `docs/.nojekyll`. |
 | **Auto-rebuild** | Pages rebuilds automatically on every push to `main` that touches `/docs`. Build time ~20s. |
 | **Regeneration recipe** | `/refresh-onboarding` skill at `.claude/skills/refresh-onboarding/SKILL.md` |
+| **When to refresh** | When platform state *materially* changes — new pipeline, drift item resolved, major status change. Roughly every 3 months minimum. |
 
-**When to regenerate:** When platform state materially changes — pipeline added/removed/status-changed, new env var, drift item resolved or new one surfaced, outgoing-maintainer transition, or roughly every 3 months regardless of changes.
+**The page is a snapshot.** Small drift between regenerations is acceptable. The authoritative current-state reference is always **this CLAUDE.md**, not the onboarding page.
 
-**How to regenerate:** Invoke the skill via `/refresh-onboarding`. The skill walks the agent through re-verifying DB state, picking up CLAUDE.md changes, and regenerating the page via the `visual-explainer` skill. Output goes to `docs/index.html`; commit and push and Pages rebuilds.
+### 2. Handoff Doc (internal — repo root)
 
-**The page is a snapshot, not a living document.** Small drift between regenerations is acceptable; large drift triggers a refresh. The authoritative current-state reference is always **this CLAUDE.md file**, not the onboarding page.
+**Source file:** `HANDOFF.md` (repo root)
+
+| Item | Detail |
+|---|---|
+| **Purpose** | Synthesis doc for the incoming maintainer covering reading order, current pipeline status, in-flight work, drift items, credentials transfer, first-week plan |
+| **Regeneration recipe** | `/refresh-handoff` skill at `.claude/skills/refresh-handoff/SKILL.md` |
+| **When to refresh** | More often than the onboarding page. Whenever a material commit lands, a drift item resolves, in-flight work status changes, or roughly weekly during active pre-handoff work. |
+| **How to refresh** | Surgical edits via the skill — preserves carefully-crafted prose (Tips, First-Week Plan, Knowledge Areas) while updating volatile fields (snapshot date, drift table, in-flight section, uncommitted-work breadcrumb) |
+
+### Cadence guidance
+
+- **HANDOFF.md** changes often during the pre-handoff window — refresh weekly or after each material commit
+- **onboarding.html** changes rarely — only when a public-visible thing actually changed
+- They are **decoupled by design**: a Bucket 3 progress update belongs in HANDOFF.md but doesn't necessarily warrant a public-facing snapshot refresh
+- Both skills require explicit user authorization before pushing to remote
 
 ---
 
