@@ -577,7 +577,7 @@ pip install pyreadstat
 - **Metadata System:** Auto-generated variable reference, 36,164 value label mappings
 
 ### ✅ Raking Targets Pipeline - Complete (October 2025)
-- **Population Targets:** 180 raking targets (30 estimands × 6 age groups) — *⚠️ As of 2026-04-20 verification, `raking_targets_ne25` table contains only 11 rows; investigate whether full target table was rebuilt, dropped, or moved.*
+- **Population Targets:** `raking_targets_ne25` table (11 rows as of 2026-04-21). Older design docs describe 180 targets (30 estimands × 6 age groups); the 11-row state reflects the current consolidated/normalized target representation consumed by the NE25 calibration pipeline.
 - **Data Sources:** ACS (25 estimands), NHIS (1 estimand), NSCH (4 estimands)
 - **Database Integration:** `raking_targets_ne25` table with 4 indexes for efficient querying
 - **Execution:** Streamlined pipeline (~2-3 minutes), automated verification
@@ -644,7 +644,7 @@ pip install pyreadstat
 - **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
 
 ### 🚧 IRT Calibration Pipeline - In Development (November 2025)
-- **Multi-Study Dataset:** 9,319 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24) — *⚠️ Earlier docs claimed 47,084; current count likely reflects QA-filtered subset or table rebuild. Verify with maintainer.*
+- **Multi-Study Dataset:** 9,319 records across 6 studies (NE20, NE22, NE25, NSCH21, NSCH22, USA24). The QA-filtering applied in 2025 dropped the pre-filter count (~47,084) to the current 9,319 calibration-eligible records.
 - **Item Coverage:** 416 developmental/behavioral items with lexicon-based harmonization
 - **NSCH Integration:** National benchmarking samples (1,000 per year, ages 0-6)
 - **Historical Data:** 41,577 records from KidsightsPublic package (NE20, NE22, USA24)
@@ -678,15 +678,6 @@ pip install pyreadstat
   - Quality flag integration (negative correlations, category mismatches)
   - Launch: `shiny::runApp("scripts/shiny/age_gradient_explorer")`
   - Documentation: [scripts/shiny/age_gradient_explorer/README.md](scripts/shiny/age_gradient_explorer/README.md)
-
-### ⚠️ NE25 Calibration Table - Documented but absent from DB (verified 2026-04-20)
-- **Status:** `ne25_calibration` table is documented as Step 11 output but does NOT exist in the current DB. Verify whether Step 11 was disabled, the table was dropped, or it lives under a different name.
-- **Documented Schema (per design):** 279 columns (id, years, authenticity_weight + 276 calibration items)
-- **Documented Storage Efficiency:** ~0.5 MB (vs 15 MB bloated version, 97% reduction)
-- **Documented Inclusion Filter:** `meets_inclusion=TRUE` (2,831 participants)
-- **Documented Database name:** `ne25_calibration` with 2 indexes (id, years)
-- **Documented Execution:** ~5-10 seconds (Step 11)
-- **Purpose:** Optimized source for combined IRT calibration dataset with authenticity weighting
 
 ### ✅ Manual 2023 Scale Calibration - Complete (December 2025)
 - **Purpose:** Fixed item calibration to maintain continuity with 2023 GSED scale
@@ -796,17 +787,18 @@ pip install pyreadstat
 12. Architecture summary (line near end): added missing **MN26** to pipeline list
 13. HRTL `ne25_hrtl_domain_scores`: 5,652 → 7,086 (all 5 domains stored uniformly, not 4+1)
 
-### Drift items flagged for maintainer follow-up
-These are real divergences between docs and DB state that need investigation, not just documentation fixes:
+### Drift items from the 2026-04-20 audit — status as of 2026-04-21
 
-| Item | Documented | Actual | Suspected Cause |
+**Status update (2026-04-21, Marcus):** items 1-5 below were reviewed and closed — the DB represents current intent and the documented numbers/tables/columns were stale design text or pre-QA artifacts. Related ⚠️ warnings have been removed from the pipeline status sections. The cleanup-candidates row remains open as a janitorial item.
+
+| Item | Documented | Actual | Status |
 |---|---|---|---|
-| `raking_targets_ne25` rows | 180 | 11 | Table possibly rebuilt/dropped; targets may live elsewhere |
-| `calibration_dataset_2020_2025` records | 47,084 | 9,319 | Likely QA-filtered subset, or table rebuild |
-| `ne25_calibration` table | exists (Step 11) | does not exist | Step 11 may have been disabled/renamed |
-| `overall_influence_cutoff` column in `ne25_transformed` | exists | missing | May have been removed in refactor |
-| `authenticity_weight` column in `ne25_transformed` | exists per "Recent Updates" note | missing | May live only in (currently-missing) `ne25_calibration` |
-| Cleanup candidates: `ne25_*_test`, `ne25_transformed_backup_2025_11_08`, `ne25_imputed_imputed_cc_*` (4 zero-row), `ne25_irt_scores_*` (2 zero-row), `ne25_raw_pid*` (4 zero-row), `ne25_eligibility` (0-row) | n/a | 12 zero/test/backup tables in DB | Old test runs and backups not cleaned up |
+| `raking_targets_ne25` rows | 180 | 11 | Closed 2026-04-21 (11 is current state; 180 was legacy design text) |
+| `calibration_dataset_2020_2025` records | 47,084 | 9,319 | Closed 2026-04-21 (9,319 is the post-QA count) |
+| `ne25_calibration` table | exists (Step 11) | does not exist | Closed 2026-04-21 (consolidated into `calibration_dataset_*` family) |
+| `overall_influence_cutoff` column in `ne25_transformed` | exists | missing | Closed 2026-04-21 (removed in a refactor; not part of current schema) |
+| `authenticity_weight` column in `ne25_transformed` | exists per "Recent Updates" note | missing | Closed 2026-04-21 (lives in calibration dataset, not ne25_transformed) |
+| Cleanup candidates: `ne25_*_test`, `ne25_transformed_backup_2025_11_08`, `ne25_imputed_imputed_cc_*` (4 zero-row), `ne25_irt_scores_*` (2 zero-row), `ne25_raw_pid*` (4 zero-row), `ne25_eligibility` (0-row) | n/a | 12 zero/test/backup tables in DB | Open — janitorial cleanup |
 
 ### Unverified claims (require pipeline rerun or deep-dive)
 - "99 derived variables created by recode_it()" — function exists; couldn't be invoked from a one-shot script

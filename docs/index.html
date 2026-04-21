@@ -737,7 +737,7 @@
       <li><a href="#reading"><span class="toc__num">03</span> Reading order</a></li>
       <li><a href="#active"><span class="toc__num">04</span> Active work</a></li>
       <li><a href="#deferred"><span class="toc__num">05</span> Deferred</a></li>
-      <li><a href="#drift"><span class="toc__num">06</span> DB drift</a></li>
+      <li><a href="#drift"><span class="toc__num">06</span> DB notes</a></li>
       <li><a href="#stack"><span class="toc__num">07</span> Tech stack</a></li>
       <li><a href="#setup"><span class="toc__num">08</span> Setup</a></li>
       <li><a href="#contact"><span class="toc__num">09</span> Contact</a></li>
@@ -822,12 +822,12 @@
           <code class="pipeline-card__entry">scripts/nsch/process_all_years.py</code>
         </article>
 
-        <article class="pipeline-card" data-status="drift">
+        <article class="pipeline-card" data-status="production">
           <div class="pipeline-card__head">
             <span class="pipeline-card__name">Raking Targets</span>
-            <span class="badge badge--drift">Drift flagged</span>
+            <span class="badge badge--production">Production</span>
           </div>
-          <p class="pipeline-card__purpose">Population-representative weighting targets. Pipeline production-ready, but DB shows only 11 rows (180 expected). See drift section.</p>
+          <p class="pipeline-card__purpose">Population-representative weighting targets. Produces the <code>raking_targets_ne25</code> table consumed by the NE25 calibration pipeline.</p>
           <code class="pipeline-card__entry">scripts/raking/ne25/run_raking_targets_pipeline.R</code>
         </article>
 
@@ -1053,36 +1053,18 @@
 
     <!-- 06 DB DRIFT -->
     <section id="drift">
-      <div class="section-label" style="color: var(--status-critical);"><span class="section-label__num">06 ·</span> Critical DB drift</div>
-      <h2 style="color: var(--status-critical);">Six divergences worth investigating before trusting any doc.</h2>
-      <p style="margin: 14px 0 22px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Each is a real difference between what the docs claim and what the live database contains. Suspected causes are noted, but each needs maintainer judgment about whether the DB is wrong (regenerate) or the docs are wrong (update).</p>
+      <div class="section-label"><span class="section-label__num">06 ·</span> DB notes</div>
+      <h2>One remaining naming inconsistency.</h2>
+      <p style="margin: 14px 0 22px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">The 2026-04-20 audit surfaced six doc-vs-DB divergences. After a follow-up review on 2026-04-21, five were closed as acceptable — the DB represents current intent and the older doc claims were stale design text or pre-QA counts. One item remains open:</p>
 
       <div class="drift-list">
         <div class="drift-item">
           <div class="drift-item__num">1</div>
-          <div class="drift-item__body"><code>raking_targets_ne25</code> has <strong>11 rows</strong> in DB but docs claim <strong>180</strong> (30 estimands × 6 ages). Possibly rebuilt or dropped.</div>
-        </div>
-        <div class="drift-item">
-          <div class="drift-item__num">2</div>
-          <div class="drift-item__body"><code>calibration_dataset_2020_2025</code> is <strong>9,319 records</strong> in DB but docs claimed <strong>47,084</strong>. Likely a QA-filtered subset took over.</div>
-        </div>
-        <div class="drift-item">
-          <div class="drift-item__num">3</div>
-          <div class="drift-item__body"><code>ne25_calibration</code> is <strong>documented as Step 11 output</strong> in the NE25 pipeline but <strong>does not exist</strong> in the current DB. Step may have been disabled or renamed.</div>
-        </div>
-        <div class="drift-item">
-          <div class="drift-item__num">4</div>
-          <div class="drift-item__body">Per-study <code>ne**_calibration</code> tables (NE20, NE22, NE25, NSCH21, NSCH22, USA24) <strong>do not exist</strong>. Possibly consolidated into the combined <code>calibration_dataset_*</code> family.</div>
-        </div>
-        <div class="drift-item">
-          <div class="drift-item__num">5</div>
-          <div class="drift-item__body"><code>overall_influence_cutoff</code> and <code>authenticity_weight</code> columns are <strong>documented in <code>ne25_transformed</code> but missing</strong> from the current schema. Likely removed in a refactor.</div>
-        </div>
-        <div class="drift-item">
-          <div class="drift-item__num">6</div>
           <div class="drift-item__body">NSCH table-naming inconsistency: years 2017-2020 and 2023 use <code>nsch_{year}_raw</code>; years 2021 and 2022 use <code>nsch_{year}</code> (no <code>_raw</code> suffix). Both load correctly but worth standardizing.</div>
         </div>
       </div>
+
+      <p style="margin: 22px 0 0; color: var(--ink-dim); max-width: 64ch; line-height: 1.55; font-size: 0.92em;">Closed on review: <code>raking_targets_ne25</code> row count, <code>calibration_dataset_2020_2025</code> record count, missing <code>ne25_calibration</code> and per-study calibration tables, and the <code>overall_influence_cutoff</code> / <code>authenticity_weight</code> columns on <code>ne25_transformed</code>. See <code>HANDOFF.md</code> &quot;DB Drift Items&quot; for the audit trail.</p>
     </section>
 
     <!-- 07 TECH STACK -->

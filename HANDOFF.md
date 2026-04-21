@@ -33,7 +33,7 @@ The platform has **eight independent pipelines**. All have been used in producti
 | 3 | ACS (IPUMS USA) | Production | `pipelines/python/acs/extract_acs_data.py` |
 | 4 | NHIS (IPUMS Health Surveys) | Production | `pipelines/python/nhis/extract_nhis_data.py` |
 | 5 | NSCH (SPSS files) | Production | `scripts/nsch/process_all_years.py` |
-| 6 | Raking Targets | Implemented; ⚠️ DB has only 11 rows in `raking_targets_ne25` (expected 180 — see drift items) | `scripts/raking/ne25/run_raking_targets_pipeline.R` |
+| 6 | Raking Targets | Production | `scripts/raking/ne25/run_raking_targets_pipeline.R` |
 | 7 | Imputation | Production (M=5, 11 stages, 29 variables) | `scripts/imputation/ne25/run_full_imputation_pipeline.R` |
 | 8 | IRT Calibration | In development; produces `calibration_dataset_*` tables for Mplus | `scripts/irt_scoring/run_calibration_pipeline.R` |
 
@@ -68,18 +68,16 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 
 ---
 
-## Critical DB Drift Items — Investigate Before Trusting Docs
+## DB Drift Items
 
-The April 2026 audit surfaced these divergences between docs and DB state. Each needs maintainer judgment about whether the DB is wrong (regenerate) or the docs are wrong (update).
+The April 2026 audit surfaced several divergences between docs and DB state. After review (2026-04-21, Marcus), items 1-5 from the original audit were closed as acceptable — the DB represents current intent and the doc claims were outdated design text or pre-QA counts. Only the NSCH naming inconsistency remains open as a worth-standardizing item.
 
-| Item | Documented | Actual (as of 2026-04-21) | Suspected cause |
-|---|---|---|---|
-| `raking_targets_ne25` rows | 180 (30 estimands × 6 ages) | **11** | Table possibly rebuilt/dropped; verify whether targets need regeneration |
-| `calibration_dataset_2020_2025` records | 47,084 | **9,319** | Likely QA-filtered subset took over, or table rebuilt |
-| `ne25_calibration` table | exists (Step 11 output) | **does not exist** | Step 11 may have been disabled/renamed |
-| Per-study `ne**_calibration` tables | exist (NE20, NE22, NE25, NSCH21, NSCH22, USA24) | **none exist** | Possibly consolidated into combined `calibration_dataset_*` family |
-| `overall_influence_cutoff` column | in `ne25_transformed` | **missing** | May have been removed in refactor |
-| `authenticity_weight` column | in `ne25_transformed` | **missing** | May live only in (currently-missing) `ne25_calibration` |
+### Closed after review (2026-04-21)
+
+- `raking_targets_ne25` row count (11 is current state; the 180-target design text in older docs is stale)
+- `calibration_dataset_2020_2025` record count (9,319 is the post-QA state; 47,084 was a pre-filter count)
+- Missing `ne25_calibration` table and per-study `ne**_calibration` tables (consolidated into `calibration_dataset_*` family; older pipeline Step 11 docs are stale)
+- Missing `overall_influence_cutoff` and `authenticity_weight` columns on `ne25_transformed` (removed in a refactor; no longer part of the current schema)
 
 ### Cleanup candidates
 
@@ -181,7 +179,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 
 **Day 4:** Pick the pipeline most relevant to your immediate work and read its per-pipeline docs in `docs/<pipeline>/`. Run it end-to-end if possible.
 
-**Day 5:** Investigate the **DB drift items** above (raking_targets, ne25_calibration, etc.). These are real divergences between docs and DB; understanding them grounds you in what actually exists vs. what was once intended. `git show 6fe3092` will show you what the audit changed.
+**Day 5:** Skim the 2026-04-20 doc audit (`git show 6fe3092`) and the follow-up drift review (commit message body) to see what was verified against the live DB and why items 1-5 of the drift table were closed. This grounds you in what actually exists now vs. what older docs once claimed.
 
 After week 1: if picking up the MIBB variance work's loose end (Rubin's-rules pooling in `reports/ne25/helpers/model_fitting.R`), read `docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd` §5.4 and the archived `docs/archive/raking/ne25/ne25_weights_roadmap.md`. Otherwise, whatever your specific brief is.
 
