@@ -2,8 +2,8 @@
 
 **For:** Incoming maintainer of the Kidsights Data Platform
 **From:** Marcus Waldman (outgoing maintainer)
-**Snapshot date:** 2026-04-20
-**Last audit commit:** `6fe3092` ([Docs] Pre-handoff audit: cleanup, archive plans, and drift-check 19 docs)
+**Snapshot date:** 2026-04-21
+**Last updated:** 2026-04-21 (HEAD `1786e6f`; last audit commit `6fe3092`)
 
 > **5-minute visual orientation:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
 >
@@ -22,7 +22,7 @@ After that, dive into per-pipeline docs as needed. The new architecture/README.m
 
 ---
 
-## What's Running in Production (as of 2026-04-20)
+## What's Running in Production (as of 2026-04-21)
 
 The platform has **eight independent pipelines**. All have been used in production at some point; current state varies:
 
@@ -43,20 +43,22 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 
 ## Active In-Flight Work
 
-### NE25 MIBB Variance Estimation Framework (highest-priority active work)
+### NE25 MIBB Variance Estimation Framework — complete (April 2026)
 
 **What:** Multiple Imputation + Bayesian Bootstrap (MIBB) for estimating sampling variance of NE25 raking weights, accounting for both substantive imputation uncertainty and weight calibration uncertainty.
 
-**Where:** `scripts/raking/ne25/35_run_bayesian_bootstrap.R` (orchestrator, currently modified — see "Uncommitted work" below)
+**Where:** `scripts/raking/ne25/35_run_bayesian_bootstrap.R` (orchestrator) and `scripts/raking/ne25/36_store_bootstrap_weights_long.py` (DB loader).
 
-**Status:**
-- Bucket 1 complete: M=1 calibrated raking weights (production)
-- Bucket 2 complete: M=5 multi-imputation calibrated weights (production)
-- **Bucket 3 in progress:** Bayesian bootstrap of the NE25 sample for variance — 1,000 warm-started Stan refits, parallelized via `future.apply` with 8 workers, ~3 hours total wall-clock
+**Status:** All three buckets shipped.
+- Bucket 1: M=1 calibrated raking weights (production).
+- Bucket 2: M=5 multi-imputation calibrated weights (production; `ne25_raked_weights`, 13,225 rows).
+- **Bucket 3 complete (commits `1b5ac79`, `971875f`):** 5 imputations × 200 Bayesian-bootstrap draws = 1,000 Stan refits, all converged. Stored in `ne25_raked_weights_boot` (**2,645,000 rows**, PK `(pid, record_id, imputation_m, boot_b)`). Framework: MI + sample-only Bayesian bootstrap (NE22 pattern — `bbw ~ Exp(1)` as multiplicative data weight in the moment loss; flat `Dirichlet(1,…,1)` prior). Per-imputation Kish-N CV across bootstrap draws: 0.009–0.010.
 
-**Recent design pivot (per-project memory):** Switched from MIB-with-target-bootstrap to MI + Bayesian bootstrap of the sample. Earlier `BOOTSTRAP_IMPLEMENTATION_PLAN.md` (now in `docs/archive/raking/ne25/`) is for the upstream **survey-design** replicate weights bootstrap on ACS targets — that work completed in October 2025 and is unrelated to Bucket 3.
+**Design note (per-project memory):** The earlier `BOOTSTRAP_IMPLEMENTATION_PLAN.md` (now in `docs/archive/raking/ne25/`) is for the upstream **survey-design** replicate weights bootstrap on ACS targets — that work completed in October 2025 and is unrelated to the MIBB variance work described here.
 
-**Active todo:** [`todo/ne25_weights_roadmap.md`](todo/ne25_weights_roadmap.md) (most recently updated 2026-04-20)
+**Follow-on (separate ticket, not yet started):** wire `reports/ne25/helpers/model_fitting.R` to iterate over `(imputation_m, boot_b)` pairs and pool variance via Rubin's rules. Today it consumes only the point-estimate `calibrated_weight` column.
+
+**Closed-out references:** [`todo/ne25_weights_roadmap.md`](todo/ne25_weights_roadmap.md) (all three buckets now marked complete); [`docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd`](docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd) §5.4 documents the shipped implementation and Rubin's-rules formula.
 
 ### MN26 (Minnesota 2026)
 
@@ -70,7 +72,7 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 
 The April 2026 audit surfaced these divergences between docs and DB state. Each needs maintainer judgment about whether the DB is wrong (regenerate) or the docs are wrong (update).
 
-| Item | Documented | Actual (as of 2026-04-20) | Suspected cause |
+| Item | Documented | Actual (as of 2026-04-21) | Suspected cause |
 |---|---|---|---|
 | `raking_targets_ne25` rows | 180 (30 estimands × 6 ages) | **11** | Table possibly rebuilt/dropped; verify whether targets need regeneration |
 | `calibration_dataset_2020_2025` records | 47,084 | **9,319** | Likely QA-filtered subset took over, or table rebuilt |
@@ -130,13 +132,7 @@ Full setup walkthrough: [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATI
 
 ## Uncommitted Work in Repo at Handoff
 
-The following are pre-existing modifications NOT in the audit commit (they were in-flight when the audit started):
-
-```
-M scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe   (binary)
-```
-
-This is from Bucket 3 Bayesian bootstrap work. Decide with outgoing maintainer whether to commit, discard, or leave for incoming maintainer to resume.
+None as of 2026-04-21. The earlier breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was recompiled and committed as part of the Bucket 3 shipping window (`971875f`), alongside its regenerated `.stan` source. Working tree is clean.
 
 ---
 
