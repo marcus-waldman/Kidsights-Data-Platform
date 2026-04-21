@@ -133,6 +133,11 @@ R/authenticity_screening/
 # Pages landing page — deliberately committed for GitHub Pages serving
 !docs/index.html
 
+# MN26 Quarto-rendered docs — single-file HTML (embed-resources: true).
+# Re-render and re-commit alongside the .qmd source when the source changes.
+!docs/mn26/pipeline_guide.html
+!docs/mn26/pipeline_slides.html
+
 # Todo archive artifacts
 todo/archive.zip
 todo/kidsights-calibration/

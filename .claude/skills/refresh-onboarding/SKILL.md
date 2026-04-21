@@ -124,6 +124,8 @@ Invoke the `visual-explainer` skill with a prompt that:
 
 Never use Pages-relative paths like `setup/INSTALLATION_GUIDE.md` or `docs/CLAUDE.md` — those resolve against the Pages URL and return raw markdown.
 
+**Exception — Quarto-rendered HTML under `/docs`:** Self-contained HTML files (`embed-resources: true`) committed alongside their `.qmd` sources SHOULD use relative Pages paths like `mn26/pipeline_guide.html`. Pages serves those directly as rendered pages; a GitHub blob URL for the same file would show HTML source, not the rendered view. The MN26 card in section 01 uses this pattern to link `mn26/pipeline_guide.html` and `mn26/pipeline_slides.html`. Each new Quarto doc added under `/docs` with a `.gitignore` exception should be linked the same way. Preserve existing such links on regeneration; do not rewrite them to blob URLs.
+
 For reference on the existing aesthetic and structure, the agent can read the current `docs/index.html` before invoking visual-explainer — but should treat it as a stylistic template, not a content source.
 
 ### Phase 4: Verify and commit
