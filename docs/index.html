@@ -747,7 +747,7 @@
   <main>
     <!-- HERO -->
     <header class="hero">
-      <div class="hero__eyebrow">Repository orientation · Snapshot 2026-04-20</div>
+      <div class="hero__eyebrow">Repository orientation · Snapshot 2026-04-21</div>
       <h1>Kidsights Data Platform <br><span class="accent">Five-minute orientation</span></h1>
       <p class="hero__pitch">A multi-source ETL platform combining a Nebraska childhood-development survey (REDCap) with national datasets (ACS, NHIS, NSCH) to support post-stratification weighting, multiple imputation, and IRT psychometric scoring.</p>
       <div class="hero__meta">
@@ -757,7 +757,7 @@
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Snapshot date</span>
-          <span class="hero__meta-val">April 20, 2026</span>
+          <span class="hero__meta-val">April 21, 2026</span>
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Source of truth</span>
@@ -1020,16 +1020,17 @@
       <div class="section-label"><span class="section-label__num">04 ·</span> Active in-flight work</div>
       <div class="callout callout--flight">
         <div class="callout__header">
-          <h3 class="callout__title">NE25 MIBB Variance Estimation — Bucket 3</h3>
-          <span class="badge badge--flight">In flight</span>
+          <h3 class="callout__title">NE25 MIBB Variance Estimation — Complete</h3>
+          <span class="badge badge--flight">Shipped April 2026</span>
         </div>
-        <p>Multiple Imputation + Bayesian Bootstrap for the sampling variance of NE25 raking weights. The third and final bucket of the MIBB framework.</p>
+        <p>Multiple Imputation + Bayesian Bootstrap for the sampling variance of NE25 raking weights. All three buckets of the MIBB framework have shipped; the database now has a full per-<code>(m, b)</code> replicate weight set for Rubin's-rules variance pooling.</p>
         <ul>
-          <li><strong>Method:</strong> 1,000 warm-started Stan refits, parallelized via <code>future.apply</code> with 8 workers.</li>
-          <li><strong>Wall-clock:</strong> approximately 3 hours per full run.</li>
-          <li><strong>Status:</strong> Bucket 1 (M=1) and Bucket 2 (M=5) are complete. Bucket 3 is the in-flight piece.</li>
-          <li><strong>Driver:</strong> <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/todo/ne25_weights_roadmap.md" target="_blank" rel="noopener noreferrer"><code>todo/ne25_weights_roadmap.md</code></a></li>
-          <li><strong>Orchestrator:</strong> <code>scripts/raking/ne25/35_run_bayesian_bootstrap.R</code></li>
+          <li><strong>Scale:</strong> 5 imputations × 200 Bayesian-bootstrap draws = <strong>1,000 Stan refits</strong>, all converged (<code>stan_ok = TRUE</code>). Wall-clock ~3 h on 8 <code>future::multisession</code> workers with Stan pre-compiled in the parent session.</li>
+          <li><strong>Framework:</strong> MI + sample-only Bayesian bootstrap (NE22 pattern). Targets treated as fixed population quantities; <code>bbw ~ Exp(1)</code> enters the masked factorized moment loss as a multiplicative data weight, not as a prior concentration — avoiding the Dirichlet-prior gradient singularity of the earlier attempt.</li>
+          <li><strong>Storage:</strong> long-format DuckDB table <code>ne25_raked_weights_boot</code> with PK <code>(pid, record_id, imputation_m, boot_b)</code> — <strong>2,645,000 rows</strong>. Python-based loader (<code>36_store_bootstrap_weights_long.py</code>) bulk-inserts via PyArrow after an earlier R <code>dbAppendTable</code> path segfaulted on the 2.6M-row write.</li>
+          <li><strong>Stability:</strong> per-imputation Kish-N CV across bootstrap draws = 0.009-0.010; baseline reproducibility (bbw = 1) within ~3e-2 RMS of Bucket 2.</li>
+          <li><strong>Next up (separate ticket, not started):</strong> wire <code>reports/ne25/helpers/model_fitting.R</code> to iterate over <code>(imputation_m, boot_b)</code> pairs and pool variance via Rubin's rules. Today it consumes only the single point-estimate <code>calibrated_weight</code> column.</li>
+          <li><strong>Documentation:</strong> <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/raking/RAKING_INTEGRATION.md" target="_blank" rel="noopener noreferrer"><code>RAKING_INTEGRATION.md</code> Bayesian-Bootstrap section</a>, <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd" target="_blank" rel="noopener noreferrer"><code>WEIGHT_CONSTRUCTION.qmd §5.4</code></a>, <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/todo/ne25_weights_roadmap.md" target="_blank" rel="noopener noreferrer"><code>todo/ne25_weights_roadmap.md</code></a> (all buckets marked complete).</li>
         </ul>
       </div>
     </section>
@@ -1158,7 +1159,7 @@
 
     <!-- FOOTER -->
     <footer>
-      <p><strong>Snapshot date:</strong> 2026-04-20. Regenerate via the <code>/refresh-onboarding</code> skill when platform state materially changes (new pipeline, deferred-work shifts, major status changes).</p>
+      <p><strong>Snapshot date:</strong> 2026-04-21. Regenerate via the <code>/refresh-onboarding</code> skill when platform state materially changes (new pipeline, deferred-work shifts, major status changes).</p>
       <p><a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md" target="_blank" rel="noopener noreferrer"><code>CLAUDE.md</code></a> is the living reference. This page is a read-once orientation snapshot — it will go stale.</p>
     </footer>
   </main>
