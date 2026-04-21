@@ -106,6 +106,38 @@ GitHub issue templates live in `.github/ISSUE_TEMPLATE/` if you want context on 
 
 ---
 
+## Analysis Artifacts (collaborator-facing)
+
+Paper-specific analytic datasets — curated, joined, renamed subsets built on top of the pipeline outputs — live in `data/analyses/` as flat files rather than DuckDB tables. They're produced on demand by scripts in `scripts/analyses/` and shared with external collaborators in CSV/RDS/SPSS/Stata.
+
+**Why not in DuckDB?** These are paper-scoped cuts, not reusable pipeline artifacts. Flat files avoid making DuckDB a dependency for SPSS/Stata collaborators and keep the DB schema focused on pipeline outputs.
+
+**⚠️ All files in `data/analyses/` are gitignored** (`data/` is ignored except two explicit exceptions). You will not find the `.rds`/`.csv`/`.sav`/`.dta` files in the repo — they live on the maintainer's local machine. To regenerate, run the construction script from the repo root after the DuckDB database has been populated (requires NE25 + imputation + raking + scoring pipelines to have run).
+
+### SES Analytic Dataset (Nebraska 2025)
+
+**Purpose:** Supports SES-focused research questions (material hardship, food security, home learning environment, child development outcomes). Actively used by external collaborators — expect questions during the handoff window.
+
+**Construction:**
+- [`scripts/analyses/create_ses_analytic_dataset.R`](scripts/analyses/create_ses_analytic_dataset.R) — builds `.csv` / `.rds` / `.sav` / `.dta` + `ses_analytic_codebook.csv`
+- [`scripts/analyses/generate_codebook_html.R`](scripts/analyses/generate_codebook_html.R) — builds `ses_analytic_codebook.html`
+
+**Output files (all local / gitignored):**
+- `data/analyses/ses_analytic_dataset.csv`
+- `data/analyses/ses_analytic_dataset.rds`
+- `data/analyses/ses_analytic_dataset.sav` (SPSS)
+- `data/analyses/ses_analytic_dataset.dta` (Stata)
+- `data/analyses/ses_analytic_codebook.csv`
+- `data/analyses/ses_analytic_codebook.html`
+
+**Data guide:** [`docs/analyses/ses_analytic_data_guide.qmd`](docs/analyses/ses_analytic_data_guide.qmd) — comprehensive variable profiles (114 variables across 17 domains), sample composition, transformation log, variable-renaming map, masking rules. Render to HTML for distribution.
+
+**What collaborators ask:** variable definitions and their origin columns, inclusion criteria (`meets_inclusion`), survey-weight interpretation (`calibrated_weight`), D-score age masking (children ≥42 months), HRTL Motor masking (GitHub Issue #15), and the renaming map from DB column names to analytic names. All answered in the data guide.
+
+**Maintenance rule:** When NE25 pipeline outputs change (new derived variables, renamed columns, updated scoring), rerun the construction script to regenerate the files, then re-render the guide. The guide imports the `.rds` at render time, so a stale `.rds` means a stale guide.
+
+---
+
 ## Credentials / Access Transfer
 
 The platform requires three external API integrations. Each is configured via the `.env` file at the project root (see `.env.template` for variables):
@@ -167,6 +199,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 | Authenticity screening | docs/authenticity_screening/README.md | scripts/influence_diagnostics/README.md |
 | Codebook system | docs/codebook/README.md | docs/codebook/codebook_api.md |
 | Database tables | [docs/database/TABLES.md](docs/database/TABLES.md) | [docs/database/table_metadata.yaml](docs/database/table_metadata.yaml) (hand-written source of truth) |
+| SES analytic dataset (collaborator-facing) | [docs/analyses/ses_analytic_data_guide.qmd](docs/analyses/ses_analytic_data_guide.qmd) | scripts/analyses/create_ses_analytic_dataset.R + generate_codebook_html.R |
 
 ---
 

@@ -739,9 +739,10 @@
       <li><a href="#active"><span class="toc__num">05</span> Active work</a></li>
       <li><a href="#deferred"><span class="toc__num">06</span> Deferred</a></li>
       <li><a href="#drift"><span class="toc__num">07</span> DB notes</a></li>
-      <li><a href="#stack"><span class="toc__num">08</span> Tech stack</a></li>
-      <li><a href="#setup"><span class="toc__num">09</span> Setup</a></li>
-      <li><a href="#contact"><span class="toc__num">10</span> Contact</a></li>
+      <li><a href="#artifacts"><span class="toc__num">08</span> Analysis artifacts</a></li>
+      <li><a href="#stack"><span class="toc__num">09</span> Tech stack</a></li>
+      <li><a href="#setup"><span class="toc__num">10</span> Setup</a></li>
+      <li><a href="#contact"><span class="toc__num">11</span> Contact</a></li>
     </ol>
   </aside>
 
@@ -1100,9 +1101,29 @@
       <p style="margin: 18px 0 0; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;"><strong>Full table catalog:</strong> <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/database/TABLES.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);"><code style="font-family: var(--font-mono); font-size: 12px;">docs/database/TABLES.md</code></a> lists all 97 tables grouped by pipeline — row counts, source script, primary downstream consumer, status — with a Cleanup Candidates section at the bottom. Source of truth for metadata: <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/database/table_metadata.yaml" target="_blank" rel="noopener noreferrer" style="color: var(--gold);"><code style="font-family: var(--font-mono); font-size: 12px;">docs/database/table_metadata.yaml</code></a>.</p>
     </section>
 
-    <!-- 08 TECH STACK -->
+    <!-- 08 ANALYSIS ARTIFACTS -->
+    <section id="artifacts">
+      <div class="section-label"><span class="section-label__num">08 ·</span> Analysis artifacts</div>
+      <h2>Not every output lives in DuckDB.</h2>
+      <p style="margin: 14px 0 28px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Paper-specific analytic datasets — curated, joined, renamed subsets built on top of the pipeline outputs — live in <code style="font-family: var(--font-mono); font-size: 12px;">data/analyses/</code> as flat files (CSV / RDS / SPSS / Stata), not as DuckDB tables. They're produced on demand by <code style="font-family: var(--font-mono); font-size: 12px;">scripts/analyses/</code> and shared with external collaborators. <strong style="color: var(--ink);">These files are gitignored</strong> — they live on the maintainer's local machine, not in the repo. Expect collaborator questions about them during handoff.</p>
+
+      <div class="pipeline-grid">
+        <article class="pipeline-card">
+          <div class="pipeline-card__head">
+            <span class="pipeline-card__name">SES Analytic Dataset</span>
+            <span class="badge badge--prod">NE25</span>
+          </div>
+          <p class="pipeline-card__purpose">114 variables across 17 domains (SES, material hardship, food security, home learning environment, child development outcomes). Inclusion filter: <code>meets_inclusion</code>. Exported as CSV / RDS / SPSS / Stata plus a codebook. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/analyses/ses_analytic_data_guide.qmd" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">Full data guide →</a></p>
+          <code class="pipeline-card__entry">scripts/analyses/create_ses_analytic_dataset.R</code>
+        </article>
+      </div>
+
+      <p style="margin: 22px 0 0; color: var(--ink-dim); max-width: 64ch; line-height: 1.55; font-size: 0.92em;"><strong>Why not in DuckDB?</strong> These are paper-scoped cuts, not reusable pipeline artifacts. Flat files avoid making DuckDB a dependency for SPSS / Stata collaborators and keep the DB schema focused on pipeline outputs. Rerun the construction script when NE25 pipeline outputs change; then re-render the data guide.</p>
+    </section>
+
+    <!-- 09 TECH STACK -->
     <section id="stack">
-      <div class="section-label"><span class="section-label__num">08 ·</span> Tech stack</div>
+      <div class="section-label"><span class="section-label__num">09 ·</span> Tech stack</div>
       <h2>What you need to be comfortable with.</h2>
       <div class="stack" style="margin-top: 24px;">
         <div class="stack-item">
@@ -1132,9 +1153,9 @@
       </div>
     </section>
 
-    <!-- 09 SETUP -->
+    <!-- 10 SETUP -->
     <section id="setup">
-      <div class="section-label"><span class="section-label__num">09 ·</span> Setup quick-glance</div>
+      <div class="section-label"><span class="section-label__num">10 ·</span> Setup quick-glance</div>
       <h2>Five steps to a working local install.</h2>
       <div class="setup" style="margin-top: 24px;">
         <div class="setup__step">
@@ -1156,9 +1177,9 @@
       </div>
     </section>
 
-    <!-- 10 CONTACT -->
+    <!-- 11 CONTACT -->
     <section id="contact">
-      <div class="section-label"><span class="section-label__num">10 ·</span> Outgoing maintainer</div>
+      <div class="section-label"><span class="section-label__num">11 ·</span> Outgoing maintainer</div>
       <div class="contact">
         <div class="contact__avatar">MW</div>
         <div>

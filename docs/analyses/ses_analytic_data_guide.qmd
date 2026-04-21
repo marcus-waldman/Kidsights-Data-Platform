@@ -67,8 +67,8 @@ tibble::tibble(
   Value = c(
     ncol(analytic_data),
     nrow(analytic_data),
-    sum(analytic_data$meets_inclusion, na.rm = TRUE)),$
-    sprintf("%.1f - %.1f years", min(analytic_data$years_old, na.rm = TRUE)),$
+    sum(analytic_data$meets_inclusion, na.rm = TRUE),
+    sprintf("%.1f - %.1f years", min(analytic_data$years_old, na.rm = TRUE),
             max(analytic_data$years_old, na.rm = TRUE)),
     "2024-2025"
   )
@@ -109,9 +109,9 @@ The dataset contains **114 variables** organized into 17 logical groups:
 inclusion_table <- analytic_data %>%
   summarise(
     `Total Records` = n(),
-    `Meets Inclusion` = sum(meets_inclusion, na.rm = TRUE)),$
-    `Eligible` = sum(eligible, na.rm = TRUE)),$
-    `Not Influential` = sum(!influential, na.rm = TRUE)),$
+    `Meets Inclusion` = sum(meets_inclusion, na.rm = TRUE),
+    `Eligible` = sum(eligible, na.rm = TRUE),
+    `Not Influential` = sum(!influential, na.rm = TRUE),
     `Excluded` = sum(!meets_inclusion, na.rm = TRUE)
   ) %>%
   tidyr::pivot_longer(everything(), names_to = "Criterion", values_to = "N") %>%
@@ -320,8 +320,8 @@ gov_summary <- purrr::map_df(names(gov_services), function(var) {
     summarise(
       Service = gov_services[[var]],
       Variable = var,
-      Enrolled = sum(.data[[var]] == 1, na.rm = TRUE)),$
-      `Not Enrolled` = sum(.data[[var]] == 0, na.rm = TRUE)),$
+      Enrolled = sum(.data[[var]] == 1, na.rm = TRUE),
+      `Not Enrolled` = sum(.data[[var]] == 0, na.rm = TRUE),
       Missing = sum(is.na(.data[[var]])),
       `Enrollment %` = sprintf("%.1f%%",
         (sum(.data[[var]] == 1, na.rm = TRUE) /
@@ -402,9 +402,9 @@ analytic_data %>%
   summarise(
     `Mean` = sprintf("%.2f", mean(phq2_total, na.rm = TRUE)),
     `SD` = sprintf("%.2f", sd(phq2_total, na.rm = TRUE)),
-    `Range` = sprintf("%.0f - %.0f", min(phq2_total, na.rm = TRUE)),$
+    `Range` = sprintf("%.0f - %.0f", min(phq2_total, na.rm = TRUE),
                       max(phq2_total, na.rm = TRUE)),
-    `Positive Screen N` = as.character(sum(phq2_positive == 1, na.rm = TRUE)),$
+    `Positive Screen N` = as.character(sum(phq2_positive == 1, na.rm = TRUE)),
     `Positive Screen %` = sprintf("%.1f%%",
       (sum(phq2_positive == 1, na.rm = TRUE) /
         sum(!is.na(phq2_positive))) * 100),
@@ -433,9 +433,9 @@ analytic_data %>%
   summarise(
     `Mean` = sprintf("%.2f", mean(gad2_total, na.rm = TRUE)),
     `SD` = sprintf("%.2f", sd(gad2_total, na.rm = TRUE)),
-    `Range` = sprintf("%.0f - %.0f", min(gad2_total, na.rm = TRUE)),$
+    `Range` = sprintf("%.0f - %.0f", min(gad2_total, na.rm = TRUE),
                       max(gad2_total, na.rm = TRUE)),
-    `Positive Screen N` = as.character(sum(gad2_positive == 1, na.rm = TRUE)),$
+    `Positive Screen N` = as.character(sum(gad2_positive == 1, na.rm = TRUE)),
     `Positive Screen %` = sprintf("%.1f%%",
       (sum(gad2_positive == 1, na.rm = TRUE) /
         sum(!is.na(gad2_positive))) * 100),
@@ -454,7 +454,7 @@ analytic_data %>%
   summarise(
     `Mean ACE Score` = sprintf("%.2f", mean(a1_ace_total, na.rm = TRUE)),
     `SD` = sprintf("%.2f", sd(a1_ace_total, na.rm = TRUE)),
-    `Range` = sprintf("%.0f - %.0f", min(a1_ace_total, na.rm = TRUE)),$
+    `Range` = sprintf("%.0f - %.0f", min(a1_ace_total, na.rm = TRUE),
                       max(a1_ace_total, na.rm = TRUE)),
     `Missing N` = as.character(sum(is.na(a1_ace_total)))
   ) %>%
@@ -606,7 +606,7 @@ analytic_data %>%
   summarise(
     `Mean ACE Score` = sprintf("%.2f", mean(child_ace_total, na.rm = TRUE)),
     `SD` = sprintf("%.2f", sd(child_ace_total, na.rm = TRUE)),
-    `Range` = sprintf("%.0f - %.0f", min(child_ace_total, na.rm = TRUE)),$
+    `Range` = sprintf("%.0f - %.0f", min(child_ace_total, na.rm = TRUE),
                       max(child_ace_total, na.rm = TRUE)),
     `Missing N` = as.character(sum(is.na(child_ace_total)))
   ) %>%
@@ -672,9 +672,9 @@ kidsights_by_age <- analytic_data %>%
     across(all_of(kidsights_vars),
            list(
              n = ~sum(!is.na(.)),
-             mean = ~mean(., na.rm = TRUE)),$
-             sd = ~sd(., na.rm = TRUE)),$
-             min = ~min(., na.rm = TRUE)),$
+             mean = ~mean(., na.rm = TRUE),
+             sd = ~sd(., na.rm = TRUE),
+             min = ~min(., na.rm = TRUE),
              max = ~max(., na.rm = TRUE)
            ),
            .names = "{.col}_{.fn}")
@@ -765,7 +765,7 @@ credi_by_age <- analytic_data %>%
     across(all_of(credi_vars),
            list(
              n = ~sum(!is.na(.)),
-             mean = ~mean(., na.rm = TRUE)),$
+             mean = ~mean(., na.rm = TRUE),
              sd = ~sd(., na.rm = TRUE)
            ),
            .names = "{.col}_{.fn}")

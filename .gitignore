@@ -80,9 +80,15 @@ temp/
 .cache/
 
 # Data files - protect participant data
-data/
+# Use data/* (not data/) so git descends into subdirs for per-file exception rules.
+# Default stance: everything under data/ is ignored; each exception must be named explicitly.
+data/*
 !data/credi-mest_df.csv
 !data/Zip_County_Code_UPDATED10.18.xlsx
+# Allow descent into data/analyses/ so the single tracked README can be picked up.
+# Everything else inside data/analyses/ is still ignored via data/analyses/* below.
+!data/analyses/
+data/analyses/*
 *.rds
 *.parquet
 
@@ -137,6 +143,15 @@ R/authenticity_screening/
 # Re-render and re-commit alongside the .qmd source when the source changes.
 !docs/mn26/pipeline_guide.html
 !docs/mn26/pipeline_slides.html
+
+# SES analytic data guide — single-file HTML (embed-resources: true).
+# Re-render alongside the .qmd source when NE25 pipeline outputs change.
+!docs/analyses/ses_analytic_data_guide.html
+
+# data/analyses/README.md — maintainer-facing pointer in an otherwise-gitignored
+# directory. The rest of data/analyses/ contains paper-specific datasets built
+# from participant data and must remain ignored.
+!data/analyses/README.md
 
 # Todo archive artifacts
 todo/archive.zip
