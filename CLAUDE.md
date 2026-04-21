@@ -393,7 +393,7 @@ shiny::runApp("scripts/shiny/age_gradient_explorer")
 
 ## Documentation Maintenance
 
-Two living documents need periodic refresh during active development. Each has a dedicated Claude skill that encapsulates the regeneration recipe so the work doesn't need to be re-derived from scratch each time.
+Three living documents need periodic refresh during active development. Each has a dedicated Claude skill that encapsulates the regeneration recipe so the work doesn't need to be re-derived from scratch each time.
 
 ### 1. Onboarding Page (public — GitHub Pages)
 
@@ -420,12 +420,25 @@ Two living documents need periodic refresh during active development. Each has a
 | **When to refresh** | More often than the onboarding page. Whenever a material commit lands, a drift item resolves, in-flight work status changes, or roughly weekly during active pre-handoff work. |
 | **How to refresh** | Surgical edits via the skill — preserves carefully-crafted prose (Tips, First-Week Plan, Knowledge Areas) while updating volatile fields (snapshot date, drift table, in-flight section, uncommitted-work breadcrumb) |
 
+### 3. Database Table Catalog (internal — repo docs)
+
+**Source file:** [`docs/database/TABLES.md`](docs/database/TABLES.md) (generated) + [`docs/database/table_metadata.yaml`](docs/database/table_metadata.yaml) (hand-written source of truth)
+
+| Item | Detail |
+|---|---|
+| **Purpose** | Authoritative catalog of all ~97 DuckDB tables grouped by pipeline (ne25, ne25_imputed, nsch, nhis, acs, calibration, raking, crosswalks, metadata, cleanup). For each table: row count, column count, source script, primary downstream consumer, status. |
+| **Architecture** | Hybrid regeneration — live DB introspection (`scripts/documentation/inventory_tables.py`) merged with hand-written YAML metadata. Assembled by `scripts/documentation/generate_tables_md.py`, which exits non-zero on orphan / stale drift. |
+| **Regeneration recipe** | `/refresh-database-inventory` skill at `.claude/skills/refresh-database-inventory/SKILL.md` |
+| **When to refresh** | When a table is added, dropped, renamed, or moves between pipelines; when row counts drift materially; when a cleanup-candidate table is finally removed. Weekly-ish during active development. |
+| **How to refresh** | Edit `table_metadata.yaml` → run the skill → commit both files together. Never hand-edit `TABLES.md` — it is overwritten on regeneration. |
+
 ### Cadence guidance
 
 - **HANDOFF.md** changes often during the pre-handoff window — refresh weekly or after each material commit
 - **onboarding.html** changes rarely — only when a public-visible thing actually changed
-- They are **decoupled by design**: a Bucket 3 progress update belongs in HANDOFF.md but doesn't necessarily warrant a public-facing snapshot refresh
-- Both skills require explicit user authorization before pushing to remote
+- **TABLES.md** changes with schema evolution — any table add/drop/rename, plus periodic sweeps to keep metadata and status values accurate
+- They are **decoupled by design**: a Bucket 3 progress update belongs in HANDOFF.md but doesn't necessarily warrant a public-facing snapshot refresh; a new cleanup candidate belongs in TABLES.md but doesn't necessarily warrant an onboarding refresh
+- All three skills require explicit user authorization before pushing to remote
 
 ---
 

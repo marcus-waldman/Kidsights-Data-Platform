@@ -1,0 +1,752 @@
+# docs/database/table_metadata.yaml
+#
+# Hand-written metadata for every table in the Kidsights Data Platform DuckDB.
+# This is the authoritative source for table purpose, source, and downstream
+# consumer. The /refresh-database-inventory skill reads this file together
+# with the live DB inventory (scripts/temp/inventory_tables.py output) to
+# regenerate docs/database/TABLES.md.
+#
+# Schema per entry:
+#   purpose:            One-line description of what the table holds.
+#   source:             Which script or pipeline step writes to the table.
+#   primary_downstream: Single primary consumer (pipeline step + script).
+#                       Use "—" if the table is a terminal output.
+#   status:             One of: live | backup | test | empty | deprecated
+#   group:              Display grouping in TABLES.md — one of:
+#                         ne25, ne25_imputed, mn26, nsch, nhis, acs,
+#                         calibration, raking, crosswalks, metadata,
+#                         historical, cleanup
+#   dictionary:         (optional) Path to the full column dictionary.
+#   notes:              (optional) Maintainer notes, gotchas, history.
+#
+# When adding a new table: append a new entry; the skill's orphan check will
+# flag tables that exist in the DB but are missing from this file.
+
+tables:
+
+  # ==========================================================================
+  # ne25_* — Nebraska 2025 REDCap survey pipeline (non-imputed)
+  # ==========================================================================
+
+  ne25_raw:
+    purpose: "Raw REDCap exports from the four NE25 project PIDs, unioned and lightly cleaned."
+    source: "Step 5 of run_ne25_pipeline.R (R/extract/ne25.R writes via python.db.operations)."
+    primary_downstream: "Step 6 of run_ne25_pipeline.R — feeds recode_it() derivation into ne25_transformed."
+    status: live
+    group: ne25
+
+  ne25_transformed:
+    purpose: "Canonical NE25 analytic table — raw fields + 99 derived variables + inclusion flags + weights + scoring joins."
+    source: "Step 6 onward of run_ne25_pipeline.R (recode_it() for derived vars, Step 6.7+ joins scores, Step 6.9 joins raking weights)."
+    primary_downstream: "Most downstream consumers: raking (scripts/raking/ne25/*), imputation pipeline, IRT calibration prep, all reports."
+    status: live
+    group: ne25
+    dictionary: "docs/data_dictionary/ne25_data_dictionary_full.md"
+
+  ne25_transformed_backup_2025_11_08:
+    purpose: "Pre-refactor snapshot of ne25_transformed (670 cols vs current 723)."
+    source: "Manual backup taken 2025-11-08 before schema changes."
+    primary_downstream: "—"
+    status: backup
+    group: cleanup
+    notes: "Flagged for cleanup in HANDOFF.md. Schema pre-dates the weight and scoring column additions."
+
+  ne25_raw_pid7679:
+    purpose: "Per-project staging table for REDCap PID 7679 (defunct)."
+    source: "Legacy per-project ingestion pattern (pre-unioned ne25_raw)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_raw_pid7943:
+    purpose: "Per-project staging table for REDCap PID 7943 (defunct)."
+    source: "Legacy per-project ingestion pattern (pre-unioned ne25_raw)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_raw_pid7999:
+    purpose: "Per-project staging table for REDCap PID 7999 (defunct)."
+    source: "Legacy per-project ingestion pattern (pre-unioned ne25_raw)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_raw_pid8014:
+    purpose: "Per-project staging table for REDCap PID 8014 (defunct)."
+    source: "Legacy per-project ingestion pattern (pre-unioned ne25_raw)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_eligibility:
+    purpose: "Originally a standalone eligibility snapshot; eligibility flags now live on ne25_transformed."
+    source: "Historical — R/harmonize/ne25_eligibility.R referenced this name but current pipeline writes eligibility columns into ne25_transformed."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_data_dictionary:
+    purpose: "REDCap field metadata (field_name, form_name, field_type, labels, branching logic) for NE25."
+    source: "pipelines/python/generate_metadata.py (REDCap metadata export loaded into DuckDB)."
+    primary_downstream: "scripts/documentation/generate_html_documentation.py and the codebook dashboard."
+    status: live
+    group: metadata
+
+  ne25_metadata:
+    purpose: "Variable-level summary statistics for the NE25 transformed dataset (n_missing, unique_values, min/max, labels)."
+    source: "pipelines/python/generate_metadata.py, run near the end of the NE25 pipeline."
+    primary_downstream: "Data dictionary HTML and codebook dashboard."
+    status: live
+    group: metadata
+
+  ne25_flagged_observations:
+    purpose: "Cook's-distance flagged observations from manual influence-diagnostic screening. Joined into ne25_transformed as the `influential` column."
+    source: "scripts/influence_diagnostics/ (manual workflow; inserts via calibration/ne25/manual_2023_scale/utils/00_load_item_response_data.R)."
+    primary_downstream: "Step 6.5 of run_ne25_pipeline.R (joins into ne25_transformed)."
+    status: live
+    group: ne25
+    notes: "Only 4 rows currently; most flagged observations live elsewhere. Verify scope before relying on this count."
+
+  ne25_too_few_items:
+    purpose: "Exclusion flags for NE25 participants with insufficient item responses for IRT scoring (718 records)."
+    source: "calibration/ne25/manual_2023_scale/run_manual_calibration.R."
+    primary_downstream: "Step 6.7 of run_ne25_pipeline.R (joins as inclusion criterion)."
+    status: live
+    group: ne25
+
+  ne25_kidsights_gsed_pf_scores_2022_scale:
+    purpose: "Person-fit scores from the manual 2023-scale fixed-item Mplus calibration (7 domains × score + CSEM). 2,785 participants scored."
+    source: "calibration/ne25/manual_2023_scale/run_manual_calibration.R (Mplus output loaded into DuckDB)."
+    primary_downstream: "Step 6.7 of run_ne25_pipeline.R (joins person-fit scores into ne25_transformed)."
+    status: live
+    group: ne25
+
+  ne25_credi_scores:
+    purpose: "CREDI developmental scoring for NE25 children under 4 (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). 884 scored of 1,678 eligible."
+    source: "Step 7.5 of run_ne25_pipeline.R via R/credi/score_credi.R."
+    primary_downstream: "—"
+    status: live
+    group: ne25
+
+  ne25_credi_scores_test:
+    purpose: "Test/development duplicate of ne25_credi_scores."
+    source: "Historical test run."
+    primary_downstream: "—"
+    status: test
+    group: cleanup
+
+  ne25_dscore_scores:
+    purpose: "GSED D-score results for NE25 (d, daz, sem, a, n, p). 2,639 of 2,645 scored."
+    source: "Step 7.6 of run_ne25_pipeline.R via R/dscore/score_dscore.R using gsed2406 key."
+    primary_downstream: "—"
+    status: live
+    group: ne25
+
+  ne25_dscore_scores_test:
+    purpose: "Test/development duplicate of ne25_dscore_scores."
+    source: "Historical test run."
+    primary_downstream: "—"
+    status: test
+    group: cleanup
+
+  ne25_hrtl_domain_scores:
+    purpose: "HRTL per-domain classification (5 domains × ~1,411-1,425 records). Motor Development classification masked to NA per Issue #15."
+    source: "Step 7.7 of run_ne25_pipeline.R — scripts/hrtl/01..04_*.R (extract → Rasch → impute → CAHMI threshold scoring)."
+    primary_downstream: "—"
+    status: live
+    group: ne25
+
+  ne25_hrtl_overall:
+    purpose: "HRTL overall readiness classification for ages 3-5 (1,412 records). Currently all NA pending Motor fix (Issue #15)."
+    source: "Step 7.7 of run_ne25_pipeline.R — scripts/hrtl/04_score_hrtl.R."
+    primary_downstream: "—"
+    status: live
+    group: ne25
+
+  ne25_irt_scores_kidsights:
+    purpose: "Placeholder for Kidsights IRT score cache; never populated by the current pipeline."
+    source: "Legacy schema (pre-manual-calibration workflow)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_irt_scores_psychosocial:
+    purpose: "Placeholder for psychosocial IRT score cache; never populated by the current pipeline."
+    source: "Legacy schema (pre-manual-calibration workflow)."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_raked_weights:
+    purpose: "Bucket 2 output: M=5 multi-imputation calibrated raking weights (13,225 rows = 5 × 2,645)."
+    source: "scripts/raking/ne25/32-34_*.R (run_ne25_raking_full.R orchestrator)."
+    primary_downstream: "Step 6.9 of run_ne25_pipeline.R (pulls M=1 slice as calibrated_weight column)."
+    status: live
+    group: raking
+
+  ne25_raked_weights_boot:
+    purpose: "Bucket 3 output: MIBB replicate weights (2,645,000 rows = 5 imputations × 200 bootstrap draws × 2,645 records)."
+    source: "scripts/raking/ne25/35_run_bayesian_bootstrap.R + 36_store_bootstrap_weights_long.py."
+    primary_downstream: "reports/ne25/helpers/model_fitting.R (Rubin's-rules pooling — not yet wired as of 2026-04-21)."
+    status: live
+    group: raking
+
+  # ==========================================================================
+  # ne25_imputed_* — Multiple-imputation variable tables (study-specific)
+  # ==========================================================================
+
+  ne25_imputed_puma:
+    purpose: "M=5 probabilistically allocated PUMAs for NE25 records with missing PUMA assignments."
+    source: "scripts/imputation/ne25/01_impute_geography.py."
+    primary_downstream: "Raking pipeline (joins imputed geography for calibration target matching)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_county:
+    purpose: "M=5 probabilistically allocated counties."
+    source: "scripts/imputation/ne25/01_impute_geography.py."
+    primary_downstream: "Raking pipeline and imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_census_tract:
+    purpose: "M=5 probabilistically allocated census tracts."
+    source: "scripts/imputation/ne25/01_impute_geography.py."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_female:
+    purpose: "M=5 MICE-imputed binary sex indicator."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R + 02b_insert_sociodem_imputations.py."
+    primary_downstream: "Raking pipeline (sex estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_raceG:
+    purpose: "M=5 MICE-imputed collapsed race/ethnicity categories."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R + 02b_insert_sociodem_imputations.py."
+    primary_downstream: "Raking pipeline (race/ethnicity estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_educ_mom:
+    purpose: "M=5 MICE-imputed maternal education."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R + 02b_insert_sociodem_imputations.py."
+    primary_downstream: "Raking pipeline (mother education estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_educ_a2:
+    purpose: "M=5 MICE-imputed secondary caregiver education."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_income:
+    purpose: "M=5 MICE-imputed household income."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R."
+    primary_downstream: "Downstream FPL calculation and reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_family_size:
+    purpose: "M=5 MICE-imputed family size."
+    source: "scripts/imputation/ne25/02_impute_sociodem.R."
+    primary_downstream: "Downstream FPL calculation."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_fplcat:
+    purpose: "M=5 imputed federal poverty level categories (derived from imputed income + family size)."
+    source: "scripts/imputation/ne25/03_derive_fpl.R."
+    primary_downstream: "Raking pipeline (FPL estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_cc_receives_care:
+    purpose: "M=5 3-stage-sequential imputed childcare receipt indicator."
+    source: "scripts/imputation/ne25/04_impute_childcare.R + 04_insert_childcare_imputations.py."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_cc_primary_type:
+    purpose: "M=5 imputed primary childcare type."
+    source: "scripts/imputation/ne25/04_impute_childcare.R."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_cc_hours_per_week:
+    purpose: "M=5 imputed weekly childcare hours."
+    source: "scripts/imputation/ne25/04_impute_childcare.R."
+    primary_downstream: "Derived childcare_10hrs_nonfamily flag."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_childcare_10hrs_nonfamily:
+    purpose: "M=5 derived indicator: >=10 hours/week non-family childcare."
+    source: "scripts/imputation/ne25/04_impute_childcare.R (derived)."
+    primary_downstream: "Raking pipeline (childcare estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_phq2_interest:
+    purpose: "M=5 CART-imputed PHQ-2 anhedonia item."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R + 05b_insert_mental_health_imputations.py."
+    primary_downstream: "Derived phq2_positive flag; raking pipeline."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_phq2_depressed:
+    purpose: "M=5 CART-imputed PHQ-2 depressed-mood item."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R."
+    primary_downstream: "Derived phq2_positive flag."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_phq2_positive:
+    purpose: "M=5 derived PHQ-2 positive-screen indicator."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R (derived)."
+    primary_downstream: "Raking pipeline (mental health estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_gad2_nervous:
+    purpose: "M=5 CART-imputed GAD-2 nervousness item."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R."
+    primary_downstream: "Derived gad2_positive flag."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_gad2_worry:
+    purpose: "M=5 CART-imputed GAD-2 worry item."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R."
+    primary_downstream: "Derived gad2_positive flag."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_gad2_positive:
+    purpose: "M=5 derived GAD-2 positive-screen indicator."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R (derived)."
+    primary_downstream: "Raking pipeline (mental health estimand)."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_q1502:
+    purpose: "M=5 CART-imputed parenting item (q1502)."
+    source: "scripts/imputation/ne25/05_impute_mental_health.R."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_parent_divorce:
+    purpose: "M=5 random-forest-imputed child ACE: parent divorce/separation."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_parent_death:
+    purpose: "M=5 random-forest-imputed child ACE: parent death."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_parent_jail:
+    purpose: "M=5 random-forest-imputed child ACE: parent incarceration."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_domestic_violence:
+    purpose: "M=5 random-forest-imputed child ACE: domestic violence exposure."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_neighborhood_violence:
+    purpose: "M=5 random-forest-imputed child ACE: neighborhood violence."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_mental_illness:
+    purpose: "M=5 random-forest-imputed child ACE: household mental illness."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_substance_use:
+    purpose: "M=5 random-forest-imputed child ACE: household substance use."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_discrimination:
+    purpose: "M=5 random-forest-imputed child ACE: racial/ethnic discrimination."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R."
+    primary_downstream: "Derived child_ace_total."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_child_ace_total:
+    purpose: "M=5 derived total child ACE score (sum of 8 items)."
+    source: "scripts/imputation/ne25/06_impute_child_aces.R (derived)."
+    primary_downstream: "Imputation-aware reports."
+    status: live
+    group: ne25_imputed
+
+  ne25_imputed_imputed_cc_receives_care:
+    purpose: "Defunct double-prefixed childcare imputation table."
+    source: "Early implementation bug — superseded by ne25_imputed_cc_receives_care."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_imputed_imputed_cc_primary_type:
+    purpose: "Defunct double-prefixed childcare imputation table."
+    source: "Early implementation bug — superseded by ne25_imputed_cc_primary_type."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_imputed_imputed_cc_hours_per_week:
+    purpose: "Defunct double-prefixed childcare imputation table."
+    source: "Early implementation bug — superseded by ne25_imputed_cc_hours_per_week."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  ne25_imputed_imputed_childcare_10hrs_nonfamily:
+    purpose: "Defunct double-prefixed childcare imputation table."
+    source: "Early implementation bug — superseded by ne25_imputed_childcare_10hrs_nonfamily."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  # ==========================================================================
+  # nsch_* — National Survey of Children's Health (7 years + metadata)
+  # ==========================================================================
+
+  nsch_2016_raw:
+    purpose: "NSCH 2016 raw data — never loaded (schema differences with 2017+)."
+    source: "Schema placeholder only; scripts/nsch/process_all_years.py skips 2016."
+    primary_downstream: "—"
+    status: empty
+    group: nsch
+    notes: "Documented as a schema-incompatibility case in HANDOFF.md."
+
+  nsch_2017_raw:
+    purpose: "NSCH 2017 raw data, 21,599 records × 813 cols."
+    source: "scripts/nsch/process_all_years.py (SPSS → Feather → DuckDB)."
+    primary_downstream: "IRT calibration pipeline (NSCH records used for national benchmarking)."
+    status: live
+    group: nsch
+
+  nsch_2018_raw:
+    purpose: "NSCH 2018 raw data, 30,530 records × 835 cols."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline."
+    status: live
+    group: nsch
+
+  nsch_2019_raw:
+    purpose: "NSCH 2019 raw data, 29,433 records × 834 cols."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline."
+    status: live
+    group: nsch
+
+  nsch_2020_raw:
+    purpose: "NSCH 2020 raw data, 42,777 records × 847 cols."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline."
+    status: live
+    group: nsch
+
+  nsch_2021:
+    purpose: "NSCH 2021 raw data, 50,892 records × 909 cols. Note naming inconsistency (no _raw suffix)."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline."
+    status: live
+    group: nsch
+    notes: "Naming inconsistency flagged in HANDOFF.md. Years 2017-2020 and 2023 use nsch_{year}_raw; 2021 and 2022 use nsch_{year}. Worth standardizing."
+
+  nsch_2022:
+    purpose: "NSCH 2022 raw data, 54,103 records × 958 cols. Note naming inconsistency (no _raw suffix)."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline; raking targets (NSCH estimands)."
+    status: live
+    group: nsch
+    notes: "See nsch_2021 note on naming inconsistency."
+
+  nsch_2023_raw:
+    purpose: "NSCH 2023 raw data, 55,162 records × 895 cols."
+    source: "scripts/nsch/process_all_years.py."
+    primary_downstream: "IRT calibration pipeline; raking targets."
+    status: live
+    group: nsch
+
+  nsch_crosswalk:
+    purpose: "NSCH cross-year variable crosswalk (empty placeholder)."
+    source: "Planned metadata table; never populated."
+    primary_downstream: "—"
+    status: empty
+    group: cleanup
+
+  nsch_value_labels:
+    purpose: "Value-label mappings across all NSCH years (36,164 rows)."
+    source: "pipelines/python/nsch/load_nsch_metadata.py."
+    primary_downstream: "Data dictionary generation; IRT calibration codebook harmonization."
+    status: live
+    group: nsch
+
+  nsch_variables:
+    purpose: "Variable metadata across all NSCH years (6,867 rows)."
+    source: "pipelines/python/nsch/load_nsch_metadata.py."
+    primary_downstream: "Data dictionary generation; IRT calibration codebook harmonization."
+    status: live
+    group: nsch
+
+  # ==========================================================================
+  # nhis_* — National Health Interview Survey
+  # ==========================================================================
+
+  nhis_raw:
+    purpose: "NHIS multi-year raw extracts (2019-2024), 229,609 records × 66 cols."
+    source: "pipelines/python/nhis/insert_nhis_database.py (IPUMS extraction → Feather → DuckDB)."
+    primary_downstream: "Raking pipeline scripts 12-14 (NHIS estimand estimation)."
+    status: live
+    group: nhis
+
+  # ==========================================================================
+  # acs_* — IPUMS USA ACS extracts + DDI metadata
+  # ==========================================================================
+
+  acs_data:
+    purpose: "ACS multi-year raw extracts for target states (24,449 records for Nebraska 2019-2023)."
+    source: "pipelines/python/acs/insert_acs_database.py (IPUMS extraction → Feather → DuckDB)."
+    primary_downstream: "Raking pipeline scripts 01-07 (ACS survey design and GLM estimation)."
+    status: live
+    group: acs
+
+  acs_variables:
+    purpose: "ACS variable metadata parsed from DDI XML (42 vars currently tracked)."
+    source: "pipelines/python/acs/ddi_parser.py + insert_acs_database.py."
+    primary_downstream: "Raking pipeline transformation lookups."
+    status: live
+    group: acs
+
+  acs_value_labels:
+    purpose: "ACS value-label mappings (1,144 rows across all variables)."
+    source: "pipelines/python/acs/ddi_parser.py."
+    primary_downstream: "Raking pipeline transformation lookups."
+    status: live
+    group: acs
+
+  acs_metadata_registry:
+    purpose: "Registry of DDI metadata files loaded (title, producer, dates)."
+    source: "pipelines/python/acs/insert_acs_database.py."
+    primary_downstream: "Provenance audit trail."
+    status: live
+    group: acs
+
+  # ==========================================================================
+  # calibration_* + historical_* — IRT calibration multi-study dataset
+  # ==========================================================================
+
+  calibration_dataset_2020_2025:
+    purpose: "Wide-format multi-study calibration dataset (9,319 post-QA records × 312 cols, 6 studies)."
+    source: "scripts/irt_scoring/prepare_calibration_dataset.R via scripts/irt_scoring/run_calibration_pipeline.R."
+    primary_downstream: "mplus/calibdat.dat export (weighted graded response model in Mplus)."
+    status: live
+    group: calibration
+
+  calibration_dataset_2020_2025_restructured:
+    purpose: "Restructured variant of the calibration dataset used as the reference table for Mplus MODEL syntax generation (85,544 rows × 303 cols)."
+    source: "scripts/irt_scoring/prepare_calibration_dataset.R (alternate shape for syntax builder)."
+    primary_downstream: "scripts/irt_scoring/calibration/generate_model_syntax.R (produces MODEL / CONSTRAINT / PRIOR sheets)."
+    status: live
+    group: calibration
+
+  calibration_dataset_long:
+    purpose: "Long-format calibration dataset with QA flags (1,332,042 rows × 9 cols: id, years, study, studynum, lex_equate, y, cooksd_quantile, maskflag, devflag)."
+    source: "scripts/irt_scoring/create_calibration_long.R."
+    primary_downstream: "Age Gradient Explorer Shiny app; masking/QA analysis."
+    status: live
+    group: calibration
+
+  calibration_dataset_with_flags:
+    purpose: "Wide-format subset with QA flags merged in (18,638 rows × 314 cols)."
+    source: "scripts/irt_scoring/run_calibration_pipeline.R (flag-joined variant)."
+    primary_downstream: "QA inspection; alternate Mplus export."
+    status: live
+    group: calibration
+
+  calibration_dataset_full_with_flags:
+    purpose: "All calibration records + just the flag columns (46,003 rows × 10 cols)."
+    source: "scripts/irt_scoring/run_calibration_pipeline.R."
+    primary_downstream: "QA summary reports; masking audit."
+    status: live
+    group: calibration
+
+  historical_calibration_2020_2024:
+    purpose: "Historical multi-study Kidsights calibration records (5,012 rows × 290 cols) imported from the KidsightsPublic package — covers NE20, NE22, USA24."
+    source: "scripts/irt_scoring/import_historical_calibration.R."
+    primary_downstream: "scripts/irt_scoring/prepare_calibration_dataset.R (merged into calibration_dataset_2020_2025)."
+    status: live
+    group: historical
+
+  # ==========================================================================
+  # raking_* — Population-target + bootstrap replicate tables
+  # ==========================================================================
+
+  raking_targets_ne25:
+    purpose: "Pooled population-representative targets for NE25 raking (11 consolidated target rows × 14 cols including estimate, SE, CI, sample_size)."
+    source: "scripts/raking/ne25/run_raking_targets_pipeline.R."
+    primary_downstream: "NE25 raking pipeline scripts 32-34 (calibration via Stan optimization)."
+    status: live
+    group: raking
+    notes: "11 is the current consolidated-target state; older design docs describing 180 targets (30 estimands × 6 age groups) are stale text. See HANDOFF.md drift review."
+
+  raking_targets_boot_replicates:
+    purpose: "Bootstrap replicate estimates for ACS estimands (737,280 rows = 180 targets × 4,096 Rao-Wu-Yue-Beaumont replicates)."
+    source: "scripts/raking/ne25/run_bootstrap_pipeline.R + 23_insert_boot_replicates.py + 24_create_database_table.py."
+    primary_downstream: "Variance estimation in raking-targets construction; input to MIBB variance framework."
+    status: live
+    group: raking
+
+  # ==========================================================================
+  # Geographic crosswalks (geo_zip_to_* + ne_zip_county_crosswalk)
+  # ==========================================================================
+
+  geo_zip_to_cbsa:
+    purpose: "ZCTA → Core-Based Statistical Area crosswalk with population allocation factors (40,769 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "R/utils/query_geo_crosswalk.R and python/db/query_geo_crosswalk.py; NE25 transform for ZIP-based geography."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_congress:
+    purpose: "ZCTA → Congressional district crosswalk (647 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Geographic transformation utilities."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_county:
+    purpose: "ZCTA → county crosswalk (975 rows, supersedes ne_zip_county_crosswalk for general use)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "NE25 and MN26 transforms for county assignment."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_tract:
+    purpose: "ZCTA → Census tract crosswalk (1,711 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Imputation pipeline (census tract allocation)."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_puma:
+    purpose: "ZCTA → PUMA 2022 crosswalk (708 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "NE25 transform (PUMA assignment) and imputation pipeline."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_urban_rural:
+    purpose: "ZCTA → urban/rural classification (42,870 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "NE25 and MN26 transforms."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_school_dist:
+    purpose: "ZCTA → school district crosswalk (1,673 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Geographic transformation utilities."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_state_leg_upper:
+    purpose: "ZCTA → state legislative upper chamber crosswalk (902 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Geographic transformation utilities."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_state_leg_lower:
+    purpose: "ZCTA → state legislative lower chamber crosswalk (591 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Geographic transformation utilities."
+    status: live
+    group: crosswalks
+
+  geo_zip_to_native_lands:
+    purpose: "ZCTA → tribal/native lands crosswalk (35,026 rows)."
+    source: "pipelines/python/load_geographic_crosswalks.py."
+    primary_downstream: "Geographic transformation utilities."
+    status: live
+    group: crosswalks
+
+  ne_zip_county_crosswalk:
+    purpose: "Nebraska-specific legacy ZIP → acceptable-counties lookup (627 rows, 2 cols)."
+    source: "scripts/setup/load_zip_crosswalk.R."
+    primary_downstream: "NE25 eligibility logic (in-state verification)."
+    status: live
+    group: crosswalks
+    notes: "Older/simpler format than geo_zip_to_county. Kept for NE25 eligibility path that expects the acceptable_counties array form."
+
+  # ==========================================================================
+  # Metadata / catalog tables not tied to a single pipeline
+  # ==========================================================================
+
+  imputation_metadata:
+    purpose: "Imputation provenance registry (21 rows × 9 cols: study_id, variable_name, n_imputations, method, predictors, dates, software version)."
+    source: "scripts/imputation/ne25/*.py (one row per imputed variable per study)."
+    primary_downstream: "Imputation-aware downstream tooling; python.imputation.helpers validation."
+    status: live
+    group: metadata
+
+  item_review_notes:
+    purpose: "Reviewer annotations from the Age Gradient Explorer QA tool (6,186 rows: id, item_id, note, timestamp, reviewer, is_current)."
+    source: "scripts/shiny/age_gradient_explorer/notes_helpers_db.R (interactive Shiny writes)."
+    primary_downstream: "IRT calibration QA workflow (informs masking decisions)."
+    status: live
+    group: metadata
+
+  # ==========================================================================
+  # Test / development tables (cleanup candidates)
+  # ==========================================================================
+
+  test_duckdb_120:
+    purpose: "Smoke-test table for DuckDB 1.2.0 migration."
+    source: "Ad-hoc development."
+    primary_downstream: "—"
+    status: test
+    group: cleanup
+
+  test_geo_parquet:
+    purpose: "Smoke-test table for geographic Parquet loading."
+    source: "Ad-hoc development."
+    primary_downstream: "—"
+    status: test
+    group: cleanup
+
+  test_table:
+    purpose: "Generic smoke-test placeholder."
+    source: "Ad-hoc development."
+    primary_downstream: "—"
+    status: test
+    group: cleanup
