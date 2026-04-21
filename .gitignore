@@ -130,6 +130,9 @@ _gsdata_/
 output/
 R/authenticity_screening/
 
+# Pages landing page — deliberately committed for GitHub Pages serving
+!docs/index.html
+
 # Todo archive artifacts
 todo/archive.zip
 todo/kidsights-calibration/

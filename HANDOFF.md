@@ -5,6 +5,10 @@
 **Snapshot date:** 2026-04-20
 **Last audit commit:** `6fe3092` ([Docs] Pre-handoff audit: cleanup, archive plans, and drift-check 19 docs)
 
+> **5-minute visual orientation:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
+>
+> Open this in a browser before reading anything below. It's a one-page visual map of the 8 pipelines, the architecture, what's running, what's deferred, and the critical DB drift items. Source: `docs/index.html`. Regenerate via the `/refresh-onboarding` skill (see CLAUDE.md → Documentation Maintenance) when platform state materially changes.
+
 ---
 
 ## Read in This Order
