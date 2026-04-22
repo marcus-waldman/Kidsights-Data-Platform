@@ -2,8 +2,8 @@
 
 **For:** Incoming maintainer of the Kidsights Data Platform
 **From:** Marcus Waldman (outgoing maintainer)
-**Snapshot date:** 2026-04-21
-**Last updated:** 2026-04-21 (HEAD `1786e6f`; last audit commit `6fe3092`)
+**Snapshot date:** 2026-04-22
+**Last updated:** 2026-04-22 (HEAD `d76e343`; last audit commit `6fe3092`)
 
 > **5-minute visual orientation:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
 >
@@ -22,7 +22,7 @@ After that, dive into per-pipeline docs as needed. The new architecture/README.m
 
 ---
 
-## What's Running in Production (as of 2026-04-21)
+## What's Running in Production (as of 2026-04-22)
 
 The platform has **eight independent pipelines**. All have been used in production at some point; current state varies:
 
@@ -84,7 +84,7 @@ The April 2026 audit surfaced several divergences between docs and DB state. Aft
 12+ zero-row / test / backup tables polluting the schema:
 - `ne25_*_test` (2 tables)
 - `ne25_transformed_backup_2025_11_08`
-- `ne25_imputed_imputed_cc_*` (4 zero-row defunct double-prefixed)
+- `ne25_imputed_imputed_cc_*` (3 zero-row defunct double-prefixed: `cc_hours_per_week`, `cc_primary_type`, `cc_receives_care`)
 - `ne25_irt_scores_*` (2 zero-row)
 - `ne25_raw_pid*` (4 zero-row per-project)
 - `ne25_eligibility` (0-row)
@@ -156,13 +156,13 @@ The platform requires three external API integrations. Each is configured via th
 
 The `.env` file is gitignored — never commit it.
 
-Full setup walkthrough: [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATION_GUIDE.md).
+Full setup walkthrough: [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATION_GUIDE.md). For a conversational, pipeline-aware walkthrough consumable by Claude Desktop (asks only for the credentials the chosen pipeline needs; ends with an MN26 smoke test and a pre-filled GitHub-issue template on failure): [docs/setup/SETUP_RUNBOOK.md](docs/setup/SETUP_RUNBOOK.md).
 
 ---
 
 ## Uncommitted Work in Repo at Handoff
 
-None as of 2026-04-21. The earlier breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was recompiled and committed as part of the Bucket 3 shipping window (`971875f`), alongside its regenerated `.stan` source. Working tree is clean.
+None as of 2026-04-22. The earlier breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was recompiled and committed as part of the Bucket 3 shipping window (`971875f`), alongside its regenerated `.stan` source. Working tree is clean.
 
 ---
 
@@ -187,7 +187,7 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 | What is this repo | CLAUDE.md | README.md |
 | How to run pipeline X | docs/QUICK_REFERENCE.md | docs/architecture/PIPELINE_STEPS.md |
 | Architecture decisions | docs/architecture/PIPELINE_OVERVIEW.md | docs/architecture/README.md |
-| Setup / new machine | docs/setup/INSTALLATION_GUIDE.md | docs/setup/INSTALLATION_CHECKLIST.md |
+| Setup / new machine | docs/setup/INSTALLATION_GUIDE.md | docs/setup/INSTALLATION_CHECKLIST.md · [docs/setup/SETUP_RUNBOOK.md](docs/setup/SETUP_RUNBOOK.md) (Claude Desktop walkthrough) |
 | Coding standards | docs/guides/CODING_STANDARDS.md | CLAUDE.md "Critical Coding Standards" |
 | Missing data handling | docs/guides/MISSING_DATA_GUIDE.md | (REQUIRED reading before adding derived vars) |
 | NE25 raking weights | docs/raking/RAKING_INTEGRATION.md | docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd |
