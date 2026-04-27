@@ -196,6 +196,35 @@ tables:
   # mn26_* — Minnesota 2026 REDCap survey pipeline (multi-child households)
   # ==========================================================================
 
+  mn26_raw_wide:
+    purpose: "Raw REDCap exports from the MN26 NORC project in wide format (one row per household, child-2 fields suffixed with _c2). Audit trail."
+    source: "Step 4a of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py."
+    primary_downstream: "—"
+    status: live
+    group: mn26
+    notes: "Wide format preserved for audit; downstream code reads from mn26_raw (long) instead."
+
+  mn26_raw:
+    purpose: "Raw REDCap data after wide-to-long pivot (one row per child, keyed on pid + record_id + child_num)."
+    source: "Step 4b of run_mn26_pipeline.R — pivot_mn26_wide_to_long() then pipelines/python/insert_raw_data.py."
+    primary_downstream: "Step 5 of run_mn26_pipeline.R — feeds recode_it() into mn26_transformed."
+    status: live
+    group: mn26
+
+  mn26_transformed:
+    purpose: "Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score joins. Multi-child key (pid, record_id, child_num)."
+    source: "Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6 scoring joins."
+    primary_downstream: "R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), and downstream MN26 reports."
+    status: live
+    group: mn26
+
+  mn26_data_dictionary:
+    purpose: "REDCap data dictionary for the MN26 NORC project — active fields with type, choices, branching logic. Used for value-label resolution during recoding."
+    source: "Step 10 of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py."
+    primary_downstream: "R/transform/mn26_transforms.R::recode_it() reads dict for value_labels()."
+    status: live
+    group: mn26
+
   mn26_credi_scores:
     purpose: "CREDI developmental scoring for MN26 children under 4 years old (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). Keyed on (pid, record_id, child_num)."
     source: "Step 8.5 of run_mn26_pipeline.R via R/credi/score_credi.R with study_id='mn26'."

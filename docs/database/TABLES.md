@@ -1,8 +1,8 @@
 # Database Table Catalog
 
-**Snapshot date:** 2026-04-21
+**Snapshot date:** 2026-04-27
 **Database:** `data/duckdb/kidsights_local.duckdb`
-**Total tables:** 97
+**Total tables:** 103
 **Regenerate via:** `/refresh-database-inventory` skill (see `.claude/skills/refresh-database-inventory/SKILL.md`)
 **Source of truth for metadata:** [`docs/database/table_metadata.yaml`](table_metadata.yaml)
 
@@ -71,6 +71,19 @@ Multiple-imputation outputs (M=5) from `scripts/imputation/ne25/`. Each table st
 | `ne25_imputed_puma` | 4,430 | 5 | scripts/imputation/ne25/01_impute_geography.py. | M=5 probabilistically allocated PUMAs for NE25 records with missing PUMA assignments. | Raking pipeline (joins imputed geography for calibration target matching). | live |
 | `ne25_imputed_q1502` | 115 | 5 | scripts/imputation/ne25/05_impute_mental_health.R. | M=5 CART-imputed parenting item (q1502). | Imputation-aware reports. | live |
 | `ne25_imputed_raceG` | 360 | 5 | scripts/imputation/ne25/02_impute_sociodem.R + 02b_insert_sociodem_imputations.py. | M=5 MICE-imputed collapsed race/ethnicity categories. | Raking pipeline (race/ethnicity estimand). | live |
+
+## MN26 Pipeline
+
+Minnesota 2026 REDCap pipeline (NORC-administered, multi-child households). Wide-to-long pivot produces one row per child keyed on `(pid, record_id, child_num)`. Currently produces raw + transformed tables plus CREDI and GSED D-score outputs; HRTL scoring deferred.
+
+| Table | Rows | Cols | Source | Purpose | Used by | Status |
+|---|---:|---:|---|---|---|---|
+| `mn26_credi_scores` | 893 | 18 | Step 8.5 of run_mn26_pipeline.R via R/credi/score_credi.R with study_id='mn26'. | CREDI developmental scoring for MN26 children under 4 years old (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). Keyed on (pid, record_id, child_num). | — _Note: Multi-child key: each (pid, record_id, child_num) is a distinct row. Same scorer as NE25, parameterized via study_id._ | live |
+| `mn26_data_dictionary` | 865 | 14 | Step 10 of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py. | REDCap data dictionary for the MN26 NORC project — active fields with type, choices, branching logic. Used for value-label resolution during recoding. | R/transform/mn26_transforms.R::recode_it() reads dict for value_labels(). | live |
+| `mn26_dscore_scores` | 1,106 | 9 | Step 8.6 of run_mn26_pipeline.R via R/dscore/score_dscore.R with study_id='mn26' and key='gsed2406'. | GSED D-score results for MN26 (d, daz, sem, a, n, p). Keyed on (pid, record_id, child_num); all meets_inclusion=TRUE children eligible. | — _Note: Multi-child key. Same scorer as NE25, parameterized via study_id._ | live |
+| `mn26_raw` | 10,771 | 6 | Step 4b of run_mn26_pipeline.R — pivot_mn26_wide_to_long() then pipelines/python/insert_raw_data.py. | Raw REDCap data after wide-to-long pivot (one row per child, keyed on pid + record_id + child_num). | Step 5 of run_mn26_pipeline.R — feeds recode_it() into mn26_transformed. | live |
+| `mn26_raw_wide` | 10,400 | 5 | Step 4a of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py. | Raw REDCap exports from the MN26 NORC project in wide format (one row per household, child-2 fields suffixed with _c2). Audit trail. | — _Note: Wide format preserved for audit; downstream code reads from mn26_raw (long) instead._ | live |
+| `mn26_transformed` | 9,271 | 662 | Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6 scoring joins. | Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score joins. Multi-child key (pid, record_id, child_num). | R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), and downstream MN26 reports. | live |
 
 ## NSCH Pipeline
 
@@ -205,4 +218,4 @@ When a table is added, dropped, or its metadata changes:
 2. Invoke `/refresh-database-inventory` (the skill runs the generator and surfaces orphan/stale warnings).
 3. Commit both the YAML edits and the regenerated `TABLES.md` together.
 
-*Generated 2026-04-21 by `scripts/documentation/generate_tables_md.py`.*
+*Generated 2026-04-27 by `scripts/documentation/generate_tables_md.py`.*

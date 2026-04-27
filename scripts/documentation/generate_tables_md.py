@@ -57,8 +57,10 @@ GROUP_INTROS = {
         "`(pid, record_id, imputation_m)`."
     ),
     "mn26": (
-        "Minnesota 2026 REDCap pipeline. Currently runs in `--skip-database` test mode — "
-        "no `mn26_*` tables expected in the DB yet."
+        "Minnesota 2026 REDCap pipeline (NORC-administered, multi-child households). "
+        "Wide-to-long pivot produces one row per child keyed on `(pid, record_id, child_num)`. "
+        "Currently produces raw + transformed tables plus CREDI and GSED D-score outputs; "
+        "HRTL scoring deferred."
     ),
     "nsch": (
         "National Survey of Children's Health (2016-2023). Produced by `scripts/nsch/process_all_years.py`. "
