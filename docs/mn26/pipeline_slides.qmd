@@ -36,8 +36,8 @@ REDCap survey measuring early childhood development in children ages 0–5.
 - Pulls raw data from 4 REDCap projects via API
 - Pivots multi-child households (up to 2 children) to long format
 - Recodes raw REDCap fields into ~600 analysis-ready variables
-- Applies eligibility filter (consent + child age)
-- Scores Kidsights IRT (all eligible), CREDI (under 4 yr), and GSED D-score
+- Applies eligibility filter (consent + child age 0-5.99 yr)
+- Scores Kidsights IRT (all eligible), CREDI (under 4 yr), GSED D-score, and HRTL (ages 3-5; Motor unmasked via NORC `_end` catch-up)
 - Stores results in DuckDB
 :::
 
@@ -47,12 +47,13 @@ REDCap survey measuring early childhood development in children ages 0–5.
 | Stage | Count |
 |---|---:|
 | Records extracted | 10,400 |
-| Rows after pivot | 10,771 |
-| Eligible | 1,106 |
-| Kidsights scored | 982 |
-| CREDI scored (<4 yr) | 410 |
-| D-score scored | 985 |
-| Runtime (full) | 2.5 sec |
+| Rows after pivot | 10,773 |
+| Eligible | 1,296 |
+| Kidsights scored | 1,158 |
+| CREDI scored (<4 yr) | 411 |
+| D-score scored | 1,161 |
+| HRTL scored (3-5 yr) | 555 |
+| Runtime (full) | 2.6 sec |
 
 **Entry point:** `run_mn26_pipeline.R`
 **Full guide:** `docs/mn26/pipeline_guide.qmd`
@@ -106,13 +107,14 @@ REDCap survey measuring early childhood development in children ages 0–5.
   <path d="M 890 130 L 890 165" class="s-flow" marker-end="url(#slide-arrow)"/>
   <text x="890" y="153" text-anchor="middle" class="s-count">10,400 rec</text>
 
+
   <!-- Step 3: Pivot -->
   <rect x="740" y="165" width="300" height="50" class="s-step p-piv"/>
   <text x="890" y="185" text-anchor="middle" class="s-title">3 · Wide-to-long pivot</text>
   <text x="890" y="202" text-anchor="middle" class="s-file">R/transform/mn26_pivot.R</text>
 
   <path d="M 890 215 L 890 250" class="s-flow" marker-end="url(#slide-arrow)"/>
-  <text x="890" y="238" text-anchor="middle" class="s-count">10,771 rows</text>
+  <text x="890" y="238" text-anchor="middle" class="s-count">10,773 rows</text>
 
   <!-- Step 5: Transform -->
   <rect x="740" y="250" width="300" height="50" class="s-step p-tx"/>
@@ -127,15 +129,15 @@ REDCap survey measuring early childhood development in children ages 0–5.
   <text x="890" y="372" text-anchor="middle" class="s-file">R/harmonize/mn26_eligibility.R</text>
 
   <path d="M 890 385 L 890 420" class="s-flow" marker-end="url(#slide-arrow)"/>
-  <text x="890" y="408" text-anchor="middle" class="s-count">1,106 eligible</text>
+  <text x="890" y="408" text-anchor="middle" class="s-count">1,296 eligible</text>
 
-  <!-- Step 8 / 8.5 / 8.6: Scoring (Kidsights + CREDI + GSED D-score) -->
+  <!-- Steps 8 / 8.5 / 8.6 / 8.7: Scoring (Kidsights + CREDI + GSED + HRTL) -->
   <rect x="740" y="420" width="300" height="50" class="s-step p-sc"/>
-  <text x="890" y="440" text-anchor="middle" class="s-title">8 / 8.5 / 8.6 · Scoring</text>
-  <text x="890" y="457" text-anchor="middle" class="s-file">Kidsights · CREDI · GSED D-score</text>
+  <text x="890" y="440" text-anchor="middle" class="s-title">8 / 8.5 / 8.6 / 8.7 · Scoring</text>
+  <text x="890" y="457" text-anchor="middle" class="s-file">Kidsights · CREDI · GSED · HRTL</text>
 
   <path d="M 890 470 L 890 505" class="s-flow" marker-end="url(#slide-arrow)"/>
-  <text x="890" y="493" text-anchor="middle" class="s-count">982 / 410 / 985</text>
+  <text x="890" y="493" text-anchor="middle" class="s-count">1158 / 411 / 1161 / 555</text>
 
   <!-- Storage -->
   <rect x="740" y="505" width="300" height="50" class="s-step p-st"/>
@@ -146,7 +148,7 @@ REDCap survey measuring early childhood development in children ages 0–5.
   <path d="M 740 530 L 380 530" class="s-flow" marker-end="url(#slide-arrow)"/>
   <rect x="60" y="505" width="300" height="50" class="s-ext"/>
   <text x="210" y="530" text-anchor="middle" class="s-ext-t">DuckDB</text>
-  <text x="210" y="547" text-anchor="middle" class="s-file">mn26_raw · mn26_transformed · mn26_*_scores</text>
+  <text x="210" y="547" text-anchor="middle" class="s-file">mn26_raw · mn26_transformed · mn26_*_scores · mn26_hrtl_*</text>
 
   <!-- Legend -->
   <g transform="translate(60, 580)">
@@ -193,14 +195,16 @@ REDCap survey measuring early childhood development in children ages 0–5.
 MN26 Pipeline Complete
 ========================================
   Records extracted:   10400
-  After pivot:         10771
-    (10400 c1 + 371 c2)
-  Eligible:             1106
-  Meets inclusion:      1106
-  Kidsights scored:      982
-  CREDI scored:          410
-  GSED D-score scored:   985
-  Total duration:    2.5 sec
+  After pivot:         10773
+    (10400 c1 + 373 c2)
+  Eligible:             1296
+  Meets inclusion:      1296
+  Kidsights scored:     1158
+  CREDI scored:          411
+  GSED D-score scored:  1161
+  HRTL scored:           555
+  HRTL Motor coverage: 99.5% (scored)
+  Total duration:    2.6 sec
 ========================================
 ```
 
@@ -264,7 +268,7 @@ don't exist in the real data.
 | Criterion | Field |
 |---|---|
 | Informed consent | `eq001 == 1` |
-| Child age 0–5 | `age_in_days_n ≤ 1825` |
+| Child age 0–5.99 | `age_in_days_n < 2191` |
 
 **Applied only if columns exist** (skipped in production):
 
@@ -275,9 +279,9 @@ don't exist in the real data.
 Verbose output shows exactly which criteria were applied vs. skipped:
 
 ```
-Total children:         10771
-Consent (eq001):         1407 [required]
-Child age (<=5yr):       1106 [required]
+Total children:         10773
+Consent (eq001):         1411 [required]
+Child age (<6yr):        1296 [required]
 Parent age (eq003):      column absent [NORC pre-screened, skipped]
 Primary CG (eq002):      column absent [NORC pre-screened, skipped]
 MN residence:            column absent [NORC pre-screened, skipped]

@@ -1077,8 +1077,8 @@ Kidsights Data Platform
 <li>Pulls raw data from 4 REDCap projects via API</li>
 <li>Pivots multi-child households (up to 2 children) to long format</li>
 <li>Recodes raw REDCap fields into ~600 analysis-ready variables</li>
-<li>Applies eligibility filter (consent + child age)</li>
-<li>Scores Kidsights IRT (all eligible), CREDI (under 4 yr), and GSED D-score</li>
+<li>Applies eligibility filter (consent + child age 0-5.99 yr)</li>
+<li>Scores Kidsights IRT (all eligible), CREDI (under 4 yr), GSED D-score, and HRTL (ages 3-5; Motor unmasked via NORC <code>_end</code> catch-up)</li>
 <li>Stores results in DuckDB</li>
 </ul>
 </div><div class="column" style="width:50%;">
@@ -1097,27 +1097,31 @@ Kidsights Data Platform
 </tr>
 <tr class="even">
 <td>Rows after pivot</td>
-<td style="text-align: right;">10,771</td>
+<td style="text-align: right;">10,773</td>
 </tr>
 <tr class="odd">
 <td>Eligible</td>
-<td style="text-align: right;">1,106</td>
+<td style="text-align: right;">1,296</td>
 </tr>
 <tr class="even">
 <td>Kidsights scored</td>
-<td style="text-align: right;">982</td>
+<td style="text-align: right;">1,158</td>
 </tr>
 <tr class="odd">
 <td>CREDI scored (&lt;4 yr)</td>
-<td style="text-align: right;">410</td>
+<td style="text-align: right;">411</td>
 </tr>
 <tr class="even">
 <td>D-score scored</td>
-<td style="text-align: right;">985</td>
+<td style="text-align: right;">1,161</td>
 </tr>
 <tr class="odd">
+<td>HRTL scored (3-5 yr)</td>
+<td style="text-align: right;">555</td>
+</tr>
+<tr class="even">
 <td>Runtime (full)</td>
-<td style="text-align: right;">2.5 sec</td>
+<td style="text-align: right;">2.6 sec</td>
 </tr>
 </tbody>
 </table>
@@ -1168,13 +1172,14 @@ Kidsights Data Platform
   <path d="M 890 130 L 890 165" class="s-flow" marker-end="url(#slide-arrow)" />
   <text x="890" y="153" text-anchor="middle" class="s-count">10,400 rec</text>
 
+
   <!-- Step 3: Pivot -->
   <rect x="740" y="165" width="300" height="50" class="s-step p-piv" />
   <text x="890" y="185" text-anchor="middle" class="s-title">3 · Wide-to-long pivot</text>
   <text x="890" y="202" text-anchor="middle" class="s-file">R/transform/mn26_pivot.R</text>
 
   <path d="M 890 215 L 890 250" class="s-flow" marker-end="url(#slide-arrow)" />
-  <text x="890" y="238" text-anchor="middle" class="s-count">10,771 rows</text>
+  <text x="890" y="238" text-anchor="middle" class="s-count">10,773 rows</text>
 
   <!-- Step 5: Transform -->
   <rect x="740" y="250" width="300" height="50" class="s-step p-tx" />
@@ -1189,15 +1194,15 @@ Kidsights Data Platform
   <text x="890" y="372" text-anchor="middle" class="s-file">R/harmonize/mn26_eligibility.R</text>
 
   <path d="M 890 385 L 890 420" class="s-flow" marker-end="url(#slide-arrow)" />
-  <text x="890" y="408" text-anchor="middle" class="s-count">1,106 eligible</text>
+  <text x="890" y="408" text-anchor="middle" class="s-count">1,296 eligible</text>
 
-  <!-- Step 8 / 8.5 / 8.6: Scoring (Kidsights + CREDI + GSED D-score) -->
+  <!-- Steps 8 / 8.5 / 8.6 / 8.7: Scoring (Kidsights + CREDI + GSED + HRTL) -->
   <rect x="740" y="420" width="300" height="50" class="s-step p-sc" />
-  <text x="890" y="440" text-anchor="middle" class="s-title">8 / 8.5 / 8.6 · Scoring</text>
-  <text x="890" y="457" text-anchor="middle" class="s-file">Kidsights · CREDI · GSED D-score</text>
+  <text x="890" y="440" text-anchor="middle" class="s-title">8 / 8.5 / 8.6 / 8.7 · Scoring</text>
+  <text x="890" y="457" text-anchor="middle" class="s-file">Kidsights · CREDI · GSED · HRTL</text>
 
   <path d="M 890 470 L 890 505" class="s-flow" marker-end="url(#slide-arrow)" />
-  <text x="890" y="493" text-anchor="middle" class="s-count">982 / 410 / 985</text>
+  <text x="890" y="493" text-anchor="middle" class="s-count">1158 / 411 / 1161 / 555</text>
 
   <!-- Storage -->
   <rect x="740" y="505" width="300" height="50" class="s-step p-st" />
@@ -1208,7 +1213,7 @@ Kidsights Data Platform
   <path d="M 740 530 L 380 530" class="s-flow" marker-end="url(#slide-arrow)" />
   <rect x="60" y="505" width="300" height="50" class="s-ext" />
   <text x="210" y="530" text-anchor="middle" class="s-ext-t">DuckDB</text>
-  <text x="210" y="547" text-anchor="middle" class="s-file">mn26_raw · mn26_transformed · mn26_*_scores</text>
+  <text x="210" y="547" text-anchor="middle" class="s-file">mn26_raw · mn26_transformed · mn26_*_scores · mn26_hrtl_*</text>
 
   <!-- Legend -->
   <g transform="translate(60, 580)">
@@ -1244,14 +1249,16 @@ Kidsights Data Platform
 <pre><code>MN26 Pipeline Complete
 ========================================
   Records extracted:   10400
-  After pivot:         10771
-    (10400 c1 + 371 c2)
-  Eligible:             1106
-  Meets inclusion:      1106
-  Kidsights scored:      982
-  CREDI scored:          410
-  GSED D-score scored:   985
-  Total duration:    2.5 sec
+  After pivot:         10773
+    (10400 c1 + 373 c2)
+  Eligible:             1296
+  Meets inclusion:      1296
+  Kidsights scored:     1158
+  CREDI scored:          411
+  GSED D-score scored:  1161
+  HRTL scored:           555
+  HRTL Motor coverage: 99.5% (scored)
+  Total duration:    2.6 sec
 ========================================</code></pre>
 <h3 id="interactive-use">Interactive use</h3>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="st">&quot;pipelines/orchestration/mn26_pipeline.R&quot;</span>)</span>
@@ -1363,8 +1370,8 @@ Kidsights Data Platform
 <td><code>eq001 == 1</code></td>
 </tr>
 <tr class="even">
-<td>Child age 0–5</td>
-<td><code>age_in_days_n ≤ 1825</code></td>
+<td>Child age 0–5.99</td>
+<td><code>age_in_days_n &lt; 2191</code></td>
 </tr>
 </tbody>
 </table>
@@ -1375,9 +1382,9 @@ Kidsights Data Platform
 <li>Minnesota residence · <code>mn_eqstate</code></li>
 </ul>
 <p>Verbose output shows exactly which criteria were applied vs. skipped:</p>
-<pre><code>Total children:         10771
-Consent (eq001):         1407 [required]
-Child age (&lt;=5yr):       1106 [required]
+<pre><code>Total children:         10773
+Consent (eq001):         1411 [required]
+Child age (&lt;6yr):        1296 [required]
 Parent age (eq003):      column absent [NORC pre-screened, skipped]
 Primary CG (eq002):      column absent [NORC pre-screened, skipped]
 MN residence:            column absent [NORC pre-screened, skipped]</code></pre>
