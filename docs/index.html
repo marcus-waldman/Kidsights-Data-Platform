@@ -749,7 +749,7 @@
   <main>
     <!-- HERO -->
     <header class="hero">
-      <div class="hero__eyebrow">Repository orientation · Snapshot 2026-04-22</div>
+      <div class="hero__eyebrow">Repository orientation · Snapshot 2026-04-27</div>
       <h1>Kidsights Data Platform <br><span class="accent">Five-minute orientation</span></h1>
       <p class="hero__pitch">A multi-source ETL platform combining a Nebraska childhood-development survey (REDCap) with national datasets (ACS, NHIS, NSCH) to support post-stratification weighting, multiple imputation, and IRT psychometric scoring.</p>
 
@@ -764,7 +764,7 @@
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Snapshot date</span>
-          <span class="hero__meta-val">April 22, 2026</span>
+          <span class="hero__meta-val">April 27, 2026</span>
         </div>
         <div class="hero__meta-item">
           <span class="hero__meta-key">Source of truth</span>
@@ -1028,7 +1028,7 @@
     <section id="skills">
       <div class="section-label"><span class="section-label__num">04 ·</span> Project skills</div>
       <h2>Slash commands that regenerate living docs.</h2>
-      <p style="margin: 14px 0 24px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Three skills live in <code style="font-family: var(--font-mono); font-size: 12px;">.claude/skills/</code> of this repo. Each encapsulates the recipe for regenerating one of the platform's living documentation artifacts, so the work doesn't need to be re-derived from scratch each time.</p>
+      <p style="margin: 14px 0 24px; color: var(--ink-dim); max-width: 64ch; line-height: 1.55;">Four skills live in <code style="font-family: var(--font-mono); font-size: 12px;">.claude/skills/</code> of this repo. The first three encapsulate recipes for regenerating the platform's living documentation; the fourth produces a methods-section artifact (PRISMA flow diagram for the NE25 analytic sample) on demand.</p>
 
       <div class="stack" style="margin-top: 24px;">
         <div class="stack-item">
@@ -1043,8 +1043,12 @@
           <span class="stack-item__name">/refresh-database-inventory</span>
           <span class="stack-item__desc">Regenerate <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/database/TABLES.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);"><code style="font-family: var(--font-mono); font-size: 11px;">docs/database/TABLES.md</code></a> from live DuckDB introspection + the hand-written YAML metadata. Invoke when a table is added, dropped, renamed, or when row counts drift materially. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/.claude/skills/refresh-database-inventory/SKILL.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">SKILL.md →</a> &nbsp;·&nbsp; <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/docs/database/TABLES.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">Catalog →</a></span>
         </div>
+        <div class="stack-item">
+          <span class="stack-item__name">/prisma-ne25</span>
+          <span class="stack-item__desc">Generate a PRISMA-style flow diagram for the NE25 analytic-sample construction, with two human-in-the-loop checkpoints to confirm exclusion-stage layout and methods-section wording. Output is a Mermaid <code style="font-family: var(--font-mono); font-size: 11px;">flowchart TD</code> block (chat-only or written to a <code style="font-family: var(--font-mono); font-size: 11px;">.qmd</code>). Invoke when writing a methods section, updating <code style="font-family: var(--font-mono); font-size: 11px;">WEIGHT_CONSTRUCTION.qmd</code>, or auditing the chain from raw to weighted N. <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/.claude/skills/prisma-ne25/SKILL.md" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">SKILL.md →</a></span>
+        </div>
       </div>
-      <p style="margin: 18px 0 0; color: var(--ink-faint); font-size: 13px; line-height: 1.55;">All three skills require explicit maintainer authorization before pushing to remote. Cadence guidance: <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md#documentation-maintenance" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">CLAUDE.md → Documentation Maintenance</a>.</p>
+      <p style="margin: 18px 0 0; color: var(--ink-faint); font-size: 13px; line-height: 1.55;">All four skills require explicit maintainer authorization before pushing to remote. Cadence guidance: <a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md#documentation-maintenance" target="_blank" rel="noopener noreferrer" style="color: var(--gold);">CLAUDE.md → Documentation Maintenance</a>.</p>
     </section>
 
     <!-- 05 ACTIVE WORK -->
@@ -1195,7 +1199,7 @@
 
     <!-- FOOTER -->
     <footer>
-      <p><strong>Snapshot date:</strong> 2026-04-22. Regenerate via the <code>/refresh-onboarding</code> skill when platform state materially changes (new pipeline, deferred-work shifts, major status changes).</p>
+      <p><strong>Snapshot date:</strong> 2026-04-27. Regenerate via the <code>/refresh-onboarding</code> skill when platform state materially changes (new pipeline, deferred-work shifts, major status changes).</p>
       <p><a href="https://github.com/marcus-waldman/Kidsights-Data-Platform/blob/HEAD/CLAUDE.md" target="_blank" rel="noopener noreferrer"><code>CLAUDE.md</code></a> is the living reference. This page is a read-once orientation snapshot — it will go stale.</p>
     </footer>
   </main>
