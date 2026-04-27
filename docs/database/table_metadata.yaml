@@ -241,6 +241,22 @@ tables:
     group: mn26
     notes: "Multi-child key. Same scorer as NE25, parameterized via study_id."
 
+  mn26_hrtl_domain_scores:
+    purpose: "HRTL per-domain classification for MN26 (5 domains x ~316-374 records per domain). Long format keyed on (pid, record_id, child_num, domain) with avg_code, classification, years_old."
+    source: "Step 8.7 of run_mn26_pipeline.R via R/hrtl/score_hrtl.R with study_id='mn26'."
+    primary_downstream: "—"
+    status: live
+    group: mn26
+    notes: "Unlike NE25, MN26 produces non-NA Motor Development classifications because NORC's _end catch-up fields (coalesced in Step 4.5) bring 3-5 yr Motor coverage to ~85%, well above the 0.50 auto coverage gate threshold."
+
+  mn26_hrtl_overall:
+    purpose: "Overall HRTL readiness classification for MN26 children ages 3-5 (n_on_track, n_needs_support, hrtl). Keyed on (pid, record_id, child_num)."
+    source: "Step 8.7 of run_mn26_pipeline.R via R/hrtl/score_hrtl.R."
+    primary_downstream: "—"
+    status: live
+    group: mn26
+    notes: "HRTL = TRUE iff >=4 domains On-Track AND 0 domains Needs Support. Unlike NE25 (where overall is uniformly NA pending Issue #15), MN26 produces real overall HRTL classifications."
+
   # ==========================================================================
   # ne25_imputed_* — Multiple-imputation variable tables (study-specific)
   # ==========================================================================

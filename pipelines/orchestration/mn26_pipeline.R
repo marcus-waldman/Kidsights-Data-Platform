@@ -15,6 +15,7 @@
 #'   8. Kidsights developmental scoring (KidsightsPublic package)
 #'   8.5. CREDI scoring (children under 4)
 #'   8.6. GSED D-score (all meets_inclusion children)
+#'   8.7. HRTL scoring (ages 3-5; auto Motor coverage gate)
 #'   9. Store transformed data in DuckDB
 #'   10. Store data dictionary
 
@@ -33,6 +34,7 @@ source("R/utils/environment_config.R")
 source("R/utils/safe_joins.R")
 source("R/credi/score_credi.R")
 source("R/dscore/score_dscore.R")
+source("R/hrtl/score_hrtl.R")
 
 #' Execute the complete MN26 pipeline
 #'
@@ -183,6 +185,69 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     } else {
       message("\n--- Step 4: SKIPPED (skip_database=TRUE) ---")
     }
+
+    # ==================================================================
+    # STEP 4.5: HRTL MOTOR _end CATCH-UP COALESCE
+    # ==================================================================
+    # NORC added _end-suffixed catch-up fields for the HRTL Motor drawing
+    # items in module_6_1097_2191 (3-6 yr form) to fix NE25's age-routing
+    # gap. Coalesce them into the canonical names BEFORE recode_it() so
+    # reverse_code_items() and validate_item_responses() see the merged
+    # values via the codebook's mn26 lexicon (the _end columns themselves
+    # have no codebook entry).
+    message("\n--- Step 4.5: HRTL Motor _end coalesce ---")
+    step_start <- Sys.time()
+
+    motor_pairs <- list(
+      c(canonical = "nom029x", catchup = "nom029x_end"),  # DRAWCIRCLE
+      c(canonical = "nom033x", catchup = "nom033x_end"),  # DRAWFACE
+      c(canonical = "nom034x", catchup = "nom034x_end")   # DRAWPERSON
+      # nom042x (BOUNCEBALL) lives natively in the 3-6 yr form -- no _end twin
+    )
+
+    n_coalesced_total <- 0L
+    n_both_total      <- 0L
+    n_disagree_total  <- 0L
+
+    for (p in motor_pairs) {
+      canonical <- p[["canonical"]]
+      catchup   <- p[["catchup"]]
+      if (!(canonical %in% names(raw_long)) || !(catchup %in% names(raw_long))) {
+        message(sprintf("  [INFO] %s/%s pair not present in data; skipping", canonical, catchup))
+        next
+      }
+      v_can <- raw_long[[canonical]]
+      v_end <- raw_long[[catchup]]
+      has_can <- !is.na(v_can)
+      has_end <- !is.na(v_end)
+      both    <- has_can & has_end
+      disagree <- both & (v_can != v_end)
+      n_coal_this <- sum(has_can | has_end)
+      n_both_this <- sum(both)
+      n_dis_this  <- sum(disagree)
+      n_coalesced_total <- n_coalesced_total + n_coal_this
+      n_both_total      <- n_both_total + n_both_this
+      n_disagree_total  <- n_disagree_total + n_dis_this
+
+      # Audit column captures provenance per row before we drop the _end col
+      raw_long[[paste0(canonical, "_source")]] <- dplyr::case_when(
+        both     ~ "both",
+        has_end  ~ "end",
+        has_can  ~ "original",
+        TRUE     ~ NA_character_
+      )
+
+      # Coalesce: prefer _end (the HRTL-eligible-band catch-up)
+      raw_long[[canonical]] <- dplyr::coalesce(v_end, v_can)
+      raw_long[[catchup]]   <- NULL
+
+      message(sprintf("  [INFO] %-9s coalesced: %d non-NA (%d both, %d disagree)",
+                      canonical, n_coal_this, n_both_this, n_dis_this))
+    }
+    message(sprintf("  Motor _end coalesce summary: %d total coalesced, %d both, %d disagreements",
+                    n_coalesced_total, n_both_total, n_disagree_total))
+
+    metrics$step_durations$motor_coalesce <- as.numeric(Sys.time() - step_start)
 
     # ==================================================================
     # STEP 5: DATA TRANSFORMATION
@@ -393,6 +458,79 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     metrics$step_durations$dscore_scoring <- as.numeric(Sys.time() - step_start)
 
     # ==================================================================
+    # STEP 8.7: HRTL SCORING (AGES 3-5; AUTO MOTOR COVERAGE GATE)
+    # ==================================================================
+    # Function-based HRTL scorer with auto coverage gate. MN26's _end
+    # catch-up coalesce (Step 4.5) ensures Motor coverage in the 3-5 yr
+    # band is ~85%, well above the 0.50 threshold -- so unlike NE25,
+    # MN26 produces non-NA Motor classifications and overall HRTL.
+    # MN26 covariate is kidsights_theta (from Step 8); the NE25 manual-
+    # calibration covariates (kidsights_2022, general_gsed_pf_2022) do
+    # not exist in mn26_transformed and the scorer drops them silently.
+    message("\n--- Step 8.7: HRTL Scoring Pipeline ---")
+    step_start <- Sys.time()
+
+    tryCatch({
+      hrtl_results <- score_hrtl(
+        data = transformed_data,
+        study_id = "mn26",
+        key_vars = c("pid", "record_id", "child_num"),
+        codebook_path = "codebook/data/codebook.json",
+        thresholds_path = "data/reference/hrtl/HRTL-2022-Scoring-Thresholds.xlsx",
+        itemdict_path = "data/reference/hrtl/itemdict22.csv",
+        covariate_cols = c("kidsights_theta"),
+        min_motor_coverage = 0.50,
+        verbose = TRUE
+      )
+
+      if (nrow(hrtl_results$domain_scores) > 0 && !skip_database) {
+        save_hrtl_scores_to_db(
+          hrtl_result = hrtl_results,
+          db_path = config$output$database_path,
+          study_id = "mn26",
+          key_vars = c("pid", "record_id", "child_num"),
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        metrics$n_hrtl_scored <- nrow(hrtl_results$overall)
+        metrics$hrtl_motor_coverage <- hrtl_results$motor_coverage
+        metrics$hrtl_motor_masked   <- hrtl_results$motor_masked
+      } else if (nrow(hrtl_results$domain_scores) > 0) {
+        message(sprintf("HRTL scoring complete (%d domain rows); skipping DB save (skip_database=TRUE)",
+                        nrow(hrtl_results$domain_scores)))
+        metrics$n_hrtl_scored <- nrow(hrtl_results$overall)
+        metrics$hrtl_motor_coverage <- hrtl_results$motor_coverage
+        metrics$hrtl_motor_masked   <- hrtl_results$motor_masked
+      } else {
+        message("No records eligible for HRTL scoring")
+        metrics$n_hrtl_scored <- 0
+      }
+
+      # Domain classification summary
+      if (nrow(hrtl_results$domain_scores) > 0) {
+        message("\nMN26 HRTL Domain Classification Summary:")
+        for (d in unique(hrtl_results$domain_scores$domain)) {
+          domain_rows <- hrtl_results$domain_scores %>% dplyr::filter(domain == !!d)
+          n_classified <- sum(!is.na(domain_rows$classification))
+          if (n_classified == 0) {
+            message(sprintf("  %s: all NA (masked)", d))
+          } else {
+            on_track <- sum(domain_rows$classification == "On-Track", na.rm = TRUE)
+            pct <- 100 * on_track / n_classified
+            message(sprintf("  %s: %d/%d on-track (%.1f%%)", d, on_track, n_classified, pct))
+          }
+        }
+      }
+    }, error = function(e) {
+      message("  [WARN] HRTL scoring failed: ", e$message)
+      message("  [WARN] Continuing pipeline without HRTL scores")
+      metrics$n_hrtl_scored <<- 0
+    })
+
+    metrics$step_durations$hrtl_scoring <- as.numeric(Sys.time() - step_start)
+
+    # ==================================================================
     # STEP 9: STORE TRANSFORMED DATA IN DUCKDB
     # ==================================================================
     if (!skip_database) {
@@ -457,6 +595,12 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
   message(sprintf("  Kidsights scored:     %d", if (is.null(metrics$n_kidsights_scored)) 0 else metrics$n_kidsights_scored))
   message(sprintf("  CREDI scored:         %d", if (is.null(metrics$n_credi_scored)) 0 else metrics$n_credi_scored))
   message(sprintf("  GSED D-score scored:  %d", if (is.null(metrics$n_dscore_scored)) 0 else metrics$n_dscore_scored))
+  message(sprintf("  HRTL scored:          %d", if (is.null(metrics$n_hrtl_scored)) 0 else metrics$n_hrtl_scored))
+  if (!is.null(metrics$hrtl_motor_coverage)) {
+    message(sprintf("  HRTL Motor coverage:  %.1f%% (%s)",
+                    100 * metrics$hrtl_motor_coverage,
+                    if (isTRUE(metrics$hrtl_motor_masked)) "MASKED" else "scored"))
+  }
   message(sprintf("  Total duration:       %.1f seconds", metrics$total_duration))
   message("========================================\n")
 

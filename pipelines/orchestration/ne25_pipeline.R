@@ -1115,132 +1115,64 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
     # ===========================================================================
     # STEP 7.7: HRTL SCORING (FULL PIPELINE: EXTRACT -> RASCH -> IMPUTE -> SCORE)
     # ===========================================================================
+    # Function-based scorer (PR 2 of MN26 scoring integration). Replaces the
+    # earlier four-script pattern (scripts/hrtl/0[1-4]_*.R sourced sequentially).
+    # Motor masking is automatic via the coverage gate inside score_hrtl():
+    # NE25's Motor coverage in the 3-5 yr eligible band is ~0.1% (Issue #15),
+    # which falls below the 0.50 threshold and triggers Motor mask + overall NA.
     message("\n--- Step 7.7: HRTL Scoring Pipeline ---")
     hrtl_start <- Sys.time()
 
     tryCatch({
-      # Step 7.7a: Extract domain datasets and derive DailyAct_22
-      message("\n  [7.7a] Extracting domain datasets...")
-      source("scripts/hrtl/01_extract_domain_datasets.R")
+      source("R/hrtl/score_hrtl.R")
 
-      # Step 7.7b: Fit Rasch models for each domain
-      message("\n  [7.7b] Fitting Rasch models...")
-      source("scripts/hrtl/02_fit_rasch_models.R")
-
-      # Step 7.7c: Impute missing values using Rasch EAP scores
-      message("\n  [7.7c] Imputing missing values...")
-      source("scripts/hrtl/03_impute_missing_values.R")
-
-      # Step 7.7d: Score HRTL domains using CAHMI thresholds
-      # Uses validated scoring logic from 04_score_hrtl.R (produces correct percentages)
-      message("\n  [7.7d] Scoring HRTL domains...")
-      source("scripts/hrtl/04_score_hrtl.R")
-
-      # Extract results from the script's global variables
-      hrtl_results <- list(
-        domain_scores = dplyr::bind_rows(lapply(names(domain_results), function(domain) {
-          domain_results[[domain]]$coded_data %>%
-            dplyr::mutate(
-              domain = domain,
-              classification = status,
-              avg_code = avg_score
-            ) %>%
-            dplyr::select(pid, record_id, domain, avg_code, classification, years_old)
-        })),
-        hrtl_overall = hrtl_data %>%
-          dplyr::select(pid, record_id, n_on_track, n_needs_support, hrtl)
+      hrtl_results <- score_hrtl(
+        data = final_data,
+        study_id = "ne25",
+        key_vars = c("pid", "record_id"),
+        codebook_path = "codebook/data/codebook.json",
+        thresholds_path = "data/reference/hrtl/HRTL-2022-Scoring-Thresholds.xlsx",
+        itemdict_path = "data/reference/hrtl/itemdict22.csv",
+        covariate_cols = c("kidsights_2022", "general_gsed_pf_2022"),
+        min_motor_coverage = 0.50,
+        verbose = TRUE
       )
 
-      # Save domain scores to database
       if (nrow(hrtl_results$domain_scores) > 0) {
-        message(sprintf("HRTL scoring complete. Saving %d domain score records to database...", nrow(hrtl_results$domain_scores)))
+        save_hrtl_scores_to_db(
+          hrtl_result = hrtl_results,
+          db_path = "data/duckdb/kidsights_local.duckdb",
+          study_id = "ne25",
+          key_vars = c("pid", "record_id"),
+          overwrite = TRUE,
+          verbose = TRUE
+        )
 
-        # =========================================================================
-        # NE25 DATA QUALITY MASKING (Issue #15)
-        # https://github.com/anthropics/kidsights/issues/15
-        #
-        # Motor Development domain excluded due to 93% missing data in NE25:
-        # - DrawFace, DrawPerson, BounceBall items are age-routed and largely missing
-        # - Imputation on 93% missing data produces unreliable estimates
-        # - Overall HRTL marked NA because it requires all 5 domains
-        # =========================================================================
-        message("\n[NE25 Data Quality] Masking Motor Development and overall HRTL (Issue #15)")
+        # Metrics
+        metrics$hrtl_records_attempted <- nrow(hrtl_results$overall)
+        metrics$hrtl_records_scored <- nrow(hrtl_results$overall)
+        metrics$hrtl_motor_coverage <- hrtl_results$motor_coverage
+        metrics$hrtl_motor_masked <- hrtl_results$motor_masked
 
-        # Mask Motor Development classification as NA
-        hrtl_results$domain_scores <- hrtl_results$domain_scores %>%
-          dplyr::mutate(
-            classification = dplyr::if_else(
-              domain == "Motor Development",
-              NA_character_,
-              classification
-            ),
-            avg_code = dplyr::if_else(
-              domain == "Motor Development",
-              NA_real_,
-              avg_code
-            )
-          )
-
-        # Mark overall HRTL as NA (incomplete without Motor Development)
-        hrtl_results$hrtl_overall <- hrtl_results$hrtl_overall %>%
-          dplyr::mutate(hrtl = NA)
-
-        message("  - Motor Development: classification masked as NA")
-        message("  - Overall HRTL: marked as NA (requires all 5 domains)")
-
-        # Save to database directly
-        hrtl_con <- duckdb::dbConnect(duckdb::duckdb(),
-                                      dbdir = "data/duckdb/kidsights_local.duckdb",
-                                      read_only = FALSE)
-
-        tryCatch({
-          # Save domain scores
-          DBI::dbWriteTable(hrtl_con, "ne25_hrtl_domain_scores", hrtl_results$domain_scores,
-                           overwrite = TRUE, append = FALSE)
-          message(sprintf("[OK] Saved %d domain score records", nrow(hrtl_results$domain_scores)))
-
-          # Create index
-          DBI::dbExecute(hrtl_con,
-            "CREATE INDEX IF NOT EXISTS idx_ne25_hrtl_domain_scores_pid
-             ON ne25_hrtl_domain_scores (pid, record_id, domain)")
-
-          # Save overall HRTL
-          DBI::dbWriteTable(hrtl_con, "ne25_hrtl_overall", hrtl_results$hrtl_overall,
-                           overwrite = TRUE, append = FALSE)
-          message(sprintf("[OK] Saved %d overall HRTL records", nrow(hrtl_results$hrtl_overall)))
-
-          # Create index
-          DBI::dbExecute(hrtl_con,
-            "CREATE UNIQUE INDEX IF NOT EXISTS idx_ne25_hrtl_overall_pid
-             ON ne25_hrtl_overall (pid, record_id)")
-
-        }, finally = {
-          duckdb::dbDisconnect(hrtl_con, shutdown = TRUE)
-        })
-
-        # Calculate metrics (exclude Motor Development from scored count)
-        n_children_scored <- length(unique(hrtl_results$domain_scores$pid[
-          !is.na(hrtl_results$domain_scores$avg_code) &
-          hrtl_results$domain_scores$domain != "Motor Development"
-        ]))
-        metrics$hrtl_records_attempted <- length(unique(hrtl_results$hrtl_overall$pid))
-        metrics$hrtl_records_scored <- n_children_scored
-
-        message(sprintf("\nHRTL Domain Classification Summary:"))
-        for (domain in unique(hrtl_results$domain_scores$domain)) {
-          domain_data <- hrtl_results$domain_scores %>%
-            dplyr::filter(domain == !!domain)
-          if (domain == "Motor Development") {
-            message(sprintf("  %s: MASKED (NE25 data quality issue)", domain))
+        # Domain classification summary
+        message("\nHRTL Domain Classification Summary:")
+        for (d in unique(hrtl_results$domain_scores$domain)) {
+          domain_rows <- hrtl_results$domain_scores %>% dplyr::filter(domain == !!d)
+          n_classified <- sum(!is.na(domain_rows$classification))
+          if (n_classified == 0) {
+            message(sprintf("  %s: all NA (masked)", d))
           } else {
-            on_track <- sum(domain_data$classification == "On-Track", na.rm = TRUE)
-            n_domain <- sum(!is.na(domain_data$classification))
-            pct <- 100 * on_track / n_domain
-            message(sprintf("  %s: %d/%d on-track (%.1f%%)", domain, on_track, n_domain, pct))
+            on_track <- sum(domain_rows$classification == "On-Track", na.rm = TRUE)
+            pct <- 100 * on_track / n_classified
+            message(sprintf("  %s: %d/%d on-track (%.1f%%)", d, on_track, n_classified, pct))
           }
         }
+        if (isTRUE(hrtl_results$motor_masked)) {
+          message(sprintf("  [Motor coverage gate triggered: %.1f%% < 50%% threshold]",
+                          100 * hrtl_results$motor_coverage))
+        }
       } else {
-        message("No records eligible for HRTL scoring (no children ages 3-5)")
+        message("No records eligible for HRTL scoring")
         metrics$hrtl_records_scored <- 0
         metrics$hrtl_records_attempted <- 0
       }
