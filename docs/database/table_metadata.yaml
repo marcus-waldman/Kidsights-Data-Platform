@@ -193,6 +193,26 @@ tables:
     group: raking
 
   # ==========================================================================
+  # mn26_* — Minnesota 2026 REDCap survey pipeline (multi-child households)
+  # ==========================================================================
+
+  mn26_credi_scores:
+    purpose: "CREDI developmental scoring for MN26 children under 4 years old (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). Keyed on (pid, record_id, child_num)."
+    source: "Step 8.5 of run_mn26_pipeline.R via R/credi/score_credi.R with study_id='mn26'."
+    primary_downstream: "—"
+    status: live
+    group: mn26
+    notes: "Multi-child key: each (pid, record_id, child_num) is a distinct row. Same scorer as NE25, parameterized via study_id."
+
+  mn26_dscore_scores:
+    purpose: "GSED D-score results for MN26 (d, daz, sem, a, n, p). Keyed on (pid, record_id, child_num); all meets_inclusion=TRUE children eligible."
+    source: "Step 8.6 of run_mn26_pipeline.R via R/dscore/score_dscore.R with study_id='mn26' and key='gsed2406'."
+    primary_downstream: "—"
+    status: live
+    group: mn26
+    notes: "Multi-child key. Same scorer as NE25, parameterized via study_id."
+
+  # ==========================================================================
   # ne25_imputed_* — Multiple-imputation variable tables (study-specific)
   # ==========================================================================
 

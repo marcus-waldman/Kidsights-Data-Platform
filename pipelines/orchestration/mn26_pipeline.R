@@ -13,6 +13,8 @@
 #'   6. Eligibility validation (4 criteria)
 #'   7. Create meets_inclusion filter
 #'   8. Kidsights developmental scoring (KidsightsPublic package)
+#'   8.5. CREDI scoring (children under 4)
+#'   8.6. GSED D-score (all meets_inclusion children)
 #'   9. Store transformed data in DuckDB
 #'   10. Store data dictionary
 
@@ -29,6 +31,8 @@ source("R/transform/mn26_transforms.R")
 source("R/harmonize/mn26_eligibility.R")
 source("R/utils/environment_config.R")
 source("R/utils/safe_joins.R")
+source("R/credi/score_credi.R")
+source("R/dscore/score_dscore.R")
 
 #' Execute the complete MN26 pipeline
 #'
@@ -268,6 +272,127 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     # for MN26 — psychosocial items are NE25-specific.
 
     # ==================================================================
+    # STEP 8.5: CREDI SCORING (CHILDREN UNDER 4 YEARS OLD)
+    # ==================================================================
+    message("\n--- Step 8.5: CREDI Developmental Scoring ---")
+    step_start <- Sys.time()
+
+    tryCatch({
+      message("Computing CREDI developmental scores for children under 4 years old...")
+      credi_scores <- score_credi(
+        data = transformed_data,
+        codebook_path = "codebook/data/codebook.json",
+        min_items = 5,
+        age_cutoff = 4,
+        study_id = "mn26",
+        key_vars = c("pid", "record_id", "child_num"),
+        verbose = TRUE
+      )
+
+      if (nrow(credi_scores) > 0 && !skip_database) {
+        message(sprintf("CREDI scoring complete. Saving %d records to database...", nrow(credi_scores)))
+        save_credi_scores_to_db(
+          scores = credi_scores,
+          db_path = config$output$database_path,
+          table_name = "mn26_credi_scores",
+          key_vars = c("pid", "record_id", "child_num"),
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        # Join CREDI scores back into transformed_data with credi_ prefix
+        credi_renamed <- credi_scores %>%
+          dplyr::rename_with(
+            ~paste0("credi_", tolower(.x)),
+            -dplyr::all_of(c("pid", "record_id", "child_num"))
+          )
+        transformed_data <- transformed_data %>%
+          safe_left_join(credi_renamed, by_vars = c("pid", "record_id", "child_num"))
+
+        metrics$n_credi_scored <- sum(!is.na(transformed_data$credi_overall))
+      } else if (nrow(credi_scores) > 0) {
+        message(sprintf("CREDI scoring complete (%d records); skipping DB save (skip_database=TRUE)",
+                        nrow(credi_scores)))
+        metrics$n_credi_scored <- sum(!is.na(credi_scores$OVERALL))
+      } else {
+        message("No records eligible for CREDI scoring (no children under 4 years old)")
+        metrics$n_credi_scored <- 0
+      }
+    }, error = function(e) {
+      message("  [WARN] CREDI scoring failed: ", e$message)
+      message("  [WARN] Continuing pipeline without CREDI scores")
+      metrics$n_credi_scored <<- 0
+    })
+
+    metrics$step_durations$credi_scoring <- as.numeric(Sys.time() - step_start)
+
+    # ==================================================================
+    # STEP 8.6: GSED D-SCORE CALCULATION (ALL ELIGIBLE AGES)
+    # ==================================================================
+    message("\n--- Step 8.6: GSED D-score Calculation ---")
+    step_start <- Sys.time()
+
+    tryCatch({
+      # Bridge MN26 -> cross-study naming. MN26's REDCap project uses NORC's
+      # `_n` (numeric) suffix convention (`age_in_days_n`); the cross-study
+      # scorer expects `age_in_days`. Mirror the column without renaming the
+      # source so other MN26-specific code that reads `age_in_days_n` is
+      # unaffected.
+      dscore_input <- transformed_data
+      if (!"age_in_days" %in% names(dscore_input) &&
+          "age_in_days_n" %in% names(dscore_input)) {
+        dscore_input$age_in_days <- dscore_input$age_in_days_n
+      }
+
+      message("Computing GSED D-scores for all eligible children...")
+      dscore_scores <- score_dscore(
+        data = dscore_input,
+        codebook_path = "codebook/data/codebook.json",
+        key = "gsed2406",
+        study_id = "mn26",
+        key_vars = c("pid", "record_id", "child_num"),
+        verbose = TRUE
+      )
+
+      if (nrow(dscore_scores) > 0 && !skip_database) {
+        message(sprintf("GSED D-score calculation complete. Saving %d records to database...",
+                        nrow(dscore_scores)))
+        save_dscore_scores_to_db(
+          scores = dscore_scores,
+          db_path = config$output$database_path,
+          table_name = "mn26_dscore_scores",
+          key_vars = c("pid", "record_id", "child_num"),
+          overwrite = TRUE,
+          verbose = TRUE
+        )
+
+        # Join D-scores back into transformed_data with dscore_ prefix
+        dscore_renamed <- dscore_scores %>%
+          dplyr::rename_with(
+            ~paste0("dscore_", tolower(.x)),
+            -dplyr::all_of(c("pid", "record_id", "child_num"))
+          )
+        transformed_data <- transformed_data %>%
+          safe_left_join(dscore_renamed, by_vars = c("pid", "record_id", "child_num"))
+
+        metrics$n_dscore_scored <- sum(!is.na(transformed_data$dscore_d))
+      } else if (nrow(dscore_scores) > 0) {
+        message(sprintf("D-score calculation complete (%d records); skipping DB save (skip_database=TRUE)",
+                        nrow(dscore_scores)))
+        metrics$n_dscore_scored <- sum(!is.na(dscore_scores$d))
+      } else {
+        message("No records eligible for GSED D-score calculation")
+        metrics$n_dscore_scored <- 0
+      }
+    }, error = function(e) {
+      message("  [WARN] GSED D-score calculation failed: ", e$message)
+      message("  [WARN] Continuing pipeline without GSED D-scores")
+      metrics$n_dscore_scored <<- 0
+    })
+
+    metrics$step_durations$dscore_scoring <- as.numeric(Sys.time() - step_start)
+
+    # ==================================================================
     # STEP 9: STORE TRANSFORMED DATA IN DUCKDB
     # ==================================================================
     if (!skip_database) {
@@ -330,6 +455,8 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
   message(sprintf("  Eligible:             %d", metrics$n_eligible))
   message(sprintf("  Meets inclusion:      %d", metrics$n_meets_inclusion))
   message(sprintf("  Kidsights scored:     %d", if (is.null(metrics$n_kidsights_scored)) 0 else metrics$n_kidsights_scored))
+  message(sprintf("  CREDI scored:         %d", if (is.null(metrics$n_credi_scored)) 0 else metrics$n_credi_scored))
+  message(sprintf("  GSED D-score scored:  %d", if (is.null(metrics$n_dscore_scored)) 0 else metrics$n_dscore_scored))
   message(sprintf("  Total duration:       %.1f seconds", metrics$total_duration))
   message("========================================\n")
 

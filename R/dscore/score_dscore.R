@@ -8,23 +8,27 @@
 # Dependencies: dscore, dplyr, jsonlite, duckdb, DBI
 ################################################################################
 
-#' Score GSED D-scores for NE25 data
+#' Score GSED D-scores (multi-study)
 #'
-#' @param data Data frame with ne25_transformed structure (must have: pid, record_id,
-#'   age_in_days, meets_inclusion, and GSED item columns)
+#' @param data Data frame with study-transformed structure (must have key_vars,
+#'   `age_in_days`, `meets_inclusion`, and GSED item columns)
 #' @param codebook_path Path to codebook.json file (default: "codebook/data/codebook.json")
 #' @param key GSED key for difficulty estimates (default: "gsed2406", most recent)
+#' @param study_id Codebook lexicon key driving item lookup (default: "ne25")
+#' @param key_vars Join-key columns; uniquely identify a row in `data`
+#'   (default: c("pid","record_id"); MN26 callers pass c("pid","record_id","child_num"))
 #' @param verbose Logical, print progress messages (default: TRUE)
 #'
-#' @return Data frame with columns: pid, record_id, a (age), n (items used),
+#' @return Data frame keyed by `key_vars` with: a (age), n (items used),
 #'   p (proportion passed), d (D-score), sem (SEM), daz (DAZ)
 #'
 #' @details
 #' Filters to meets_inclusion = TRUE and calculates GSED D-scores using the
-#' dscore package. Automatically extracts GSED item mappings from codebook.json.
+#' dscore package. Automatically extracts GSED item mappings from codebook.json
+#' using the lexicon key indicated by `study_id`.
 #'
 #' Output columns:
-#' - pid, record_id: Participant identifiers
+#' - All columns named in `key_vars` (passed through unchanged)
 #' - a: Decimal age in years
 #' - n: Number of items with valid (0/1) responses
 #' - p: Proportion of milestones passed
@@ -36,15 +40,17 @@
 score_dscore <- function(data,
                          codebook_path = "codebook/data/codebook.json",
                          key = "gsed2406",
+                         study_id = "ne25",
+                         key_vars = c("pid", "record_id"),
                          verbose = TRUE) {
 
   # ===========================================================================
   # 1. VALIDATE INPUT
   # ===========================================================================
-  if (verbose) message("Validating input data...")
+  if (verbose) message(sprintf("Validating input data (study_id=%s)...", study_id))
 
   # Check required columns
-  required_cols <- c("pid", "record_id", "age_in_days", "meets_inclusion")
+  required_cols <- c(key_vars, "age_in_days", "meets_inclusion")
   missing_cols <- setdiff(required_cols, names(data))
 
   if (length(missing_cols) > 0) {
@@ -69,24 +75,25 @@ score_dscore <- function(data,
   for (item_key in names(codebook$items)) {
     item_data <- codebook$items[[item_key]]
 
-    # Check if item has lexicons field with both gsed and ne25
+    # Check if item has lexicons field with both gsed and the study lexicon
     if (!is.null(item_data$lexicons) &&
         !is.null(item_data$lexicons$gsed) &&
-        !is.null(item_data$lexicons$ne25)) {
+        !is.null(item_data$lexicons[[study_id]])) {
 
-      ne25_var <- tolower(item_data$lexicons$ne25)
+      study_var <- tolower(item_data$lexicons[[study_id]])
       gsed_code <- item_data$lexicons$gsed
 
-      gsed_mappings[[gsed_code]] <- ne25_var
+      gsed_mappings[[gsed_code]] <- study_var
     }
   }
 
   if (length(gsed_mappings) == 0) {
-    stop("No GSED item mappings found in codebook")
+    stop(sprintf("No GSED item mappings found in codebook for study_id='%s'", study_id))
   }
 
   if (verbose) {
-    message(sprintf("  Found %d GSED item mappings in codebook", length(gsed_mappings)))
+    message(sprintf("  Found %d GSED item mappings in codebook (study_id=%s)",
+                    length(gsed_mappings), study_id))
   }
 
   # ===========================================================================
@@ -107,16 +114,18 @@ score_dscore <- function(data,
 
   if (n_filtered == 0) {
     warning("No records meet inclusion criteria")
-    return(data.frame(
-      pid = character(0),
-      record_id = integer(0),
-      a = numeric(0),
-      n = integer(0),
-      p = numeric(0),
-      d = numeric(0),
+    # Return zero-row data frame; preserve key_vars schema so downstream
+    # left_joins/save calls don't break on a missing column.
+    empty <- data.frame(
+      a   = numeric(0),
+      n   = integer(0),
+      p   = numeric(0),
+      d   = numeric(0),
       sem = numeric(0),
       daz = numeric(0)
-    ))
+    )
+    for (col in key_vars) empty[[col]] <- character(0)
+    return(empty[, c(key_vars, "a", "n", "p", "d", "sem", "daz"), drop = FALSE])
   }
 
   # ===========================================================================
@@ -125,30 +134,30 @@ score_dscore <- function(data,
   if (verbose) message("Selecting and renaming GSED variables...")
 
   # Find available GSED variables
-  ne25_vars <- unlist(gsed_mappings)
-  available_ne25 <- intersect(ne25_vars, names(filtered_data))
+  study_vars <- unlist(gsed_mappings)
+  available_study <- intersect(study_vars, names(filtered_data))
 
-  if (length(available_ne25) == 0) {
-    stop("No GSED variables found in data")
+  if (length(available_study) == 0) {
+    stop(sprintf("No GSED variables found in data for study_id='%s'", study_id))
   }
 
   # Create rename vector (new_name = old_name for dplyr::rename)
-  # Find GSED codes for available ne25 vars
-  gsed_codes <- names(gsed_mappings)[match(available_ne25, ne25_vars)]
-  rename_vec <- setNames(available_ne25, gsed_codes)
+  # Find GSED codes for available study vars
+  gsed_codes <- names(gsed_mappings)[match(available_study, study_vars)]
+  rename_vec <- setNames(available_study, gsed_codes)
 
   if (verbose) {
     message(sprintf("  Found %d/%d GSED variables in data",
-                    length(available_ne25), length(gsed_mappings)))
+                    length(available_study), length(gsed_mappings)))
   }
 
   # Select and rename
   dscore_input <- filtered_data %>%
-    dplyr::select(pid, record_id, age_in_days, dplyr::all_of(available_ne25)) %>%
+    dplyr::select(dplyr::all_of(key_vars), age_in_days, dplyr::all_of(available_study)) %>%
     dplyr::rename(!!!rename_vec)
 
   # Get GSED item columns (exclude identifiers)
-  gsed_cols <- setdiff(names(dscore_input), c("pid", "record_id", "age_in_days"))
+  gsed_cols <- setdiff(names(dscore_input), c(key_vars, "age_in_days"))
 
   # ===========================================================================
   # 5. RUN DSCORE CALCULATION
@@ -165,7 +174,7 @@ score_dscore <- function(data,
     xname = "age_in_days",
     xunit = "days",
     key = key,
-    prepend = c("pid", "record_id"),
+    prepend = key_vars,
     verbose = FALSE
   )
 
@@ -191,19 +200,21 @@ score_dscore <- function(data,
 #' @param scores Data frame returned by score_dscore()
 #' @param db_path Path to DuckDB database file
 #' @param table_name Name for the database table (default: "ne25_dscore_scores")
+#' @param key_vars Columns to index (default: c("pid","record_id"))
 #' @param overwrite Logical, overwrite existing table (default: TRUE)
 #' @param verbose Logical, print progress messages (default: TRUE)
 #'
 #' @return Invisible NULL (called for side effect of database insertion)
 #'
 #' @details
-#' Creates indexes on pid and record_id columns for efficient querying.
-#' Table structure: pid, record_id, a, n, p, d, sem, daz
+#' Creates indexes on each column in `key_vars` for efficient querying.
+#' Table structure: <key_vars>, a, n, p, d, sem, daz
 #'
 #' @export
 save_dscore_scores_to_db <- function(scores,
                                      db_path = "data/duckdb/kidsights_local.duckdb",
                                      table_name = "ne25_dscore_scores",
+                                     key_vars = c("pid", "record_id"),
                                      overwrite = TRUE,
                                      verbose = TRUE) {
 
@@ -221,20 +232,17 @@ save_dscore_scores_to_db <- function(scores,
     message(sprintf("  Wrote %d records to '%s'", nrow(scores), table_name))
   }
 
-  # Create indexes
+  # Create indexes on each key column
   tryCatch({
-    # Index on pid
-    pid_index_name <- paste0("idx_", table_name, "_pid")
-    DBI::dbExecute(con, sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (pid)",
-                                pid_index_name, table_name))
-
-    # Index on record_id
-    record_id_index_name <- paste0("idx_", table_name, "_record_id")
-    DBI::dbExecute(con, sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (record_id)",
-                                record_id_index_name, table_name))
-
+    created <- character(0)
+    for (col in key_vars) {
+      idx_name <- paste0("idx_", table_name, "_", col)
+      DBI::dbExecute(con, sprintf("CREATE INDEX IF NOT EXISTS %s ON %s (%s)",
+                                  idx_name, table_name, col))
+      created <- c(created, idx_name)
+    }
     if (verbose) {
-      message(sprintf("  Created indexes: %s, %s", pid_index_name, record_id_index_name))
+      message(sprintf("  Created indexes: %s", paste(created, collapse = ", ")))
     }
   }, error = function(e) {
     warning(sprintf("Failed to create indexes: %s", e$message))

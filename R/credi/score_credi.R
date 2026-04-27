@@ -1,18 +1,21 @@
 # ==============================================================================
-# CREDI Scoring Function for NE25 Pipeline
+# CREDI Scoring Function (multi-study)
 # ==============================================================================
-# Purpose: Compute CREDI developmental scores for children under 4 years old
-# Author: CREDI Integration Team
-# Date: 2025-12-10
+# Purpose: Compute CREDI developmental scores for children under 4 years old.
 #
 # Inputs:
-#   - data: Data frame with ne25_transformed data (lowercase column names)
+#   - data: Data frame with study-transformed data (lowercase column names)
 #   - codebook_path: Path to codebook.json (optional)
 #   - min_items: Minimum number of items required for scoring (default: 5)
 #   - age_cutoff: Maximum age in years for CREDI scoring (default: 4)
+#   - study_id: Study identifier driving codebook lexicon lookup
+#               (e.g., "ne25", "mn26"). Default: "ne25".
+#   - key_vars: Join-key columns identifying a unique row in `data`.
+#               NE25 uses c("pid","record_id"); MN26 uses
+#               c("pid","record_id","child_num").
 #
 # Outputs:
-#   - Data frame with pid, record_id, and CREDI scores (15 columns):
+#   - Data frame keyed by `key_vars` with 15 CREDI score columns:
 #     - Domain scores: COG, LANG, MOT, SEM, OVERALL
 #     - Z-scores: Z_COG, Z_LANG, Z_MOT, Z_SEM, Z_OVERALL
 #     - Standard errors: COG_SE, LANG_SE, MOT_SE, SEM_SE, OVERALL_SE
@@ -24,28 +27,33 @@
 #' Computes CREDI (Caregiver Reported Early Development Instruments) scores
 #' for children under 4 years old using the credi R package.
 #'
-#' @param data Data frame with ne25_transformed data (lowercase column names)
+#' @param data Data frame with study-transformed data (lowercase column names)
 #' @param codebook_path Path to codebook.json (default: "codebook/data/codebook.json")
 #' @param min_items Minimum number of items required for scoring (default: 5)
 #' @param age_cutoff Maximum age in years for CREDI scoring (default: 4)
+#' @param study_id Codebook lexicon key driving item lookup (default: "ne25")
+#' @param key_vars Join-key columns; uniquely identify a row in `data`
+#'   (default: c("pid","record_id"); MN26 callers pass c("pid","record_id","child_num"))
 #' @param verbose Logical, print progress messages (default: TRUE)
 #'
-#' @return Data frame with pid, record_id, and 15 CREDI score columns
+#' @return Data frame keyed by `key_vars` with 15 CREDI score columns
 #'
 #' @export
 score_credi <- function(data,
                         codebook_path = "codebook/data/codebook.json",
                         min_items = 5,
                         age_cutoff = 4,
+                        study_id = "ne25",
+                        key_vars = c("pid", "record_id"),
                         verbose = TRUE) {
 
   # ============================================================================
   # 1. Validate Inputs
   # ============================================================================
-  if (verbose) cat("[INFO] Validating inputs...\n")
+  if (verbose) cat(sprintf("[INFO] Validating inputs (study_id=%s)...\n", study_id))
 
   # Check required columns
-  required_cols <- c("pid", "record_id", "years_old", "meets_inclusion")
+  required_cols <- c(key_vars, "years_old", "meets_inclusion")
   missing_cols <- setdiff(required_cols, names(data))
 
   if (length(missing_cols) > 0) {
@@ -73,19 +81,21 @@ score_credi <- function(data,
 
   for (item_key in names(codebook$items)) {
     item <- codebook$items[[item_key]]
-    if (!is.null(item$lexicons$credi) && !is.null(item$lexicons$ne25)) {
+    study_lex <- item$lexicons[[study_id]]
+    if (!is.null(item$lexicons$credi) && !is.null(study_lex)) {
       if (startsWith(item$lexicons$credi, "LF")) {
-        credi_mappings[[item$lexicons$credi]] <- tolower(item$lexicons$ne25)
+        credi_mappings[[item$lexicons$credi]] <- tolower(study_lex)
       }
     }
   }
 
   if (length(credi_mappings) == 0) {
-    stop("No CREDI LF mappings found in codebook")
+    stop(sprintf("No CREDI LF mappings found in codebook for study_id='%s'", study_id))
   }
 
   if (verbose) {
-    cat(sprintf("[INFO] Loaded %d CREDI LF item mappings\n", length(credi_mappings)))
+    cat(sprintf("[INFO] Loaded %d CREDI LF item mappings (study_id=%s)\n",
+                length(credi_mappings), study_id))
   }
 
   # ============================================================================
@@ -114,14 +124,14 @@ score_credi <- function(data,
 
   # Check which variables exist in the data
   credi_codes <- names(credi_mappings)
-  ne25_vars <- unlist(credi_mappings)
+  study_vars <- unlist(credi_mappings)
 
-  available_vars <- intersect(ne25_vars, names(filtered_data))
-  missing_vars <- setdiff(ne25_vars, names(filtered_data))
+  available_vars <- intersect(study_vars, names(filtered_data))
+  missing_vars <- setdiff(study_vars, names(filtered_data))
 
   if (verbose) {
     cat(sprintf("[INFO] %d/%d CREDI variables found in data\n",
-                length(available_vars), length(ne25_vars)))
+                length(available_vars), length(study_vars)))
   }
 
   if (length(available_vars) == 0) {
@@ -134,11 +144,11 @@ score_credi <- function(data,
 
   # Prepare input for credi::score()
   credi_input <- filtered_data %>%
-    dplyr::select(pid, record_id, years_old, dplyr::all_of(available_vars)) %>%
+    dplyr::select(dplyr::all_of(key_vars), years_old, dplyr::all_of(available_vars)) %>%
     dplyr::rename(!!!rename_vec) %>%
     dplyr::rename(AGE = years_old) %>%
     dplyr::mutate(ID = 1:dplyr::n()) %>%
-    dplyr::select(ID, pid, record_id, AGE, dplyr::everything())
+    dplyr::select(ID, dplyr::all_of(key_vars), AGE, dplyr::everything())
 
   if (verbose) {
     cat(sprintf("[INFO] Created CREDI input dataframe: %d rows x %d columns\n",
@@ -204,9 +214,9 @@ score_credi <- function(data,
   # Check which columns exist in scored_data
   available_score_cols <- intersect(score_cols, names(scored_data))
 
-  # Merge scores back with pid/record_id
+  # Merge scores back with the join keys
   final_scores <- credi_input %>%
-    dplyr::select(ID, pid, record_id) %>%
+    dplyr::select(ID, dplyr::all_of(key_vars)) %>%
     dplyr::left_join(
       scored_data %>% dplyr::select(dplyr::all_of(available_score_cols)),
       by = "ID"
@@ -229,6 +239,7 @@ score_credi <- function(data,
 #' @param scores Data frame with CREDI scores (output from score_credi())
 #' @param db_path Path to DuckDB database
 #' @param table_name Name of the table to create (default: "ne25_credi_scores")
+#' @param key_vars Columns to index (default: c("pid","record_id"))
 #' @param overwrite Logical, overwrite existing table (default: TRUE)
 #' @param verbose Logical, print progress messages (default: TRUE)
 #'
@@ -236,6 +247,7 @@ score_credi <- function(data,
 save_credi_scores_to_db <- function(scores,
                                     db_path = "data/duckdb/kidsights_local.duckdb",
                                     table_name = "ne25_credi_scores",
+                                    key_vars = c("pid", "record_id"),
                                     overwrite = TRUE,
                                     verbose = TRUE) {
 
@@ -247,11 +259,15 @@ save_credi_scores_to_db <- function(scores,
   # Write table
   DBI::dbWriteTable(con, table_name, scores, overwrite = overwrite)
 
-  # Create indexes
+  # Create indexes on each key column
   if (verbose) cat("[INFO] Creating indexes...\n")
 
-  DBI::dbExecute(con, sprintf("CREATE INDEX IF NOT EXISTS idx_%s_pid ON %s(pid)", table_name, table_name))
-  DBI::dbExecute(con, sprintf("CREATE INDEX IF NOT EXISTS idx_%s_record_id ON %s(record_id)", table_name, table_name))
+  for (col in key_vars) {
+    DBI::dbExecute(con, sprintf(
+      "CREATE INDEX IF NOT EXISTS idx_%s_%s ON %s(%s)",
+      table_name, col, table_name, col
+    ))
+  }
 
   # Disconnect
   DBI::dbDisconnect(con, shutdown = TRUE)

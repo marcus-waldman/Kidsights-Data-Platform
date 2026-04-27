@@ -934,6 +934,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
         codebook_path = "codebook/data/codebook.json",
         min_items = 5,
         age_cutoff = 4,
+        study_id = "ne25",
+        key_vars = c("pid", "record_id"),
         verbose = TRUE
       )
 
@@ -945,6 +947,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           scores = credi_scores,
           db_path = "data/duckdb/kidsights_local.duckdb",
           table_name = "ne25_credi_scores",
+          key_vars = c("pid", "record_id"),
           overwrite = TRUE,
           verbose = TRUE
         )
@@ -1028,6 +1031,8 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
         data = final_data,
         codebook_path = "codebook/data/codebook.json",
         key = "gsed2406",
+        study_id = "ne25",
+        key_vars = c("pid", "record_id"),
         verbose = TRUE
       )
 
@@ -1039,6 +1044,7 @@ run_ne25_pipeline <- function(config_path = "config/sources/ne25.yaml",
           scores = dscore_scores,
           db_path = "data/duckdb/kidsights_local.duckdb",
           table_name = "ne25_dscore_scores",
+          key_vars = c("pid", "record_id"),
           overwrite = TRUE,
           verbose = TRUE
         )
