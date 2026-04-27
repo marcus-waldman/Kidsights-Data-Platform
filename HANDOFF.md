@@ -2,8 +2,8 @@
 
 **For:** Incoming maintainer of the Kidsights Data Platform
 **From:** Marcus Waldman (outgoing maintainer)
-**Snapshot date:** 2026-04-22
-**Last updated:** 2026-04-22 (HEAD `d76e343`; last audit commit `6fe3092`)
+**Snapshot date:** 2026-04-27
+**Last updated:** 2026-04-27 (HEAD `ab83775`; last audit commit `6fe3092`)
 
 > **5-minute visual orientation:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
 >
@@ -22,7 +22,7 @@ After that, dive into per-pipeline docs as needed. The new architecture/README.m
 
 ---
 
-## What's Running in Production (as of 2026-04-22)
+## What's Running in Production (as of 2026-04-27)
 
 The platform has **eight independent pipelines**. All have been used in production at some point; current state varies:
 
@@ -63,6 +63,8 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 ### MN26 (Minnesota 2026)
 
 **Status:** Core pipeline runs end-to-end. Kidsights scoring integrated. Raking and imputation **explicitly deferred** (need MN ACS data extraction first).
+
+**Active sub-effort (in working tree, uncommitted as of 2026-04-27):** Wiring NE25's CREDI, D-score, and HRTL scorers into MN26 with multi-child key handling (`pid + record_id + child_num`). Touched files: `R/credi/score_credi.R`, `R/dscore/score_dscore.R`, `pipelines/orchestration/mn26_pipeline.R`, `pipelines/orchestration/ne25_pipeline.R`. Companion audit script: `scripts/mn26/audit_codebook_lexicons.R` (untracked). See "Uncommitted Work" section for the full breadcrumb.
 
 **Active todo:** [`todo/mn26_pipeline_plan.md`](todo/mn26_pipeline_plan.md)
 
@@ -162,7 +164,19 @@ Full setup walkthrough: [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATI
 
 ## Uncommitted Work in Repo at Handoff
 
-None as of 2026-04-22. The earlier breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was recompiled and committed as part of the Bucket 3 shipping window (`971875f`), alongside its regenerated `.stan` source. Working tree is clean.
+As of 2026-04-27 the working tree carries an in-progress MN26 scoring-integration effort plus a freshly-added project-scoped Claude skill:
+
+**Modified (5 files, ~249 insertions / 72 deletions):**
+- `R/credi/score_credi.R`, `R/dscore/score_dscore.R` — scorer adjustments to support MN26's multi-child key (`pid + record_id + child_num`)
+- `pipelines/orchestration/mn26_pipeline.R` (~127 insertions) — wires CREDI / D-score / HRTL scoring into MN26
+- `pipelines/orchestration/ne25_pipeline.R` (small edit) — companion change in the NE25 orchestrator
+- `docs/database/table_metadata.yaml` — table catalog metadata addition
+
+**Untracked:**
+- `.claude/skills/prisma-ne25/` — new project-scoped skill for generating PRISMA-style flow diagrams of the NE25 analytic-sample construction (HITL workflow with two checkpoints; output is a Mermaid block, optionally written to a `.qmd`). Test-run completed 2026-04-27. To be committed alongside this HANDOFF refresh.
+- `scripts/mn26/audit_codebook_lexicons.R` — companion script to the MN26 scoring-integration effort
+
+The MN26 scoring-integration files belong to a separate landing window from this HANDOFF refresh. Earlier MIBB Bucket-3 breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was committed in `971875f` and is no longer in the working tree.
 
 ---
 
@@ -205,15 +219,16 @@ To view what the audit changed: `git show 6fe3092 --stat`. To find the comprehen
 
 ## Project-Scoped Claude Skills
 
-Three skills live in `.claude/skills/` of this repo and encapsulate the regeneration recipes for the platform's living documentation. Invoke from Claude Code via the slash command shown. Each skill's `SKILL.md` documents the workflow, constraints, and success criteria.
+Four skills live in `.claude/skills/` of this repo. The first three encapsulate regeneration recipes for the platform's living documentation; the fourth produces a methods-section artifact (PRISMA flow diagram) for the NE25 analytic sample. Invoke from Claude Code via the slash command shown. Each skill's `SKILL.md` documents the workflow, constraints, and success criteria.
 
 | Skill | Purpose | When to invoke | SKILL.md |
 |---|---|---|---|
 | `/refresh-onboarding` | Regenerate `docs/index.html` (the public GitHub Pages orientation page). | Pipeline added/removed, status change, drift item resolved, quarterly minimum. | [.claude/skills/refresh-onboarding/SKILL.md](.claude/skills/refresh-onboarding/SKILL.md) |
 | `/refresh-handoff` | Surgically update HANDOFF.md (this doc). Preserves hand-crafted prose; updates volatile fields only. | Material commit lands, drift item resolves, in-flight workstream shifts, weekly during pre-handoff. | [.claude/skills/refresh-handoff/SKILL.md](.claude/skills/refresh-handoff/SKILL.md) |
 | `/refresh-database-inventory` | Regenerate `docs/database/TABLES.md` from live DB introspection + hand-written YAML metadata. | Table added/dropped/renamed, row counts drift materially, cleanup candidates purged. | [.claude/skills/refresh-database-inventory/SKILL.md](.claude/skills/refresh-database-inventory/SKILL.md) |
+| `/prisma-ne25` | Generate a PRISMA-style flow diagram for the NE25 analytic-sample construction (REDCap pull -> eligible -> analytic -> weighted), with two HITL checkpoints. Output is a Mermaid `flowchart TD` block, in chat or written to a `.qmd`. | Writing a methods section, updating `WEIGHT_CONSTRUCTION.qmd`, onboarding a collaborator on what was excluded and why, auditing the chain from raw to weighted N. | [.claude/skills/prisma-ne25/SKILL.md](.claude/skills/prisma-ne25/SKILL.md) |
 
-All three skills require explicit user authorization before pushing to remote. See CLAUDE.md → Documentation Maintenance for the broader cadence guidance. If a fourth project-scoped skill is added, extend both this table and the equivalent section on the onboarding page.
+All four skills require explicit user authorization before pushing to remote. See CLAUDE.md → Documentation Maintenance for the broader cadence guidance. If a fifth project-scoped skill is added, extend both this table and the equivalent section on the onboarding page.
 
 ---
 
