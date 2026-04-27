@@ -212,9 +212,9 @@ tables:
     group: mn26
 
   mn26_transformed:
-    purpose: "Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score joins. Multi-child key (pid, record_id, child_num)."
-    source: "Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6 scoring joins."
-    primary_downstream: "R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), and downstream MN26 reports."
+    purpose: "Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score/HRTL joins. Multi-child key (pid, record_id, child_num)."
+    source: "Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6/8.7 scoring joins."
+    primary_downstream: "R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), R/hrtl/score_hrtl.R (Step 8.7), and downstream MN26 reports."
     status: live
     group: mn26
 
@@ -242,12 +242,12 @@ tables:
     notes: "Multi-child key. Same scorer as NE25, parameterized via study_id."
 
   mn26_hrtl_domain_scores:
-    purpose: "HRTL per-domain classification for MN26 (5 domains x ~316-374 records per domain). Long format keyed on (pid, record_id, child_num, domain) with avg_code, classification, years_old."
+    purpose: "HRTL per-domain classification for MN26 (4 domains x ~547-555 records per domain; Health domain skipped due to mirt Rasch convergence failure on 3-item x 67%-missing config). Long format keyed on (pid, record_id, child_num, domain) with avg_code, classification, years_old."
     source: "Step 8.7 of run_mn26_pipeline.R via R/hrtl/score_hrtl.R with study_id='mn26'."
     primary_downstream: "—"
     status: live
     group: mn26
-    notes: "Unlike NE25, MN26 produces non-NA Motor Development classifications because NORC's _end catch-up fields (coalesced in Step 4.5) bring 3-5 yr Motor coverage to ~85%, well above the 0.50 auto coverage gate threshold."
+    notes: "Unlike NE25, MN26 produces non-NA Motor Development classifications because NORC's _end catch-up fields (coalesced in Step 4.5) bring 3-5 yr Motor coverage to ~99%, well above the 0.50 auto coverage gate threshold."
 
   mn26_hrtl_overall:
     purpose: "Overall HRTL readiness classification for MN26 children ages 3-5 (n_on_track, n_needs_support, hrtl). Keyed on (pid, record_id, child_num)."
@@ -255,7 +255,7 @@ tables:
     primary_downstream: "—"
     status: live
     group: mn26
-    notes: "HRTL = TRUE iff >=4 domains On-Track AND 0 domains Needs Support. Unlike NE25 (where overall is uniformly NA pending Issue #15), MN26 produces real overall HRTL classifications."
+    notes: "HRTL = TRUE iff >=4 domains On-Track AND 0 domains Needs Support. Computed from the 4 scored domains (Health skipped) so the criterion effectively requires all 4 to be On-Track and none Needs Support. Unlike NE25 (where overall is uniformly NA pending Issue #15), MN26 produces real overall HRTL classifications."
 
   # ==========================================================================
   # ne25_imputed_* — Multiple-imputation variable tables (study-specific)

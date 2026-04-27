@@ -2,7 +2,7 @@
 
 **Snapshot date:** 2026-04-27
 **Database:** `data/duckdb/kidsights_local.duckdb`
-**Total tables:** 103
+**Total tables:** 105
 **Regenerate via:** `/refresh-database-inventory` skill (see `.claude/skills/refresh-database-inventory/SKILL.md`)
 **Source of truth for metadata:** [`docs/database/table_metadata.yaml`](table_metadata.yaml)
 
@@ -78,12 +78,14 @@ Minnesota 2026 REDCap pipeline (NORC-administered, multi-child households). Wide
 
 | Table | Rows | Cols | Source | Purpose | Used by | Status |
 |---|---:|---:|---|---|---|---|
-| `mn26_credi_scores` | 893 | 18 | Step 8.5 of run_mn26_pipeline.R via R/credi/score_credi.R with study_id='mn26'. | CREDI developmental scoring for MN26 children under 4 years old (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). Keyed on (pid, record_id, child_num). | — _Note: Multi-child key: each (pid, record_id, child_num) is a distinct row. Same scorer as NE25, parameterized via study_id._ | live |
+| `mn26_credi_scores` | 895 | 18 | Step 8.5 of run_mn26_pipeline.R via R/credi/score_credi.R with study_id='mn26'. | CREDI developmental scoring for MN26 children under 4 years old (15 columns: 5 domain scores + 5 Z-scores + 5 SEs). Keyed on (pid, record_id, child_num). | — _Note: Multi-child key: each (pid, record_id, child_num) is a distinct row. Same scorer as NE25, parameterized via study_id._ | live |
 | `mn26_data_dictionary` | 865 | 14 | Step 10 of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py. | REDCap data dictionary for the MN26 NORC project — active fields with type, choices, branching logic. Used for value-label resolution during recoding. | R/transform/mn26_transforms.R::recode_it() reads dict for value_labels(). | live |
-| `mn26_dscore_scores` | 1,106 | 9 | Step 8.6 of run_mn26_pipeline.R via R/dscore/score_dscore.R with study_id='mn26' and key='gsed2406'. | GSED D-score results for MN26 (d, daz, sem, a, n, p). Keyed on (pid, record_id, child_num); all meets_inclusion=TRUE children eligible. | — _Note: Multi-child key. Same scorer as NE25, parameterized via study_id._ | live |
-| `mn26_raw` | 10,771 | 6 | Step 4b of run_mn26_pipeline.R — pivot_mn26_wide_to_long() then pipelines/python/insert_raw_data.py. | Raw REDCap data after wide-to-long pivot (one row per child, keyed on pid + record_id + child_num). | Step 5 of run_mn26_pipeline.R — feeds recode_it() into mn26_transformed. | live |
+| `mn26_dscore_scores` | 1,296 | 9 | Step 8.6 of run_mn26_pipeline.R via R/dscore/score_dscore.R with study_id='mn26' and key='gsed2406'. | GSED D-score results for MN26 (d, daz, sem, a, n, p). Keyed on (pid, record_id, child_num); all meets_inclusion=TRUE children eligible. | — _Note: Multi-child key. Same scorer as NE25, parameterized via study_id._ | live |
+| `mn26_hrtl_domain_scores` | 2,198 | 7 | Step 8.7 of run_mn26_pipeline.R via R/hrtl/score_hrtl.R with study_id='mn26'. | HRTL per-domain classification for MN26 (4 domains x ~547-555 records per domain; Health domain skipped due to mirt Rasch convergence failure on 3-item x 67%-missing config). Long format keyed on (pid, record_id, child_num, domain) with avg_code, classification, years_old. | — _Note: Unlike NE25, MN26 produces non-NA Motor Development classifications because NORC's _end catch-up fields (coalesced in Step 4.5) bring 3-5 yr Motor coverage to ~99%, well above the 0.50 auto coverage gate threshold._ | live |
+| `mn26_hrtl_overall` | 555 | 6 | Step 8.7 of run_mn26_pipeline.R via R/hrtl/score_hrtl.R. | Overall HRTL readiness classification for MN26 children ages 3-5 (n_on_track, n_needs_support, hrtl). Keyed on (pid, record_id, child_num). | — _Note: HRTL = TRUE iff >=4 domains On-Track AND 0 domains Needs Support. Computed from the 4 scored domains (Health skipped) so the criterion effectively requires all 4 to be On-Track and none Needs Support. Unlike NE25 (where overall is uniformly NA pending Issue #15), MN26 produces real overall HRTL classifications._ | live |
+| `mn26_raw` | 10,773 | 6 | Step 4b of run_mn26_pipeline.R — pivot_mn26_wide_to_long() then pipelines/python/insert_raw_data.py. | Raw REDCap data after wide-to-long pivot (one row per child, keyed on pid + record_id + child_num). | Step 5 of run_mn26_pipeline.R — feeds recode_it() into mn26_transformed. | live |
 | `mn26_raw_wide` | 10,400 | 5 | Step 4a of run_mn26_pipeline.R via pipelines/python/insert_raw_data.py. | Raw REDCap exports from the MN26 NORC project in wide format (one row per household, child-2 fields suffixed with _c2). Audit trail. | — _Note: Wide format preserved for audit; downstream code reads from mn26_raw (long) instead._ | live |
-| `mn26_transformed` | 9,271 | 662 | Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6 scoring joins. | Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score joins. Multi-child key (pid, record_id, child_num). | R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), and downstream MN26 reports. | live |
+| `mn26_transformed` | 9,273 | 662 | Step 9 of run_mn26_pipeline.R after recode_it(), eligibility, inclusion filter, and Step 8/8.5/8.6/8.7 scoring joins. | Canonical MN26 analytic table — transformed/recoded fields + eligibility flags + Kidsights/CREDI/D-score/HRTL joins. Multi-child key (pid, record_id, child_num). | R/credi/score_credi.R (Step 8.5), R/dscore/score_dscore.R (Step 8.6), R/hrtl/score_hrtl.R (Step 8.7), and downstream MN26 reports. | live |
 
 ## NSCH Pipeline
 
