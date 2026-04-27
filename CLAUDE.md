@@ -629,9 +629,9 @@ pip install pyreadstat
   - Verified all 11 stages execute successfully with proper database insertions
   - Child ACEs stage validated: 2,585 total rows across 9 ACE tables with binary/valid range checks passing
 
-### 🚧 MN26 Pipeline - Core Complete (April 2026)
+### ✅ MN26 Pipeline - Scoring Complete (April 2026)
 - **📖 Full Guide:** [`docs/mn26/pipeline_guide.qmd`](docs/mn26/pipeline_guide.qmd) — authoritative documentation for code reviewers (Quick Start, data flow diagram, variable recoding reference, eligibility logic, scoring, troubleshooting)
-- **Status:** Core pipeline runs end-to-end. Kidsights scoring integrated. Raking and imputation deferred.
+- **Status:** Core pipeline + Kidsights + CREDI + GSED D-score + HRTL all shipped (2026-04-27, commits `60c056d`, `942541b`, `fcb78e8`). Raking and imputation remain deferred (need MN ACS extraction first).
 - **Study:** Minnesota 2026 (NORC-administered REDCap survey)
 - **Multi-Child:** Up to 2 children per household, wide-to-long pivot (pid + record_id + child_num)
 - **Reconciliation Audit:** Three-way dictionary comparison (NE25 vs MN26 active vs MN26 full)
@@ -640,19 +640,20 @@ pip install pyreadstat
   - Sex codes (cqr009) confirmed IDENTICAL — earlier "swap" claims were incorrect
   - Education codes (cqr004) confirmed IDENTICAL (both 0-8)
 - **Key Variable Changes:** cqr002→mn2 (parent gender), age_in_days→age_in_days_n, eqstate→mn_eqstate, cqr010→cqr010b (race 15→6 categories), sq002→sq002b
-- **Eligibility:** 4 criteria (vs NE25's 9): parent age, child age ≤5yr, primary caregiver, MN residence
-- **Data:** 2,654 test records from NORC REDCap project, 976 columns
-- **Pipeline Steps:** Extract → Pivot → Store raw → Transform → Eligibility → Kidsights scoring → Store transformed → Dictionary
-- **Kidsights Scoring (Step 8):** Automated via `KidsightsPublic` R package (CmdStan MAP with fixed item parameters)
-  - 220 developmental items scored (GRM, age-informed prior with ln(age+1) and age basis)
-  - Psychosocial scoring NOT included for MN26 (NE25-specific items)
-  - Graceful failure: pipeline continues with NA scores if CmdStan unavailable
-- **Execution Time:** ~1.3 seconds (skip-database mode, scoring adds ~2-15s with real data)
+- **Eligibility:** 4 criteria (vs NE25's 9): parent age, child age 0–5.99 yr (`age_in_days_n < 2191`), primary caregiver, MN residence
+- **Data (latest production run, 2026-04-27):** 10,400 records extracted from NORC REDCap; 10,773 rows post-pivot (10,400 child-1 + 373 child-2); 1,296 meets_inclusion=TRUE
+- **Pipeline Steps:** Extract → Pivot → Store raw → **HRTL Motor `_end` coalesce (4.5)** → Transform → Eligibility → Kidsights scoring → **CREDI scoring (8.5)** → **GSED D-score (8.6)** → **HRTL scoring (8.7)** → Store transformed → Dictionary
+- **Kidsights Scoring (Step 8):** Automated via `KidsightsPublic` R package (CmdStan MAP with fixed item parameters); 220 developmental items, 1,158 scored. Psychosocial scoring NOT included (NE25-specific items). Graceful failure: pipeline continues with NA scores if CmdStan unavailable.
+- **CREDI Scoring (Step 8.5):** `R/credi/score_credi.R` parameterized via `study_id="mn26"`. 60 CREDI LF items, 411 children scored (under-4 cohort). Output: `mn26_credi_scores` (895 rows × 18 cols).
+- **GSED D-score (Step 8.6):** `R/dscore/score_dscore.R` parameterized via `study_id="mn26"` and `key="gsed2406"`. 132 GSED items, 1,161 scored. Output: `mn26_dscore_scores` (1,296 rows × 9 cols). Bridges NORC's `age_in_days_n` to the cross-study `age_in_days` column expected by the scorer.
+- **HRTL Scoring (Step 8.7):** `R/hrtl/score_hrtl.R` (function-based replacement for the four-script NE25 pipeline). 4 of 5 domains scored (Health domain skipped due to mirt Rasch convergence failure on the 3-item × 67%-missing config). 555 children classified. Auto Motor coverage gate (default 0.50) — MN26 Motor coverage 99.4% triggers SCORED (vs NE25's 25% triggering MASKED). Output: `mn26_hrtl_domain_scores` (2,198 rows) + `mn26_hrtl_overall` (555 rows; 49% HRTL=TRUE).
+- **HRTL Motor `_end` Coalesce (Step 4.5):** Pre-`recode_it()` step that folds NORC's `_end`-suffixed Motor catch-up fields (`nom029x_end`, `nom033x_end`, `nom034x_end`) into the canonical column names. NORC added these fields to `module_6_1097_2191` (3–6 yr KMT form) to fix NE25's age-routing gap. Without the coalesce, MN26 would inherit NE25's Motor blind spot.
+- **Execution Time:** ~2.6 seconds (full production pipeline including DB writes). Skip-database test mode: ~1.3 seconds.
 - **Entry Point:** `run_mn26_pipeline.R` (supports `--skip-database`, `--credentials` flags)
 - **Config:** `config/sources/mn26.yaml` (fully populated)
 - **Plan:** `todo/mn26_pipeline_plan.md`
-- **Audit Script:** `scripts/mn26/reconciliation_audit.R`
-- **Deferred:** Raking targets (needs MN ACS), imputation, SES analytic dataset
+- **Audit Scripts:** `scripts/mn26/reconciliation_audit.R`, `scripts/mn26/audit_codebook_lexicons.R` (verifies CREDI/GSED items have MN26 lexicons)
+- **Deferred:** Raking targets (needs MN ACS), imputation, SES analytic dataset, HRTL Health domain (mirt fit failure)
 - **Shared Utils Extracted:** `R/utils/{recode_utils,cpi_utils,poverty_utils}.R` (used by both NE25 and MN26)
 - **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
 
