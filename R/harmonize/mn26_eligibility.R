@@ -10,7 +10,8 @@
 #
 # Required criteria (always checked — columns reliably present):
 #   1. Informed consent (eq001 == 1)
-#   2. Child age 0-5 years (age_in_days_n <= 1825)
+#   2. Child age 0-5 years (age_in_days_n < 2191; admits the full 0-5.99 yr
+#      band so 5-year-olds remain HRTL-eligible)
 #
 # Optional criteria (checked if columns exist — legacy test projects):
 #   3. Parent age >= 19 (eq003 == 1)
@@ -56,7 +57,7 @@ check_mn26_eligibility <- function(data, verbose = TRUE) {
   elig_df <- data %>%
     dplyr::mutate(
       pass_consent = !is.na(eq001) & eq001 == 1,
-      pass_child_age = !is.na(age_in_days_n) & age_in_days_n <= 1825
+      pass_child_age = !is.na(age_in_days_n) & age_in_days_n < 2191
     )
 
   # --- Optional legacy criteria (only if columns exist) ---------------------
@@ -98,7 +99,7 @@ check_mn26_eligibility <- function(data, verbose = TRUE) {
       exclusion_reason = dplyr::case_when(
         eligible ~ NA_character_,
         !pass_consent ~ "No informed consent",
-        !pass_child_age ~ "Child age > 5 years or missing",
+        !pass_child_age ~ "Child age >= 6 years or missing",
         has_eq003 & !pass_parent_age %in% TRUE ~ "Parent age < 19 or missing",
         has_eq002 & !pass_primary_caregiver %in% TRUE ~ "Not primary caregiver or missing",
         has_mn_state & !pass_minnesota_residence %in% TRUE ~ "Not Minnesota resident or missing",
@@ -117,7 +118,7 @@ check_mn26_eligibility <- function(data, verbose = TRUE) {
     message("  Criterion breakdown:")
     message("    Consent (eq001):         ", sum(elig_df$pass_consent, na.rm = TRUE),
             " [required]")
-    message("    Child age (<=5yr):       ", sum(elig_df$pass_child_age, na.rm = TRUE),
+    message("    Child age (<6yr):        ", sum(elig_df$pass_child_age, na.rm = TRUE),
             " [required]")
     message("    Parent age (eq003):      ",
             if (has_eq003) sum(elig_df$pass_parent_age, na.rm = TRUE) else "column absent",
