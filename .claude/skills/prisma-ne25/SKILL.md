@@ -120,7 +120,9 @@ Render the final Mermaid block. Then ask the user where it goes:
 | Chat only | Quick look, draft for a coauthor email | (no file) |
 | Standalone Quarto doc | Reusable, renderable to HTML/PDF, lives in repo | `docs/ne25/prisma_diagram.qmd` |
 | Append to weight-construction narrative | Methods section for the weighting writeup | `docs/raking/ne25/WEIGHT_CONSTRUCTION.qmd` (new subsection) |
-| One-off HTML | Sharing externally without rendering pipeline | `~/.agent/diagrams/ne25_prisma.html` |
+| Local HTML / PDF render | Visual review or coauthor email; transient artifact, not committed | `tmp/ne25_prisma.{html,pdf}` (project-scoped, gitignored) |
+
+**Path convention — important.** Local-only diagram artifacts go in the project's `tmp/` directory, **not** the global `~/.agent/diagrams/` scratch space. The repo's `.gitignore` covers `tmp/` entirely and also globally ignores `*.html` and `*.pdf` (with explicit `!docs/...` exceptions for committed pages), so files dropped in `tmp/` are automatically untracked — no risk of accidentally committing a methods figure.
 
 Per the user's standing preference, **prefer Quarto over plain Markdown** for any committed artifact.
 
@@ -169,6 +171,7 @@ flowchart TD
 - Inventing methods-section wording without asking. Internal pipeline column names ("too_few_item_responses", "influential") are not publication-friendly.
 - Treating Step 6.10 (out-of-state) as a "bandaid" or "workaround" in the diagram label. It is the final treatment for records with no PUMA match.
 - Auto-committing the rendered `.qmd` or appending to `WEIGHT_CONSTRUCTION.qmd` without explicit user authorization for each landing site.
+- Writing diagram artifacts to `~/.agent/diagrams/` (the global, cross-project Claude scratch space). That path mixes Kidsights methods figures with unrelated artifacts from other projects and bypasses the repo's own `tmp/` convention. Use `tmp/` for any local-only render.
 
 ## Success criteria
 
