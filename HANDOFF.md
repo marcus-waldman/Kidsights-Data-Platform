@@ -3,7 +3,7 @@
 **For:** Incoming maintainer of the Kidsights Data Platform
 **From:** Marcus Waldman (outgoing maintainer)
 **Snapshot date:** 2026-04-27
-**Last updated:** 2026-04-27 (HEAD `f6925ef`; last audit commit `6fe3092`)
+**Last updated:** 2026-04-27 (HEAD `1f7bbb9`; last audit commit `6fe3092`)
 
 > **5-minute visual orientation:** [https://marcus-waldman.github.io/Kidsights-Data-Platform/](https://marcus-waldman.github.io/Kidsights-Data-Platform/)
 >
@@ -29,7 +29,7 @@ The platform has **eight independent pipelines**. All have been used in producti
 | # | Pipeline | Status | Entry point |
 |---|---|---|---|
 | 1 | NE25 (Nebraska 2025 REDCap) | Production | `run_ne25_pipeline.R` |
-| 2 | MN26 (Minnesota 2026 REDCap, multi-child) | Core + CREDI/D-score shipped (2026-04-27); HRTL, raking, imputation deferred | `run_mn26_pipeline.R` |
+| 2 | MN26 (Minnesota 2026 REDCap, multi-child) | Core + CREDI/D-score/HRTL shipped (2026-04-27); raking, imputation deferred | `run_mn26_pipeline.R` |
 | 3 | ACS (IPUMS USA) | Production | `pipelines/python/acs/extract_acs_data.py` |
 | 4 | NHIS (IPUMS Health Surveys) | Production | `pipelines/python/nhis/extract_nhis_data.py` |
 | 5 | NSCH (SPSS files) | Production | `scripts/nsch/process_all_years.py` |
@@ -62,11 +62,13 @@ For per-pipeline operational details and current record counts, see [CLAUDE.md �
 
 ### MN26 (Minnesota 2026)
 
-**Status:** Core pipeline + CREDI + D-score scoring **shipped 2026-04-27** (commit `60c056d`). HRTL, raking, and imputation remain deferred. First production run materialized 6 `mn26_*` tables in DuckDB: `raw_wide` (10,400), `raw` (10,771 post-pivot), `transformed` (9,271), `data_dictionary` (865), `credi_scores` (893), `dscore_scores` (1,106).
+**Status:** Core pipeline + CREDI + D-score + HRTL scoring **shipped 2026-04-27** (commits `60c056d`, `942541b`, `fcb78e8`). Raking and imputation remain deferred. Production DuckDB now has 8 `mn26_*` tables: `raw_wide` (10,400), `raw` (10,773 post-pivot), `transformed` (9,273), `data_dictionary` (865), `credi_scores` (895), `dscore_scores` (1,296), `hrtl_domain_scores` (2,198), `hrtl_overall` (555).
 
-**What shipped today:** CREDI and D-score scorers parameterized via `study_id` and `key_vars`, so the same NE25 scorers now drive both NE25 (single-child key) and MN26 (multi-child key `pid + record_id + child_num`). NE25 behavior verified bit-identical via regression smoke test; MN26 production run produced 410 CREDI scores and 985 D-scores against 1,106 `meets_inclusion=TRUE` children. Companion audit script `scripts/mn26/audit_codebook_lexicons.R` confirms 60/60 CREDI LF + 132/132 GSED items have MN26 lexicon coverage.
+**PR 1 — CREDI + D-score (commit `60c056d`):** scorers parameterized via `study_id` and `key_vars`, so the same NE25 scorers now drive both NE25 (single-child key) and MN26 (multi-child key `pid + record_id + child_num`). NE25 behavior verified bit-identical via regression. Companion audit `scripts/mn26/audit_codebook_lexicons.R` confirms 60/60 CREDI LF + 132/132 GSED items have MN26 lexicon coverage.
 
-**Deferred (separate PR):** HRTL scoring for MN26 — requires `_end`-suffix Motor catch-up coalesce in the transform layer (NORC added `nom029x_end` / `nom033x_end` / `nom034x_end` to `module_6_1097_2191` to fix NE25's age-routing gap where the drawing items were routed away from the 3–5 yr HRTL-eligible band), study-conditional Motor masking with an auto coverage gate, and refactor of the script-based HRTL pipeline into a function-based scorer. Plan exists; ship is gated on verifying MN26 Motor coverage in the live data.
+**PR 2 — HRTL (commit `942541b`):** function-based replacement for the old four-script pipeline at `R/hrtl/score_hrtl.R`. Three sub-changes that compose: (a) Step 4.5 `_end` coalesce in MN26 orchestration that folds `nom029x_end` / `nom033x_end` / `nom034x_end` into the canonical column names before `recode_it()` so reverse-coding and validation see the merged values; (b) auto Motor coverage gate inside the scorer (default 0.50) — masks Motor when coverage falls below threshold (NE25 at 25% triggers, MN26 at 99% does not); (c) optional covariate path (NE25 uses `kidsights_2022 + general_gsed_pf_2022`; MN26 uses `kidsights_theta` from Step 8). MN26 produces 4 of 5 HRTL domains; Health domain skipped due to mirt Rasch convergence failure on the 3-item × 67%-missing config.
+
+**Age-5 admission fix (commit `fcb78e8`):** child-age eligibility criterion in `R/harmonize/mn26_eligibility.R` changed from `age_in_days_n <= 1825` (5.0 yr cutoff) to `age_in_days_n < 2191` (~6.0 yr), restoring the full 0–5.99 yr admission window. Pre-fix, 163 age-5 children with complete `_end` Motor data were silently excluded. Post-fix: eligible cohort 1,106 → 1,296, HRTL coverage 382 → 555 children spanning the full 3–5 yr HRTL band.
 
 **Active todo:** [`todo/mn26_pipeline_plan.md`](todo/mn26_pipeline_plan.md)
 
@@ -168,10 +170,14 @@ Full setup walkthrough: [docs/setup/INSTALLATION_GUIDE.md](docs/setup/INSTALLATI
 
 **Working tree clean as of 2026-04-27.** Recent landings since the prior HANDOFF snapshot:
 
-- `f6925ef` — `[Docs] Refresh database inventory (2026-04-27)` — catalogs the 6 new `mn26_*` tables and updates the MN26 group intro
-- `60c056d` — `[MN26] Wire CREDI + D-score scoring; parameterize scorers via study_id` — the core PR 1 of the MN26 scoring work
-- `dd9ec98` — `[Docs] /prisma-ne25 skill: use project tmp/ for local renders, not ~/.agent/`
-- `b573ab1` / `856f236` — earlier 2026-04-27 onboarding + HANDOFF docs refresh and `/prisma-ne25` skill landing
+- `1f7bbb9` — `[Docs] Refresh database inventory (2026-04-27)` — catalogs the 2 new `mn26_hrtl_*` tables and refreshes row counts post-age-5 fix (105 tables across 12 groups)
+- `32fdd4e` — `[Docs] Refresh MN26 essentials slides (HRTL + age-5 admission)` — adds HRTL to the bullet list, refreshes production-scale numbers
+- `fcb78e8` — `[MN26] Admit age-5 children to eligibility (age_in_days_n < 2191)` — restores the full 0–5.99 yr admission window
+- `942541b` — `[MN26] Wire HRTL scoring; parameterize HRTL scorer with auto Motor coverage gate` — PR 2 of MN26 scoring integration
+- `336e6cf` — `[Docs] Refresh MN26 essentials slides with 2026-04-27 production numbers` — initial post-PR-1 slide refresh
+- `60c056d` — `[MN26] Wire CREDI + D-score scoring; parameterize scorers via study_id` — PR 1 of MN26 scoring integration
+- `f6925ef` / `77d7e4a` — earlier 2026-04-27 docs refreshes (TABLES.md, HANDOFF.md)
+- `dd9ec98` / `b573ab1` / `856f236` — `/prisma-ne25` skill scratch-dir fix + earlier docs refreshes
 
 Earlier MIBB Bucket-3 breadcrumb (`scripts/raking/ne25/utils/calibrate_weights_simplex_factorized.exe`) was committed in `971875f` and is no longer in the working tree.
 
