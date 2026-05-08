@@ -640,9 +640,15 @@ pip install pyreadstat
   - Sex codes (cqr009) confirmed IDENTICAL — earlier "swap" claims were incorrect
   - Education codes (cqr004) confirmed IDENTICAL (both 0-8)
 - **Key Variable Changes:** cqr002→mn2 (parent gender), age_in_days→age_in_days_n, eqstate→mn_eqstate, cqr010→cqr010b (race 15→6 categories), sq002→sq002b
-- **Eligibility:** 4 criteria (vs NE25's 9): parent age, child age 0–5.99 yr (`age_in_days_n < 2191`), primary caregiver, MN residence
-- **Data (latest production run, 2026-04-27):** 10,400 records extracted from NORC REDCap; 10,773 rows post-pivot (10,400 child-1 + 373 child-2); 1,296 meets_inclusion=TRUE
-- **Pipeline Steps:** Extract → Pivot → Store raw → **HRTL Motor `_end` coalesce (4.5)** → Transform → Eligibility → Kidsights scoring → **CREDI scoring (8.5)** → **GSED D-score (8.6)** → **HRTL scoring (8.7)** → Store transformed → Dictionary
+- **Analytic Sample (NORC-aligned, replaces simple 4-criterion rule):** Mirrors `kidsights-norc/origin/norc_shared : progress-monitoring/mn26/utils/norc_summarise.R`. Sample-defining work happens **pre-pivot** in `R/harmonize/mn26_norc_sample.R`:
+  - `apply_norc_replace_records()` — dedup returning users via `id_xwalk.rds` (P_SUID); reissue PID 8792 supersedes earlier records
+  - `apply_norc_sample()` — `filter(!smoke_case | !in_scope)`; retains out-of-scope cases so the sample-frame denominator is preserved
+  - `norc_elig_screen()` — 4-scenario eligibility (`elig_type` ∈ {"1","2","3a","3b"}); age cap 2191 days; uses `kids_u6_n`, `mn_birth_c1_n/c2_n`, `parent_guardian_c1_n/c2_n`, `dob_n/c2_n`, `consent_date_n`, `eligibility_form_norc_complete`
+  - Pivot derives per-child `eligible` from HH flags: child_num=1 → `solo_kid_elig | youngest_kid_elig`; child_num=2 → `oldest_kid_elig`
+  - `compute_mn26_survey_completion()` (post-pivot, NORC-aligned) sets `last_module_complete` from `*_complete` flags + `survey_complete = eligible & last_module_complete %in% {Follow-up, Compensation}`
+  - `meets_inclusion = eligible & survey_complete` — matches NORC `summary_rates` "# HHs completing the survey"
+- **Required external input:** `id_xwalk.rds` (NORC P_SUID crosswalk; not committed). Path configured in `config/sources/mn26.yaml::analytic_sample.id_xwalk_path`. Override via `--id-xwalk` CLI flag.
+- **Pipeline Steps:** Extract → **NORC sample (2.5: replace_records / sample / elig_screen)** → Pivot (per-child eligible) → Store raw → **HRTL Motor `_end` coalesce (4.5)** → Transform → Eligibility validation → **Survey completion (6.5)** → Inclusion filter → Kidsights scoring → **CREDI scoring (8.5)** → **GSED D-score (8.6)** → **HRTL scoring (8.7)** → Store transformed → Dictionary
 - **Kidsights Scoring (Step 8):** Automated via `KidsightsPublic` R package (CmdStan MAP with fixed item parameters); 220 developmental items, 1,158 scored. Psychosocial scoring NOT included (NE25-specific items). Graceful failure: pipeline continues with NA scores if CmdStan unavailable.
 - **CREDI Scoring (Step 8.5):** `R/credi/score_credi.R` parameterized via `study_id="mn26"`. 60 CREDI LF items, 411 children scored (under-4 cohort). Output: `mn26_credi_scores` (895 rows × 18 cols).
 - **GSED D-score (Step 8.6):** `R/dscore/score_dscore.R` parameterized via `study_id="mn26"` and `key="gsed2406"`. 132 GSED items, 1,161 scored. Output: `mn26_dscore_scores` (1,296 rows × 9 cols). Bridges NORC's `age_in_days_n` to the cross-study `age_in_days` column expected by the scorer.

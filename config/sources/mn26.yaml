@@ -13,7 +13,9 @@ redcap:
   # Override via REDCAP_API_CREDENTIALS_PATH_MN26 env var in .env
   api_credentials_file: "C:/my_auths/kidsights_redcap_norc_MN_2026.csv"
 
-  # MN26 uses 1-2 REDCap projects (vs NE25's 4)
+  # MN26 production uses 5 REDCap projects (4 production + 1 reissue):
+  #   8723, 8724, 8725, 8726 — Kidsights Survey NORC 1-4 (production)
+  #   8792                   — Incomplete REDCap Responses (reissue URLs)
   # PIDs are loaded dynamically from credentials CSV
   timeout: 300  # seconds
   rate_limit:
@@ -83,8 +85,11 @@ fields:
       105: "Other"
 
 # Data validation rules
+# NOTE: NORC analytic sample uses 2191 days (~6 years) — see analytic_sample
+# block below. The 1825 value here is retained for any legacy code path that
+# may still reference it; new code should read analytic_sample.age_max_days.
 validation:
-  child_age_max_days: 1825  # 5 years (vs NE25's 2191 = 6 years)
+  child_age_max_days: 2191  # ~6 years (NORC analytic sample band)
   caregiver_min_age: 19
 
   # Minnesota ZIP code prefixes (complete list)
@@ -109,31 +114,35 @@ validation:
 
   validate_zip_county_match: true
 
-# Eligibility criteria (4 criteria, vs NE25's 9)
-eligibility_criteria:
-  criterion_1:
-    name: "parent_age"
-    description: "Parent/caregiver is 19 years or older"
-    field: "eq003"
-    required_value: 1
+# NORC analytic sample definition (replaces the legacy 4-criterion rule)
+# Mirrors kidsights-norc/origin/norc_shared:
+#   progress-monitoring/mn26/utils/norc_summarise.R::norc_elig_screen()
+# NORC pre-screens parent age (>=19), primary caregiver, and MN residency
+# BEFORE routing participants to REDCap, so those criteria are not collected
+# in production. Eligibility is determined entirely by the eligibility_form_norc
+# instrument (kids_u6_n, mn_birth_*, parent_guardian_*, dob_*, age_in_days_*).
+analytic_sample:
+  # P_SUID crosswalk (NORC sampling frame) — NOT committed to git
+  id_xwalk_path: "C:/Users/marcu/Downloads/gunther/id_xwalk.rds"
 
-  criterion_2:
-    name: "child_age"
-    description: "Child is 0-5 years old (1825 days or younger)"
-    field: "age_in_days_n"
-    max_value: 1825
+  # REDCap project ID used to issue fresh URLs to participants who closed
+  # the survey before saving (NORC reissue project)
+  reissue_pid: 8792
 
-  criterion_3:
-    name: "primary_caregiver"
-    description: "Respondent is primary caregiver"
-    field: "eq002"
-    required_value: 1
+  # Maximum child age in days (~6.0 years; admits the full 0-5.99 yr band)
+  age_max_days: 2191
 
-  criterion_4:
-    name: "minnesota_residence"
-    description: "Currently lives in the state of Minnesota"
-    field: "mn_eqstate"
-    required_value: 1
+  # Module labels considered "survey complete" (in NORC instrument-order)
+  survey_complete_modules:
+    - "Follow-up"
+    - "Compensation"
+
+  # Eligibility scenarios (informational; logic lives in norc_elig_screen)
+  scenarios:
+    type_1:  "1 child u6, MN-born, age <= 2191d, parent/guardian"
+    type_2:  ">1 child u6, exactly 1 MN-born; youngest MN-born qualifies"
+    type_3a: ">1 child u6, >1 MN-born; youngest qualifies"
+    type_3b: ">1 child u6, >1 MN-born; next-youngest qualifies"
 
 # Recoding specifications
 recoding:

@@ -29,7 +29,9 @@ library(KidsightsPublic)  # CmdStan MAP scoring (score_kidsights, score_psychoso
 source("R/extract/mn26.R")
 source("R/transform/mn26_pivot.R")
 source("R/transform/mn26_transforms.R")
+source("R/transform/mn26_survey_completion.R")
 source("R/harmonize/mn26_eligibility.R")
+source("R/harmonize/mn26_norc_sample.R")
 source("R/utils/environment_config.R")
 source("R/utils/safe_joins.R")
 source("R/credi/score_credi.R")
@@ -45,7 +47,8 @@ source("R/hrtl/score_hrtl.R")
 run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
                               credentials_path = NULL,
                               skip_database = FALSE,
-                              data = NULL) {
+                              data = NULL,
+                              id_xwalk_path = NULL) {
 
   execution_id <- paste0("mn26_", format(Sys.time(), "%Y%m%d_%H%M%S"))
   pipeline_start <- Sys.time()
@@ -120,6 +123,40 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     if ("sq001" %in% names(raw_wide)) {
       raw_wide$sq001 <- as.character(raw_wide$sq001)
     }
+
+    # ==================================================================
+    # STEP 2.5: NORC ANALYTIC SAMPLE DEFINITION (PRE-PIVOT, HH-LEVEL)
+    # ==================================================================
+    # Aligns the sample with NORC's `norc_summarise.R` rules. Three
+    # pre-pivot operations on raw_wide:
+    #   2.5a — dedupe returning respondents via id_xwalk (P_SUID)
+    #   2.5b — drop in-scope smoke cases (retain out-of-scope)
+    #   2.5c — 4-scenario eligibility (elig_type ∈ {"1","2","3a","3b"})
+    # The pivot then derives per-child `eligible` from the HH-level
+    # solo/youngest/oldest_kid_elig flags.
+    message("\n--- Step 2.5: NORC Analytic Sample Definition ---")
+    step_start <- Sys.time()
+
+    sample_cfg     <- config$analytic_sample
+    resolved_xwalk <- if (!is.null(id_xwalk_path)) id_xwalk_path
+                      else if (!is.null(sample_cfg) && !is.null(sample_cfg$id_xwalk_path)) sample_cfg$id_xwalk_path
+                      else NULL
+    if (is.null(resolved_xwalk) || resolved_xwalk == "") {
+      stop("id_xwalk path not configured; set analytic_sample.id_xwalk_path in ",
+           config_path, " or pass id_xwalk_path = '...' to run_mn26_pipeline()")
+    }
+    reissue_pid_cfg <- if (!is.null(sample_cfg$reissue_pid)) sample_cfg$reissue_pid else 8792
+    age_max_cfg     <- if (!is.null(sample_cfg$age_max_days)) sample_cfg$age_max_days else 2191
+
+    raw_wide <- apply_norc_replace_records(raw_wide,
+                                           id_xwalk_path = resolved_xwalk,
+                                           reissue_pid   = reissue_pid_cfg)
+    raw_wide <- apply_norc_sample(raw_wide)
+    raw_wide <- norc_elig_screen(raw_wide, age_max_days = age_max_cfg)
+
+    metrics$n_after_norc_sample  <- nrow(raw_wide)
+    metrics$n_eligible_hh        <- sum(raw_wide$eligible %in% TRUE)
+    metrics$step_durations$norc_sample <- as.numeric(Sys.time() - step_start)
 
     # ==================================================================
     # STEP 3: WIDE-TO-LONG PIVOT
@@ -268,19 +305,43 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
                     nrow(transformed_data), ncol(transformed_data)))
 
     # ==================================================================
-    # STEP 6: ELIGIBILITY VALIDATION
+    # STEP 6: ELIGIBILITY VALIDATION (per-child, NORC-aligned)
     # ==================================================================
+    # The substantive eligibility was computed pre-pivot in Step 2.5c and
+    # pivoted to per-child in Step 3. This call validates that the columns
+    # are present and reports the per-child × elig_type breakdown.
     message("\n--- Step 6: Eligibility Validation ---")
     step_start <- Sys.time()
 
     transformed_data <- check_mn26_eligibility(transformed_data)
-    metrics$n_eligible <- sum(transformed_data$eligible, na.rm = TRUE)
+    metrics$n_eligible <- sum(transformed_data$eligible %in% TRUE)
 
     metrics$step_durations$eligibility <- as.numeric(Sys.time() - step_start)
 
     # ==================================================================
-    # STEP 7: CREATE MEETS_INCLUSION FILTER
+    # STEP 6.5: SURVEY COMPLETION (NORC-aligned)
     # ==================================================================
+    # Computes last_module_complete + survey_complete from the *_complete
+    # instrument flags. Required for the inclusion filter below.
+    message("\n--- Step 6.5: Survey Completion ---")
+    step_start <- Sys.time()
+
+    survey_modules <- if (!is.null(config$analytic_sample$survey_complete_modules))
+      config$analytic_sample$survey_complete_modules
+    else c("Follow-up", "Compensation")
+
+    transformed_data <- compute_mn26_survey_completion(
+      transformed_data,
+      survey_complete_modules = survey_modules
+    )
+    metrics$n_survey_complete <- sum(transformed_data$survey_complete %in% TRUE)
+    metrics$step_durations$survey_completion <- as.numeric(Sys.time() - step_start)
+
+    # ==================================================================
+    # STEP 7: CREATE MEETS_INCLUSION FILTER (NORC analytic sample)
+    # ==================================================================
+    # meets_inclusion = eligible & survey_complete
+    # Matches NORC `norc_summary$summary_rates` "# HHs completing the survey".
     message("\n--- Step 7: Inclusion Filter ---")
 
     transformed_data <- apply_mn26_inclusion(transformed_data)
@@ -588,10 +649,17 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
   message("MN26 Pipeline Complete")
   message("========================================")
   message(sprintf("  Records extracted:    %d", metrics$n_extracted))
+  message(sprintf("  After NORC sample:    %d (HH-level)",
+                  if (is.null(metrics$n_after_norc_sample)) 0 else metrics$n_after_norc_sample))
+  message(sprintf("  Eligible HHs:         %d (NORC 4-scenario)",
+                  if (is.null(metrics$n_eligible_hh)) 0 else metrics$n_eligible_hh))
   message(sprintf("  Records after pivot:  %d (child 1: %d, child 2: %d)",
                   metrics$n_pivoted, metrics$n_child1, metrics$n_child2))
-  message(sprintf("  Eligible:             %d", metrics$n_eligible))
-  message(sprintf("  Meets inclusion:      %d", metrics$n_meets_inclusion))
+  message(sprintf("  Eligible (per child): %d", metrics$n_eligible))
+  message(sprintf("  Survey complete:      %d",
+                  if (is.null(metrics$n_survey_complete)) 0 else metrics$n_survey_complete))
+  message(sprintf("  Meets inclusion:      %d (eligible & survey_complete)",
+                  metrics$n_meets_inclusion))
   message(sprintf("  Kidsights scored:     %d", if (is.null(metrics$n_kidsights_scored)) 0 else metrics$n_kidsights_scored))
   message(sprintf("  CREDI scored:         %d", if (is.null(metrics$n_credi_scored)) 0 else metrics$n_credi_scored))
   message(sprintf("  GSED D-score scored:  %d", if (is.null(metrics$n_dscore_scored)) 0 else metrics$n_dscore_scored))

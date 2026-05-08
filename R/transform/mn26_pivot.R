@@ -197,6 +197,33 @@ pivot_mn26_wide_to_long <- function(wide_data, verbose = TRUE) {
   long_data <- long_data %>%
     dplyr::arrange(pid, record_id, child_num)
 
+  # --------------------------------------------------------------------------
+  # Step 7: Per-child eligibility (NORC sample alignment)
+  # --------------------------------------------------------------------------
+  # If the upstream pre-pivot pipeline added NORC's HH-level eligibility flags
+  # (solo_kid_elig, youngest_kid_elig, oldest_kid_elig from norc_elig_screen),
+  # collapse them into a single per-child `eligible` flag here:
+  #   - child_num == 1 represents the youngest (or only) MN-born child;
+  #     it is eligible iff solo_kid_elig OR youngest_kid_elig
+  #   - child_num == 2 represents the next-youngest sibling;
+  #     it is eligible iff oldest_kid_elig
+  # The HH-level `eligible` column (if present) is overwritten with this
+  # per-child value, which is what the rest of the pipeline expects.
+
+  hh_flag_cols <- c("solo_kid_elig", "youngest_kid_elig", "oldest_kid_elig")
+  if (all(hh_flag_cols %in% names(long_data))) {
+    long_data$eligible <- dplyr::if_else(
+      long_data$child_num == 1L,
+      long_data$solo_kid_elig %in% TRUE | long_data$youngest_kid_elig %in% TRUE,
+      long_data$oldest_kid_elig %in% TRUE
+    )
+    if (verbose) {
+      n_elig <- sum(long_data$eligible, na.rm = TRUE)
+      message("  Per-child eligible (from NORC HH flags): ", n_elig,
+              " of ", nrow(long_data))
+    }
+  }
+
   if (verbose) {
     message("  Final long format: ", nrow(long_data), " rows (",
             nrow(child1), " child 1 + ", n_child2, " child 2)")
