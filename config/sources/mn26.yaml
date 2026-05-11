@@ -122,8 +122,10 @@ validation:
 # in production. Eligibility is determined entirely by the eligibility_form_norc
 # instrument (kids_u6_n, mn_birth_*, parent_guardian_*, dob_*, age_in_days_*).
 analytic_sample:
-  # P_SUID crosswalk (NORC sampling frame) — NOT committed to git
-  id_xwalk_path: "C:/Users/marcu/Downloads/gunther/id_xwalk.rds"
+  # P_SUID crosswalk (NORC sampling frame). Committed in-repo (no PII;
+  # needed by every operator). Override at runtime with --id-xwalk on
+  # run_mn26_pipeline.R for ad-hoc testing.
+  id_xwalk_path: "data/mn26/id_xwalk.rds"
 
   # REDCap project ID used to issue fresh URLs to participants who closed
   # the survey before saving (NORC reissue project)

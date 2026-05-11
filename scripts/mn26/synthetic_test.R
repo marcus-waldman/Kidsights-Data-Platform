@@ -80,12 +80,26 @@ synthetic <- sim_data %>%
     source_project = "mn26_synthetic_test",
     extraction_id = paste0("syn_", format(Sys.time(), "%Y%m%d")),
 
-    # Age (convert years to days for pipeline)
+    # Age (convert years to days for pipeline). Date-class so dob_n <= consent_date_n
+    # in norc_elig_screen() compares as Dates, not lexically (issue #16 V2).
     age_in_days_n = round(years_old * 365.25),
-    dob_n = as.character(Sys.Date() - age_in_days_n),
-    consent_date_n = as.character(Sys.Date()),
+    dob_n = Sys.Date() - age_in_days_n,
+    consent_date_n = Sys.Date(),
 
-    # Eligibility (all pass)
+    # NORC eligibility form fields (default: single child u6, MN-born, parent/guardian).
+    # Step 4 below overrides c2 households to scenario 3a (both kids eligible).
+    kids_u6_n = 1L,
+    mn_birth_c1_n = 1L,
+    mn_birth_c2_n = NA_integer_,           # NA when kids_u6_n == 1 (issue #16 V3)
+    parent_guardian_c1_n = 1L,
+    parent_guardian_c2_n = NA_integer_,
+    eligibility_form_norc_complete = 2L,
+
+    # Survey completion: module_9 = 2 → last_module_complete = "Compensation",
+    # so survey_complete = TRUE for all eligible synthetic households.
+    module_9_compensation_information_complete = 2L,
+
+    # Eligibility (legacy 4-criterion fields; retained for any code path that still reads them)
     eq001 = 1L,
     eq002 = 1L,
     eq003 = 1L,
@@ -164,7 +178,7 @@ c2_item_names <- setdiff(names(sim_c2), c("id", "years_old"))
 for (col in c2_item_names) {
   synthetic[[paste0(col, "_c2")]] <- NA
 }
-synthetic$dob_c2_n <- NA_character_
+synthetic$dob_c2_n <- as.Date(NA)        # Date-class to match dob_n (V2)
 synthetic$age_in_days_c2_n <- NA_real_
 synthetic$cqr009_c2 <- NA_integer_
 synthetic$cqr011_c2 <- NA_integer_
@@ -175,10 +189,16 @@ for (rc in paste0("cqr010_c2b___", 100:105)) {
 # Fill child 2 data for selected households
 for (k in seq_along(c2_idx)) {
   i <- c2_idx[k]
-  synthetic$dob_c2_n[i] <- as.character(Sys.Date() - round(ages_c2[k] * 365.25))
+  synthetic$dob_c2_n[i] <- Sys.Date() - round(ages_c2[k] * 365.25)
   synthetic$age_in_days_c2_n[i] <- round(ages_c2[k] * 365.25)
   synthetic$cqr009_c2[i] <- sample(c(0L, 1L), 1)
   synthetic$cqr011_c2[i] <- sample(c(0L, 1L), 1, prob = c(0.75, 0.25))
+
+  # NORC fields: promote to scenario 3a (2 kids u6, both MN-born → both eligible).
+  # Keeps the existing n_eligible == n_total assertion below valid.
+  synthetic$kids_u6_n[i] <- 2L
+  synthetic$mn_birth_c2_n[i] <- 2L
+  synthetic$parent_guardian_c2_n[i] <- 1L
 
   # Race for child 2
   c2_race_cols <- paste0("cqr010_c2b___", 100:105)
@@ -195,6 +215,27 @@ cat("  Child 2 added for ", N_CHILD2, " households\n")
 cat("  Total columns: ", ncol(synthetic), "\n")
 
 # ==============================================================================
+# STEP 4.5: Build synthetic id_xwalk (NORC P_SUID crosswalk for Step 2.5)
+# ==============================================================================
+# Step 2.5 of the orchestrator unconditionally calls apply_norc_replace_records(),
+# which requires a P_SUID crosswalk. Build one in tempdir() that matches every
+# synthetic record_id under pid 9999 with no smoke cases and no reissues.
+cat("Step 4.5: Building synthetic id_xwalk...\n")
+
+id_xwalk_synthetic <- data.frame(
+  P_SUID      = paste0("SYN_", synthetic$record_id),
+  P_PIN       = paste0("PIN", synthetic$record_id),
+  survey_link = paste0("syn_url_", synthetic$record_id),
+  PID         = 9999L,                       # matches synthetic$pid = "9999"
+  smoke_case  = FALSE,
+  record_id   = as.integer(synthetic$record_id),
+  stringsAsFactors = FALSE
+)
+xwalk_path <- file.path(tempdir(), "synthetic_id_xwalk.rds")
+saveRDS(id_xwalk_synthetic, xwalk_path)
+cat("  Saved: ", xwalk_path, " (", nrow(id_xwalk_synthetic), " rows)\n", sep = "")
+
+# ==============================================================================
 # STEP 5: Run MN26 pipeline (pivot → transform → eligibility → scoring)
 # ==============================================================================
 cat("\nStep 5: Running MN26 pipeline on synthetic data...\n\n")
@@ -204,7 +245,8 @@ source("pipelines/orchestration/mn26_pipeline.R")
 result <- run_mn26_pipeline(
   config_path = "config/sources/mn26.yaml",
   skip_database = TRUE,
-  data = synthetic
+  data = synthetic,
+  id_xwalk_path = xwalk_path
 )
 
 # ==============================================================================
@@ -230,6 +272,23 @@ n_eligible <- sum(td$eligible, na.rm = TRUE)
 cat(sprintf("Eligible: %d of %d\n", n_eligible, n_total))
 stopifnot(n_eligible == n_total)
 cat("  [OK] All synthetic records eligible\n")
+
+# Check 2.5: NORC sample + meets_inclusion (added with Step 2.5 alignment)
+n_meets_inc <- sum(td$meets_inclusion %in% TRUE)
+cat(sprintf("Meets inclusion: %d of %d\n", n_meets_inc, n_total))
+stopifnot(n_meets_inc == n_total)
+cat("  [OK] All synthetic records meet inclusion (eligible & survey_complete)\n")
+
+# Confirm scenario distribution: 450 single-child (type 1) + 50 multi-child (type 3a).
+# elig_type lives at HH level pre-pivot; in the pivoted long table both child rows
+# of a 3a HH carry the same elig_type, so we count distinct (record_id) per type.
+hh_types <- unique(td[, c("record_id", "elig_type")])
+n_type_1  <- sum(hh_types$elig_type == "1",  na.rm = TRUE)
+n_type_3a <- sum(hh_types$elig_type == "3a", na.rm = TRUE)
+cat(sprintf("Scenario distribution: type_1 = %d, type_3a = %d\n", n_type_1, n_type_3a))
+stopifnot(n_type_1 == N_HOUSEHOLDS - N_CHILD2)
+stopifnot(n_type_3a == N_CHILD2)
+cat("  [OK] NORC scenario assignment matches synthetic design\n")
 
 # Check 3: Scoring
 if ("kidsights_theta" %in% names(td)) {

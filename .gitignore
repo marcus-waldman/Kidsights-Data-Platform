@@ -91,6 +91,12 @@ data/*
 data/analyses/*
 *.rds
 *.parquet
+# MN26 NORC sampling-frame artifacts (no PII; needed by operators / future raking)
+!data/mn26/
+!data/mn26/id_xwalk.rds
+!data/mn26/frame/
+!data/mn26/frame/frame_child_demographic_summary.rds
+!data/mn26/frame/frame_mother_demographic_summary.rds
 
 # Codebook data - allow codebook.json but not backups
 !codebook/data/

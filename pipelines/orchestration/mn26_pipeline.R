@@ -138,12 +138,12 @@ run_mn26_pipeline <- function(config_path = "config/sources/mn26.yaml",
     step_start <- Sys.time()
 
     sample_cfg     <- config$analytic_sample
-    resolved_xwalk <- if (!is.null(id_xwalk_path)) id_xwalk_path
+    resolved_xwalk <- if (!is.null(id_xwalk_path) && nzchar(id_xwalk_path)) id_xwalk_path
                       else if (!is.null(sample_cfg) && !is.null(sample_cfg$id_xwalk_path)) sample_cfg$id_xwalk_path
                       else NULL
     if (is.null(resolved_xwalk) || resolved_xwalk == "") {
       stop("id_xwalk path not configured; set analytic_sample.id_xwalk_path in ",
-           config_path, " or pass id_xwalk_path = '...' to run_mn26_pipeline()")
+           config_path, " or pass --id-xwalk on run_mn26_pipeline.R")
     }
     reissue_pid_cfg <- if (!is.null(sample_cfg$reissue_pid)) sample_cfg$reissue_pid else 8792
     age_max_cfg     <- if (!is.null(sample_cfg$age_max_days)) sample_cfg$age_max_days else 2191
