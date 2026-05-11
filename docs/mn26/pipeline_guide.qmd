@@ -1273,3 +1273,96 @@ result$metrics$n_child2  # should equal households with non-empty dob_c2_n
 Compare with what you expect from the REDCap project. If they don't
 match, the pivot logic in `R/transform/mn26_pivot.R` may need to
 account for a new column naming pattern that NORC has introduced.
+
+# Known Limitations {#sec-known-limitations}
+
+As of the first successful end-to-end live run (2026-05-11, commits
+`deb1f82` + `21c2863`), Step 5 (`recode_it()`) emits three
+`Failed to process` warnings. The pipeline continues — the `tryCatch`
+in `recode_it()` swallows individual transform errors and downstream
+scoring runs cleanly on the 1,630 `meets_inclusion` records. But
+about **25 derived columns** aren't populated in the transformed
+output. These are documented and **deferred** because no downstream
+consumer needs them yet (MN26 raking + imputation are themselves
+deferred pending MN ACS extraction).
+
+All three were pre-existing — the 2026-04-27 "scoring complete"
+milestone didn't surface them because that run was synthetic-only,
+and the synthetic test populates the affected fields with non-NA
+values across all label ranges.
+
+## 1. `geographic` — missing input data
+
+**Symptom:** `Failed to process geographic :` (empty error message)
+
+**Root cause:** The geographic transform queries the
+`geo_zip_to_puma`, `geo_zip_to_county`, and `geo_zip_to_tract`
+crosswalk tables. These are **Nebraska-scoped** and don't include
+Minnesota ZIPs (550–567). The transform errors early on the first
+query that returns nothing useful.
+
+**Affected derived columns (~10):** `puma`, `puma_afact`, `county`,
+`county_name`, `county_afact`, `tract`, `tract_fips`, `tract_afact`,
+and related allocation columns.
+
+**Fix lives:** Data layer. Requires MN ACS extraction (also deferred)
+so MN-scoped crosswalks can be built.
+
+## 2. `caregiver relationship` — 100% NA upstream
+
+**Symptom:** `Failed to process caregiver relationship : 'ref' must be an existing level`
+
+**Root cause:** Fields `cqr008` (responding-caregiver type) and
+`nschj013` (secondary-caregiver type) are **100% NA in live MN26
+data** (10,562 of 10,562 long rows on 2026-05-11). The transform
+builds `relation2` via `mapvalues(nschj013, ...)` which yields
+all-NA. The subsequent `as.factor()` produces a factor with zero
+levels. The `relevel(ref = "Biological or Adoptive Parent")` call
+then errors because the ref label can't exist in an empty level
+set.
+
+**Affected derived columns (4):** `relation1`, `relation2`,
+`female_a1`, `mom_a1`.
+
+**Fix lives:** Upstream. Verify with NORC whether `cqr008` /
+`nschj013` were renamed in the MN26 instrument and missed during
+the reconciliation audit (`scripts/mn26/reconciliation_audit.R`), or
+whether NORC isn't collecting them at all. If renamed → update
+field-mapping config. If not collected → either accept the gap or
+work with NORC to start collecting.
+
+## 3. `education` — sparse data, root cause uncertain
+
+**Symptom:** `Failed to process education : 'ref' must be an existing level`
+
+**Root cause (partial):** `cqr004` (primary caregiver education) is
+83% NA and `nschj017` (secondary caregiver education) is 84% NA.
+The non-NA values span codes 0–5 only — no respondents at codes 6
+("Bachelor's Degree"), 7 ("Master's"), or 8 ("Doctorate") in the
+partial collection so far. The transform builds `educ_max` with
+explicit `factor(x, levels = c("0",...,"8"), labels = ...)` which
+*should* preserve all 9 levels regardless of data, but
+`relevel(ref = "Bachelor's Degree (BA, BS, AB)")` still fails. The
+exact level-loss mechanism wasn't isolated on 2026-05-11; debugging
+needs instrumentation inside `recode__()` to print `levels(educ_max)`
+right before the relevel call.
+
+**Affected derived columns (12):** `educ_max`, `educ_a1`, `educ_a2`,
+`educ_mom`, `educ4_max`, `educ4_a1`, `educ4_a2`, `educ4_mom`,
+`educ6_max`, `educ6_a1`, `educ6_a2`, `educ6_mom`.
+
+**Fix lives:** Most likely the transform code (a defensive
+`relevel()` that no-ops when the factor's level-set doesn't include
+the ref). The sparse-data problem may self-resolve as collection
+continues and respondents at the high-education codes appear.
+
+## When to revisit
+
+- **Before MN26 raking work begins** — all three need to be
+  functional for raking target construction.
+- **If a downstream analysis needs maternal education** (e.g., SES
+  descriptive tables, demographic stratification): fix `education`
+  first — it's the most tractable of the three.
+- **If NORC adds caregiver-2 collection** so `cqr008` / `nschj013`
+  stop being 100% NA: `caregiver relationship` will start succeeding
+  on its own without code change.

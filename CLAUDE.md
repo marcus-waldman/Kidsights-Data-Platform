@@ -659,7 +659,7 @@ pip install pyreadstat
 - **Config:** `config/sources/mn26.yaml` (fully populated)
 - **Plan:** `todo/mn26_pipeline_plan.md`
 - **Audit Scripts:** `scripts/mn26/reconciliation_audit.R`, `scripts/mn26/audit_codebook_lexicons.R` (verifies CREDI/GSED items have MN26 lexicons)
-- **Deferred:** Raking targets (needs MN ACS), imputation, SES analytic dataset, HRTL Health domain (mirt fit failure)
+- **Deferred:** Raking targets (needs MN ACS), imputation, SES analytic dataset, HRTL Health domain (mirt fit failure), 3 transform stages (`geographic`, `caregiver relationship`, `education`) producing ~25 unpopulated derived columns — surfaced by first successful live `--skip-database` run (2026-05-11); see [docs/mn26/pipeline_guide.qmd §Known Limitations](docs/mn26/pipeline_guide.qmd#sec-known-limitations)
 - **Shared Utils Extracted:** `R/utils/{recode_utils,cpi_utils,poverty_utils}.R` (used by both NE25 and MN26)
 - **CRITICAL:** All MN26 joins use `pid + record_id + child_num` (not just `pid + record_id`) for multi-child correctness
 
