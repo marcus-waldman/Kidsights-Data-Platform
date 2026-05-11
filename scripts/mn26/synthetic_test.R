@@ -76,6 +76,9 @@ synthetic <- sim_data %>%
     # Identifiers
     pid = "9999",
     redcap_event_name = "baseline_arm_1",
+    # survey_link is the join key against id_xwalk (NORC pattern; one URL per
+    # REDCap record). Use record_id as a deterministic stand-in for the URL slug.
+    survey_link = paste0("syn_url_", record_id),
     retrieved_date = Sys.time(),
     source_project = "mn26_synthetic_test",
     extraction_id = paste0("syn_", format(Sys.time(), "%Y%m%d")),

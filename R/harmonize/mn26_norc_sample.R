@@ -105,6 +105,13 @@ apply_norc_replace_records <- function(raw_wide,
   if (!"consent_date_n" %in% names(raw_wide)) {
     stop("raw_wide must include 'consent_date_n' for reissue dedup logic")
   }
+  if (!"survey_link" %in% names(raw_wide)) {
+    # Mirror NORC: production-report.R:198 joins id_xwalk on (record_id, survey_link)
+    # to resolve cases where the same record_id has multiple xwalk entries
+    # (different survey URLs issued to the same respondent).
+    stop("raw_wide must include 'survey_link' for NORC xwalk join ",
+         "(mirrors kidsights-norc:norc_shared production-report.R:197-201)")
+  }
 
   reissue_pid_chr <- as.character(reissue_pid)
 
@@ -117,12 +124,14 @@ apply_norc_replace_records <- function(raw_wide,
       record_id = as.integer(record_id)
     )
 
-  # Step A — Identify active reissues (consented rows in the reissue project)
+  # Step A — Identify active reissues (consented rows in the reissue project).
+  # Join on (record_id, survey_link) per NORC; using (pid, record_id) would
+  # inflate when xwalk has multiple survey_links per (pid, record_id).
   reissue_consented <- raw_wide %>%
     dplyr::filter(pid == reissue_pid_chr, !is.na(consent_date_n)) %>%
-    dplyr::select(pid, record_id, consent_date_n) %>%
-    dplyr::left_join(xwalk %>% dplyr::select(pid, record_id, P_SUID),
-                     by = c("pid", "record_id")) %>%
+    dplyr::select(pid, record_id, survey_link, consent_date_n) %>%
+    dplyr::left_join(xwalk %>% dplyr::select(record_id, survey_link, P_SUID),
+                     by = c("record_id", "survey_link")) %>%
     dplyr::filter(!is.na(P_SUID))
 
   # If a P_SUID activated multiple reissue record_ids, keep the latest consent
@@ -135,11 +144,14 @@ apply_norc_replace_records <- function(raw_wide,
   active_reissue_suids    <- reissue_consented$P_SUID
   active_reissue_recordids <- reissue_consented$record_id
 
-  # Step B — Augment raw_wide with id_xwalk columns
+  # Step B — Augment raw_wide with id_xwalk columns. Join on (record_id,
+  # survey_link) per NORC production-report.R:198 — survey_link is unique per
+  # REDCap submission and selects the one xwalk row that matches the data
+  # even when the original xwalk has multiple survey_links per (pid, record_id).
   augmented <- raw_wide %>%
     dplyr::left_join(
-      xwalk %>% dplyr::select(pid, record_id, P_SUID, P_PIN, survey_link, smoke_case),
-      by = c("pid", "record_id")
+      xwalk %>% dplyr::select(record_id, survey_link, P_SUID, P_PIN, smoke_case),
+      by = c("record_id", "survey_link")
     ) %>%
     dplyr::mutate(in_scope = !is.na(P_SUID))
 
