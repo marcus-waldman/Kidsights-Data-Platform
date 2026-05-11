@@ -4,7 +4,8 @@
 -- Key differences from NE25:
 --   - mn26_raw_wide: Original household-level extraction (1 row per household)
 --   - mn26_raw: Post-pivot long format (1 row per child, child_num = 1 or 2)
---   - 4 eligibility criteria (vs NE25's 9)
+--   - NORC 4-scenario eligibility (vs NE25's 9-CID model);
+--     eligibility lives inside mn26_transformed (no separate table)
 --   - child_num column throughout for multi-child support
 
 -- ============================================================================
@@ -56,30 +57,31 @@ CREATE TABLE IF NOT EXISTS mn26_raw (
 );
 
 -- ============================================================================
--- ELIGIBILITY (4 criteria, evaluated per child)
+-- ELIGIBILITY: now lives inside mn26_transformed (no separate table)
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS mn26_eligibility (
-    record_id INTEGER,
-    pid TEXT,
-    child_num INTEGER,
-
-    -- Individual eligibility checks
-    pass_parent_age BOOLEAN,         -- eq003 == 1 (parent/caregiver >= 19)
-    pass_child_age BOOLEAN,          -- age_in_days_n <= 1825 (0-5 years)
-    pass_primary_caregiver BOOLEAN,  -- eq002 == 1
-    pass_minnesota_residence BOOLEAN, -- mn_eqstate == 1
-
-    -- Overall flag
-    eligible BOOLEAN,
-
-    -- Exclusion reason (if not eligible)
-    exclusion_reason TEXT,
-
-    -- Validation metadata
-    eligibility_validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (record_id, pid, child_num)
-);
+-- Pre-2026-04 design had a 4-criterion check producing pass_consent /
+-- pass_child_age / pass_parent_age / pass_primary_caregiver /
+-- pass_minnesota_residence columns written to a dedicated mn26_eligibility
+-- table. That model was superseded by NORC's 4-scenario classification
+-- (commit 2033bca, "Align analytic sample with NORC norc_shared definition").
+--
+-- The current eligibility columns live as part of mn26_transformed:
+--   elig_type             VARCHAR  -- "1", "2", "3a", "3b", or NULL
+--   solo_kid_elig         BOOLEAN  -- single-child eligibility flag
+--   youngest_kid_elig     BOOLEAN  -- youngest-of-multi eligibility flag
+--   oldest_kid_elig       BOOLEAN  -- oldest-of-multi eligibility flag
+--   elig_kids             INTEGER  -- 0, 1, or 2 eligible children in HH
+--   mn_kids               INTEGER  -- 0, 1, or >1 MN-born under-6 children
+--   screener_complete     BOOLEAN  -- eligibility_form_norc_complete != 0
+--   eligible              BOOLEAN  -- final per-child eligibility flag
+--   last_module_complete  VARCHAR  -- e.g. "Compensation", "Follow-up"
+--   survey_complete       BOOLEAN  -- eligible & last_module in {FU, Comp}
+--   meets_inclusion       BOOLEAN  -- eligible & survey_complete (Step 7)
+--
+-- The previous CREATE TABLE for mn26_eligibility has been removed because
+-- (a) the pipeline doesn't populate it, (b) the Python insert uses
+-- if_exists="replace" so the schema wouldn't be enforced anyway, and (c)
+-- it listed obsolete pass_* columns that no longer exist in any output.
 
 -- ============================================================================
 -- TRANSFORMED DATA (fully derived variables, 1 row per child)
@@ -221,12 +223,10 @@ CREATE INDEX IF NOT EXISTS idx_mn26_raw_pid ON mn26_raw(pid);
 CREATE INDEX IF NOT EXISTS idx_mn26_raw_record ON mn26_raw(record_id);
 CREATE INDEX IF NOT EXISTS idx_mn26_raw_child ON mn26_raw(child_num);
 
--- Eligibility
-CREATE INDEX IF NOT EXISTS idx_mn26_eligibility_eligible ON mn26_eligibility(eligible);
-CREATE INDEX IF NOT EXISTS idx_mn26_eligibility_pid ON mn26_eligibility(pid);
-
--- Transformed
+-- Transformed (eligibility columns now live here; see header above)
 CREATE INDEX IF NOT EXISTS idx_mn26_transformed_inclusion ON mn26_transformed(meets_inclusion);
+CREATE INDEX IF NOT EXISTS idx_mn26_transformed_eligible ON mn26_transformed(eligible);
+CREATE INDEX IF NOT EXISTS idx_mn26_transformed_elig_type ON mn26_transformed(elig_type);
 CREATE INDEX IF NOT EXISTS idx_mn26_transformed_pid ON mn26_transformed(pid);
 CREATE INDEX IF NOT EXISTS idx_mn26_transformed_child ON mn26_transformed(child_num);
 CREATE INDEX IF NOT EXISTS idx_mn26_transformed_raceG ON mn26_transformed(raceG);

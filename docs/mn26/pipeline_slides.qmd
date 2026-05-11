@@ -232,7 +232,7 @@ result$metrics        # timing & counts
 | `female_a1` | `mn2` | `recode__()` L411–458 | **Renamed** from `cqr002`, added non-binary=97 |
 | `educ_a1`, `educ4_*`, `educ6_*` | `cqr004` + `nschj017` | `recode__()` L555–700 | Same coding (0–8) |
 | `income`, `inc99`, `fpl`, `fplcat` | `cqr006`, `consent_date_n`, `fqlive1_*` | `recode__()` L510–553 | **Recoded**: slider $500K → $250K+ |
-| `eligible`, `meets_inclusion` | `eq001`, `age_in_days_n` | `check_mn26_eligibility()` | NORC pre-screened |
+| `eligible`, `elig_type`, `meets_inclusion` | `kids_u6_n`, `mn_birth_c*_n`, `parent_guardian_c*_n`, `age_in_days_*_n`, `consent_date_n`, `eligibility_form_norc_complete` | `norc_elig_screen()` (Step 2.5) + survey completion (Step 6.5) + `apply_mn26_inclusion()` (Step 7) | NORC 4-scenario |
 
 - **Dispatcher:** `recode_it(data, dict, what = "all")` in `R/transform/mn26_transforms.R`
 - **Spot-check pattern:** `table(result$data$cqr009, result$data$female, useNA="always")` — diagonal should be clean
@@ -240,53 +240,43 @@ result$metrics        # timing & counts
 
 ---
 
-## Eligibility: NORC Pre-Screening Model {.smaller}
+## Eligibility: NORC 4-Scenario Model {.smaller}
 
 ::: {.columns}
 ::: {.column width="50%"}
-### Key design decision
+### Source of truth
 
-NORC screens participants **before** routing to REDCap for:
+Eligibility logic is **ported from NORC's `norc_shared` branch**
+(`progress-monitoring/mn26/utils/norc_summarise.R`). The
+classification runs **pre-pivot, household-level** in Step 2.5
+via `norc_elig_screen()`.
 
-- Caregiver age ≥ 19
-- Primary caregiver status
-- Minnesota residence
+A household is eligible iff:
 
-Only approved participants ever see the REDCap survey.
+1. `eligibility_form_norc_complete != 0`, AND
+2. At least one child matches a scenario
 
-**Consequence:** the legacy NE25 fields (`eq002`, `eq003`, `mn_eqstate`)
-are **absent** from production data exports — those columns
-don't exist in the real data.
+All scenarios require: MN-born, age ≤ 2191 days (~6 yr), respondent is parent/guardian.
 
+NE25's `eq001/eq002/eq003/mn_eqstate` are absent from production data — NORC screens off-REDCap.
 :::
 
 ::: {.column width="50%"}
-### Adaptive criteria
+### The four scenarios
 
-**Always required** (pipeline errors if missing):
+| `elig_type` | Households (live 2026-05-11) |
+|---|---:|
+| `"1"` (1 kid u6, MN-born) | 753 |
+| `"2"` (>1 kid u6, exactly 1 MN-born → youngest) | 36 |
+| `"3a"` (>1 kid u6, >1 MN-born → both) | 543 |
+| `"3b"` (>1 kid u6, >1 MN-born → only oldest) | 5 |
+| Ineligible / screener incomplete | 8,695 |
 
-| Criterion | Field |
-|---|---|
-| Informed consent | `eq001 == 1` |
-| Child age 0–5.99 | `age_in_days_n < 2191` |
+**Step 6.5** adds `survey_complete = last_module_complete ∈ {Follow-up, Compensation}`.
 
-**Applied only if columns exist** (skipped in production):
-
-- Parent age ≥ 19 · `eq003`
-- Primary caregiver · `eq002`
-- Minnesota residence · `mn_eqstate`
-
-Verbose output shows exactly which criteria were applied vs. skipped:
-
-```
-Total children:         10773
-Consent (eq001):         1411 [required]
-Child age (<6yr):        1296 [required]
-Parent age (eq003):      column absent [NORC pre-screened, skipped]
-Primary CG (eq002):      column absent [NORC pre-screened, skipped]
-MN residence:            column absent [NORC pre-screened, skipped]
-```
+**Step 7** sets `meets_inclusion = eligible & survey_complete`.
+Matches NORC's `summary_rates` "# HHs completing the survey".
 :::
 :::
 
-**Bottom line:** eligible = passed consent AND valid child age. Scored records (Step 8) are the further subset with ≥ 5 non-missing item responses.
+**Bottom line:** eligibility comes from NORC's eligibility-form fields, not legacy `eq*` checks. Scored records (Step 8) further filter to `meets_inclusion`.

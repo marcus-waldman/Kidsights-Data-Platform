@@ -99,9 +99,11 @@ Key numbers to sanity-check:
   (1 row per household) to long (1 row per child). Households with two
   children contribute two rows. See [pivot logic](#sec-overview).
 - **Eligible « extracted.** NORC projects contain records at all screening
-  stages, not just consented participants. Only records with `eq001 == 1`
-  (informed consent) AND `age_in_days_n <= 1825` (child 0–5 years) pass
-  eligibility. See [eligibility logic](#sec-eligibility) for details.
+  stages, not just consented participants. Eligibility follows NORC's
+  4-scenario classification (`elig_type` ∈ {"1", "2", "3a", "3b"})
+  computed pre-pivot in Step 2.5 from `kids_u6_n`, `mn_birth_c*_n`,
+  `parent_guardian_c*_n`, age ≤ 2191 days, and
+  `eligibility_form_norc_complete`. See [eligibility logic](#sec-eligibility).
 - **Scored < eligible.** `KidsightsPublic::score_kidsights()` requires at
   least 5 non-missing developmental item responses. Eligible children who
   fell short of this threshold (e.g., partial completions) get `NA` for
@@ -128,10 +130,22 @@ were added.
 
 ## Data flow diagram
 
-The diagram below shows the 10-step MN26 pipeline with **real row counts
-from the most recent production run** (10,200 records across 4 NORC
-REDCap projects). Steps are color-coded by phase and annotated with the
-file responsible for each step.
+The diagram below shows the principal phases of the MN26 pipeline with
+**real row counts from the 2026-05-11 live run** (10,600 records across
+4 NORC REDCap projects + the 8792 reissue project). Steps are
+color-coded by phase and annotated with the file responsible for each
+step.
+
+::: {.callout-note}
+The diagram preserves the original 10-step shape for readability, but
+the orchestrator has since expanded to 13 named steps. Additional
+steps not shown here: **2.5** (NORC analytic sample definition;
+`apply_norc_replace_records()` → `apply_norc_sample()` →
+`norc_elig_screen()`), **4.5** (HRTL Motor `_end` catch-up coalesce),
+**6.5** (`compute_mn26_survey_completion()`), **8.5** (CREDI), **8.6**
+(GSED D-score), and **8.7** (HRTL). See the step → file mapping table
+in [Code Organization Map](#sec-code-map) for the full list.
+:::
 
 ```{=html}
 <style>
@@ -190,8 +204,8 @@ file responsible for each step.
   </defs>
 
   <!-- Title -->
-  <text x="480" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">MN26 Pipeline — 10 Steps</text>
-  <text x="480" y="50" text-anchor="middle" font-size="12" fill="#64748b">Data flow with production row counts (4 NORC REDCap projects)</text>
+  <text x="480" y="30" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">MN26 Pipeline — Principal Phases</text>
+  <text x="480" y="50" text-anchor="middle" font-size="12" fill="#64748b">Live run 2026-05-11 (4 NORC projects + 8792 reissue). Orchestrator has 13 named steps; see callout above.</text>
 
   <!-- External: REDCap source (outside pipeline) -->
   <rect x="330" y="80" width="300" height="50" class="external"/>
@@ -216,7 +230,7 @@ file responsible for each step.
   <!-- Count badge after Step 2 -->
   <path d="M 690 220 L 690 270" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="600" y="232" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="248" text-anchor="middle" class="count-badge">10,200 records (wide)</text>
+  <text x="690" y="248" text-anchor="middle" class="count-badge">10,600 records → 10,013 after NORC sample</text>
 
   <!-- Step 3: Pivot -->
   <rect x="500" y="270" width="380" height="60" class="step-box phase-pivot"/>
@@ -226,7 +240,7 @@ file responsible for each step.
   <!-- Count after pivot -->
   <path d="M 690 330 L 690 380" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="560" y="342" width="260" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="358" text-anchor="middle" class="count-badge">10,517 child-rows (10,200 + 317)</text>
+  <text x="690" y="358" text-anchor="middle" class="count-badge">10,562 child-rows (10,013 + 549)</text>
 
   <!-- Step 4: Store raw -->
   <rect x="80" y="380" width="380" height="60" class="step-box phase-store"/>
@@ -245,7 +259,7 @@ file responsible for each step.
   <!-- Count after transform -->
   <path d="M 690 440 L 690 490" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="600" y="452" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="468" text-anchor="middle" class="count-badge">10,517 × 627 cols</text>
+  <text x="690" y="468" text-anchor="middle" class="count-badge">10,562 × 645 cols</text>
 
   <!-- Step 6: Eligibility -->
   <rect x="500" y="490" width="380" height="60" class="step-box phase-eligible"/>
@@ -255,7 +269,7 @@ file responsible for each step.
   <!-- Count after eligibility -->
   <path d="M 690 550 L 690 600" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="600" y="562" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="578" text-anchor="middle" class="count-badge">964 eligible (9.2%)</text>
+  <text x="690" y="578" text-anchor="middle" class="count-badge">1,834 eligible (17.4%)</text>
 
   <!-- Step 7: Inclusion filter -->
   <rect x="500" y="600" width="380" height="60" class="step-box phase-eligible"/>
@@ -265,7 +279,7 @@ file responsible for each step.
   <!-- Count after inclusion -->
   <path d="M 690 660 L 690 710" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="600" y="672" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="688" text-anchor="middle" class="count-badge">964 meets_inclusion</text>
+  <text x="690" y="688" text-anchor="middle" class="count-badge">1,630 meets_inclusion</text>
 
   <!-- Step 8: Scoring -->
   <rect x="500" y="710" width="380" height="60" class="step-box phase-score"/>
@@ -275,7 +289,7 @@ file responsible for each step.
   <!-- Count after scoring -->
   <path d="M 690 770 L 690 820" class="flow-line" marker-end="url(#mn26arrow)"/>
   <rect x="600" y="782" width="180" height="22" rx="4" ry="4" fill="#fee2e2" stroke="#fecaca"/>
-  <text x="690" y="798" text-anchor="middle" class="count-badge">848 scored (of 964)</text>
+  <text x="690" y="798" text-anchor="middle" class="count-badge">1,622 Kidsights · 564 CREDI · 1,625 GSED · 798 HRTL</text>
 
   <!-- Step 9: Store transformed -->
   <rect x="500" y="820" width="380" height="60" class="step-box phase-store"/>
@@ -348,15 +362,24 @@ See [Variable Recoding Reference](#sec-recoding) for the mapping from
 raw fields to derived columns. Output: same 10,517 rows, expanded from
 883 raw columns to ~627 (many raw columns collapse into derived ones).
 
-### Eligibility (Steps 6–7): "Who counts?"
+### Eligibility (Steps 2.5, 6, 6.5, 7): "Who counts?"
 
-Because NORC pre-screens participants before they reach REDCap, only
-two criteria are checked on-REDCap: informed consent (`eq001 == 1`)
-and child age 0–5 years (`age_in_days_n <= 1825`). The legacy NE25
-criteria (`eq002`, `eq003`, `mn_eqstate`) are absent from production
-exports and automatically skipped. Output: **964 eligible children**
-(9.2% of 10,517). For MN26, `meets_inclusion` equals `eligible` with no
-additional filters.
+Eligibility logic is **ported from NORC's `norc_shared` branch** and
+runs pre-pivot at the household level in **Step 2.5**
+(`norc_elig_screen()` in `R/harmonize/mn26_norc_sample.R`). It
+classifies each household into one of four scenarios
+(`elig_type` ∈ {"1", "2", "3a", "3b"}) based on `kids_u6_n`,
+`mn_birth_c*_n`, `parent_guardian_c*_n`, age ≤ 2191 days, and
+`eligibility_form_norc_complete`. The pivot derives per-child
+`eligible` from the household-level scenario flags. **Step 6**
+(`check_mn26_eligibility()`) validates the eligibility columns are
+present and reports a per-child × `elig_type` breakdown. **Step 6.5**
+(`compute_mn26_survey_completion()`) adds `survey_complete`. **Step 7**
+(`apply_mn26_inclusion()`) sets
+`meets_inclusion = eligible & survey_complete` — matching NORC's
+`summary_rates` "# HHs completing the survey" metric. Output from a
+2026-05-11 live run: **1,834 eligible per-child** (17.4% of 10,562),
+**1,630 `meets_inclusion`**.
 
 ### Scoring (Step 8): "What's their developmental score?"
 
@@ -503,7 +526,8 @@ Kidsights-Data-Platform/              <- run commands from here
 │   ├── extract/mn26.R               <- extraction functions
 │   ├── transform/mn26_pivot.R       <- wide-to-long
 │   ├── transform/mn26_transforms.R  <- recode_it() dispatcher
-│   ├── harmonize/mn26_eligibility.R <- 4-criteria check
+│   ├── harmonize/mn26_norc_sample.R <- NORC 4-scenario eligibility (Step 2.5)
+│   ├── harmonize/mn26_eligibility.R <- post-NORC validation + inclusion filter
 │   └── utils/                       <- shared helpers
 ├── config/sources/mn26.yaml         <- config
 ├── pipelines/orchestration/
@@ -664,7 +688,9 @@ section tells you **which file to open for any given concern**.
 | `R/extract/mn26.R` | 235 | REDCap API extraction. Loads credentials, pulls data + dictionary from N projects. | `load_mn26_credentials()`, `extract_mn26_data()`, `extract_mn26_dictionary()` |
 | `R/transform/mn26_pivot.R` | 207 | Wide-to-long pivot for multi-child households. | `pivot_mn26_wide_to_long()` |
 | `R/transform/mn26_transforms.R` | 1390 | Variable recoding dispatcher (race, sex, age, education, income, etc.). | `recode_it()`, `recode__()` (internal) |
-| `R/harmonize/mn26_eligibility.R` | 157 | 4-criteria eligibility check (NORC production-aligned). | `check_mn26_eligibility()`, `apply_mn26_inclusion()` |
+| `R/harmonize/mn26_norc_sample.R` | 333 | NORC 4-scenario eligibility computed pre-pivot (Step 2.5). Ported from `kidsights-norc:norc_shared`. | `apply_norc_replace_records()`, `apply_norc_sample()`, `norc_elig_screen()`, `load_norc_id_xwalk()` |
+| `R/harmonize/mn26_eligibility.R` | 157 | Post-NORC eligibility column validation (Step 6) + inclusion filter (Step 7). | `check_mn26_eligibility()`, `apply_mn26_inclusion()` |
+| `R/transform/mn26_survey_completion.R` | — | Survey-completion derivation (Step 6.5): `last_module_complete`, `survey_complete`. | `compute_mn26_survey_completion()` |
 | `R/utils/flexible_bind_rows.R` | 92 | Resolves column type conflicts when combining multi-project REDCap extracts. | `flexible_bind_rows()` |
 | `R/utils/recode_utils.R` | 23 | Recode sentinel missing codes (99, 9, -99, etc.) to NA. | `recode_missing()` |
 | `R/utils/cpi_utils.R` | 49 | CPI adjustment ratios via FRED API (for income deflation). | `cpi_ratio_1999()` |
@@ -680,12 +706,18 @@ Each of the 10 orchestrator steps calls into specific modules:
 |---|---|---|---|
 | 1 | Load API credentials | `R/extract/mn26.R` | `load_mn26_credentials()` |
 | 2 | Extract REDCap data + dictionary | `R/extract/mn26.R` | `extract_mn26_data()` |
-| 3 | Wide-to-long pivot | `R/transform/mn26_pivot.R` | `pivot_mn26_wide_to_long()` |
+| **2.5** | **NORC analytic sample definition (replace_records → sample → elig_screen)** | `R/harmonize/mn26_norc_sample.R` | `apply_norc_replace_records()`, `apply_norc_sample()`, `norc_elig_screen()` |
+| 3 | Wide-to-long pivot (derives per-child `eligible` from HH flags) | `R/transform/mn26_pivot.R` | `pivot_mn26_wide_to_long()` |
 | 4 | Store raw (wide + long) in DuckDB | `pipelines/python/insert_raw_data.py` (via `system2()`) | — |
+| **4.5** | **HRTL Motor `_end` catch-up coalesce** | `pipelines/orchestration/mn26_pipeline.R` | inline |
 | 5 | Variable transformation | `R/transform/mn26_transforms.R` | `recode_it(data, dict, what = "all")` |
-| 6 | Eligibility validation | `R/harmonize/mn26_eligibility.R` | `check_mn26_eligibility()` |
-| 7 | Create `meets_inclusion` filter | `R/harmonize/mn26_eligibility.R` | `apply_mn26_inclusion()` |
+| 6 | Eligibility validation (post-NORC column check + scenario counts) | `R/harmonize/mn26_eligibility.R` | `check_mn26_eligibility()` |
+| **6.5** | **Survey completion (`last_module_complete`, `survey_complete`)** | `R/transform/mn26_survey_completion.R` | `compute_mn26_survey_completion()` |
+| 7 | Create `meets_inclusion` filter (= `eligible & survey_complete`) | `R/harmonize/mn26_eligibility.R` | `apply_mn26_inclusion()` |
 | 8 | Kidsights developmental scoring | `KidsightsPublic` package | `KidsightsPublic::score_kidsights()` |
+| **8.5** | **CREDI scoring (children under 4)** | `R/credi/score_credi.R` | `score_credi()` |
+| **8.6** | **GSED D-score (all eligible)** | `R/dscore/score_dscore.R` | `score_dscore()` |
+| **8.7** | **HRTL scoring (ages 3–5)** | `R/hrtl/score_hrtl.R` | `score_hrtl()` |
 | 9 | Store transformed data in DuckDB | `pipelines/python/insert_raw_data.py` | — |
 | 10 | Store data dictionary in DuckDB | `pipelines/python/insert_raw_data.py` | — |
 
@@ -887,10 +919,10 @@ NE25.
 
 | Aspect | Value |
 |---|---|
-| Source REDCap fields | `eq001` (consent), `age_in_days_n` (child age); optionally `eq002`, `eq003`, `mn_eqstate` |
-| Function | `check_mn26_eligibility()` + `apply_mn26_inclusion()` in `R/harmonize/mn26_eligibility.R` |
-| Output variables | `pass_consent`, `pass_child_age`, `pass_parent_age`, `pass_primary_caregiver`, `pass_minnesota_residence`, `eligible`, `meets_inclusion`, `exclusion_reason` |
-| NE25 vs MN26 | **ARCHITECTURALLY DIFFERENT**. See [Eligibility Logic](#sec-eligibility) for full details. Required: `eq001 == 1` AND `age_in_days_n <= 1825`. Optional (if columns present): `eq002/eq003/mn_eqstate`. NE25 required all 9 CID checks; MN26 offloads caregiver screening to NORC. |
+| Source REDCap fields | `kids_u6_n`, `mn_birth_c1_n`, `mn_birth_c2_n`, `parent_guardian_c1_n`, `parent_guardian_c2_n`, `dob_n`, `dob_c2_n`, `age_in_days_n`, `age_in_days_c2_n`, `consent_date_n`, `eligibility_form_norc_complete` |
+| Functions | `norc_elig_screen()` in `R/harmonize/mn26_norc_sample.R` (Step 2.5, pre-pivot, HH-level); `check_mn26_eligibility()` in `R/harmonize/mn26_eligibility.R` (Step 6, validates per-child columns); `compute_mn26_survey_completion()` in `R/transform/mn26_survey_completion.R` (Step 6.5); `apply_mn26_inclusion()` in `R/harmonize/mn26_eligibility.R` (Step 7) |
+| Output variables | `mn_kids`, `solo_kid_elig`, `youngest_kid_elig`, `oldest_kid_elig`, `elig_kids`, `elig_type`, `screener_complete`, `eligible`, `last_module_complete`, `survey_complete`, `meets_inclusion` |
+| NE25 vs MN26 | **ARCHITECTURALLY DIFFERENT**. NE25 uses 9 CID checks computed post-pivot. MN26 uses NORC's 4-scenario eligibility (`elig_type` ∈ {"1", "2", "3a", "3b"}) computed pre-pivot in Step 2.5, then gates on `survey_complete` in Step 6.5. See [Eligibility Logic](#sec-eligibility) for full details. |
 
 ---
 
@@ -969,53 +1001,92 @@ values for them.
 
 ## What the pipeline checks
 
-The pipeline's eligibility function (`check_mn26_eligibility()` in
-`R/harmonize/mn26_eligibility.R`) is adaptive: it always checks the
-required criteria, and conditionally applies legacy criteria if the
-columns happen to be present.
+Eligibility follows **NORC's 4-scenario classification**, ported from
+`kidsights-norc:norc_shared` (`progress-monitoring/mn26/utils/norc_summarise.R`).
+The classification runs pre-pivot at the household level in **Step 2.5**
+(`norc_elig_screen()` in `R/harmonize/mn26_norc_sample.R`); per-child
+`eligible` is then derived in the pivot from the household-level
+scenario flags.
 
-### Required criteria (always checked)
+### The four eligibility scenarios
 
-| # | Criterion | Field | Rule |
-|---|---|---|---|
-| 1 | Informed consent | `eq001` | `eq001 == 1` |
-| 2 | Child age 0–5 | `age_in_days_n` | `age_in_days_n <= 1825` |
+A household is eligible iff `eligibility_form_norc_complete != 0` AND at
+least one child satisfies a scenario:
 
-If either required column is missing from the data, the function raises
-an error immediately — this is a structural problem, not a data problem.
+| `elig_type` | When | Eligible child(ren) |
+|---|---|---|
+| `"1"` | 1 child u6, MN-born, age ≤ 2191d, parent/guardian | The single child |
+| `"2"` | >1 child u6, exactly 1 MN-born; youngest qualifies | Youngest only |
+| `"3a"` | >1 child u6, >1 MN-born; youngest qualifies | Both children |
+| `"3b"` | >1 child u6, >1 MN-born; only oldest qualifies | Oldest only |
 
-### Optional criteria (checked only if columns present)
+All scenarios require: MN-born, age ≤ **2191 days (~6 years)**,
+respondent is parent/guardian.
 
-| # | Criterion | Field | Status in production |
-|---|---|---|---|
-| 3 | Caregiver age ≥19 | `eq003` | **Absent** — NORC pre-screened |
-| 4 | Primary caregiver | `eq002` | **Absent** — NORC pre-screened |
-| 5 | Minnesota residence | `mn_eqstate` | **Absent** — NORC pre-screened |
+### NORC eligibility-form fields used as inputs
 
-If a column is absent, the function logs `column absent [NORC pre-screened, skipped]`
-in its verbose output and treats that criterion as effectively passed.
-This is safe because NORC only routes approved participants to REDCap.
+| Field | Meaning |
+|---|---|
+| `kids_u6_n` | Number of children under 6 in HH |
+| `mn_birth_c1_n` | 1 if youngest child is MN-born (binary) |
+| `mn_birth_c2_n` | Count of MN-born older siblings (NA when `kids_u6_n == 1`) |
+| `parent_guardian_c1_n`, `parent_guardian_c2_n` | Respondent is parent/guardian for child 1 / child 2 |
+| `dob_n`, `dob_c2_n` | Birth dates (DOB sanity check: must be ≤ `consent_date_n`) |
+| `age_in_days_n`, `age_in_days_c2_n` | Ages in days (must be ≤ 2191) |
+| `consent_date_n` | Consent date |
+| `eligibility_form_norc_complete` | REDCap completion flag (must be ≠ 0) |
 
-### Final `eligible` flag
+The legacy NE25 fields (`eq001`, `eq002`, `eq003`, `mn_eqstate`) are
+**absent from production data** — NORC pre-screens caregiver age,
+primary caregiver status, and Minnesota residence off-REDCap, so those
+fields are never administered.
+
+### Pre-pivot household-level outputs
+
+`norc_elig_screen()` adds these columns to `raw_wide`:
+
+- `mn_kids` — number of MN-born under-6 children (0/1/>1)
+- `solo_kid_elig` / `youngest_kid_elig` / `oldest_kid_elig` — per-slot eligibility flags
+- `elig_kids` — count of eligible children in HH (0/1/2)
+- `elig_type` — scenario classifier (`"1"`, `"2"`, `"3a"`, `"3b"`, or NA)
+- `screener_complete` — TRUE if `eligibility_form_norc_complete != 0`
+- `eligible` — TRUE if any `elig_type` matched AND `screener_complete`
+
+### Per-child eligibility (derived in pivot)
+
+The pivot derives per-child `eligible` from the HH-level slot flags:
+
+- `child_num == 1` row: `eligible = solo_kid_elig %in% TRUE | youngest_kid_elig %in% TRUE`
+- `child_num == 2` row: `eligible = oldest_kid_elig %in% TRUE`
+
+### Survey completion (Step 6.5)
+
+`compute_mn26_survey_completion()` walks the `*_complete` instrument
+flags and sets:
+
+- `last_module_complete` — name of the last module the respondent
+  reached (e.g., "Module 6 (C1)", "Compensation", "Follow-up")
+- `survey_complete = eligible & last_module_complete %in% {"Follow-up", "Compensation"}`
+
+This is stricter than eligibility alone: an eligible household that
+dropped out mid-survey has `eligible = TRUE` but `survey_complete = FALSE`.
+
+## Inclusion filter (Step 7)
+
+`apply_mn26_inclusion()` sets:
 
 ```
-eligible = pass_consent
-         & pass_child_age
-         & (pass_parent_age          | is.na(pass_parent_age))
-         & (pass_primary_caregiver   | is.na(pass_primary_caregiver))
-         & (pass_minnesota_residence | is.na(pass_minnesota_residence))
+meets_inclusion = eligible & survey_complete
 ```
 
-The `| is.na(...)` clauses mean "if this criterion is missing entirely,
-don't count it against the participant". Legacy fields contribute NA
-rather than FALSE, so they short-circuit correctly.
+This matches NORC's `summary_rates` "# HHs completing the survey"
+metric. Downstream scoring stages (Kidsights, CREDI, GSED, HRTL) all
+filter on `meets_inclusion`. From the first successful live run
+(2026-05-11): 1,834 eligible per-child → 1,630 `meets_inclusion`.
 
-## Inclusion filter
-
-`apply_mn26_inclusion()` copies `eligible` into `meets_inclusion`. For
-MN26, no additional filters (authenticity screening, influential
-observation flagging) are applied — that differs from NE25, which layers
-those checks on top of eligibility.
+Unlike NE25, MN26 does **not** layer authenticity screening or
+influential-observation flagging on top of inclusion — those checks
+don't currently apply to the MN26 cohort.
 
 ## Historical context
 
